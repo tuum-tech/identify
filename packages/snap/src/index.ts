@@ -28,10 +28,8 @@ export const onRpcRequest: OnRpcRequestHandler = ({ origin, request }) => {
         params: [
           {
             prompt: getMessage(origin),
-            description:
-              'This custom confirmation is just for display purposes.',
-            textAreaContent:
-              'But you can edit the snap source code to make it do something, if you want to!',
+            description: 'This is what description will look like',
+            textAreaContent: 'This is what content will look like',
           },
         ],
       });
