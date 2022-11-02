@@ -1,7 +1,6 @@
 {
   "name": "@tuum-tech/identity-snap",
   "version": "0.1.0",
-  "private": true,
   "description": "A snap for managing Decentralized Identifiers(DIDs)",
   "repository": {
     "type": "git",
