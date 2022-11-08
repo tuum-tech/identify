@@ -1,4 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { OnRpcRequestHandler } from '@metamask/snap-types';
+import { getDid } from './did/getDID';
+import { init } from './utils/init';
+import { getCurrentAccount } from './utils/snapUtils';
+import { getSnapStateUnchecked, initAccountState } from './utils/stateUtils';
 
 /**
  * Get a message from the origin. For demonstration purposes only.
@@ -20,7 +25,33 @@ export const getMessage = (originString: string): string =>
  * @throws If the request method is not valid for this snap.
  * @throws If the `snap_confirm` call failed.
  */
-export const onRpcRequest: OnRpcRequestHandler = ({ origin, request }) => {
+export const onRpcRequest: OnRpcRequestHandler = async ({
+  origin,
+  request,
+}) => {
+  let state = await getSnapStateUnchecked(wallet);
+  console.log('state: ', state);
+
+  if (state === null) {
+    state = await init(wallet);
+  }
+
+  const account = await getCurrentAccount(wallet);
+  console.log('account: ', account);
+
+  // FIXME: HANDLE NULL maybe throw ?
+  if (account === null) {
+    return;
+  }
+
+  if (!(account in state.accountState)) {
+    await initAccountState(wallet, state, account);
+  }
+
+  console.log('Request:', request);
+  console.log('Origin:', origin);
+  console.log('-------------------------------------------------------------');
+
   switch (request.method) {
     case 'hello':
       return wallet.request({
@@ -33,6 +64,8 @@ export const onRpcRequest: OnRpcRequestHandler = ({ origin, request }) => {
           },
         ],
       });
+    case 'getDID':
+      return await getDid(wallet, state, account);
     default:
       throw new Error('Method not found.');
   }

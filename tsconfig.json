@@ -4,11 +4,12 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "module": "CommonJS",
-    "moduleResolution": "node",
+    "moduleResolution": "Node",
     "useUnknownInCatchVariables": false,
     "sourceMap": true,
     "strict": true,
-    "target": "ES2017"
+    "typeRoots": ["./node_modules/@types"],
+    "target": "ES2020"
   },
   "exclude": ["**/__snapshots__/**", "**/test/**", "**/*.test.ts"]
 }

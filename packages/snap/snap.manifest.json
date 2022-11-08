@@ -7,7 +7,7 @@
     "url": "https://github.com/tuum-tech/identity-snap.git"
   },
   "source": {
-    "shasum": "p/UtED7hrzp3n89Dp61f37NzbxctQ7Wchwp3Qll8wcs=",
+    "shasum": "XjsqUs2fvraxg8zVZ3fRcJTwrS6SpyXeWiaTVmgsk3s=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -18,7 +18,11 @@
     }
   },
   "initialPermissions": {
-    "snap_confirm": {}
+    "snap_confirm": {},
+    "snap_manageState": {},
+    "eth_accounts": {
+      "requiredMethods": []
+    }
   },
   "manifestVersion": "0.1"
 }
