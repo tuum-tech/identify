@@ -7,10 +7,10 @@
     "url": "https://github.com/tuum-tech/identity-snap.git"
   },
   "source": {
-    "shasum": "XjsqUs2fvraxg8zVZ3fRcJTwrS6SpyXeWiaTVmgsk3s=",
+    "shasum": "VRVZybEJz1kXnPdZFUoRS3Hi4lbD2fxAhqHWUEhKuso=",
     "location": {
       "npm": {
-        "filePath": "dist/bundle.js",
+        "filePath": "dist/snap.js",
         "iconPath": "images/icon.svg",
         "packageName": "@tuum-tech/identity-snap",
         "registry": "https://registry.npmjs.org/"

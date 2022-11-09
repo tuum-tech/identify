@@ -1,6 +1,7 @@
 import { IIdentifier, IKey, VerifiableCredential } from '@veramo/core';
 import { ManagedPrivateKey } from '@veramo/key-manager';
 
+/* eslint-disable */
 export type IdentitySnapState = {
   /**
    * Account specific storage

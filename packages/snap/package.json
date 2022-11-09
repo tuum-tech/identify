@@ -32,9 +32,8 @@
   "scripts": {
     "prebuild": "yarn run clean",
     "build": "webpack && yarn build:snap",
-    "build:snap": "yarn build:snap:postprocess && mm-snap manifest --fix && yarn build:snap:eval",
+    "build:snap": "mm-snap manifest --fix && yarn build:snap:eval",
     "build:snap:eval": "mm-snap eval -b dist/snap.js",
-    "build:snap:postprocess": "node ./src/post-process/post-process.js",
     "clean": "rimraf dist build ",
     "compile": "babel src -d lib",
     "lint": "yarn lint:eslint && yarn lint:misc --check",

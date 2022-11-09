@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable */
 import { OnRpcRequestHandler } from '@metamask/snap-types';
 import { getDid } from './did/getDID';
 import { init } from './utils/init';

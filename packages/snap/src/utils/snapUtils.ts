@@ -3,6 +3,7 @@ import * as ethers from 'ethers';
 import { IdentitySnapState, SnapConfirmParams } from '../interfaces';
 import { updateSnapState } from './stateUtils';
 
+/* eslint-disable */
 /**
  * Function that returns address of the currently selected MetaMask account.
  *
@@ -10,11 +11,10 @@ import { updateSnapState } from './stateUtils';
  *
  * @returns {Promise<string>} address - MetaMask address
  *
- * @beta
  *
  **/
 export async function getCurrentAccount(
-  wallet: SnapProvider,
+  wallet: SnapProvider
 ): Promise<string | null> {
   try {
     const accounts = (await wallet.request({
@@ -39,7 +39,7 @@ export async function getCurrentNetwork(wallet: SnapProvider): Promise<string> {
  */
 export async function togglePopups(
   wallet: SnapProvider,
-  state: IdentitySnapState,
+  state: IdentitySnapState
 ) {
   state.snapConfig.dApp.disablePopups = !state.snapConfig.dApp.disablePopups;
   await updateSnapState(wallet, state);
@@ -52,7 +52,7 @@ export async function togglePopups(
 export async function addFriendlyDapp(
   wallet: SnapProvider,
   state: IdentitySnapState,
-  dapp: string,
+  dapp: string
 ) {
   state.snapConfig.dApp.friendlyDapps.push(dapp);
   await updateSnapState(wallet, state);
@@ -65,7 +65,7 @@ export async function addFriendlyDapp(
 export async function removeFriendlyDapp(
   wallet: SnapProvider,
   state: IdentitySnapState,
-  dapp: string,
+  dapp: string
 ) {
   // FIXME: TEST IF YOU CAN REFERENCE FRIENDLY DAPS
   // let friendlyDapps = state.snapConfig.dApp.friendlyDapps;
@@ -83,7 +83,7 @@ export async function removeFriendlyDapp(
 export async function getPublicKey(
   wallet: SnapProvider,
   state: IdentitySnapState,
-  account: string,
+  account: string
 ): Promise<string> {
   if (state.accountState[account].publicKey !== '')
     return state.accountState[account].publicKey;
@@ -107,7 +107,7 @@ export async function getPublicKey(
 
 export async function snapConfirm(
   wallet: SnapProvider,
-  params: SnapConfirmParams,
+  params: SnapConfirmParams
 ): Promise<boolean> {
   return (await wallet.request({
     method: 'snap_confirm',

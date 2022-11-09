@@ -3,6 +3,7 @@ import { IdentitySnapState } from '../interfaces';
 import { getEmptyAccountState, getInitialSnapState } from './config';
 import { getPublicKey } from './snapUtils';
 
+/* eslint-disable */
 /**
  * Function for updating IdentitySnapState object in the MetaMask state
  *
@@ -15,7 +16,7 @@ import { getPublicKey } from './snapUtils';
  **/
 export async function updateSnapState(
   wallet: SnapProvider,
-  snapState: IdentitySnapState,
+  snapState: IdentitySnapState
 ) {
   await wallet.request({
     method: 'snap_manageState',
@@ -34,7 +35,7 @@ export async function updateSnapState(
  *
  **/
 export async function getSnapStateUnchecked(
-  wallet: SnapProvider,
+  wallet: SnapProvider
 ): Promise<IdentitySnapState | null> {
   return (await wallet.request({
     method: 'snap_manageState',
@@ -53,7 +54,7 @@ export async function getSnapStateUnchecked(
  *
  **/
 export async function initSnapState(
-  wallet: SnapProvider,
+  wallet: SnapProvider
 ): Promise<IdentitySnapState> {
   const state = getInitialSnapState();
   await updateSnapState(wallet, state);
@@ -74,7 +75,7 @@ export async function initSnapState(
 export async function initAccountState(
   wallet: SnapProvider,
   state: IdentitySnapState,
-  account: string,
+  account: string
 ): Promise<void> {
   state.accountState[account] = getEmptyAccountState();
   // FIXME: How to handle if user declines signature ?

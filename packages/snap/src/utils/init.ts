@@ -3,6 +3,7 @@ import { IdentitySnapState } from '../interfaces';
 import { snapConfirm } from './snapUtils';
 import { initSnapState } from './stateUtils';
 
+/* eslint-disable */
 export async function init(wallet: SnapProvider): Promise<IdentitySnapState> {
   const promptObj = {
     prompt: 'Terms and Conditions',
