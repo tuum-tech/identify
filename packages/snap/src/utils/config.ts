@@ -12,8 +12,10 @@ const emptyAccountState = {
   identifiers: {},
   publicKey: '',
   accountConfig: {
-    didMethod: 'did:pkh',
-    vcStore: 'snap',
+    identity: {
+      didMethod: 'did:pkh',
+      vcStore: 'snap',
+    },
   } as IdentityAccountConfig,
 } as IdentityAccountState;
 

@@ -1,19 +1,20 @@
 import { useContext } from 'react';
 import styled from 'styled-components';
-import { MetamaskActions, MetaMaskContext } from '../hooks';
 import {
-  connectSnap,
-  getSnap,
-  sendHello,
-  shouldDisplayReconnectButton,
-} from '../utils';
-import {
+  Card,
   ConnectButton,
   InstallFlaskButton,
   ReconnectButton,
   SendHelloButton,
-  Card,
 } from '../components';
+import { MetamaskActions, MetaMaskContext } from '../hooks';
+import {
+  connectSnap,
+  getDID,
+  getSnap,
+  sendHello,
+  shouldDisplayReconnectButton,
+} from '../utils';
 
 const Container = styled.div`
   display: flex;
@@ -126,6 +127,16 @@ const Index = () => {
     }
   };
 
+  const handleGetDIDClick = async () => {
+    try {
+      const did = await getDID();
+      console.log('Your DID is: ', did);
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
   return (
     <Container>
       <Heading>
@@ -191,6 +202,24 @@ const Index = () => {
             button: (
               <SendHelloButton
                 onClick={handleSendHelloClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'getDID',
+            description: 'Get the current DID of the user',
+            button: (
+              <SendHelloButton
+                onClick={handleGetDIDClick}
                 disabled={!state.installedSnap}
               />
             ),

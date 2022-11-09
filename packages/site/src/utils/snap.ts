@@ -20,7 +20,7 @@ export const getSnaps = async (): Promise<GetSnapsResponse> => {
  */
 export const connectSnap = async (
   snapId: string = defaultSnapOrigin,
-  params: Record<'version' | string, unknown> = {},
+  params: Record<'version' | string, unknown> = {}
 ) => {
   await window.ethereum.request({
     method: 'wallet_enable',
@@ -48,7 +48,7 @@ export const getSnap = async (version?: string): Promise<Snap | undefined> => {
 
     return Object.values(snaps).find(
       (snap) =>
-        snap.id === defaultSnapOrigin && (!version || snap.version === version),
+        snap.id === defaultSnapOrigin && (!version || snap.version === version)
     );
   } catch (e) {
     console.log('Failed to obtain installed snap', e);
@@ -57,7 +57,7 @@ export const getSnap = async (version?: string): Promise<Snap | undefined> => {
 };
 
 /**
- * Invoke the "hello" method from the example snap.
+ * Invoke the "hello" method from the snap.
  */
 
 export const sendHello = async () => {
@@ -67,6 +67,22 @@ export const sendHello = async () => {
       defaultSnapOrigin,
       {
         method: 'hello',
+      },
+    ],
+  });
+};
+
+/**
+ * Invoke the "getDID" method from the snap.
+ */
+
+export const getDID = async () => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: [
+      defaultSnapOrigin,
+      {
+        method: 'getDID',
       },
     ],
   });

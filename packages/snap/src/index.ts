@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { OnRpcRequestHandler } from '@metamask/snap-types';
-import { getDid } from './did/getDID';
+import { getDid } from './rpc/did/getDID';
 import { init } from './utils/init';
 import { getCurrentAccount } from './utils/snapUtils';
 import { getSnapStateUnchecked, initAccountState } from './utils/stateUtils';
@@ -65,7 +65,9 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         ],
       });
     case 'getDID':
-      return await getDid(wallet, state, account);
+      const did = await getDid(wallet, state, account);
+      console.log('DID: ', did);
+      return did;
     default:
       throw new Error('Method not found.');
   }
