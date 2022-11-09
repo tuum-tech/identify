@@ -13444,7 +13444,7 @@ __metadata:
   linkType: hard
 
 "loader-utils@npm:^1.4.1":
-  version: 1.4.0
+  version: 1.4.1
   resolution: "loader-utils@npm:1.4.1"
   dependencies:
     big.js: ^5.2.2
