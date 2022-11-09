@@ -16,7 +16,8 @@ export async function getDid(
   account: string
 ): Promise<string> {
   const method = 'did:pkh';
-  console.log('Current method', method);
   const chain_id = await getCurrentNetwork(wallet);
-  return `did:pkh:eip155:${chain_id}:${account}`;
+  const result = `${method}:eip155:${chain_id}:${account}`;
+  console.log('DID: ', result);
+  return result;
 }
