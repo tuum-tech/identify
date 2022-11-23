@@ -6,11 +6,12 @@ import {
 } from '../interfaces';
 
 const emptyAccountState = {
-  snapKeyStore: {},
   snapPrivateKeyStore: {},
-  vcs: {},
+  snapKeyStore: {},
   identifiers: {},
+  vcs: {},
   publicKey: '',
+  privateKey: '',
   accountConfig: {
     identity: {
       didMethod: 'did:pkh',

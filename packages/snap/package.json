@@ -47,6 +47,8 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.20.1",
+    "@hashgraph/sdk": "^2.18.6",
+    "@metamask/key-tree": "^6.0.0",
     "@veramo/core": "^4.1.1",
     "@veramo/key-manager": "^4.1.1",
     "ethers": "^5.7.2"

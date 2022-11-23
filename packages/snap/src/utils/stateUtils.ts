@@ -79,6 +79,9 @@ export async function initAccountState(
 ): Promise<void> {
   state.accountState[account] = getEmptyAccountState();
   // FIXME: How to handle if user declines signature ?
+  /* const privateKey = await getPrivateKey(wallet);
+  console.log('privatekey: ', privateKey);
+  state.accountState[account].privateKey = privateKey; */
   const publicKey = await getPublicKey(wallet, state, account);
   state.accountState[account].publicKey = publicKey;
   await updateSnapState(wallet, state);
