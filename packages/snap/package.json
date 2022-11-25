@@ -51,10 +51,7 @@
     "@metamask/key-tree": "^6.0.0",
     "@veramo/core": "^4.1.1",
     "@veramo/key-manager": "^4.1.1",
-    "ethers": "^5.7.2",
-    "multibase": "^4.0.6",
-    "multicodec": "^3.2.1",
-    "secp256k1": "^4.0.3"
+    "ethers": "^5.7.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.2",
@@ -72,7 +69,6 @@
     "@metamask/snaps-webpack-plugin": "^0.23.0",
     "@types/jest": "^29.2.2",
     "@types/lodash.clonedeep": "^4.5.7",
-    "@types/secp256k1": "^4.0.3",
     "@typescript-eslint/eslint-plugin": "^5.33.0",
     "@typescript-eslint/parser": "^5.33.0",
     "babel-loader": "^9.1.0",

@@ -1,17 +1,5 @@
-import {
-  AccountId,
-  AccountInfoQuery,
-  Client,
-  PrivateKey,
-  PublicKey,
-} from '@hashgraph/sdk';
-
-import Multibase from 'multibase';
-import Multicodec from 'multicodec';
-
 import { ethers } from 'ethers';
 import { IdentitySnapState } from '../interfaces';
-import { getCompressedPublicKey } from '../utils/snapUtils';
 
 /* eslint-disable */
 /*
@@ -22,17 +10,6 @@ Note the prefix of "0.0" indicating the shard and realm
 This is especially useful when the account has no HBAR because an account with some HBAR 
 takes the form of 0.0.123
 */
-export async function recoveredPublicKeyToAccountId(
-  state: IdentitySnapState,
-  account: string
-): Promise<AccountId> {
-  const compressed = ethers.utils.computePublicKey(
-    ethers.utils.arrayify(state.accountState[account].publicKey),
-    true
-  );
-
-  return PublicKey.fromString(compressed).toAccountId(0, 0);
-}
 
 /* export async function transferHbarsToAccount(
   operatorId: any,
@@ -41,6 +18,40 @@ export async function recoveredPublicKeyToAccountId(
   accountId: AccountId
 ): Promise<any> {
   client.setOperator(operatorId, operatorPrivateKey);
+
+  console.log("Transferring some Hbar to the new account");
+    let transaction = await new TransferTransaction()
+        .addHbarTransfer(wallet.getAccountId(), new Hbar(10).negated())
+        .addHbarTransfer(aliasAccountId, new Hbar(10))
+        .freezeWithSigner(wallet);
+    transaction = await transaction.signWithSigner(wallet);
+
+    const response = await transaction.executeWithSigner(wallet);
+    await response.getReceiptWithSigner(wallet);
+
+    const balance = await new AccountBalanceQuery()
+        .setNodeAccountIds([response.nodeId])
+        .setAccountId(aliasAccountId)
+        .executeWithSigner(wallet);
+
+    console.log(`Balances of the new account: ${balance.toString()}`);
+
+    const info = await new AccountInfoQuery()
+        .setNodeAccountIds([response.nodeId])
+        .setAccountId(aliasAccountId)
+        .executeWithSigner(wallet);
+
+    console.log(`Info about the new account: ${info.toString()}`);
+
+    
+     * Note that once an account exists in the ledger, it is assigned a normal AccountId, which can be retrieved
+     * via an AccountInfoQuery.
+     *
+     * Users may continue to refer to the account by its aliasKey AccountId, but they may also
+     * now refer to it by its normal AccountId
+     *
+
+    //console.log(`The normal account ID: ${info.accountId.toString()}`);
 
   const transferTransaction = await new TransferTransaction()
     .addHbarTransfer(client.operatorAccountId, new Hbar(amount).negated())
@@ -55,67 +66,42 @@ This function is used to generate account ID from the EVM address. It'll return 
 with a null aliasKey member with the form 
 0.0.123
 Note the prefix of "0.0" indicating the shard and realm
-
- return new AccountInfoQuery({
-    accountId: AccountId.fromEvmAddress(0, 0, evmAddress),
-  }).execute(client);
 */
-/* export async function getAccountInfo(
+export async function getAccountInfo(
   state: IdentitySnapState,
   account: string
 ): Promise<string> {
-  const publicKey = PublicKey.fromString(state.accountState[account].publicKey);
-  const privateKey = PrivateKey.fromString(
-    state.accountState[account].privateKey
-  );
-  const aliasAccountId = publicKey.toAccountId(0, 0);
-  const hederaWallet = new Wallet(aliasAccountId, privateKey);
-
-  const info = await new AccountInfoQuery()
-    .setAccountId(aliasAccountId)
-    .executeWithSigner(hederaWallet);
-  return info.toString();
-} */
-
-export async function getAccountInfo(account: string, state: IdentitySnapState,): Promise<String> {
-  // Operator account ID and private key from string value
-  const OPERATOR_ID = AccountId.fromString('0.0.48865029');
-  const OPERATOR_KEY = PrivateKey.fromString(
-    '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c'
+  const compressedKey = ethers.utils.computePublicKey(
+    ethers.utils.arrayify(state.accountState[account].publicKey),
+    true
   );
 
-  // Pre-configured client for test network (testnet)
-  // TODO: Configure client based on whether it's a testnet, previewnet or mainnet
-  const client = Client.forTestnet();
+  async function mirrorQuery(url: RequestInfo | URL) {
+    let response = await fetch(url);
+    let info = await response.json();
+    return info;
+  }
+  // Returns all account information for the given public key
+  const accountInfoUrl = `https://testnet.mirrornode.hedera.com/api/v1/accounts?account.publickey=${compressedKey}`;
+  let accountInfoResult = await mirrorQuery(accountInfoUrl);
 
-  //Set the operator with the operator ID and operator key
-  client.setOperator(OPERATOR_ID, OPERATOR_KEY);
-
-  // console.log('client: ', JSON.stringify(client, null, 4));
-
-  let compressedKey = getCompressedPublicKey(
-    state.accountState[account].publicKey
-  );
-
-  const publicKey = PublicKey.fromString(compressedKey);
-  const aliasAccountId = publicKey.toAccountId(0, 0);
-
-  console.log("account: ", account);
-  const result = AccountId.fromEvmAddress(0, 0, account).toString()
-  console.log("result: ", result);
-  return result;
-  /* const info = await new AccountInfoQuery()
-        .setAccountId(aliasAccountId)
-        .execute(client);
- 
-    console.log(`The normal account ID: ${info.accountId}`);
-    console.log(`Account Balance: ${info.balance}`); */
-
-/*   const info = await new AccountInfoQuery({
-    accountId: AccountId.fromEvmAddress(0, 0, account),
-  }).execute(client); */
-  //console.log('info: ', info);
-
-  //if (info.accountId) return info.accountId.toString();
-  //else return '';
+  let accountId: string = '';
+  // This Hbar account needs some HBAR to be activated on the ledger
+  if (
+    accountInfoResult.hasOwnProperty('accounts') &&
+    accountInfoResult.accounts.length > 0
+  ) {
+    for (let i = 0; i < accountInfoResult.accounts.length; i++) {
+      const result = accountInfoResult.accounts[i];
+      if (result.evm_address === account) {
+        accountId = result.account;
+        break;
+      }
+    }
+  } else {
+    // This Hbar account is not activated on the ledger yet. Need to send some HBAR to this account to activate it first
+    // TODO: Transfer HBAR to this account then get account info: https://github.com/hashgraph/hedera-sdk-js/blob/develop/examples/account-alias.js
+  }
+  console.log('accountId: ', accountId);
+  return accountId;
 }

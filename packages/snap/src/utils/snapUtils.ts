@@ -1,4 +1,3 @@
-import { publicKeyConvert } from 'secp256k1';
 import {
   getBIP44AddressKeyDeriver,
   JsonBIP44CoinTypeNode,
@@ -109,20 +108,6 @@ export async function getPublicKey(
   const msgHashBytes = ethers.utils.arrayify(msgHash);
 
   return ethers.utils.recoverPublicKey(msgHashBytes, signedMsg);
-}
-
-export function getCompressedPublicKey(publicKey: string): string {
-  return _uint8ArrayToHex(
-    publicKeyConvert(_hexToUnit8Array(publicKey.split('0x')[1]), true)
-  );
-}
-
-export function _uint8ArrayToHex(arr: any) {
-  return Buffer.from(arr).toString('hex');
-}
-
-export function _hexToUnit8Array(str: any) {
-  return new Uint8Array(Buffer.from(str, 'hex'));
 }
 
 /**
