@@ -1,8 +1,13 @@
-import { getBIP44AddressKeyDeriver } from '@metamask/key-tree';
+import { publicKeyConvert } from 'secp256k1';
+import {
+  getBIP44AddressKeyDeriver,
+  JsonBIP44CoinTypeNode,
+} from '@metamask/key-tree';
 import { SnapProvider } from '@metamask/snap-types';
 import * as ethers from 'ethers';
 import { IdentitySnapState, SnapConfirmParams } from '../interfaces';
 import { updateSnapState } from './stateUtils';
+import { getMetamaskVersion, isNewerVersion } from './version';
 
 /* eslint-disable */
 /**
@@ -106,6 +111,20 @@ export async function getPublicKey(
   return ethers.utils.recoverPublicKey(msgHashBytes, signedMsg);
 }
 
+export function getCompressedPublicKey(publicKey: string): string {
+  return _uint8ArrayToHex(
+    publicKeyConvert(_hexToUnit8Array(publicKey.split('0x')[1]), true)
+  );
+}
+
+export function _uint8ArrayToHex(arr: any) {
+  return Buffer.from(arr).toString('hex');
+}
+
+export function _hexToUnit8Array(str: any) {
+  return new Uint8Array(Buffer.from(str, 'hex'));
+}
+
 /**
  *  Get the private key for the current account using snap_getBip44Entropy.
  *
@@ -113,13 +132,22 @@ export async function getPublicKey(
  */
 export async function getPrivateKey(wallet: SnapProvider): Promise<string> {
   console.log('wallet: ', wallet);
+  const bip44Code = 3030;
+  const currentVersion = await getMetamaskVersion(wallet);
+  let hbarNode: JsonBIP44CoinTypeNode;
   // coin_type 3030 = HBAR. Refer to https://github.com/satoshilabs/slips/blob/master/slip-0044.md
-  const hbarNode: any = await wallet.request({
-    method: 'snap_getBip44Entropy',
-    params: {
-      coinType: 3030,
-    },
-  });
+  if (isNewerVersion('MetaMask/v10.18.99-flask.0', currentVersion))
+    hbarNode = (await wallet.request({
+      method: 'snap_getBip44Entropy',
+      params: {
+        coinType: Number(bip44Code),
+      },
+    })) as JsonBIP44CoinTypeNode;
+  else
+    hbarNode = (await wallet.request({
+      method: `snap_getBip44Entropy_${bip44Code}`,
+      params: [],
+    })) as JsonBIP44CoinTypeNode;
   console.log('hbarNode: ', hbarNode);
 
   // Next, we'll create an address key deriver function for the Dogecoin coin_type node.

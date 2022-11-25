@@ -66,7 +66,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       });
     case 'getDID':
       console.log('Trying to call getDID API');
-      const info = await getAccountInfo(account);
+      const info = await getAccountInfo(account, state);
       return info;
     /* case 'getDID':
       const did = await getDid(wallet, state, account);

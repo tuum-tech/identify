@@ -6,8 +6,12 @@ import {
   PublicKey,
 } from '@hashgraph/sdk';
 
+import Multibase from 'multibase';
+import Multicodec from 'multicodec';
+
 import { ethers } from 'ethers';
 import { IdentitySnapState } from '../interfaces';
+import { getCompressedPublicKey } from '../utils/snapUtils';
 
 /* eslint-disable */
 /*
@@ -73,7 +77,7 @@ Note the prefix of "0.0" indicating the shard and realm
   return info.toString();
 } */
 
-export async function getAccountInfo(account: string): Promise<String> {
+export async function getAccountInfo(account: string, state: IdentitySnapState,): Promise<String> {
   // Operator account ID and private key from string value
   const OPERATOR_ID = AccountId.fromString('0.0.48865029');
   const OPERATOR_KEY = PrivateKey.fromString(
@@ -87,13 +91,31 @@ export async function getAccountInfo(account: string): Promise<String> {
   //Set the operator with the operator ID and operator key
   client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-  console.log('client: ', JSON.stringify(client, null, 4));
+  // console.log('client: ', JSON.stringify(client, null, 4));
 
-  const info = await new AccountInfoQuery({
+  let compressedKey = getCompressedPublicKey(
+    state.accountState[account].publicKey
+  );
+
+  const publicKey = PublicKey.fromString(compressedKey);
+  const aliasAccountId = publicKey.toAccountId(0, 0);
+
+  console.log("account: ", account);
+  const result = AccountId.fromEvmAddress(0, 0, account).toString()
+  console.log("result: ", result);
+  return result;
+  /* const info = await new AccountInfoQuery()
+        .setAccountId(aliasAccountId)
+        .execute(client);
+ 
+    console.log(`The normal account ID: ${info.accountId}`);
+    console.log(`Account Balance: ${info.balance}`); */
+
+/*   const info = await new AccountInfoQuery({
     accountId: AccountId.fromEvmAddress(0, 0, account),
-  }).execute(client);
-  console.log('info: ', info);
+  }).execute(client); */
+  //console.log('info: ', info);
 
-  if (info.accountId) return info.accountId.toString();
-  else return '';
+  //if (info.accountId) return info.accountId.toString();
+  //else return '';
 }
