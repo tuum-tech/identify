@@ -34,7 +34,6 @@ export interface IdentityAccountState {
   identifiers: Record<string, IIdentifier>;
   vcs: Record<string, VerifiableCredential>;
   publicKey: string;
-  privateKey: string;
   accountConfig: IdentityAccountConfig;
 }
 
