@@ -1,6 +1,7 @@
 /* eslint-disable */
 import { OnRpcRequestHandler } from '@metamask/snap-types';
-import { getAccountInfo } from './hedera/hederaSdk';
+import { getAccountId } from './hedera/hederaSdk';
+import { getDid } from './rpc/did/getDID';
 import { init } from './utils/init';
 import { getCurrentAccount } from './utils/snapUtils';
 import { getSnapStateUnchecked, initAccountState } from './utils/stateUtils';
@@ -65,13 +66,13 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         ],
       });
     case 'getDID':
-      console.log('Trying to call getDID API');
-      const info = await getAccountInfo(state, account);
-      return info;
-    /* case 'getDID':
       const did = await getDid(wallet, state, account);
       console.log('DID: ', did);
-      return did; */
+      return did;
+    case 'getHederaAccountId':
+      const accountId = await getAccountId(state, account);
+      console.log('Account Id: ', accountId);
+      return accountId;
     default:
       throw new Error('Method not found.');
   }

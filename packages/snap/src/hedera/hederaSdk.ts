@@ -67,7 +67,7 @@ with a null aliasKey member with the form
 0.0.123
 Note the prefix of "0.0" indicating the shard and realm
 */
-export async function getAccountInfo(
+export async function getAccountId(
   state: IdentitySnapState,
   account: string
 ): Promise<string> {
@@ -102,6 +102,5 @@ export async function getAccountInfo(
     // This Hbar account is not activated on the ledger yet. Need to send some HBAR to this account to activate it first
     // TODO: Transfer HBAR to this account then get account info: https://github.com/hashgraph/hedera-sdk-js/blob/develop/examples/account-alias.js
   }
-  console.log('accountId: ', accountId);
   return accountId;
 }
