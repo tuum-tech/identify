@@ -1,7 +1,3 @@
-import {
-  getBIP44AddressKeyDeriver,
-  JsonBIP44CoinTypeNode,
-} from '@metamask/key-tree';
 import { SnapProvider } from '@metamask/snap-types';
 import * as ethers from 'ethers';
 import { IdentitySnapState, SnapConfirmParams } from '../interfaces';

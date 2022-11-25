@@ -69,10 +69,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       const did = await getDid(wallet, state, account);
       console.log('DID: ', did);
       return did;
-    case 'getHederaAccountId':
-      const accountId = await getAccountId(state, account);
-      console.log('Account Id: ', accountId);
-      return accountId;
     default:
       throw new Error('Method not found.');
   }
