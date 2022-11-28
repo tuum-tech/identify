@@ -11,6 +11,7 @@ const emptyAccountState = {
   identifiers: {},
   vcs: {},
   publicKey: '',
+  privateKey: '',
   accountConfig: {
     identity: {
       didMethod: 'did:pkh',

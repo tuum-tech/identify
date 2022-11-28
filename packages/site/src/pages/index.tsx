@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import {
   Card,
@@ -103,6 +103,8 @@ const ErrorMessage = styled.div`
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
 
+  const [hederaAccountId, setHederaAccountId] = useState('0.0.48865029');
+
   const handleConnectClick = async () => {
     try {
       await connectSnap();
@@ -129,7 +131,7 @@ const Index = () => {
 
   const handleGetDIDClick = async () => {
     try {
-      const did = await getDID();
+      const did = await getDID(hederaAccountId);
       console.log('Your DID is: ', did);
     } catch (e) {
       console.error(e);
@@ -213,24 +215,38 @@ const Index = () => {
             !shouldDisplayReconnectButton(state.installedSnap)
           }
         />
-        <Card
-          content={{
-            title: 'getDID',
-            description: 'Get the current DID of the user',
-            button: (
-              <SendHelloButton
-                onClick={handleGetDIDClick}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
+        <div>
+          <Card
+            content={{
+              title: 'getDID',
+              description: 'Get the current DID of the user',
+              form: (
+                <form>
+                  <label>
+                    Enter your Hedera Account ID
+                    <input
+                      type="text"
+                      value={hederaAccountId}
+                      onChange={(e) => setHederaAccountId(e.target.value)}
+                    />
+                  </label>
+                </form>
+              ),
+              button: (
+                <SendHelloButton
+                  onClick={handleGetDIDClick}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        </div>
         <Notice>
           <p>
             Please note that the <b>snap.manifest.json</b> and{' '}

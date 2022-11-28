@@ -4408,6 +4408,7 @@ __metadata:
     "@veramo/core": ^4.1.1
     "@veramo/key-manager": ^4.1.1
     babel-loader: ^9.1.0
+    bignumber.js: ^9.1.0
     eslint: ^8.21.0
     eslint-config-prettier: ^8.1.0
     eslint-plugin-import: ^2.26.0

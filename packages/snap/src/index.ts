@@ -1,6 +1,5 @@
 /* eslint-disable */
 import { OnRpcRequestHandler } from '@metamask/snap-types';
-import { getAccountId } from './hedera/hederaSdk';
 import { getDid } from './rpc/did/getDID';
 import { init } from './utils/init';
 import { getCurrentAccount } from './utils/snapUtils';
@@ -66,7 +65,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         ],
       });
     case 'getDID':
-      const did = await getDid(wallet, state, account);
+      const did = await getDid(wallet, state, account, request.params);
       console.log('DID: ', did);
       return did;
     default:

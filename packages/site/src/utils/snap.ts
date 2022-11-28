@@ -76,13 +76,16 @@ export const sendHello = async () => {
  * Invoke the "getDID" method from the snap.
  */
 
-export const getDID = async () => {
+export const getDID = async (hederaAccountId: string = '') => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: [
       defaultSnapOrigin,
       {
         method: 'getDID',
+        params: {
+          hederaAccountId,
+        },
       },
     ],
   });

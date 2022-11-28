@@ -79,9 +79,13 @@ export async function initAccountState(
 ): Promise<void> {
   state.accountState[account] = getEmptyAccountState();
   // FIXME: How to handle if user declines signature ?
-  /* const privateKey = await getPrivateKey(wallet);
-  console.log('privatekey: ', privateKey);
-  state.accountState[account].privateKey = privateKey; */
+  /* TODO: Uncomment this when snap issue of permission with snap_getBip44Entropy is resolved
+  const privateKey = await getPrivateKey(wallet);
+  state.accountState[account].privateKey = privateKey;
+  */
+  // TODO: Modify this to test locally by passing in a hardcoded private key of your metamask wallet
+  state.accountState[account].privateKey =
+    '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c';
   const publicKey = await getPublicKey(wallet, state, account);
   state.accountState[account].publicKey = publicKey;
   await updateSnapState(wallet, state);
