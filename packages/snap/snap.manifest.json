@@ -7,7 +7,7 @@
     "url": "https://github.com/tuum-tech/identity-snap.git"
   },
   "source": {
-    "shasum": "MvgMIipdL1g+nM2vvFVaStlVZA+E/znMyuFB2CLvg1U=",
+    "shasum": "TdG90kdNpAE8p/LX3TrFg5jcs/RIqcTgv0GuqldjDow=",
     "location": {
       "npm": {
         "filePath": "dist/snap.js",
@@ -21,9 +21,14 @@
     "endowment:network-access": {},
     "snap_confirm": {},
     "snap_manageState": {},
-    "eth_accounts": {
-      "requiredMethods": []
-    }
+    "snap_getBip44Entropy": [
+      {
+        "coinType": 1
+      },
+      {
+        "coinType": 3030
+      }
+    ]
   },
   "manifestVersion": "0.1"
 }

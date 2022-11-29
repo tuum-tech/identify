@@ -1,7 +1,7 @@
 import { SnapProvider } from '@metamask/snap-types';
+import { getKeyPair } from '../hedera/wallet/account';
 import { IdentitySnapState } from '../interfaces';
 import { getEmptyAccountState, getInitialSnapState } from './config';
-import { getPublicKey } from './snapUtils';
 
 /* eslint-disable */
 /**
@@ -79,14 +79,14 @@ export async function initAccountState(
 ): Promise<void> {
   state.accountState[account] = getEmptyAccountState();
   // FIXME: How to handle if user declines signature ?
-  /* TODO: Uncomment this when snap issue of permission with snap_getBip44Entropy is resolved
-  const privateKey = await getPrivateKey(wallet);
+  /* TODO: Uncomment this when snap issue of permission with snap_getBip44Entropy is resolved */
+  const { privateKey, publicKey } = await getKeyPair(wallet);
+  console.log('privateKey: ', privateKey);
+  console.log('publicKey: ', publicKey);
   state.accountState[account].privateKey = privateKey;
-  */
   // TODO: Modify this to test locally by passing in a hardcoded private key of your metamask wallet
-  state.accountState[account].privateKey =
-    '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c';
-  const publicKey = await getPublicKey(wallet, state, account);
+  //state.accountState[account].privateKey = '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c';
+  // const publicKey = await getPublicKey(wallet, state, account);
   state.accountState[account].publicKey = publicKey;
   await updateSnapState(wallet, state);
 }

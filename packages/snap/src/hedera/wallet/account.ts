@@ -4,32 +4,24 @@ import {
 } from '@metamask/key-tree';
 import { SnapProvider } from '@metamask/snap-types';
 import { ethers } from 'ethers';
-import { IdentitySnapState } from '../../interfaces';
-import { getMetamaskVersion, isNewerVersion } from '../../utils/version';
+import { IdentitySnapState, KeyPair } from '../../interfaces';
 
 /* eslint-disable */
 /**
  * Return derived KeyPair from seed.
  * @param wallet
  */
-export async function getPrivateKey(wallet: SnapProvider): Promise<string> {
+export async function getKeyPair(wallet: SnapProvider): Promise<KeyPair> {
   console.log('wallet: ', wallet);
-  const bip44Code = 3030;
-  const currentVersion = await getMetamaskVersion(wallet);
-  let hbarNode: JsonBIP44CoinTypeNode;
+
   // coin_type 3030 = HBAR. Refer to https://github.com/satoshilabs/slips/blob/master/slip-0044.md
-  if (isNewerVersion('MetaMask/v10.18.99-flask.0', currentVersion))
-    hbarNode = (await wallet.request({
-      method: 'snap_getBip44Entropy',
-      params: {
-        coinType: Number(bip44Code),
-      },
-    })) as JsonBIP44CoinTypeNode;
-  else
-    hbarNode = (await wallet.request({
-      method: `snap_getBip44Entropy_${bip44Code}`,
-      params: [],
-    })) as JsonBIP44CoinTypeNode;
+  const bip44Code = 3030;
+  let hbarNode: JsonBIP44CoinTypeNode = (await wallet.request({
+    method: 'snap_getBip44Entropy',
+    params: {
+      coinType: Number(bip44Code),
+    },
+  })) as JsonBIP44CoinTypeNode;
   console.log('hbarNode: ', hbarNode);
 
   // Next, we'll create an address key deriver function for the Dogecoin coin_type node.
@@ -43,12 +35,13 @@ export async function getPrivateKey(wallet: SnapProvider): Promise<string> {
   // A complete BIP-44 HD tree path consists of the following nodes:
   // m / 44 / coin_type / account' / change / address_index
   // m / 44' / 3030' / 0' / 0 / 0
-  const addressKey0 = await deriveHbarAddress(0);
-  console.log('addressKey0:', addressKey0);
-  if (addressKey0.privateKey) {
-    console.log('addressKey0.privateKey:', addressKey0.privateKey);
-    return addressKey0.privateKey;
-  } else return '';
+  const extendedPrivateKey0 = await deriveHbarAddress(0);
+  console.log('extendedPrivateKey0:', extendedPrivateKey0);
+
+  return {
+    privateKey: extendedPrivateKey0.privateKey,
+    publicKey: extendedPrivateKey0.publicKey,
+  } as KeyPair;
 }
 
 /*

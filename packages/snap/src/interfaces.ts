@@ -50,3 +50,9 @@ export type SnapConfirmParams = {
   description?: string;
   textAreaContent?: string;
 };
+
+export type KeyPair = {
+  address: string;
+  privateKey: string;
+  publicKey: string;
+};
