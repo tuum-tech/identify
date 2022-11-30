@@ -1,6 +1,6 @@
 import {
   getBIP44AddressKeyDeriver,
-  JsonBIP44CoinTypeNode,
+  JsonBIP44CoinTypeNode
 } from '@metamask/key-tree';
 import { SnapProvider } from '@metamask/snap-types';
 import { ethers } from 'ethers';
@@ -36,7 +36,7 @@ export async function getKeyPair(wallet: SnapProvider): Promise<KeyPair> {
   // m / 44 / coin_type / account' / change / address_index
   // m / 44' / 3030' / 0' / 0 / 0
   const extendedPrivateKey0 = await deriveHbarAddress(0);
-  console.log('extendedPrivateKey0:', extendedPrivateKey0);
+  console.log('extendedPrivateKey0 keys:', extendedPrivateKey0.privateKey,extendedPrivateKey0.publicKey, extendedPrivateKey0.address );
 
   return {
     privateKey: extendedPrivateKey0.privateKey,

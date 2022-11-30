@@ -29,16 +29,16 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
 }) => {
-  console.log('wallet:', JSON.stringify(wallet, null, 4));
+  console.log('wallet:', wallet);
   let state = await getSnapStateUnchecked(wallet);
-  console.log('state:', JSON.stringify(state, null, 4));
+  console.log('state:', state);
 
   if (state === null) {
     state = await init(wallet);
   }
 
   const account = await getCurrentAccount(wallet);
-  console.log('account:', JSON.stringify(account, null, 4));
+  console.log('account:', account);
 
   // FIXME: HANDLE NULL maybe throw ?
   if (account === null) {
