@@ -9,6 +9,7 @@ import {
 } from '../components';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
 import {
+  configureHederaAccount,
   connectSnap,
   getDID,
   getSnap,
@@ -102,7 +103,11 @@ const ErrorMessage = styled.div`
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
+  const [hederaAccountConfigure, setHederaAccountConfigure] = useState(false);
 
+  const [hederaPrivateKey, setHederaPrivateKey] = useState(
+    '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c'
+  );
   const [hederaAccountId, setHederaAccountId] = useState('0.0.48865029');
 
   const handleConnectClick = async () => {
@@ -129,10 +134,34 @@ const Index = () => {
     }
   };
 
+  const handleConfigureHederaAccountClick = async () => {
+    try {
+      const configured = await configureHederaAccount(
+        hederaPrivateKey,
+        hederaAccountId
+      );
+      console.log('configured: ', configured);
+      if (configured) {
+        setHederaAccountConfigure(true);
+      } else {
+        console.log('Hedera Account was not configured correctly');
+      }
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
   const handleGetDIDClick = async () => {
     try {
-      const did = await getDID(hederaAccountId);
-      console.log('Your DID is: ', did);
+      if (hederaAccountConfigure) {
+        const did = await getDID();
+        console.log('Your DID is: ', did);
+      } else {
+        console.log(
+          'Hedera Account has not yet been imported. Please call the "configure" API first'
+        );
+      }
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -215,38 +244,63 @@ const Index = () => {
             !shouldDisplayReconnectButton(state.installedSnap)
           }
         />
-        <div>
-          <Card
-            content={{
-              title: 'getDID',
-              description: 'Get the current DID of the user',
-              form: (
-                <form>
-                  <label>
-                    Enter your Hedera Account ID
-                    <input
-                      type="text"
-                      value={hederaAccountId}
-                      onChange={(e) => setHederaAccountId(e.target.value)}
-                    />
-                  </label>
-                </form>
-              ),
-              button: (
-                <SendHelloButton
-                  onClick={handleGetDIDClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        </div>
+        <Card
+          content={{
+            title: 'configureHederaAccount',
+            description: 'Configure your Hedera Account',
+            form: (
+              <form>
+                <label>
+                  Enter your Hedera Private Key
+                  <input
+                    type="text"
+                    value={hederaPrivateKey}
+                    onChange={(e) => setHederaPrivateKey(e.target.value)}
+                  />
+                </label>
+                <br />
+                <label>
+                  Enter your Hedera Account ID
+                  <input
+                    type="text"
+                    value={hederaAccountId}
+                    onChange={(e) => setHederaAccountId(e.target.value)}
+                  />
+                </label>
+              </form>
+            ),
+            button: (
+              <SendHelloButton
+                onClick={handleConfigureHederaAccountClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'getDID',
+            description: 'Get the current DID of the user',
+            button: (
+              <SendHelloButton
+                onClick={handleGetDIDClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!(state.installedSnap && hederaAccountConfigure)}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
         <Notice>
           <p>
             Please note that the <b>snap.manifest.json</b> and{' '}

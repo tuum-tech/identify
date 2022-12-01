@@ -80,6 +80,7 @@ async function testClientOperatorMatch(client: Client) {
   try {
     await tx.execute(client);
   } catch (err) {
+    console.log(`Error: ${err}`);
     if (err instanceof StatusError) {
       if (
         err.status === Status.InsufficientTxFee ||

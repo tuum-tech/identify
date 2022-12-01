@@ -7,7 +7,7 @@ import {
   useReducer,
 } from 'react';
 import { Snap } from '../types';
-import { isFlask, getSnap } from '../utils';
+import { getSnap, isFlask } from '../utils';
 
 export type MetamaskState = {
   isFlask: boolean;

@@ -10,8 +10,6 @@ const emptyAccountState = {
   snapKeyStore: {},
   identifiers: {},
   vcs: {},
-  publicKey: '',
-  privateKey: '',
   accountConfig: {
     identity: {
       didMethod: 'did:pkh',
@@ -35,8 +33,23 @@ const initialSnapState: IdentitySnapState = {
       acceptedTerms: true,
     },
   },
+  hederaAccount: {
+    privateKey: '',
+    publicKey: '',
+    accountId: '',
+  },
 };
 
 export const getInitialSnapState = () => {
   return cloneDeep(initialSnapState);
+};
+
+const hederaChainIDs = new Map([
+  ['0x127', 'mainnet'],
+  ['0x128', 'testnet'],
+  ['0x129', 'previewnet'],
+  ['0x12a', 'localnet'],
+]);
+export const getHederaChainIDs = () => {
+  return cloneDeep(hederaChainIDs);
 };

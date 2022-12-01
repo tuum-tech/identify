@@ -2,7 +2,11 @@
 import { OnRpcRequestHandler } from '@metamask/snap-types';
 import { getDid } from './rpc/did/getDID';
 import { init } from './utils/init';
-import { getCurrentAccount } from './utils/snapUtils';
+import {
+  isHederaAccountImported,
+  isValidHederaAccountParams,
+} from './utils/params';
+import { configureHederaAccount, getCurrentAccount } from './utils/snapUtils';
 import { getSnapStateUnchecked, initAccountState } from './utils/stateUtils';
 
 /**
@@ -53,6 +57,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   console.log('Origin:', origin);
   console.log('-------------------------------------------------------------');
 
+  console.log('hedera Account: ', state.hederaAccount);
+
   switch (request.method) {
     case 'hello':
       return wallet.request({
@@ -65,8 +71,18 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           },
         ],
       });
+    // You need to first configure the hedera account before any other APIs can be called because
+    // we need to set the private key and the accountId of a hedera account
+    case 'configureHederaAccount':
+      isValidHederaAccountParams(request.params);
+      return configureHederaAccount(
+        state,
+        request.params.privateKey,
+        request.params.accountId
+      );
     case 'getDID':
-      const did = await getDid(wallet, state, account, request.params);
+      isHederaAccountImported(state);
+      const did = await getDid(wallet, state, account);
       console.log('DID: ', did);
       return did;
     default:

@@ -13,6 +13,11 @@ export type IdentitySnapState = {
    * Configuration for IdentitySnap
    */
   snapConfig: IdentitySnapConfig;
+
+  /**
+   * Configuration for Hedera Account
+   */
+  hederaAccount: HederaAccount;
 };
 
 export interface IdentitySnapConfig {
@@ -33,8 +38,6 @@ export interface IdentityAccountState {
   snapKeyStore: Record<string, IKey>;
   identifiers: Record<string, IIdentifier>;
   vcs: Record<string, VerifiableCredential>;
-  publicKey: string;
-  privateKey: string;
   accountConfig: IdentityAccountConfig;
 }
 
@@ -45,14 +48,14 @@ export interface IdentityAccountConfig {
   };
 }
 
+export interface HederaAccount {
+  privateKey: string;
+  publicKey: string;
+  accountId: string;
+}
+
 export type SnapConfirmParams = {
   prompt: string;
   description?: string;
   textAreaContent?: string;
-};
-
-export type KeyPair = {
-  address: string;
-  privateKey: string;
-  publicKey: string;
 };

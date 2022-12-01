@@ -1,8 +1,11 @@
+import { AccountId, PrivateKey } from '@hashgraph/sdk';
 import { SnapProvider } from '@metamask/snap-types';
-import * as ethers from 'ethers';
+import { HederaServiceImpl } from '../hedera';
+import { WalletHedera } from '../hedera/wallet/abstract';
+import { PrivateKeySoftwareWallet } from '../hedera/wallet/software-private-key';
 import { IdentitySnapState, SnapConfirmParams } from '../interfaces';
+import { getHederaChainIDs } from './config';
 import { updateSnapState } from './stateUtils';
-import { getMetamaskVersion, isNewerVersion } from './version';
 
 /* eslint-disable */
 /**
@@ -76,12 +79,51 @@ export async function removeFriendlyDapp(
   await updateSnapState(wallet, state);
 }
 
+export async function configureHederaAccount(
+  state: IdentitySnapState,
+  _privateKey: string,
+  _accountId: string
+): Promise<boolean> {
+  const hederaChainIDs = getHederaChainIDs();
+  const chain_id = await getCurrentNetwork(wallet);
+  if (Array.from(hederaChainIDs.keys()).includes(chain_id)) {
+    const accountId = AccountId.fromString(_accountId);
+    const privateKey = PrivateKey.fromStringECDSA(_privateKey);
+    const publicKey = privateKey.publicKey;
+    const walletHedera: WalletHedera = new PrivateKeySoftwareWallet(privateKey);
+    const hedera = new HederaServiceImpl();
+
+    const client = await hedera.createClient({
+      walletHedera,
+      keyIndex: 0,
+      accountId: accountId,
+      network: hederaChainIDs.get(chain_id) as string,
+    });
+    if (client != null) {
+      state.hederaAccount.privateKey = _privateKey;
+      state.hederaAccount.publicKey = publicKey.toStringRaw();
+      state.hederaAccount.accountId = _accountId;
+      await updateSnapState(wallet, state);
+      return true;
+    } else {
+      console.error('Invalid private key or account Id');
+      return false;
+    }
+  } else {
+    console.error(
+      'Invalid Chain ID. Valid chainIDs for Hedera: [0x127: mainnet, 0x128: testnet, 0x129: previewnet, 0x12a: localnet]'
+    );
+    return false;
+  }
+}
+
 /**
+ *  UNUSEDFUNCTION
  *  Generate the public key for the current account using personal_sign.
  *
  * @returns {Promise<string>} - returns public key for current account
  */
-export async function getPublicKey(
+/* export async function getPublicKey(
   wallet: SnapProvider,
   state: IdentitySnapState,
   account: string
@@ -104,7 +146,7 @@ export async function getPublicKey(
   const msgHashBytes = ethers.utils.arrayify(msgHash);
 
   return ethers.utils.recoverPublicKey(msgHashBytes, signedMsg);
-}
+} */
 
 export async function snapConfirm(
   wallet: SnapProvider,
