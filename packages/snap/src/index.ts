@@ -1,10 +1,13 @@
 /* eslint-disable */
 import { OnRpcRequestHandler } from '@metamask/snap-types';
+import { getAvailableMethods } from './rpc/did/getAvailableMethods';
 import { getDid } from './rpc/did/getDID';
+import { switchMethod } from './rpc/did/switchMethods';
 import { init } from './utils/init';
+import { switchNetworkIfNecessary } from './utils/network';
 import {
-  isHederaAccountImported,
   isValidHederaAccountParams,
+  isValidSwitchMethodRequest,
 } from './utils/params';
 import { configureHederaAccount, getCurrentAccount } from './utils/snapUtils';
 import { getSnapStateUnchecked, initAccountState } from './utils/stateUtils';
@@ -33,31 +36,30 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
 }) => {
-  console.log('wallet:', wallet);
   let state = await getSnapStateUnchecked(wallet);
-  console.log('state:', state);
 
   if (state === null) {
     state = await init(wallet);
   }
+  console.log('state:', state);
 
-  const account = await getCurrentAccount(wallet);
+  const account = await getCurrentAccount(wallet, state);
   console.log('account:', account);
 
   // FIXME: HANDLE NULL maybe throw ?
   if (account === null) {
     return;
+  } else {
+    state.currentAccount = account;
   }
 
   if (!(account in state.accountState)) {
-    await initAccountState(wallet, state, account);
+    await initAccountState(wallet, state);
   }
 
   console.log('Request:', request);
   console.log('Origin:', origin);
   console.log('-------------------------------------------------------------');
-
-  console.log('hedera Account: ', state.hederaAccount);
 
   switch (request.method) {
     case 'hello':
@@ -80,11 +82,18 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         request.params.privateKey,
         request.params.accountId
       );
+    case 'switchMethod':
+      isValidSwitchMethodRequest(request.params);
+      return await switchMethod(wallet, state, request.params.didMethod);
     case 'getDID':
-      isHederaAccountImported(state);
-      const did = await getDid(wallet, state, account);
-      console.log('DID: ', did);
-      return did;
+      await switchNetworkIfNecessary(wallet, state);
+      return await getDid(wallet, state);
+    case 'getCurrentDIDMethod':
+      await switchNetworkIfNecessary(wallet, state);
+      return state.accountState[state.currentAccount].accountConfig.identity
+        .didMethod;
+    case 'getAvailableMethods':
+      return getAvailableMethods();
     default:
       throw new Error('Method not found.');
   }

@@ -5,6 +5,7 @@ import { WalletHedera } from '../hedera/wallet/abstract';
 import { PrivateKeySoftwareWallet } from '../hedera/wallet/software-private-key';
 import { IdentitySnapState, SnapConfirmParams } from '../interfaces';
 import { getHederaChainIDs } from './config';
+import { isHederaAccountImported } from './params';
 import { updateSnapState } from './stateUtils';
 
 /* eslint-disable */
@@ -18,16 +19,29 @@ import { updateSnapState } from './stateUtils';
  *
  **/
 export async function getCurrentAccount(
-  wallet: SnapProvider
+  wallet: SnapProvider,
+  state: IdentitySnapState
 ): Promise<string | null> {
-  try {
-    const accounts = (await wallet.request({
-      method: 'eth_requestAccounts',
-    })) as Array<string>;
-    console.log('MetaMask accounts', accounts);
-    return accounts[0];
-  } catch (e) {
-    return null;
+  const chain_id = await getCurrentNetwork(wallet);
+  const hederaChainIDs = getHederaChainIDs();
+  if (
+    Array.from(hederaChainIDs.keys()).includes(chain_id) &&
+    isHederaAccountImported(state)
+  ) {
+    // Handle Hedera
+    console.log('Hedera Metamask account: ', state.hederaAccount);
+    return state.hederaAccount.accountId;
+  } else {
+    // Handle everything else
+    try {
+      const accounts = (await wallet.request({
+        method: 'eth_requestAccounts',
+      })) as Array<string>;
+      console.log('MetaMask accounts', accounts);
+      return accounts[0];
+    } catch (e) {
+      return null;
+    }
   }
 }
 
@@ -100,6 +114,9 @@ export async function configureHederaAccount(
       network: hederaChainIDs.get(chain_id) as string,
     });
     if (client != null) {
+      if (_accountId !== state.currentAccount) {
+        state.currentAccount = _accountId;
+      }
       state.hederaAccount.privateKey = _privateKey;
       state.hederaAccount.publicKey = publicKey.toStringRaw();
       state.hederaAccount.accountId = _accountId;

@@ -5,8 +5,7 @@ import { getCurrentDid } from '../../utils/didUtils';
 /* eslint-disable */
 export async function getDid(
   wallet: SnapProvider,
-  state: IdentitySnapState,
-  account: string
+  state: IdentitySnapState
 ): Promise<string> {
-  return await getCurrentDid(wallet, state, account);
+  return await getCurrentDid(wallet, state);
 }

@@ -11,6 +11,7 @@ import { MetamaskActions, MetaMaskContext } from '../hooks';
 import {
   configureHederaAccount,
   connectSnap,
+  getCurrentDIDMethod,
   getDID,
   getSnap,
   sendHello,
@@ -143,6 +144,7 @@ const Index = () => {
       console.log('configured: ', configured);
       if (configured) {
         setHederaAccountConfigure(true);
+        alert('Hedera Account configuration was successful');
       } else {
         console.log('Hedera Account was not configured correctly');
       }
@@ -152,16 +154,22 @@ const Index = () => {
     }
   };
 
+  const handleGetCurrentDIDMethodClick = async () => {
+    try {
+      const currentDIDMethod = await getCurrentDIDMethod();
+      console.log(`Your current DID method is: ${currentDIDMethod}`);
+      alert(`Your current DID method is: ${currentDIDMethod}`);
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
   const handleGetDIDClick = async () => {
     try {
-      if (hederaAccountConfigure) {
-        const did = await getDID();
-        console.log('Your DID is: ', did);
-      } else {
-        console.log(
-          'Hedera Account has not yet been imported. Please call the "configure" API first'
-        );
-      }
+      const did = await getDID();
+      console.log(`Your DID is: ${did}`);
+      alert(`Your DID is: ${did}`);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -285,6 +293,24 @@ const Index = () => {
         />
         <Card
           content={{
+            title: 'getCurrentDIDMethod',
+            description: 'Get the current DID method to use',
+            button: (
+              <SendHelloButton
+                onClick={handleGetCurrentDIDMethodClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
             title: 'getDID',
             description: 'Get the current DID of the user',
             button: (
@@ -294,7 +320,7 @@ const Index = () => {
               />
             ),
           }}
-          disabled={!(state.installedSnap && hederaAccountConfigure)}
+          disabled={!state.installedSnap}
           fullWidth={
             state.isFlask &&
             Boolean(state.installedSnap) &&

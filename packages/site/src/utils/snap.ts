@@ -96,6 +96,22 @@ export const configureHederaAccount = async (
 };
 
 /**
+ * Invoke the "getCurrentDIDMethod" method from the snap.
+ */
+
+export const getCurrentDIDMethod = async () => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: [
+      defaultSnapOrigin,
+      {
+        method: 'getCurrentDIDMethod',
+      },
+    ],
+  });
+};
+
+/**
  * Invoke the "getDID" method from the snap.
  */
 

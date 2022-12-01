@@ -1,9 +1,9 @@
 import { IIdentifier, IKey, VerifiableCredential } from '@veramo/core';
 import { ManagedPrivateKey } from '@veramo/key-manager';
-import { availableMethods } from './did/didMethods';
 
 /* eslint-disable */
 export type IdentitySnapState = {
+  currentAccount: string;
   /**
    * Account specific storage
    */
@@ -43,7 +43,7 @@ export interface IdentityAccountState {
 
 export interface IdentityAccountConfig {
   identity: {
-    didMethod: typeof availableMethods[number];
+    didMethod: string;
     vcStore: string;
   };
 }

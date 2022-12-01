@@ -23,6 +23,7 @@ export const getEmptyAccountState = () => {
 };
 
 const initialSnapState: IdentitySnapState = {
+  currentAccount: '',
   accountState: {},
   snapConfig: {
     dApp: {

@@ -1,28 +1,37 @@
 import { SnapProvider } from '@metamask/snap-types';
 import { IdentitySnapState } from '../interfaces';
 import { getHederaChainIDs } from './config';
+import { isHederaAccountImported } from './params';
 import { getCurrentNetwork } from './snapUtils';
 
 /* eslint-disable */
 export async function getCurrentDid(
   wallet: SnapProvider,
-  state: IdentitySnapState,
-  account: string
+  state: IdentitySnapState
 ): Promise<string> {
-  const method = state.accountState[account].accountConfig.identity.didMethod;
-
-  let result = ``;
-  // Chain Id of Ethereum = 0x1
-  // For Hedera, the local and previewnet are 0x12a (298)
-  // Previewnet = 0x129 (297); Testnet = 0x128 (296); Mainnet = 0x127 (295)
+  let did: string = '';
+  const method =
+    state.accountState[state.currentAccount].accountConfig.identity.didMethod;
   const chain_id = await getCurrentNetwork(wallet);
   const hederaChainIDs = getHederaChainIDs();
-  if (Array.from(hederaChainIDs.keys()).includes(chain_id)) {
-    result = `${method}:hedera:${hederaChainIDs.get(chain_id)}:${
-      state.hederaAccount.accountId
-    }`;
+
+  if (method === 'did:pkh') {
+    if (
+      Array.from(hederaChainIDs.keys()).includes(chain_id) &&
+      isHederaAccountImported(state)
+    ) {
+      // Handle Hedera
+      did = `${method}:hedera:${hederaChainIDs.get(chain_id)}:${
+        state.hederaAccount.accountId
+      }`;
+    } else {
+      // Handle everything else
+      did = `${method}:eip155:${chain_id}:${state.currentAccount}`;
+    }
   } else {
-    result = `${method}:eip155:${chain_id}:${account}`;
+    throw new Error(
+      'did method not supported. Supported methods are: ["did:pkh"]'
+    );
   }
-  return result;
+  return did;
 }

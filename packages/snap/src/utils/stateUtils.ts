@@ -33,6 +33,28 @@ export async function updateSnapState(
  * @beta
  *
  **/
+export async function getSnapState(
+  wallet: SnapProvider
+): Promise<IdentitySnapState> {
+  const state = (await wallet.request({
+    method: 'snap_manageState',
+    params: ['get'],
+  })) as IdentitySnapState | null;
+
+  if (!state) throw Error('IdentitySnapState is not initialized!');
+  return state;
+}
+
+/**
+ * Function to retrieve IdentitySnapState object from the MetaMask state
+ *
+ * @public
+ *
+ * @returns {Promise<IdentitySnapState>} object from the state
+ *
+ * @beta
+ *
+ **/
 export async function getSnapStateUnchecked(
   wallet: SnapProvider
 ): Promise<IdentitySnapState | null> {
@@ -73,9 +95,8 @@ export async function initSnapState(
  **/
 export async function initAccountState(
   wallet: SnapProvider,
-  state: IdentitySnapState,
-  account: string
+  state: IdentitySnapState
 ): Promise<void> {
-  state.accountState[account] = getEmptyAccountState();
+  state.accountState[state.currentAccount] = getEmptyAccountState();
   await updateSnapState(wallet, state);
 }

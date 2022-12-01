@@ -25,17 +25,35 @@ export function isValidHederaAccountParams(
   throw new Error('Invalid Hedera Params passed');
 }
 
-export function isHederaAccountImported(state: IdentitySnapState) {
+export function isHederaAccountImported(state: IdentitySnapState): boolean {
   if (
-    state.hederaAccount.privateKey !== null &&
-    state.hederaAccount.publicKey !== null &&
-    state.hederaAccount.accountId !== null
+    state.hederaAccount.privateKey !== '' &&
+    state.hederaAccount.publicKey !== '' &&
+    state.hederaAccount.accountId !== ''
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+type SwitchMethodRequestParams = {
+  didMethod: string;
+};
+
+export function isValidSwitchMethodRequest(
+  params: unknown
+): asserts params is SwitchMethodRequestParams {
+  if (
+    params != null &&
+    typeof params === 'object' &&
+    'didMethod' in params &&
+    (params as SwitchMethodRequestParams).didMethod != null &&
+    typeof (params as SwitchMethodRequestParams).didMethod === 'string'
   )
     return;
 
-  throw new Error(
-    'Hedera Account has not yet been imported. Please call the "configure" API first'
-  );
+  throw new Error('Invalid switchMethod request.');
 }
 
 type SaveVCRequestParams = { verifiableCredential: VerifiableCredential };
