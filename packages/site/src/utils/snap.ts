@@ -127,4 +127,20 @@ export const getDID = async () => {
   });
 };
 
+/**
+ * Invoke the "getVCStore" method from the snap.
+ */
+
+export const getVCStore = async () => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: [
+      defaultSnapOrigin,
+      {
+        method: 'getVCStore',
+      },
+    ],
+  });
+};
+
 export const isLocalSnap = (snapId: string) => snapId.startsWith('local:');

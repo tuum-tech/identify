@@ -14,6 +14,7 @@ import {
   getCurrentDIDMethod,
   getDID,
   getSnap,
+  getVCStore,
   sendHello,
   shouldDisplayReconnectButton,
 } from '../utils';
@@ -176,6 +177,17 @@ const Index = () => {
     }
   };
 
+  const handleGetVCsClick = async () => {
+    try {
+      const vcs = await getVCStore();
+      console.log(`Your VC Store is: ${vcs}`);
+      // alert(`Your DID is: ${did}`);
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
   return (
     <Container>
       <Heading>
@@ -316,6 +328,24 @@ const Index = () => {
             button: (
               <SendHelloButton
                 onClick={handleGetDIDClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'getVCs',
+            description: 'Get the VCs of the user',
+            button: (
+              <SendHelloButton
+                onClick={handleGetVCsClick}
                 disabled={!state.installedSnap}
               />
             ),
