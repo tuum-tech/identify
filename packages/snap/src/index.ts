@@ -3,13 +3,14 @@ import { OnRpcRequestHandler } from '@metamask/snap-types';
 import { getAvailableMethods } from './rpc/did/getAvailableMethods';
 import { getDid } from './rpc/did/getDID';
 import { switchMethod } from './rpc/did/switchMethods';
+import { configureHederaAccount } from './rpc/hedera/configureAccount';
 import { init } from './utils/init';
 import { switchNetworkIfNecessary } from './utils/network';
 import {
   isValidHederaAccountParams,
   isValidSwitchMethodRequest,
 } from './utils/params';
-import { configureHederaAccount, getCurrentAccount } from './utils/snapUtils';
+import { getCurrentAccount } from './utils/snapUtils';
 import { getSnapStateUnchecked, initAccountState } from './utils/stateUtils';
 
 /**
@@ -36,6 +37,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
 }) => {
+  console.log('wallet: ', wallet);
   let state = await getSnapStateUnchecked(wallet);
 
   if (state === null) {
@@ -43,12 +45,28 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   }
   console.log('state:', state);
 
+  /* 
+    We will need to call this API before trying to get the account because sometimes when connecting to hedera,
+    the account may be null but to set the account, we need to call this API so it's a chicken and egg problem.
+    To avoid the error, we are calling this method in the beginning 
+    To set the account for Hedera, we need to set the private key and the accountId first
+   */
+  if (request.method == 'configureHederaAccount') {
+    isValidHederaAccountParams(request.params);
+    return configureHederaAccount(
+      state,
+      request.params.privateKey,
+      request.params.accountId
+    );
+  }
   const account = await getCurrentAccount(wallet, state);
   console.log('account:', account);
 
   // FIXME: HANDLE NULL maybe throw ?
   if (account === null) {
-    return;
+    throw new Error(
+      'Error while trying to get the account. Please connect to an account first'
+    );
   } else {
     state.currentAccount = account;
   }
@@ -73,15 +91,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           },
         ],
       });
-    // You need to first configure the hedera account before any other APIs can be called because
-    // we need to set the private key and the accountId of a hedera account
-    case 'configureHederaAccount':
-      isValidHederaAccountParams(request.params);
-      return configureHederaAccount(
-        state,
-        request.params.privateKey,
-        request.params.accountId
-      );
+
     case 'switchMethod':
       isValidSwitchMethodRequest(request.params);
       return await switchMethod(wallet, state, request.params.didMethod);
@@ -95,6 +105,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     case 'getAvailableMethods':
       return getAvailableMethods();
     default:
-      throw new Error('Method not found.');
+      console.error('Method not found');
+      throw new Error('Method not found');
   }
 };

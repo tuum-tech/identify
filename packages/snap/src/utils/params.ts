@@ -22,6 +22,7 @@ export function isValidHederaAccountParams(
   )
     return;
 
+  console.error('Invalid Hedera Params passed');
   throw new Error('Invalid Hedera Params passed');
 }
 
@@ -53,7 +54,8 @@ export function isValidSwitchMethodRequest(
   )
     return;
 
-  throw new Error('Invalid switchMethod request.');
+  console.error('Invalid switchMethod request');
+  throw new Error('Invalid switchMethod request');
 }
 
 type SaveVCRequestParams = { verifiableCredential: VerifiableCredential };
@@ -68,5 +70,6 @@ export function isValidSaveVCRequest(
   )
     return;
 
+  console.error('Invalid SaveVC request');
   throw new Error('Invalid SaveVC request');
 }

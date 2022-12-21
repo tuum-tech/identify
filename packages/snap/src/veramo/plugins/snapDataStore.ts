@@ -125,6 +125,9 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
     const existingEntry =
       state.accountState[account].snapPrivateKeyStore[alias];
     if (existingEntry && existingEntry.privateKeyHex !== args.privateKeyHex) {
+      console.error(
+        'key_already_exists: key exists with different data, please use a different alias'
+      );
       throw new Error(
         'key_already_exists: key exists with different data, please use a different alias'
       );

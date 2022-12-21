@@ -1,4 +1,14 @@
-import type { AccountId, PrivateKey, PublicKey } from '@hashgraph/sdk';
+import type {
+  AccountId,
+  Hbar,
+  LedgerId,
+  PrivateKey,
+  PublicKey,
+  Timestamp,
+} from '@hashgraph/sdk';
+import TokenRelationship from '@hashgraph/sdk/lib/account/TokenRelationship';
+import Duration from '@hashgraph/sdk/lib/Duration';
+import StakingInfo from '@hashgraph/sdk/lib/StakingInfo';
 import { BigNumber } from 'bignumber.js';
 
 import { WalletHedera } from './wallet/abstract';
@@ -15,11 +25,6 @@ export interface HederaService {
     // account ID we wish to associate with the wallet
     accountId: AccountId;
   }): Promise<SimpleHederaClient | null>;
-
-  getMirrorAccountInfo(
-    network: 'mainnet' | 'testnet' | 'previewnet',
-    accountId: AccountId
-  ): Promise<MirrorAccountInfo>;
 }
 
 export interface SimpleHederaClient {
@@ -32,17 +37,36 @@ export interface SimpleHederaClient {
   // get the associated account ID
   getAccountId(): AccountId;
 
+  getAccountInfo(accountId: string): Promise<HederaAccountInfo>;
+
   createAccount(options: {
     publicKey: PublicKey;
     initialBalance: BigNumber;
   }): Promise<AccountId | null>;
 }
 
-export interface MirrorAccountInfo {
-  account: string;
-  ethereum_nonce?: number;
-  evm_address?: string;
-  staked_account_id?: string;
-  staked_node_id?: number;
-  stake_period_start?: number;
+export interface HederaAccountInfo {
+  accountId: AccountId;
+  aliasKey: PublicKey;
+  autoRenewPeriod: Duration;
+  balance: Hbar;
+  contractAccountId: string;
+  ethereumNonce: Long;
+  expirationTime: Timestamp;
+  hbarAllowances: Object;
+  isDeleted: boolean;
+  isReceiverSignatureRequired: boolean;
+  key: PublicKey;
+  ledgerId: LedgerId;
+  liveHashes: Object;
+  maxAutomaticTokenAssociations: Long;
+  nftAllowances: Object;
+  ownedNfts: Long;
+  proxyAccountId: Object;
+  proxyReceived: Hbar;
+  receiveRecordThreshold: Hbar;
+  sendRecordThreshold: Hbar;
+  stakingInfo: StakingInfo;
+  tokenAllowances: Object;
+  tokenRelationships: TokenRelationship;
 }
