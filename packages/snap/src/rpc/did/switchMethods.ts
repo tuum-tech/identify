@@ -14,6 +14,9 @@ export async function switchMethod(
     state.accountState[state.currentAccount].accountConfig.identity.didMethod;
   const newDidMethod = availableMethods.find((k) => k === didMethod);
   if (!newDidMethod) {
+    console.error(
+      'did method not supported. Supported methods are: ["did:pkh"]'
+    );
     throw new Error(
       'did method not supported. Supported methods are: ["did:pkh"]'
     );

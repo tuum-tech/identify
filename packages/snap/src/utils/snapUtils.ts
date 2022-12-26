@@ -1,8 +1,4 @@
-import { AccountId, PrivateKey } from '@hashgraph/sdk';
 import { SnapProvider } from '@metamask/snap-types';
-import { HederaServiceImpl } from '../hedera';
-import { WalletHedera } from '../hedera/wallet/abstract';
-import { PrivateKeySoftwareWallet } from '../hedera/wallet/software-private-key';
 import { IdentitySnapState, SnapConfirmParams } from '../interfaces';
 import { getHederaChainIDs } from './config';
 import { isHederaAccountImported } from './params';
@@ -22,26 +18,41 @@ export async function getCurrentAccount(
   wallet: SnapProvider,
   state: IdentitySnapState
 ): Promise<string | null> {
-  const chain_id = await getCurrentNetwork(wallet);
-  const hederaChainIDs = getHederaChainIDs();
-  if (
-    Array.from(hederaChainIDs.keys()).includes(chain_id) &&
-    isHederaAccountImported(state)
-  ) {
-    // Handle Hedera
-    console.log('Hedera Metamask account: ', state.hederaAccount);
-    return state.hederaAccount.accountId;
-  } else {
-    // Handle everything else
-    try {
+  try {
+    if (
+      wallet.selectedAddress &&
+      wallet.selectedAddress !== state.currentAccount
+    ) {
+      state.currentAccount = wallet.selectedAddress;
+      await updateSnapState(wallet, state);
+    }
+
+    const chain_id = await getCurrentNetwork(wallet);
+    const hederaChainIDs = getHederaChainIDs();
+    if (Array.from(hederaChainIDs.keys()).includes(chain_id)) {
+      // Handle Hedera
+      if (isHederaAccountImported(state)) {
+        console.log(
+          `Hedera Metamask accounts: EVM Address: ${state.hederaAccount.evmAddress}, AccountId: ${state.hederaAccount.accountId}`
+        );
+        return state.hederaAccount.evmAddress;
+      } else {
+        console.error(
+          'Hedera Network was selected but Hedera Account has not yet been configured. Please configure it first by calling "configureHederaAccount" API'
+        );
+        return null;
+      }
+    } else {
+      // Handle everything else
       const accounts = (await wallet.request({
         method: 'eth_requestAccounts',
       })) as Array<string>;
-      console.log('MetaMask accounts', accounts);
+      console.log(`MetaMask accounts: EVM Address: ${accounts}`);
       return accounts[0];
-    } catch (e) {
-      return null;
     }
+  } catch (e) {
+    console.error(`Error while trying to get the account: ${e}`);
+    return null;
   }
 }
 
@@ -93,47 +104,6 @@ export async function removeFriendlyDapp(
   await updateSnapState(wallet, state);
 }
 
-export async function configureHederaAccount(
-  state: IdentitySnapState,
-  _privateKey: string,
-  _accountId: string
-): Promise<boolean> {
-  const hederaChainIDs = getHederaChainIDs();
-  const chain_id = await getCurrentNetwork(wallet);
-  if (Array.from(hederaChainIDs.keys()).includes(chain_id)) {
-    const accountId = AccountId.fromString(_accountId);
-    const privateKey = PrivateKey.fromStringECDSA(_privateKey);
-    const publicKey = privateKey.publicKey;
-    const walletHedera: WalletHedera = new PrivateKeySoftwareWallet(privateKey);
-    const hedera = new HederaServiceImpl();
-
-    const client = await hedera.createClient({
-      walletHedera,
-      keyIndex: 0,
-      accountId: accountId,
-      network: hederaChainIDs.get(chain_id) as string,
-    });
-    if (client != null) {
-      if (_accountId !== state.currentAccount) {
-        state.currentAccount = _accountId;
-      }
-      state.hederaAccount.privateKey = _privateKey;
-      state.hederaAccount.publicKey = publicKey.toStringRaw();
-      state.hederaAccount.accountId = _accountId;
-      await updateSnapState(wallet, state);
-      return true;
-    } else {
-      console.error('Invalid private key or account Id');
-      return false;
-    }
-  } else {
-    console.error(
-      'Invalid Chain ID. Valid chainIDs for Hedera: [0x127: mainnet, 0x128: testnet, 0x129: previewnet, 0x12a: localnet]'
-    );
-    return false;
-  }
-}
-
 /**
  *  UNUSEDFUNCTION
  *  Generate the public key for the current account using personal_sign.
@@ -155,6 +125,7 @@ export async function configureHederaAccount(
       params: ['getPublicKey', account],
     })) as string;
   } catch (err) {
+    console.error('User denied request');
     throw new Error('User denied request');
   }
 

@@ -17,6 +17,7 @@ export async function init(wallet: SnapProvider): Promise<IdentitySnapState> {
     console.log('starting init');
     return await initSnapState(wallet);
   } else {
+    console.error('User did not accept terms and conditions!');
     throw new Error('User did not accept terms and conditions!');
   }
 }

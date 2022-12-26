@@ -14,11 +14,14 @@ export async function switchNetworkIfNecessary(
   const chain_id = await getCurrentNetwork(wallet);
   if (Array.from(hederaChainIDs.keys()).includes(chain_id)) {
     if (isHederaAccountImported(state)) {
-      if (state.hederaAccount.accountId !== state.currentAccount) {
-        state.currentAccount = state.hederaAccount.accountId;
+      if (state.hederaAccount.evmAddress !== state.currentAccount) {
+        state.currentAccount = state.hederaAccount.evmAddress;
         await updateSnapState(wallet, state);
       }
     } else {
+      console.error(
+        'Hedera Network was selected but Hedera Account has not yet been configured. Please configure it first by calling "configureHederaAccount" API'
+      );
       throw new Error(
         'Hedera Network was selected but Hedera Account has not yet been configured. Please configure it first by calling "configureHederaAccount" API'
       );

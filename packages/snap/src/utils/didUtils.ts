@@ -29,6 +29,9 @@ export async function getCurrentDid(
       did = `${method}:eip155:${chain_id}:${state.currentAccount}`;
     }
   } else {
+    console.error(
+      'did method not supported. Supported methods are: ["did:pkh"]'
+    );
     throw new Error(
       'did method not supported. Supported methods are: ["did:pkh"]'
     );

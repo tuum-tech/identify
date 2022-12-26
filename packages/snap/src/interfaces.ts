@@ -52,6 +52,7 @@ export interface HederaAccount {
   privateKey: string;
   publicKey: string;
   accountId: string;
+  evmAddress: string;
 }
 
 export type SnapConfirmParams = {
