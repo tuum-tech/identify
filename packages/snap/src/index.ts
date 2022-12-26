@@ -3,9 +3,11 @@ import { OnRpcRequestHandler } from '@metamask/snap-types';
 import { getAvailableMethods } from './rpc/did/getAvailableMethods';
 import { getDid } from './rpc/did/getDID';
 import { switchMethod } from './rpc/did/switchMethods';
+import { getVCs } from './rpc/vc/getVCs';
 import { init } from './utils/init';
 import { switchNetworkIfNecessary } from './utils/network';
 import {
+  isValidGetVCsRequest,
   isValidHederaAccountParams,
   isValidSwitchMethodRequest,
 } from './utils/params';
@@ -60,6 +62,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   console.log('Request:', request);
   console.log('Origin:', origin);
   console.log('-------------------------------------------------------------');
+  console.log('request.params=========', request.params);
 
   switch (request.method) {
     case 'hello':
@@ -88,6 +91,9 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     case 'getDID':
       await switchNetworkIfNecessary(wallet, state);
       return await getDid(wallet, state);
+    case 'getVCs':
+      isValidGetVCsRequest(request.params);
+      return await getVCs(wallet, state, account, request.params.query);
     case 'getCurrentDIDMethod':
       await switchNetworkIfNecessary(wallet, state);
       return state.accountState[state.currentAccount].accountConfig.identity

@@ -128,16 +128,16 @@ export const getDID = async () => {
 };
 
 /**
- * Invoke the "getVCStore" method from the snap.
+ * Invoke the "getVCs" method from the snap.
  */
 
-export const getVCStore = async () => {
+export const getVCs = async (snapId: string = defaultSnapOrigin) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: [
       defaultSnapOrigin,
       {
-        method: 'getVCStore',
+        method: 'getVCs',
       },
     ],
   });

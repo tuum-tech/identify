@@ -14,7 +14,7 @@ import {
   getCurrentDIDMethod,
   getDID,
   getSnap,
-  getVCStore,
+  getVCs,
   sendHello,
   shouldDisplayReconnectButton,
 } from '../utils';
@@ -179,7 +179,7 @@ const Index = () => {
 
   const handleGetVCsClick = async () => {
     try {
-      const vcs = await getVCStore();
+      const vcs = await getVCs();
       console.log(`Your VC Store is: ${vcs}`);
       // alert(`Your DID is: ${did}`);
     } catch (e) {

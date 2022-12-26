@@ -1,8 +1,34 @@
+import { VCQuery } from '@blockchain-lab-um/ssi-snap-types';
 import { SnapProvider } from '@metamask/snap-types';
-import { IIdentifier, MinimalImportableKey } from '@veramo/core';
+import {
+  IIdentifier,
+  MinimalImportableKey,
+  VerifiableCredential,
+} from '@veramo/core';
 import { IdentitySnapState } from '../interfaces';
+import { availableVCStores } from '../veramo/plugins/availableVCStores';
 import { getAgent } from '../veramo/setup';
 import { getCurrentDid } from './didUtils';
+
+/**
+ * Get a list of VCs of the curently selected MetaMask account.
+ * @returns {Promise<VerifiableCredential[]>} Array of saved VCs.
+ */
+export async function veramoListVCs(
+  wallet: SnapProvider,
+  state: IdentitySnapState,
+  vcStore: typeof availableVCStores[number],
+  query?: VCQuery
+): Promise<VerifiableCredential[]> {
+  const agent = await getAgent(wallet, state);
+  const vcsSnap = await agent.listVCS({ store: 'snap', query: query });
+
+  if (vcStore === 'ceramic') {
+    const vcsCeramic = await agent.listVCS({ store: 'ceramic', query: query });
+    return [...vcsSnap.vcs, ...vcsCeramic.vcs];
+  }
+  return vcsSnap.vcs;
+}
 
 /* eslint-disable */
 export async function veramoImportMetaMaskAccount(

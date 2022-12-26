@@ -1,3 +1,4 @@
+import { VCQuery } from '@blockchain-lab-um/ssi-snap-types';
 import { VerifiableCredential } from '@veramo/core';
 import { IdentitySnapState } from '../interfaces';
 
@@ -69,4 +70,14 @@ export function isValidSaveVCRequest(
     return;
 
   throw new Error('Invalid SaveVC request');
+}
+
+type GetVCsRequestParams = { query?: VCQuery };
+
+export function isValidGetVCsRequest(
+  params: unknown
+): asserts params is GetVCsRequestParams {
+  if (params != null && typeof params === 'object' && 'query' in params) return;
+
+  throw new Error('Invalid GetVCs request');
 }
