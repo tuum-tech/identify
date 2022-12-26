@@ -5,6 +5,7 @@ import { IdentitySnapState } from '../../interfaces';
 import { snapConfirm } from '../../utils/snapUtils';
 import { veramoListVCs } from '../../utils/veramoUtils';
 
+/* eslint-disable */
 export async function getVCs(
   wallet: SnapProvider,
   state: IdentitySnapState,

@@ -10,10 +10,7 @@ import { availableVCStores } from '../veramo/plugins/availableVCStores';
 import { getAgent } from '../veramo/setup';
 import { getCurrentDid } from './didUtils';
 
-/**
- * Get a list of VCs of the curently selected MetaMask account.
- * @returns {Promise<VerifiableCredential[]>} Array of saved VCs.
- */
+/* eslint-disable */
 export async function veramoListVCs(
   wallet: SnapProvider,
   state: IdentitySnapState,
