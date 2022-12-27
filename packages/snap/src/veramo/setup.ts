@@ -1,14 +1,20 @@
+import { AbstractVCStore } from '@blockchain-lab-um/veramo-vc-manager/build/vc-store/abstract-vc-store';
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// Core interfaces
+import { IVCManager, VCManager } from '@blockchain-lab-um/veramo-vc-manager';
 import { SnapProvider } from '@metamask/snap-types';
-
+import { getDidPkhResolver, PkhDIDProvider } from '@tuum-tech/did-provider-pkh';
 import {
   createAgent,
+  ICredentialPlugin,
   IDataStore,
   IDIDManager,
   IKeyManager,
   IResolver,
   TAgent,
 } from '@veramo/core';
-import { W3cMessageHandler } from '@veramo/credential-w3c';
+import { CredentialPlugin, W3cMessageHandler } from '@veramo/credential-w3c';
 import { JwtMessageHandler } from '@veramo/did-jwt';
 import { AbstractIdentifierProvider, DIDManager } from '@veramo/did-manager';
 import { DIDResolverPlugin } from '@veramo/did-resolver';
@@ -17,56 +23,70 @@ import { KeyManagementSystem } from '@veramo/kms-local';
 import { MessageHandler } from '@veramo/message-handler';
 import { SdrMessageHandler } from '@veramo/selective-disclosure';
 import { Resolver } from 'did-resolver';
-
-import { getDidPkhResolver, PkhDIDProvider } from '@tuum-tech/did-provider-pkh';
-
 import { IdentitySnapState } from '../interfaces';
 import {
   SnapDIDStore,
   SnapKeyStore,
   SnapPrivateKeyStore,
+  SnapVCStore,
 } from './plugins/snapDataStore';
 
 /* eslint-disable */
 export async function getAgent(
   wallet: SnapProvider,
   state: IdentitySnapState
-): Promise<TAgent<IDIDManager & IKeyManager & IDataStore & IResolver>> {
+): Promise<
+  TAgent<
+    IKeyManager &
+      IDIDManager &
+      IResolver &
+      IVCManager &
+      ICredentialPlugin &
+      IDataStore
+  >
+> {
   const didProviders: Record<string, AbstractIdentifierProvider> = {};
+  const vcStorePlugins: Record<string, AbstractVCStore> = {};
 
   didProviders['did:pkh'] = new PkhDIDProvider({ defaultKms: 'web3' });
+  vcStorePlugins['snap'] = new SnapVCStore(wallet, state);
 
-  const agent = createAgent<IDIDManager & IKeyManager & IDataStore & IResolver>(
-    {
-      plugins: [
-        new KeyManager({
-          store: new SnapKeyStore(wallet, state),
-          kms: {
-            snap: new KeyManagementSystem(
-              new SnapPrivateKeyStore(wallet, state)
-            ),
-          },
+  const agent = createAgent<
+    IKeyManager &
+      IDIDManager &
+      IResolver &
+      IVCManager &
+      ICredentialPlugin &
+      IDataStore
+  >({
+    plugins: [
+      new KeyManager({
+        store: new SnapKeyStore(wallet, state),
+        kms: {
+          snap: new KeyManagementSystem(new SnapPrivateKeyStore(wallet, state)),
+        },
+      }),
+      new DIDManager({
+        store: new SnapDIDStore(wallet, state),
+        defaultProvider: 'metamask',
+        providers: didProviders,
+      }),
+      new DIDResolverPlugin({
+        resolver: new Resolver({
+          ...getDidPkhResolver(),
         }),
-        new DIDManager({
-          store: new SnapDIDStore(wallet, state),
-          defaultProvider: 'metamask',
-          providers: didProviders,
-        }),
-        new MessageHandler({
-          messageHandlers: [
-            new JwtMessageHandler(),
-            new W3cMessageHandler(),
-            new SdrMessageHandler(),
-          ],
-        }),
-        new DIDResolverPlugin({
-          resolver: new Resolver({
-            ...getDidPkhResolver(),
-          }),
-        }),
-      ],
-    }
-  );
+      }),
+      new VCManager({ store: vcStorePlugins }),
+      new CredentialPlugin(),
+      new MessageHandler({
+        messageHandlers: [
+          new JwtMessageHandler(),
+          new W3cMessageHandler(),
+          new SdrMessageHandler(),
+        ],
+      }),
+    ],
+  });
 
   return agent;
 }

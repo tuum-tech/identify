@@ -1,1 +1,1 @@
-export const availableVCStores = ['snap', 'ceramic'] as const;
+export const availableVCStores = ['snap'] as const;

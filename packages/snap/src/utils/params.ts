@@ -1,6 +1,5 @@
-import { VCQuery } from '@blockchain-lab-um/ssi-snap-types';
 import { VerifiableCredential } from '@veramo/core';
-import { IdentitySnapState } from '../interfaces';
+import { IdentitySnapState, VCQuery } from '../interfaces';
 
 /* eslint-disable */
 type HederaAccountParams = {

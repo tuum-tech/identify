@@ -61,3 +61,7 @@ export type SnapConfirmParams = {
   description?: string;
   textAreaContent?: string;
 };
+
+export interface VCQuery {
+  [key: string]: string;
+}

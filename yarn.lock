@@ -1534,7 +1534,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@blockchain-lab-um/ssi-snap-types@npm:^1.0.11, @blockchain-lab-um/ssi-snap-types@npm:^1.0.7":
+"@blockchain-lab-um/ssi-snap-types@npm:^1.0.7":
   version: 1.0.11
   resolution: "@blockchain-lab-um/ssi-snap-types@npm:1.0.11"
   dependencies:
@@ -3230,7 +3230,6 @@ __metadata:
     "@metamask/eslint-config-typescript": ^10.0.0
     "@typescript-eslint/eslint-plugin": ^5.33.0
     "@typescript-eslint/parser": ^5.33.0
-    caip: ^1.1.0
     eslint: ^8.21.0
     eslint-config-prettier: ^8.1.0
     eslint-plugin-import: ^2.26.0
@@ -4685,7 +4684,6 @@ __metadata:
     "@babel/preset-typescript": ^7.18.6
     "@babel/register": ^7.18.9
     "@babel/runtime": ^7.20.1
-    "@blockchain-lab-um/ssi-snap-types": ^1.0.11
     "@blockchain-lab-um/veramo-vc-manager": ^1.0.7
     "@hashgraph/sdk": ^2.18.6
     "@lavamoat/allow-scripts": ^2.0.3
@@ -4716,6 +4714,7 @@ __metadata:
     "@veramo/selective-disclosure": ^4.1.1
     babel-loader: ^9.1.0
     bignumber.js: ^9.1.0
+    caip: ^1.1.0
     did-resolver: ^4.0.1
     eslint: ^8.21.0
     eslint-config-prettier: ^8.1.0

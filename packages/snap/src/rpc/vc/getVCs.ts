@@ -1,7 +1,6 @@
-import { VCQuery } from '@blockchain-lab-um/ssi-snap-types';
 import { SnapProvider } from '@metamask/snap-types';
 import { VerifiableCredential } from '@veramo/core';
-import { IdentitySnapState } from '../../interfaces';
+import { IdentitySnapState, VCQuery } from '../../interfaces';
 import { snapConfirm } from '../../utils/snapUtils';
 import { veramoListVCs } from '../../utils/veramoUtils';
 
@@ -9,14 +8,13 @@ import { veramoListVCs } from '../../utils/veramoUtils';
 export async function getVCs(
   wallet: SnapProvider,
   state: IdentitySnapState,
-  account: string,
   query?: VCQuery
 ): Promise<VerifiableCredential[]> {
   console.log('query', query);
   const vcs = await veramoListVCs(
     wallet,
     state,
-    state.accountState[account].accountConfig.identity.vcStore,
+    state.accountState[state.currentAccount].accountConfig.identity.vcStore,
     query
   );
   console.log('VCs: ', vcs);
