@@ -1,8 +1,5 @@
-import { AbstractVCStore } from '@blockchain-lab-um/veramo-vc-manager/build/vc-store/abstract-vc-store';
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// Core interfaces
 import { IVCManager, VCManager } from '@blockchain-lab-um/veramo-vc-manager';
+import { AbstractVCStore } from '@blockchain-lab-um/veramo-vc-manager/build/vc-store/abstract-vc-store';
 import { SnapProvider } from '@metamask/snap-types';
 import { getDidPkhResolver, PkhDIDProvider } from '@tuum-tech/did-provider-pkh';
 import {
@@ -48,7 +45,7 @@ export async function getAgent(
   const didProviders: Record<string, AbstractIdentifierProvider> = {};
   const vcStorePlugins: Record<string, AbstractVCStore> = {};
 
-  didProviders['did:pkh'] = new PkhDIDProvider({ defaultKms: 'web3' });
+  didProviders['did:pkh'] = new PkhDIDProvider({ defaultKms: 'snap' });
   vcStorePlugins['snap'] = new SnapVCStore(wallet, state);
 
   const agent = createAgent<
@@ -68,7 +65,7 @@ export async function getAgent(
       }),
       new DIDManager({
         store: new SnapDIDStore(wallet, state),
-        defaultProvider: 'metamask',
+        defaultProvider: 'did:pkh',
         providers: didProviders,
       }),
       new DIDResolverPlugin({

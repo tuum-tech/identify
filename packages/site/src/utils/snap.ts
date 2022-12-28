@@ -138,6 +138,7 @@ export const getVCs = async (snapId: string = defaultSnapOrigin) => {
       defaultSnapOrigin,
       {
         method: 'getVCs',
+        params: { query: {} },
       },
     ],
   });

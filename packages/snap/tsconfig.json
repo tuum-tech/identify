@@ -3,6 +3,9 @@
   "compilerOptions": {
     "outDir": "./build"
   },
-  "files": ["../../node_modules/@metamask/snap-types/global.d.ts"],
+  "files": [
+    "../../node_modules/@metamask/snap-types/global.d.ts",
+    "./json-typings.d.ts"
+  ],
   "include": ["src/**/*.ts"]
 }

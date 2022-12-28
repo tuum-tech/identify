@@ -1,6 +1,6 @@
 module.exports = {
   cliOptions: {
-    src: './src/index.ts',
+    src: './dist/snap.js',
     port: 8080,
   },
 };

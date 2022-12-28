@@ -45,7 +45,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   if (state === null) {
     state = await init(wallet);
   }
-  console.log('state:', state);
+  console.log('state:', JSON.stringify(state));
 
   /* 
     We will need to call this API before trying to get the account because sometimes when connecting to hedera,
@@ -77,7 +77,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     await initAccountState(wallet, state);
   }
 
-  console.log('Request:', request);
+  console.log('Request:', JSON.stringify(request));
   console.log('Origin:', origin);
   console.log('-------------------------------------------------------------');
   console.log('request.params=========', request.params);

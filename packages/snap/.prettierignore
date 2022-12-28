@@ -1,5 +1,5 @@
 build
 dist
+index.html
 node_modules
-.eslintrc.js
 coverage
