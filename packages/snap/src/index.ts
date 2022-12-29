@@ -5,11 +5,13 @@ import { getDid } from './rpc/did/getDID';
 import { switchMethod } from './rpc/did/switchMethods';
 import { configureHederaAccount } from './rpc/hedera/configureAccount';
 import { getVCs } from './rpc/vc/getVCs';
+import { saveVC } from './rpc/vc/saveVC';
 import { init } from './utils/init';
 import { switchNetworkIfNecessary } from './utils/network';
 import {
   isValidGetVCsRequest,
   isValidHederaAccountParams,
+  isValidSaveVCRequest,
   isValidSwitchMethodRequest,
 } from './utils/params';
 import { getCurrentAccount } from './utils/snapUtils';
@@ -104,6 +106,9 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     case 'getVCs':
       isValidGetVCsRequest(request.params);
       return await getVCs(wallet, state, request.params.query);
+    case 'saveVC':
+      isValidSaveVCRequest(request.params);
+      return await saveVC(wallet, state, request.params.verifiableCredential);
     case 'getCurrentDIDMethod':
       await switchNetworkIfNecessary(wallet, state);
       return state.accountState[state.currentAccount].accountConfig.identity

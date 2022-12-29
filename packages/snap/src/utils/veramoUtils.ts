@@ -10,6 +10,17 @@ import { getAgent } from '../veramo/setup';
 import { getCurrentDid } from './didUtils';
 
 /* eslint-disable */
+export async function veramoSaveVC(
+  wallet: SnapProvider,
+  state: IdentitySnapState,
+  vc: VerifiableCredential,
+  vcStore: typeof availableVCStores[number]
+): Promise<boolean> {
+  const agent = await getAgent(wallet, state);
+  return await agent.saveVC({ store: 'snap', vc });
+}
+
+/* eslint-disable */
 export async function veramoListVCs(
   wallet: SnapProvider,
   state: IdentitySnapState,

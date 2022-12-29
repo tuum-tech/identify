@@ -15,9 +15,37 @@ import {
   getDID,
   getSnap,
   getVCs,
+  saveVC,
   sendHello,
   shouldDisplayReconnectButton,
 } from '../utils';
+
+const placeholderVC = {
+  credentialSchema: {
+    id: 'https://beta.api.schemas.serto.id/v1/public/program-completion-certificate/1.0/json-schema.json',
+    type: 'JsonSchemaValidator2018',
+  },
+  credentialSubject: {
+    accomplishmentType: 'Developer Certificate',
+    learnerName: 'a',
+    achievement: 'Certified Solidity Developer 2',
+    courseProvider: 'UM FERI',
+    id: 'did:ethr:rinkeby:0x6A24687621cDD1C77Bb6aCbBEE910d0C517eB443',
+  },
+  issuer: {
+    id: 'did:ethr:rinkeby:0x0241abd662da06d0af2f0152a80bc037f65a7f901160cfe1eb35ef3f0c532a2a4d',
+  },
+  type: ['VerifiableCredential', 'ProgramCompletionCertificate'],
+  '@context': [
+    'https://www.w3.org/2018/credentials/v1',
+    'https://beta.api.schemas.serto.id/v1/public/program-completion-certificate/1.0/ld-context.json',
+  ],
+  issuanceDate: '2022-06-13T12:08:10.000Z',
+  proof: {
+    type: 'JwtProof2020',
+    jwt: 'eyJhbGciOiJFUzI1NksiLCJ0eXAiOiJKV1QifQ.eyJ2YyI6eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSIsImh0dHBzOi8vYmV0YS5hcGkuc2NoZW1hcy5zZXJ0by5pZC92MS9wdWJsaWMvcHJvZ3JhbS1jb21wbGV0aW9uLWNlcnRpZmljYXRlLzEuMC9sZC1jb250ZXh0Lmpzb24iXSwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCIsIlByb2dyYW1Db21wbGV0aW9uQ2VydGlmaWNhdGUiXSwiY3JlZGVudGlhbFN1YmplY3QiOnsiYWNjb21wbGlzaG1lbnRUeXBlIjoiRGV2ZWxvcGVyIENlcnRpZmljYXRlIiwibmFtZSI6ImEiLCJhY2hpZXZlbWVudCI6IkNlcnRpZmllZCBTb2xpZGl0eSBEZXZlbG9wZXIgMiIsImNvdXJzZVByb3ZpZGVyIjoiVU0gRkVSSSJ9LCJjcmVkZW50aWFsU2NoZW1hIjp7ImlkIjoiaHR0cHM6Ly9iZXRhLmFwaS5zY2hlbWFzLnNlcnRvLmlkL3YxL3B1YmxpYy9wcm9ncmFtLWNvbXBsZXRpb24tY2VydGlmaWNhdGUvMS4wL2pzb24tc2NoZW1hLmpzb24iLCJ0eXBlIjoiSnNvblNjaGVtYVZhbGlkYXRvcjIwMTgifX0sInN1YiI6ImRpZDpldGhyOnJpbmtlYnk6MHg2QTI0Njg3NjIxY0REMUM3N0JiNmFDYkJFRTkxMGQwQzUxN2VCNDQzIiwibmJmIjoxNjUyNDQzNjkwLCJpc3MiOiJkaWQ6ZXRocjpyaW5rZWJ5OjB4MDI0MWFiZDY2MmRhMDZkMGFmMmYwMTUyYTgwYmMwMzdmNjVhN2Y5MDExNjBjZmUxZWIzNWVmM2YwYzUzMmEyYTRkIn0.Z4q7kn4vKdFI5QfAyQmqtWa0icAv91HqxSEwn-AMr4_bY3vfD_WeD3W9hgqf9tsUJPx2ru5gY3tLpAx04nk0RQ',
+  },
+};
 
 const Container = styled.div`
   display: flex;
@@ -106,6 +134,7 @@ const ErrorMessage = styled.div`
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [hederaAccountConfigure, setHederaAccountConfigure] = useState(false);
+  const [vcText, setVCText] = useState(JSON.stringify(placeholderVC));
 
   const [hederaPrivateKey, setHederaPrivateKey] = useState(
     '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c'
@@ -177,10 +206,21 @@ const Index = () => {
     }
   };
 
+  const handleSaveVClick = async () => {
+    try {
+      const vc = JSON.parse(vcText);
+      await saveVC(vc);
+      console.log(`Your VC Store was saved`);
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
   const handleGetVCsClick = async () => {
     try {
       const vcs = await getVCs();
-      console.log(`Your VC Store is: ${vcs}`);
+      console.log('Your VC Store is: ', vcs);
       // alert(`Your DID is: ${did}`);
     } catch (e) {
       console.error(e);
@@ -328,6 +368,33 @@ const Index = () => {
             button: (
               <SendHelloButton
                 onClick={handleGetDIDClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'saveVC',
+            description: 'Save VC',
+            form: (
+              <textarea
+                id="VC"
+                rows="10"
+                cols="50"
+                onChange={(e) => setVCText(e.target.value)}
+                value={vcText}
+              />
+            ),
+            button: (
+              <SendHelloButton
+                onClick={handleSaveVClick}
                 disabled={!state.installedSnap}
               />
             ),

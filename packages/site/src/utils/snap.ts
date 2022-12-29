@@ -144,4 +144,19 @@ export const getVCs = async (snapId: string = defaultSnapOrigin) => {
   });
 };
 
+export const saveVC = async (vc: unknown) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: [
+      defaultSnapOrigin,
+      {
+        method: 'saveVC',
+        params: {
+          verifiableCredential: vc,
+        },
+      },
+    ],
+  });
+};
+
 export const isLocalSnap = (snapId: string) => snapId.startsWith('local:');
