@@ -1,9 +1,12 @@
 import { gapi, loadClientAuth2 } from 'gapi-script';
 
-export const uploadToGoogleDrive = async (
-  fileName: string,
-  content: string
-) => {
+export const uploadToGoogleDrive = async ({
+  fileName,
+  content,
+}: {
+  fileName: string;
+  content: string;
+}) => {
   const file = new Blob([content], { type: 'text/plain' });
   const metadata = {
     name: fileName,

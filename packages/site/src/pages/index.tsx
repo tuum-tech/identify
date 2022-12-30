@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import styled from 'styled-components';
 import {
   Card,
@@ -18,6 +18,7 @@ import {
   saveVC,
   sendHello,
   shouldDisplayReconnectButton,
+  uploadToGoogleDrive,
 } from '../utils';
 
 const placeholderVC = {
@@ -131,10 +132,16 @@ const ErrorMessage = styled.div`
   }
 `;
 
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [hederaAccountConfigure, setHederaAccountConfigure] = useState(false);
   const [vcText, setVCText] = useState(JSON.stringify(placeholderVC));
+  const [fileName, setFileName] = useState('');
 
   const [hederaPrivateKey, setHederaPrivateKey] = useState(
     '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c'
@@ -217,6 +224,23 @@ const Index = () => {
     }
   };
 
+  const handleSaveToDrive = async () => {
+    try {
+      if (!fileName) {
+        console.error('File name is missing.');
+        return;
+      }
+      if (!vcText) {
+        console.error('VC text is empty');
+      }
+      await uploadToGoogleDrive({ fileName, content: vcText });
+      console.log(`Your VC Store was saved to google drive`);
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
   const handleGetVCsClick = async () => {
     try {
       const vcs = await getVCs();
@@ -227,6 +251,16 @@ const Index = () => {
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
   };
+
+  const handleVcTextChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => setVCText(e.target.value),
+    [setVCText]
+  );
+
+  const handleFileNameChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => setFileName(e.target.value),
+    [setVCText]
+  );
 
   return (
     <Container>
@@ -384,19 +418,35 @@ const Index = () => {
             title: 'saveVC',
             description: 'Save VC',
             form: (
-              <textarea
-                id="VC"
-                rows="10"
-                cols="50"
-                onChange={(e) => setVCText(e.target.value)}
-                value={vcText}
-              />
+              <>
+                <textarea
+                  id="VC"
+                  rows="10"
+                  cols="50"
+                  onChange={handleVcTextChange}
+                  value={vcText}
+                />
+                <input
+                  id="file-name"
+                  type="text"
+                  placeholder="File Name"
+                  value={fileName}
+                  onChange={handleFileNameChange}
+                />
+              </>
             ),
             button: (
-              <SendHelloButton
-                onClick={handleSaveVClick}
-                disabled={!state.installedSnap}
-              />
+              <ButtonContainer>
+                <SendHelloButton
+                  onClick={handleSaveVClick}
+                  disabled={!state.installedSnap}
+                />
+                <SendHelloButton
+                  onClick={handleSaveToDrive}
+                  disabled={!state.installedSnap}
+                  title="Save to Google Drive"
+                />
+              </ButtonContainer>
             ),
           }}
           disabled={!state.installedSnap}
