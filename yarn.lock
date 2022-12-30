@@ -1955,7 +1955,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ethersproject/providers@npm:5.7.2, @ethersproject/providers@npm:^5.7.0":
+"@ethersproject/providers@npm:5.7.2":
   version: 5.7.2
   resolution: "@ethersproject/providers@npm:5.7.2"
   dependencies:
@@ -4709,7 +4709,6 @@ __metadata:
     "@veramo/did-resolver": ^4.1.1
     "@veramo/key-manager": ^4.1.1
     "@veramo/kms-local": ^4.1.1
-    "@veramo/kms-web3": ^4.1.1
     "@veramo/message-handler": ^4.1.1
     "@veramo/selective-disclosure": ^4.1.1
     babel-loader: ^9.1.0
@@ -5701,20 +5700,6 @@ __metadata:
     elliptic: ^6.5.4
     uint8arrays: ^3.0.0
   checksum: dd90d652872bf11ca09f67d41bd24f8ebc7e8c6e9929d48f52d0f331e7ed5cbe8673ccb4f9e83c46edf7ee499f1a05cfd2fce5183c8fa4a034eea72d72e4847b
-  languageName: node
-  linkType: hard
-
-"@veramo/kms-web3@npm:^4.1.1":
-  version: 4.1.1
-  resolution: "@veramo/kms-web3@npm:4.1.1"
-  dependencies:
-    "@ethersproject/providers": ^5.7.0
-    "@ethersproject/strings": ^5.7.0
-    "@ethersproject/transactions": ^5.7.0
-    "@veramo/core": ^4.1.1
-    "@veramo/key-manager": ^4.1.1
-    debug: ^4.3.3
-  checksum: 19a6ddc5a04c792c02e4389197d7612b53884747d8c9b60489586a37e0c2f797d849060509b8ee463346c14ce07314b96c3ad61d7444fc1411c078aed41d1905
   languageName: node
   linkType: hard
 
@@ -11039,6 +11024,13 @@ __metadata:
   version: 1.2.3
   resolution: "functions-have-names@npm:1.2.3"
   checksum: c3f1f5ba20f4e962efb71344ce0a40722163e85bee2101ce25f88214e78182d2d2476aa85ef37950c579eb6cf6ee811c17b3101bb84004bb75655f3e33f3fdb5
+  languageName: node
+  linkType: hard
+
+"gapi-script@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "gapi-script@npm:1.2.0"
+  checksum: f61140855e9a4369de15badb2f4568fdd037d949561de5fd86eca379b89423301bc6062748aba6bd1be68a5329f6239ca9c4b6b5fe454ad6046b6b918979d1ba
   languageName: node
   linkType: hard
 
@@ -18008,6 +18000,7 @@ __metadata:
     eslint-plugin-jsdoc: ^39.2.9
     eslint-plugin-node: ^11.1.0
     eslint-plugin-prettier: ^4.2.1
+    gapi-script: ^1.2.0
     gatsby: ^4.24.4
     gatsby-plugin-manifest: ^4.24.0
     gatsby-plugin-styled-components: ^5.24.0
