@@ -47,5 +47,9 @@
   "packageManager": "yarn@3.2.1",
   "engines": {
     "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "@ethersproject/providers": "^5.7.2",
+    "@veramo/kms-web3": "^4.2.0"
   }
 }

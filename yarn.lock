@@ -1955,7 +1955,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ethersproject/providers@npm:5.7.2, @ethersproject/providers@npm:^5.7.0":
+"@ethersproject/providers@npm:5.7.2, @ethersproject/providers@npm:^5.7.0, @ethersproject/providers@npm:^5.7.2":
   version: 5.7.2
   resolution: "@ethersproject/providers@npm:5.7.2"
   dependencies:
@@ -3224,12 +3224,14 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@metamask/template-snap-monorepo@workspace:."
   dependencies:
+    "@ethersproject/providers": ^5.7.2
     "@metamask/eslint-config": ^10.0.0
     "@metamask/eslint-config-jest": ^10.0.0
     "@metamask/eslint-config-nodejs": ^10.0.0
     "@metamask/eslint-config-typescript": ^10.0.0
     "@typescript-eslint/eslint-plugin": ^5.33.0
     "@typescript-eslint/parser": ^5.33.0
+    "@veramo/kms-web3": ^4.2.0
     eslint: ^8.21.0
     eslint-config-prettier: ^8.1.0
     eslint-plugin-import: ^2.26.0
@@ -4709,7 +4711,6 @@ __metadata:
     "@veramo/did-resolver": ^4.1.1
     "@veramo/key-manager": ^4.1.1
     "@veramo/kms-local": ^4.1.1
-    "@veramo/kms-web3": ^4.1.1
     "@veramo/message-handler": ^4.1.1
     "@veramo/selective-disclosure": ^4.1.1
     babel-loader: ^9.1.0
@@ -5576,6 +5577,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@veramo/core@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "@veramo/core@npm:4.2.0"
+  dependencies:
+    credential-status: ^2.0.5
+    debug: ^4.3.3
+    did-jwt-vc: ^3.1.0
+    did-resolver: ^4.0.1
+    events: ^3.2.0
+    z-schema: ^5.0.2
+  checksum: 008429e551b16989f606b8caf19a68c3837d141e00f2400a1451a9a63759d3123c4b795b51f0967ddfbfb8daa50e3d0bdec9c395b31c7bd19172278241d27190
+  languageName: node
+  linkType: hard
+
 "@veramo/credential-ld@npm:^4.1.1":
   version: 4.1.1
   resolution: "@veramo/credential-ld@npm:4.1.1"
@@ -5680,6 +5695,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@veramo/key-manager@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "@veramo/key-manager@npm:4.2.0"
+  dependencies:
+    "@ethersproject/bytes": ^5.7.0
+    "@ethersproject/strings": ^5.7.0
+    "@ethersproject/transactions": ^5.7.0
+    "@stablelib/ed25519": ^1.0.2
+    "@veramo/core": ^4.2.0
+    did-jwt: ^6.9.0
+    uint8arrays: ^3.0.0
+    uuid: ^9.0.0
+  checksum: 9a2d4280765ae12e2880b1d1a6391dff28636ecb01e274707325ab4793c3e704b0e25ee86b83ded96490fa0adc91230c430819114d49c3f941fddf4e6e5ec359
+  languageName: node
+  linkType: hard
+
 "@veramo/kms-local@npm:^4.1.1":
   version: 4.1.1
   resolution: "@veramo/kms-local@npm:4.1.1"
@@ -5704,17 +5735,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@veramo/kms-web3@npm:^4.1.1":
-  version: 4.1.1
-  resolution: "@veramo/kms-web3@npm:4.1.1"
+"@veramo/kms-web3@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "@veramo/kms-web3@npm:4.2.0"
   dependencies:
     "@ethersproject/providers": ^5.7.0
     "@ethersproject/strings": ^5.7.0
     "@ethersproject/transactions": ^5.7.0
-    "@veramo/core": ^4.1.1
-    "@veramo/key-manager": ^4.1.1
+    "@veramo/core": ^4.2.0
+    "@veramo/key-manager": ^4.2.0
     debug: ^4.3.3
-  checksum: 19a6ddc5a04c792c02e4389197d7612b53884747d8c9b60489586a37e0c2f797d849060509b8ee463346c14ce07314b96c3ad61d7444fc1411c078aed41d1905
+  checksum: 2745f8ecc018ab96db9d5fcd4a9aa06238b477b571a7c849b2dfdc52eaae61aa7a1dbbd338541ebc9d4956b59dfc2511c777e1a3ac0270cf19c6817205d1f1bc
   languageName: node
   linkType: hard
 
@@ -18000,6 +18031,7 @@ __metadata:
     "@types/styled-components": ^5.1.25
     "@typescript-eslint/eslint-plugin": ^5.33.0
     "@typescript-eslint/parser": ^5.33.0
+    "@veramo/core": ^4.1.1
     cross-env: ^7.0.3
     eslint: ^8.21.0
     eslint-config-prettier: ^8.1.0

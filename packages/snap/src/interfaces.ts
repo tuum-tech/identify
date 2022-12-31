@@ -65,3 +65,8 @@ export type SnapConfirmParams = {
 export interface VCQuery {
   [key: string]: string;
 }
+
+export type ExampleVCValue = {
+  name: string;
+  value: string;
+};

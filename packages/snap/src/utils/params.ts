@@ -1,5 +1,5 @@
 import { VerifiableCredential } from '@veramo/core';
-import { IdentitySnapState, VCQuery } from '../interfaces';
+import { ExampleVCValue, IdentitySnapState, VCQuery } from '../interfaces';
 
 /* eslint-disable */
 type HederaAccountParams = {
@@ -74,6 +74,27 @@ export function isValidSaveVCRequest(
   throw new Error('Invalid SaveVC request');
 }
 
+type GetVPRequestParams = {
+  vcId: string;
+  domain?: string;
+  challenge?: string;
+};
+
+export function isValidGetVPRequest(
+  params: unknown
+): asserts params is GetVPRequestParams {
+  if (
+    params != null &&
+    typeof params === 'object' &&
+    'vcId' in params &&
+    (params as GetVPRequestParams).vcId != null &&
+    typeof (params as GetVPRequestParams).vcId === 'string'
+  )
+    return;
+
+  throw new Error('Invalid GetVP request');
+}
+
 type GetVCsRequestParams = { query?: VCQuery };
 
 export function isValidGetVCsRequest(
@@ -82,4 +103,15 @@ export function isValidGetVCsRequest(
   if (params != null && typeof params === 'object' && 'query' in params) return;
 
   throw new Error('Invalid GetVCs request');
+}
+
+type CreateVCRequestParams = { exampleVCData: ExampleVCValue };
+
+export function isValidCreateExampleVCRequest(
+  params: unknown
+): asserts params is CreateVCRequestParams {
+  if (params != null && typeof params === 'object' && 'exampleVCData' in params)
+    return;
+
+  throw new Error('Invalid CreateExampleVC request');
 }

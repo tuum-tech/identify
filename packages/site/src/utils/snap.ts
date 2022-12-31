@@ -1,3 +1,4 @@
+import { VerifiableCredential } from '@veramo/core';
 import { defaultSnapOrigin } from '../config';
 import { GetSnapsResponse, Snap } from '../types';
 
@@ -131,7 +132,7 @@ export const getDID = async () => {
  * Invoke the "getVCs" method from the snap.
  */
 
-export const getVCs = async (snapId: string = defaultSnapOrigin) => {
+export const getVCs = async () => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: [
@@ -139,6 +140,50 @@ export const getVCs = async (snapId: string = defaultSnapOrigin) => {
       {
         method: 'getVCs',
         params: { query: {} },
+      },
+    ],
+  });
+};
+
+/**
+ * Invoke the "saveVC" method from the snap.
+ */
+
+export const saveVC = async (vc: VerifiableCredential) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: [
+      defaultSnapOrigin,
+      {
+        method: 'saveVC',
+        params: { verifiableCredential: vc },
+      },
+    ],
+  });
+};
+
+export type ExampleVCValue = {
+  name: string;
+  value: string;
+};
+
+/**
+ * Invoke the "createExampleVC" method from the snap.
+ */
+
+export const createExampleVC = async (name: string, value: string) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: [
+      defaultSnapOrigin,
+      {
+        method: 'createExampleVC',
+        params: {
+          exampleVCData: {
+            name,
+            value,
+          },
+        },
       },
     ],
   });

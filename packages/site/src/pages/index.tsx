@@ -11,6 +11,7 @@ import { MetamaskActions, MetaMaskContext } from '../hooks';
 import {
   configureHederaAccount,
   connectSnap,
+  createExampleVC,
   getCurrentDIDMethod,
   getDID,
   getSnap,
@@ -111,6 +112,10 @@ const Index = () => {
     '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c'
   );
   const [hederaAccountId, setHederaAccountId] = useState('0.0.48865029');
+  const [createExampleVCName, setCreateExampleVCName] =
+    useState('Tuum Identity Snap');
+  const [createExampleVCValue, setCreateExampleVCValue] =
+    useState('Example VC');
 
   const handleConnectClick = async () => {
     try {
@@ -182,6 +187,19 @@ const Index = () => {
       const vcs = await getVCs();
       console.log(`Your VC Store is: ${vcs}`);
       // alert(`Your DID is: ${did}`);
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleCreateExampleVCClick = async () => {
+    try {
+      const saved = await createExampleVC(
+        createExampleVCName,
+        createExampleVCValue
+      );
+      console.log('created and saved VC: ', saved);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -346,6 +364,45 @@ const Index = () => {
             button: (
               <SendHelloButton
                 onClick={handleGetVCsClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'createExampleVC',
+            description: 'Create and Save VerifiableCredential',
+            form: (
+              <form>
+                <label>
+                  Enter name of your VC
+                  <input
+                    type="text"
+                    value={createExampleVCName}
+                    onChange={(e) => setCreateExampleVCName(e.target.value)}
+                  />
+                </label>
+                <br />
+                <label>
+                  Enter value of your VC
+                  <input
+                    type="text"
+                    value={createExampleVCValue}
+                    onChange={(e) => setCreateExampleVCValue(e.target.value)}
+                  />
+                </label>
+              </form>
+            ),
+            button: (
+              <SendHelloButton
+                onClick={handleCreateExampleVCClick}
                 disabled={!state.installedSnap}
               />
             ),
