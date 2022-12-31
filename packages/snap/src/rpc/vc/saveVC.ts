@@ -12,9 +12,7 @@ export async function saveVC(
 ) {
   const promptObj = {
     prompt: 'Save VC',
-    description: `Would you like to save the following VC in ${
-      state.accountState[state.currentAccount].accountConfig.identity.vcStore
-    }?`,
+    description: `Would you like to save the following VC in snap?`,
     textAreaContent: JSON.stringify(vc.credentialSubject),
   };
   if (await snapConfirm(wallet, promptObj)) {
@@ -22,7 +20,6 @@ export async function saveVC(
       wallet,
       state,
       vc,
-      state.accountState[state.currentAccount].accountConfig.identity.vcStore
     );
   }
   return false;

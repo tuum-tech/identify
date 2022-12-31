@@ -16,7 +16,7 @@ import {
   isValidGetVPRequest,
   isValidHederaAccountParams,
   isValidSaveVCRequest,
-  isValidSwitchMethodRequest,
+  isValidSwitchMethodRequest
 } from './utils/params';
 import { getCurrentAccount } from './utils/snapUtils';
 import { getSnapStateUnchecked, initAccountState } from './utils/stateUtils';
@@ -51,7 +51,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   if (state === null) {
     state = await init(wallet);
   }
-  console.log('state:', JSON.stringify(state));
+  console.log('state:', JSON.stringify(state, null, 4));
 
   /* 
     We will need to call this API before trying to get the account because sometimes when connecting to hedera,
@@ -83,7 +83,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     await initAccountState(wallet, state);
   }
 
-  console.log('Request:', JSON.stringify(request));
+  console.log('Request:', JSON.stringify(request, null, 4));
   console.log('Origin:', origin);
   console.log('-------------------------------------------------------------');
   console.log('request.params=========', request.params);
@@ -109,15 +109,19 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return await getDid(wallet, state);
     case 'getVCs':
       isValidGetVCsRequest(request.params);
+      await switchNetworkIfNecessary(wallet, state);
       return await getVCs(wallet, state, request.params.query);
     case 'saveVC':
       isValidSaveVCRequest(request.params);
+      await switchNetworkIfNecessary(wallet, state);
       return await saveVC(wallet, state, request.params.verifiableCredential);
     case 'createExampleVC':
       isValidCreateExampleVCRequest(request.params);
+      await switchNetworkIfNecessary(wallet, state);
       return await createExampleVC(wallet, state, request.params.exampleVCData);
     case 'getVP':
       isValidGetVPRequest(request.params);
+      await switchNetworkIfNecessary(wallet, state);
       return await getVP(
         wallet,
         state,

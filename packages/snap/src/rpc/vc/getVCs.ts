@@ -14,10 +14,9 @@ export async function getVCs(
   const vcs = await veramoListVCs(
     wallet,
     state,
-    state.accountState[state.currentAccount].accountConfig.identity.vcStore,
     query
   );
-  console.log('VCs: ', vcs);
+  console.log('VCs: ', JSON.stringify(vcs, null, 4));
   const promptObj = {
     prompt: 'Send VCs',
     description: 'Are you sure you want to send VCs to the dApp?',

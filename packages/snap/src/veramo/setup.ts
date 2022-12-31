@@ -23,6 +23,8 @@ import { MessageHandler } from '@veramo/message-handler';
 import { SdrMessageHandler } from '@veramo/selective-disclosure';
 import { Resolver } from 'did-resolver';
 import { IdentitySnapState } from '../interfaces';
+import { getHederaChainIDs } from '../utils/config';
+import { getCurrentNetwork } from '../utils/snapUtils';
 import {
   SnapDIDStore,
   SnapKeyStore,
@@ -37,13 +39,22 @@ export async function getAgent(
 ): Promise<
   TAgent<
     IKeyManager &
-      IDIDManager &
-      IResolver &
-      IVCManager &
-      ICredentialPlugin &
-      IDataStore
+    IDIDManager &
+    IResolver &
+    IVCManager &
+    ICredentialPlugin &
+    IDataStore
   >
 > {
+  let isHederaAccount: boolean = false;
+  const chain_id = await getCurrentNetwork(wallet);
+  const hederaChainIDs = getHederaChainIDs();
+  if (
+    Array.from(hederaChainIDs.keys()).includes(chain_id)
+  ) {
+    isHederaAccount = true;
+  }
+
   const web3Providers: Record<string, Web3Provider> = {};
   const didProviders: Record<string, AbstractIdentifierProvider> = {};
   const vcStorePlugins: Record<string, AbstractVCStore> = {};
@@ -51,26 +62,26 @@ export async function getAgent(
   web3Providers['metamask'] = new Web3Provider(wallet as any);
 
   didProviders['did:pkh'] = new PkhDIDProvider({ defaultKms: 'snap' });
-  vcStorePlugins['snap'] = new SnapVCStore(wallet, state);
+  vcStorePlugins['snap'] = new SnapVCStore(wallet, state, isHederaAccount);
 
   const agent = createAgent<
     IKeyManager &
-      IDIDManager &
-      IResolver &
-      IVCManager &
-      ICredentialPlugin &
-      IDataStore
+    IDIDManager &
+    IResolver &
+    IVCManager &
+    ICredentialPlugin &
+    IDataStore
   >({
     plugins: [
       new KeyManager({
-        store: new SnapKeyStore(wallet, state),
+        store: new SnapKeyStore(wallet, state, isHederaAccount),
         kms: {
           web3: new Web3KeyManagementSystem(web3Providers),
-          snap: new KeyManagementSystem(new SnapPrivateKeyStore(wallet, state)),
+          snap: new KeyManagementSystem(new SnapPrivateKeyStore(wallet, state, isHederaAccount)),
         },
       }),
       new DIDManager({
-        store: new SnapDIDStore(wallet, state),
+        store: new SnapDIDStore(wallet, state, isHederaAccount),
         defaultProvider: 'metamask',
         providers: didProviders,
       }),

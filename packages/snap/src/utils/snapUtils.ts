@@ -35,7 +35,7 @@ export async function getCurrentAccount(
         console.log(
           `Hedera Metamask accounts: EVM Address: ${state.hederaAccount.evmAddress}, AccountId: ${state.hederaAccount.accountId}`
         );
-        return state.hederaAccount.evmAddress;
+        return state.hederaAccount.accountId;
       } else {
         console.error(
           'Hedera Network was selected but Hedera Account has not yet been configured. Please configure it first by calling "configureHederaAccount" API'

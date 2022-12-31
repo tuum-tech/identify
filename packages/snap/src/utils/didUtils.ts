@@ -21,9 +21,7 @@ export async function getCurrentDid(
       isHederaAccountImported(state)
     ) {
       // Handle Hedera
-      did = `${method}:hedera:${hederaChainIDs.get(chain_id)}:${
-        state.hederaAccount.accountId
-      }`;
+      did = `${method}:hedera:${hederaChainIDs.get(chain_id)}:${state.hederaAccount.accountId}`;
     } else {
       // Handle everything else
       did = `${method}:eip155:${chain_id}:${state.currentAccount}`;

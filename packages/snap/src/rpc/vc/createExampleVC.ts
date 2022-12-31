@@ -11,16 +11,13 @@ export async function createExampleVC(
 ) {
   const promptObj = {
     prompt: 'Create and Save Example VC',
-    description: `Would you like to create and save the following VC in ${
-      state.accountState[state.currentAccount].accountConfig.identity.vcStore
-    }?`,
+    description: `Would you like to create and save the following VC in snap?`,
     textAreaContent: JSON.stringify(exampleVCData),
   };
   if (await snapConfirm(wallet, promptObj)) {
     return await veramoCreateExampleVC(
       wallet,
       state,
-      state.accountState[state.currentAccount].accountConfig.identity.vcStore,
       exampleVCData
     );
   }

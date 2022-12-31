@@ -5,7 +5,7 @@ import {
   ConnectButton,
   InstallFlaskButton,
   ReconnectButton,
-  SendHelloButton,
+  SendHelloButton
 } from '../components';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
 import {
@@ -16,8 +16,9 @@ import {
   getDID,
   getSnap,
   getVCs,
+  getVP,
   sendHello,
-  shouldDisplayReconnectButton,
+  shouldDisplayReconnectButton
 } from '../utils';
 
 const Container = styled.div`
@@ -116,6 +117,7 @@ const Index = () => {
     useState('Tuum Identity Snap');
   const [createExampleVCValue, setCreateExampleVCValue] =
     useState('Example VC');
+  const [vcId, setVcId] = useState('');
 
   const handleConnectClick = async () => {
     try {
@@ -185,8 +187,13 @@ const Index = () => {
   const handleGetVCsClick = async () => {
     try {
       const vcs = await getVCs();
-      console.log(`Your VC Store is: ${vcs}`);
-      // alert(`Your DID is: ${did}`);
+      console.log(`Your VCs are: ${JSON.stringify(vcs, null, 4)}`);
+      const vcsJson = JSON.parse(JSON.stringify(vcs))
+      const keys = vcsJson.map((vc: { key: any; }) => vc.key)
+      if (keys) {
+        setVcId(keys[keys.length - 1])
+      }
+      alert(`Your VC IDs are: ${keys}`);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -200,6 +207,17 @@ const Index = () => {
         createExampleVCValue
       );
       console.log('created and saved VC: ', saved);
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleGetVPClick = async () => {
+    try {
+      const vp = await getVP(vcId);
+      console.log(`Your VP is: ${JSON.stringify(vp, null, 4)}`);
+      alert(`Your VP is: ${JSON.stringify(vp, null, 4)}`);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -403,6 +421,36 @@ const Index = () => {
             button: (
               <SendHelloButton
                 onClick={handleCreateExampleVCClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'getVP',
+            description: 'Generate Verifiable Presentation from your VC',
+            form: (
+              <form>
+                <label>
+                  Enter the Verifiable Credential ID
+                  <input
+                    type="text"
+                    value={vcId}
+                    onChange={(e) => setVcId(e.target.value)}
+                  />
+                </label>
+              </form>
+            ),
+            button: (
+              <SendHelloButton
+                onClick={handleGetVPClick}
                 disabled={!state.installedSnap}
               />
             ),

@@ -14,8 +14,8 @@ export async function switchNetworkIfNecessary(
   const chain_id = await getCurrentNetwork(wallet);
   if (Array.from(hederaChainIDs.keys()).includes(chain_id)) {
     if (isHederaAccountImported(state)) {
-      if (state.hederaAccount.evmAddress !== state.currentAccount) {
-        state.currentAccount = state.hederaAccount.evmAddress;
+      if (state.hederaAccount.accountId !== state.currentAccount) {
+        state.currentAccount = state.hederaAccount.accountId;
         await updateSnapState(wallet, state);
       }
     } else {

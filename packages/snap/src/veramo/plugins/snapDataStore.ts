@@ -21,16 +21,21 @@ import { updateSnapState } from '../../utils/stateUtils';
 export class SnapKeyStore extends AbstractKeyStore {
   wallet: SnapProvider;
   state: IdentitySnapState;
+  isHederaAccount: boolean;
 
-  constructor(wallet: SnapProvider, state: IdentitySnapState) {
+  constructor(wallet: SnapProvider, state: IdentitySnapState, isHederaAccount: boolean) {
     super();
     this.wallet = wallet;
     this.state = state;
+    this.isHederaAccount = isHederaAccount;
   }
   private keys: Record<string, IKey> = {};
 
   async get({ kid }: { kid: string }): Promise<IKey> {
-    const account = this.state.currentAccount;
+    let account = this.state.currentAccount;
+    if (this.isHederaAccount) {
+      account = this.state.hederaAccount.accountId;
+    }
     if (!account) throw Error('User denied error');
 
     const key = this.state.accountState[account].snapKeyStore[kid];
@@ -39,7 +44,10 @@ export class SnapKeyStore extends AbstractKeyStore {
   }
 
   async delete({ kid }: { kid: string }) {
-    const account = this.state.currentAccount;
+    let account = this.state.currentAccount;
+    if (this.isHederaAccount) {
+      account = this.state.hederaAccount.accountId;
+    }
     if (!account) throw Error('User denied error');
 
     if (!this.state.accountState[account].snapKeyStore[kid])
@@ -51,7 +59,10 @@ export class SnapKeyStore extends AbstractKeyStore {
   }
 
   async import(args: IKey) {
-    const account = this.state.currentAccount;
+    let account = this.state.currentAccount;
+    if (this.isHederaAccount) {
+      account = this.state.hederaAccount.accountId;
+    }
     if (!account) throw Error('User denied error');
 
     this.state.accountState[account].snapKeyStore[args.kid] = { ...args };
@@ -60,7 +71,10 @@ export class SnapKeyStore extends AbstractKeyStore {
   }
 
   async list(): Promise<Exclude<IKey, 'privateKeyHex'>[]> {
-    const account = this.state.currentAccount;
+    let account = this.state.currentAccount;
+    if (this.isHederaAccount) {
+      account = this.state.hederaAccount.accountId;
+    }
     if (!account) throw Error('User denied error');
 
     const safeKeys = Object.values(
@@ -81,15 +95,20 @@ export class SnapKeyStore extends AbstractKeyStore {
 export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
   wallet: SnapProvider;
   state: IdentitySnapState;
+  isHederaAccount: boolean;
 
-  constructor(wallet: SnapProvider, state: IdentitySnapState) {
+  constructor(wallet: SnapProvider, state: IdentitySnapState, isHederaAccount: boolean) {
     super();
     this.wallet = wallet;
     this.state = state;
+    this.isHederaAccount = isHederaAccount;
   }
 
   async get({ alias }: { alias: string }): Promise<ManagedPrivateKey> {
-    const account = this.state.currentAccount;
+    let account = this.state.currentAccount;
+    if (this.isHederaAccount) {
+      account = this.state.hederaAccount.accountId;
+    }
     if (!account) throw Error('User denied error');
 
     const key = this.state.accountState[account].snapPrivateKeyStore[alias];
@@ -98,7 +117,10 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
   }
 
   async delete({ alias }: { alias: string }) {
-    const account = this.state.currentAccount;
+    let account = this.state.currentAccount;
+    if (this.isHederaAccount) {
+      account = this.state.hederaAccount.accountId;
+    }
     if (!account) throw Error('User denied error');
 
     if (!this.state.accountState[account].snapPrivateKeyStore[alias])
@@ -110,7 +132,10 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
   }
 
   async import(args: ImportablePrivateKey) {
-    const account = this.state.currentAccount;
+    let account = this.state.currentAccount;
+    if (this.isHederaAccount) {
+      account = this.state.hederaAccount.accountId;
+    }
     if (!account) throw Error('User denied error');
 
     const alias = args.alias || uuidv4();
@@ -133,7 +158,10 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
   }
 
   async list(): Promise<Array<ManagedPrivateKey>> {
-    const account = this.state.currentAccount;
+    let account = this.state.currentAccount;
+    if (this.isHederaAccount) {
+      account = this.state.hederaAccount.accountId;
+    }
     if (!account) throw Error('User denied error');
 
     return [
@@ -150,11 +178,13 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
 export class SnapDIDStore extends AbstractDIDStore {
   wallet: SnapProvider;
   state: IdentitySnapState;
+  isHederaAccount: boolean;
 
-  constructor(wallet: SnapProvider, state: IdentitySnapState) {
+  constructor(wallet: SnapProvider, state: IdentitySnapState, isHederaAccount: boolean) {
     super();
     this.wallet = wallet;
     this.state = state;
+    this.isHederaAccount = isHederaAccount;
   }
 
   async get({
@@ -166,7 +196,10 @@ export class SnapDIDStore extends AbstractDIDStore {
     alias: string;
     provider: string;
   }): Promise<IIdentifier> {
-    const account = this.state.currentAccount;
+    let account = this.state.currentAccount;
+    if (this.isHederaAccount) {
+      account = this.state.hederaAccount.accountId;
+    }
     if (!account) throw Error('User denied error');
     const identifiers = this.state.accountState[account].identifiers;
 
@@ -192,7 +225,10 @@ export class SnapDIDStore extends AbstractDIDStore {
   }
 
   async delete({ did }: { did: string }) {
-    const account = this.state.currentAccount;
+    let account = this.state.currentAccount;
+    if (this.isHederaAccount) {
+      account = this.state.hederaAccount.accountId;
+    }
     if (!account) throw Error('User denied error');
 
     if (!this.state.accountState[account].identifiers[did])
@@ -204,7 +240,10 @@ export class SnapDIDStore extends AbstractDIDStore {
   }
 
   async import(args: IIdentifier) {
-    const account = this.state.currentAccount;
+    let account = this.state.currentAccount;
+    if (this.isHederaAccount) {
+      account = this.state.hederaAccount.accountId;
+    }
     if (!account) throw Error('User denied error');
 
     const identifier = { ...args };
@@ -222,7 +261,10 @@ export class SnapDIDStore extends AbstractDIDStore {
     alias?: string;
     provider?: string;
   }): Promise<IIdentifier[]> {
-    const account = this.state.currentAccount;
+    let account = this.state.currentAccount;
+    if (this.isHederaAccount) {
+      account = this.state.hederaAccount.accountId;
+    }
     if (!account) throw Error('User denied error');
 
     let result: IIdentifier[] = [];
@@ -254,15 +296,20 @@ export class SnapDIDStore extends AbstractDIDStore {
 export class SnapVCStore extends AbstractVCStore {
   wallet: SnapProvider;
   state: IdentitySnapState;
+  isHederaAccount: boolean;
 
-  constructor(wallet: SnapProvider, state: IdentitySnapState) {
+  constructor(wallet: SnapProvider, state: IdentitySnapState, isHederaAccount: boolean) {
     super();
     this.wallet = wallet;
     this.state = state;
+    this.isHederaAccount = isHederaAccount;
   }
 
   async get(args: { id: string }): Promise<VerifiableCredential | null> {
-    const account = this.state.currentAccount;
+    let account = this.state.currentAccount;
+    if (this.isHederaAccount) {
+      account = this.state.hederaAccount.accountId;
+    }
     if (!account) throw Error('User denied error');
 
     if (!this.state.accountState[account].vcs[args.id])
@@ -271,7 +318,10 @@ export class SnapVCStore extends AbstractVCStore {
   }
 
   async delete({ id }: { id: string }) {
-    const account = this.state.currentAccount;
+    let account = this.state.currentAccount;
+    if (this.isHederaAccount) {
+      account = this.state.hederaAccount.accountId;
+    }
     if (!account) throw Error('User denied error');
 
     if (!this.state.accountState[account].vcs[id]) throw Error('VC not found');
@@ -282,7 +332,10 @@ export class SnapVCStore extends AbstractVCStore {
   }
 
   async import(args: VerifiableCredential) {
-    const account = this.state.currentAccount;
+    let account = this.state.currentAccount;
+    if (this.isHederaAccount) {
+      account = this.state.hederaAccount.accountId;
+    }
     if (!account) throw Error('User denied error');
 
     let alias = uuidv4();
@@ -296,7 +349,10 @@ export class SnapVCStore extends AbstractVCStore {
   }
 
   async list(): Promise<VerifiableCredential[]> {
-    const account = this.state.currentAccount;
+    let account = this.state.currentAccount;
+    if (this.isHederaAccount) {
+      account = this.state.hederaAccount.accountId;
+    }
     if (!account) throw Error('User denied error');
     const result: VerifiableCredential[] = [];
 

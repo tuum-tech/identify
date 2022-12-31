@@ -189,4 +189,29 @@ export const createExampleVC = async (name: string, value: string) => {
   });
 };
 
+/**
+ * Invoke the "getVP" method from the snap.
+ */
+
+export const getVP = async (vcId: string, challenge?: boolean) => {
+  if (!challenge) {
+    return await window.ethereum.request({
+      method: 'wallet_invokeSnap',
+      params: [defaultSnapOrigin, {
+        method: 'getVP',
+        params: { vcId: vcId }
+      }]
+    })
+  }
+  else {
+    return await window.ethereum.request({
+      method: 'wallet_invokeSnap',
+      params: [defaultSnapOrigin, {
+        method: 'getVP',
+        params: { vcId: vcId, challenge: "ab31aeae-3471-406b-b890-6389767c4cce" }
+      }]
+    })
+  }
+}
+
 export const isLocalSnap = (snapId: string) => snapId.startsWith('local:');
