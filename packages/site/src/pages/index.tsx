@@ -5,7 +5,7 @@ import {
   ConnectButton,
   InstallFlaskButton,
   ReconnectButton,
-  SendHelloButton
+  SendHelloButton,
 } from '../components';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
 import {
@@ -18,7 +18,7 @@ import {
   getVCs,
   getVP,
   sendHello,
-  shouldDisplayReconnectButton
+  shouldDisplayReconnectButton,
 } from '../utils';
 
 const Container = styled.div`
@@ -188,10 +188,10 @@ const Index = () => {
     try {
       const vcs = await getVCs();
       console.log(`Your VCs are: ${JSON.stringify(vcs, null, 4)}`);
-      const vcsJson = JSON.parse(JSON.stringify(vcs))
-      const keys = vcsJson.map((vc: { key: any; }) => vc.key)
+      const vcsJson = JSON.parse(JSON.stringify(vcs));
+      const keys = vcsJson.map((vc: { key: any }) => vc.key);
       if (keys) {
-        setVcId(keys[keys.length - 1])
+        setVcId(keys[keys.length - 1]);
       }
       alert(`Your VC IDs are: ${keys}`);
     } catch (e) {
@@ -227,7 +227,7 @@ const Index = () => {
   return (
     <Container>
       <Heading>
-        Welcome to <Span>template-snap</Span>
+        Welcome to <Span>Identity Snap</Span>
       </Heading>
       <Subtitle>
         Get started by editing <code>src/index.ts</code>
