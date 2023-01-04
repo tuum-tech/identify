@@ -197,21 +197,46 @@ export const getVP = async (vcId: string, challenge?: boolean) => {
   if (!challenge) {
     return await window.ethereum.request({
       method: 'wallet_invokeSnap',
-      params: [defaultSnapOrigin, {
-        method: 'getVP',
-        params: { vcId: vcId }
-      }]
-    })
-  }
-  else {
+      params: [
+        defaultSnapOrigin,
+        {
+          method: 'getVP',
+          params: { vcId: vcId },
+        },
+      ],
+    });
+  } else {
     return await window.ethereum.request({
       method: 'wallet_invokeSnap',
-      params: [defaultSnapOrigin, {
-        method: 'getVP',
-        params: { vcId: vcId, challenge: "ab31aeae-3471-406b-b890-6389767c4cce" }
-      }]
-    })
+      params: [
+        defaultSnapOrigin,
+        {
+          method: 'getVP',
+          params: {
+            vcId: vcId,
+            challenge: 'ab31aeae-3471-406b-b890-6389767c4cce',
+          },
+        },
+      ],
+    });
   }
-}
+};
+
+/**
+ * Invoke the "resolveDID" method from the snap.
+ */
+
+export const resolveDID = async (did?: string) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: [
+      defaultSnapOrigin,
+      {
+        method: 'resolveDID',
+        params: { did },
+      },
+    ],
+  });
+};
 
 export const isLocalSnap = (snapId: string) => snapId.startsWith('local:');

@@ -17,6 +17,7 @@ import {
   getSnap,
   getVCs,
   getVP,
+  resolveDID,
   sendHello,
   shouldDisplayReconnectButton,
 } from '../utils';
@@ -178,6 +179,17 @@ const Index = () => {
       const did = await getDID();
       console.log(`Your DID is: ${did}`);
       alert(`Your DID is: ${did}`);
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleResolveDIDClick = async () => {
+    try {
+      const doc = await resolveDID();
+      console.log(`Your DID document is is: ${JSON.stringify(doc, null, 4)}`);
+      alert(`Your DID document is: ${JSON.stringify(doc, null, 4)}`);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -364,6 +376,24 @@ const Index = () => {
             button: (
               <SendHelloButton
                 onClick={handleGetDIDClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'resolveDID',
+            description: 'Resolve the DID and return a DID document',
+            button: (
+              <SendHelloButton
+                onClick={handleResolveDIDClick}
                 disabled={!state.installedSnap}
               />
             ),

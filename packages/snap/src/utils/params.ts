@@ -100,7 +100,7 @@ type GetVCsRequestParams = { query?: VCQuery };
 export function isValidGetVCsRequest(
   params: unknown
 ): asserts params is GetVCsRequestParams {
-  if (params != null && typeof params === 'object' && 'query' in params) return;
+  if (params != null && typeof params === 'object') return;
 
   throw new Error('Invalid GetVCs request');
 }
@@ -114,4 +114,14 @@ export function isValidCreateExampleVCRequest(
     return;
 
   throw new Error('Invalid CreateExampleVC request');
+}
+
+type ResolveDIDRequestParams = { did?: string };
+
+export function isValidResolveDIDRequest(
+  params: unknown
+): asserts params is ResolveDIDRequestParams {
+  if (params != null && typeof params === 'object') return;
+
+  throw new Error('Invalid ResolveDID request');
 }

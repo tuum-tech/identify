@@ -2,6 +2,7 @@
 import { OnRpcRequestHandler } from '@metamask/snap-types';
 import { getAvailableMethods } from './rpc/did/getAvailableMethods';
 import { getDid } from './rpc/did/getDID';
+import { resolveDID } from './rpc/did/resolveDID';
 import { switchMethod } from './rpc/did/switchMethods';
 import { configureHederaAccount } from './rpc/hedera/configureAccount';
 import { createExampleVC } from './rpc/vc/createExampleVC';
@@ -15,8 +16,9 @@ import {
   isValidGetVCsRequest,
   isValidGetVPRequest,
   isValidHederaAccountParams,
+  isValidResolveDIDRequest,
   isValidSaveVCRequest,
-  isValidSwitchMethodRequest
+  isValidSwitchMethodRequest,
 } from './utils/params';
 import { getCurrentAccount } from './utils/snapUtils';
 import { getSnapStateUnchecked, initAccountState } from './utils/stateUtils';
@@ -107,6 +109,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     case 'getDID':
       await switchNetworkIfNecessary(wallet, state);
       return await getDid(wallet, state);
+    case 'resolveDID':
+      isValidResolveDIDRequest(request.params);
+      await switchNetworkIfNecessary(wallet, state);
+      return await resolveDID(wallet, state, request.params.did);
     case 'getVCs':
       isValidGetVCsRequest(request.params);
       await switchNetworkIfNecessary(wallet, state);

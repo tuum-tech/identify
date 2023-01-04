@@ -1,5 +1,6 @@
 import { SnapProvider } from '@metamask/snap-types';
 import {
+  DIDResolutionResult,
   IIdentifier,
   MinimalImportableKey,
   VerifiableCredential,
@@ -36,16 +37,33 @@ export async function veramoCreateExampleVC(
     proofFormat: 'jwt',
   });
   console.log('Created vc: ', JSON.stringify(vc, null, 4));
-  return await agent.saveVC({ store: "snap", vc });
+  return await agent.saveVC({ store: 'snap', vc });
+}
+
+/* eslint-disable */
+export async function veramoResolveDID(
+  wallet: SnapProvider,
+  state: IdentitySnapState,
+  didUrl?: string
+): Promise<DIDResolutionResult> {
+  let did = didUrl;
+  // GET DID if not exists
+  if (!did) {
+    did = await veramoImportMetaMaskAccount(wallet, state);
+  }
+  const agent = await getAgent(wallet, state);
+  return await agent.resolveDid({
+    didUrl: did,
+  });
 }
 
 export async function veramoSaveVC(
   wallet: SnapProvider,
   state: IdentitySnapState,
-  vc: VerifiableCredential,
+  vc: VerifiableCredential
 ): Promise<boolean> {
   const agent = await getAgent(wallet, state);
-  return await agent.saveVC({ store: "snap", vc });
+  return await agent.saveVC({ store: 'snap', vc });
 }
 
 export async function veramoListVCs(
@@ -139,10 +157,8 @@ export async function veramoImportMetaMaskAccount(
 
   const chain_id = await getCurrentNetwork(wallet);
   const hederaChainIDs = getHederaChainIDs();
-  if (
-    Array.from(hederaChainIDs.keys()).includes(chain_id)
-  ) {
-    controllerKeyId = `metamask-${state.hederaAccount.accountId}`
+  if (Array.from(hederaChainIDs.keys()).includes(chain_id)) {
+    controllerKeyId = `metamask-${state.hederaAccount.accountId}`;
     await agent.didManagerImport({
       did,
       provider: method,
@@ -157,7 +173,6 @@ export async function veramoImportMetaMaskAccount(
         } as MinimalImportableKey,
       ],
     });
-
   } else {
     await agent.didManagerImport({
       did,
@@ -173,7 +188,14 @@ export async function veramoImportMetaMaskAccount(
           meta: {
             provider: 'metamask',
             account: state.currentAccount.toLowerCase(),
-            algorithms: ["ES256K", "ES256K-R", "eth_signTransaction", "eth_signTypedData", "eth_signMessage", "eth_rawSign"]
+            algorithms: [
+              'ES256K',
+              'ES256K-R',
+              'eth_signTransaction',
+              'eth_signTypedData',
+              'eth_signMessage',
+              'eth_rawSign',
+            ],
           },
         } as MinimalImportableKey,
       ],
