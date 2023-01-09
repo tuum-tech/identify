@@ -1,4 +1,4 @@
-import { VerifiableCredential } from '@veramo/core';
+import { VerifiableCredential, VerifiablePresentation } from '@veramo/core';
 import { ExampleVCValue, IdentitySnapState, VCQuery } from '../interfaces';
 
 /* eslint-disable */
@@ -58,6 +58,26 @@ export function isValidSwitchMethodRequest(
   throw new Error('Invalid switchMethod request');
 }
 
+type ResolveDIDRequestParams = { did?: string };
+
+export function isValidResolveDIDRequest(
+  params: unknown
+): asserts params is ResolveDIDRequestParams {
+  if (params != null && typeof params === 'object') return;
+
+  throw new Error('Invalid ResolveDID request');
+}
+
+type GetVCsRequestParams = { query?: VCQuery };
+
+export function isValidGetVCsRequest(
+  params: unknown
+): asserts params is GetVCsRequestParams {
+  if (params != null && typeof params === 'object') return;
+
+  throw new Error('Invalid GetVCs request');
+}
+
 type SaveVCRequestParams = { verifiableCredential: VerifiableCredential };
 
 export function isValidSaveVCRequest(
@@ -72,6 +92,33 @@ export function isValidSaveVCRequest(
 
   console.error('Invalid SaveVC request');
   throw new Error('Invalid SaveVC request');
+}
+
+type CreateVCRequestParams = { exampleVCData: ExampleVCValue };
+
+export function isValidCreateExampleVCRequest(
+  params: unknown
+): asserts params is CreateVCRequestParams {
+  if (params != null && typeof params === 'object' && 'exampleVCData' in params)
+    return;
+
+  throw new Error('Invalid CreateExampleVC request');
+}
+
+type VerifyVCRequestParams = { verifiableCredential: VerifiableCredential };
+
+export function isValidVerifyVCRequest(
+  params: unknown
+): asserts params is VerifyVCRequestParams {
+  if (
+    params !== null &&
+    typeof params === 'object' &&
+    'verifiableCredential' in params
+  )
+    return;
+
+  console.error('Invalid VerifyVC request');
+  throw new Error('Invalid VerifyVC request');
 }
 
 type GetVPRequestParams = {
@@ -95,33 +142,18 @@ export function isValidGetVPRequest(
   throw new Error('Invalid GetVP request');
 }
 
-type GetVCsRequestParams = { query?: VCQuery };
+type VerifyVPRequestParams = { verifiablePresentation: VerifiablePresentation };
 
-export function isValidGetVCsRequest(
+export function isValidVerifyVPRequest(
   params: unknown
-): asserts params is GetVCsRequestParams {
-  if (params != null && typeof params === 'object') return;
-
-  throw new Error('Invalid GetVCs request');
-}
-
-type CreateVCRequestParams = { exampleVCData: ExampleVCValue };
-
-export function isValidCreateExampleVCRequest(
-  params: unknown
-): asserts params is CreateVCRequestParams {
-  if (params != null && typeof params === 'object' && 'exampleVCData' in params)
+): asserts params is VerifyVPRequestParams {
+  if (
+    params !== null &&
+    typeof params === 'object' &&
+    'verifiablePresentation' in params
+  )
     return;
 
-  throw new Error('Invalid CreateExampleVC request');
-}
-
-type ResolveDIDRequestParams = { did?: string };
-
-export function isValidResolveDIDRequest(
-  params: unknown
-): asserts params is ResolveDIDRequestParams {
-  if (params != null && typeof params === 'object') return;
-
-  throw new Error('Invalid ResolveDID request');
+  console.error('Invalid VerifyVP request');
+  throw new Error('Invalid VerifyVP request');
 }

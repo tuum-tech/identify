@@ -2,6 +2,7 @@ import { SnapProvider } from '@metamask/snap-types';
 import {
   DIDResolutionResult,
   IIdentifier,
+  IVerifyResult,
   MinimalImportableKey,
   VerifiableCredential,
   VerifiablePresentation,
@@ -13,6 +14,41 @@ import { getCurrentDid } from './didUtils';
 import { getCurrentNetwork, snapConfirm } from './snapUtils';
 
 /* eslint-disable */
+export async function veramoResolveDID(
+  wallet: SnapProvider,
+  state: IdentitySnapState,
+  didUrl?: string
+): Promise<DIDResolutionResult> {
+  let did = didUrl;
+  // GET DID if not exists
+  if (!did) {
+    did = await veramoImportMetaMaskAccount(wallet, state);
+  }
+  const agent = await getAgent(wallet, state);
+  return await agent.resolveDid({
+    didUrl: did,
+  });
+}
+
+export async function veramoListVCs(
+  wallet: SnapProvider,
+  state: IdentitySnapState,
+  query?: VCQuery
+): Promise<VerifiableCredential[]> {
+  const agent = await getAgent(wallet, state);
+  const vcsSnap = await agent.listVCS({ store: 'snap', query: query });
+  return vcsSnap.vcs;
+}
+
+export async function veramoSaveVC(
+  wallet: SnapProvider,
+  state: IdentitySnapState,
+  vc: VerifiableCredential
+): Promise<boolean> {
+  const agent = await getAgent(wallet, state);
+  return await agent.saveVC({ store: 'snap', vc });
+}
+
 export async function veramoCreateExampleVC(
   wallet: SnapProvider,
   state: IdentitySnapState,
@@ -40,40 +76,13 @@ export async function veramoCreateExampleVC(
   return await agent.saveVC({ store: 'snap', vc });
 }
 
-/* eslint-disable */
-export async function veramoResolveDID(
-  wallet: SnapProvider,
-  state: IdentitySnapState,
-  didUrl?: string
-): Promise<DIDResolutionResult> {
-  let did = didUrl;
-  // GET DID if not exists
-  if (!did) {
-    did = await veramoImportMetaMaskAccount(wallet, state);
-  }
-  const agent = await getAgent(wallet, state);
-  return await agent.resolveDid({
-    didUrl: did,
-  });
-}
-
-export async function veramoSaveVC(
+export async function veramoVerifyVC(
   wallet: SnapProvider,
   state: IdentitySnapState,
   vc: VerifiableCredential
-): Promise<boolean> {
+): Promise<IVerifyResult> {
   const agent = await getAgent(wallet, state);
-  return await agent.saveVC({ store: 'snap', vc });
-}
-
-export async function veramoListVCs(
-  wallet: SnapProvider,
-  state: IdentitySnapState,
-  query?: VCQuery
-): Promise<VerifiableCredential[]> {
-  const agent = await getAgent(wallet, state);
-  const vcsSnap = await agent.listVCS({ store: 'snap', query: query });
-  return vcsSnap.vcs;
+  return await agent.verifyCredential({ credential: vc });
 }
 
 export async function veramoCreateVP(
@@ -129,6 +138,15 @@ export async function veramoCreateVP(
   }
   console.log('No VC found...');
   return null;
+}
+
+export async function veramoVerifyVP(
+  wallet: SnapProvider,
+  state: IdentitySnapState,
+  vp: VerifiablePresentation
+): Promise<IVerifyResult> {
+  const agent = await getAgent(wallet, state);
+  return await agent.verifyPresentation({ presentation: vp });
 }
 
 export async function veramoImportMetaMaskAccount(

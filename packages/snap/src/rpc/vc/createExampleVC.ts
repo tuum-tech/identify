@@ -8,18 +8,14 @@ export async function createExampleVC(
   wallet: SnapProvider,
   state: IdentitySnapState,
   exampleVCData: ExampleVCValue
-) {
+): Promise<boolean | null> {
   const promptObj = {
     prompt: 'Create and Save Example VC',
     description: `Would you like to create and save the following VC in snap?`,
     textAreaContent: JSON.stringify(exampleVCData),
   };
   if (await snapConfirm(wallet, promptObj)) {
-    return await veramoCreateExampleVC(
-      wallet,
-      state,
-      exampleVCData
-    );
+    return await veramoCreateExampleVC(wallet, state, exampleVCData);
   }
   return false;
 }

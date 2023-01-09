@@ -9,18 +9,14 @@ export async function saveVC(
   wallet: SnapProvider,
   state: IdentitySnapState,
   vc: VerifiableCredential
-) {
+): Promise<boolean | null> {
   const promptObj = {
     prompt: 'Save VC',
     description: `Would you like to save the following VC in snap?`,
     textAreaContent: JSON.stringify(vc.credentialSubject),
   };
   if (await snapConfirm(wallet, promptObj)) {
-    return await veramoSaveVC(
-      wallet,
-      state,
-      vc,
-    );
+    return await veramoSaveVC(wallet, state, vc);
   }
   return false;
 }

@@ -1,3 +1,8 @@
+import {
+  IVerifyResult,
+  VerifiableCredential,
+  VerifiablePresentation,
+} from '@veramo/core';
 import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import {
@@ -20,6 +25,8 @@ import {
   resolveDID,
   sendHello,
   shouldDisplayReconnectButton,
+  verifyVC,
+  verifyVP,
 } from '../utils';
 
 const Container = styled.div`
@@ -119,6 +126,8 @@ const Index = () => {
   const [createExampleVCValue, setCreateExampleVCValue] =
     useState('Example VC');
   const [vcId, setVcId] = useState('');
+  const [vc, setVc] = useState({});
+  const [vp, setVp] = useState({});
 
   const handleConnectClick = async () => {
     try {
@@ -198,12 +207,13 @@ const Index = () => {
 
   const handleGetVCsClick = async () => {
     try {
-      const vcs = await getVCs();
+      const vcs = (await getVCs()) as VerifiableCredential[];
       console.log(`Your VCs are: ${JSON.stringify(vcs, null, 4)}`);
       const vcsJson = JSON.parse(JSON.stringify(vcs));
       const keys = vcsJson.map((vc: { key: any }) => vc.key);
       if (keys) {
         setVcId(keys[keys.length - 1]);
+        setVc(vcs[keys.length - 1]);
       }
       alert(`Your VC IDs are: ${keys}`);
     } catch (e) {
@@ -225,11 +235,56 @@ const Index = () => {
     }
   };
 
+  const handleVerifyVCClick = async () => {
+    try {
+      const result = (await verifyVC(vc)) as IVerifyResult;
+      if (result.verified === false) {
+        console.log('VC Verification Error: ', result.error);
+        alert(
+          `Your VC Verification Error is: ${JSON.stringify(
+            result.error,
+            null,
+            4
+          )}`
+        );
+      } else {
+        console.log('VC Verified: ', result.verified);
+        alert('Your VC was verified successfully');
+      }
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
   const handleGetVPClick = async () => {
     try {
-      const vp = await getVP(vcId);
+      const vp = (await getVP(vcId)) as VerifiablePresentation;
+      setVp(vp);
       console.log(`Your VP is: ${JSON.stringify(vp, null, 4)}`);
       alert(`Your VP is: ${JSON.stringify(vp, null, 4)}`);
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleVerifyVPClick = async () => {
+    try {
+      const result = (await verifyVP(vc)) as IVerifyResult;
+      if (result.verified === false) {
+        console.log('VP Verification Error: ', result.error);
+        alert(
+          `Your VP Verification Error is: ${JSON.stringify(
+            result.error,
+            null,
+            4
+          )}`
+        );
+      } else {
+        console.log('VP Verified: ', result.verified);
+        alert('Your VP was verified successfully');
+      }
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -464,6 +519,36 @@ const Index = () => {
         />
         <Card
           content={{
+            title: 'verifyVC',
+            description: 'Verify a VC JWT, LDS format or EIP712',
+            form: (
+              <form>
+                <label>
+                  Enter your Verifiable Credential
+                  <input
+                    type="text"
+                    value={vcId}
+                    onChange={(e) => setVc(e.target.value)}
+                  />
+                </label>
+              </form>
+            ),
+            button: (
+              <SendHelloButton
+                onClick={handleVerifyVCClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
             title: 'getVP',
             description: 'Generate Verifiable Presentation from your VC',
             form: (
@@ -481,6 +566,37 @@ const Index = () => {
             button: (
               <SendHelloButton
                 onClick={handleGetVPClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+
+        <Card
+          content={{
+            title: 'verifyVP',
+            description: 'Verify a VP JWT or LDS format',
+            form: (
+              <form>
+                <label>
+                  Enter your Verifiable Presentation
+                  <input
+                    type="text"
+                    value={vcId}
+                    onChange={(e) => setVp(e.target.value)}
+                  />
+                </label>
+              </form>
+            ),
+            button: (
+              <SendHelloButton
+                onClick={handleVerifyVPClick}
                 disabled={!state.installedSnap}
               />
             ),

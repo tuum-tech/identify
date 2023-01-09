@@ -9,6 +9,8 @@ import { createExampleVC } from './rpc/vc/createExampleVC';
 import { getVCs } from './rpc/vc/getVCs';
 import { getVP } from './rpc/vc/getVP';
 import { saveVC } from './rpc/vc/saveVC';
+import { verifyVC } from './rpc/vc/verifyVC';
+import { verifyVP } from './rpc/vc/verifyVP';
 import { init } from './utils/init';
 import { switchNetworkIfNecessary } from './utils/network';
 import {
@@ -19,6 +21,8 @@ import {
   isValidResolveDIDRequest,
   isValidSaveVCRequest,
   isValidSwitchMethodRequest,
+  isValidVerifyVCRequest,
+  isValidVerifyVPRequest,
 } from './utils/params';
 import { getCurrentAccount } from './utils/snapUtils';
 import { getSnapStateUnchecked, initAccountState } from './utils/stateUtils';
@@ -125,6 +129,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       isValidCreateExampleVCRequest(request.params);
       await switchNetworkIfNecessary(wallet, state);
       return await createExampleVC(wallet, state, request.params.exampleVCData);
+    case 'verifyVC':
+      isValidVerifyVCRequest(request.params);
+      await switchNetworkIfNecessary(wallet, state);
+      return await verifyVC(wallet, state, request.params.verifiableCredential);
     case 'getVP':
       isValidGetVPRequest(request.params);
       await switchNetworkIfNecessary(wallet, state);
@@ -134,6 +142,14 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         request.params.vcId,
         request.params.domain,
         request.params.challenge
+      );
+    case 'verifyVP':
+      isValidVerifyVPRequest(request.params);
+      await switchNetworkIfNecessary(wallet, state);
+      return await verifyVP(
+        wallet,
+        state,
+        request.params.verifiablePresentation
       );
     case 'getCurrentDIDMethod':
       await switchNetworkIfNecessary(wallet, state);

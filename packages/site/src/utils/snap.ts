@@ -1,4 +1,4 @@
-import { VerifiableCredential } from '@veramo/core';
+import { VerifiableCredential, VerifiablePresentation } from '@veramo/core';
 import { defaultSnapOrigin } from '../config';
 import { GetSnapsResponse, Snap } from '../types';
 
@@ -129,6 +129,23 @@ export const getDID = async () => {
 };
 
 /**
+ * Invoke the "resolveDID" method from the snap.
+ */
+
+export const resolveDID = async (did?: string) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: [
+      defaultSnapOrigin,
+      {
+        method: 'resolveDID',
+        params: { did },
+      },
+    ],
+  });
+};
+
+/**
  * Invoke the "getVCs" method from the snap.
  */
 
@@ -149,7 +166,7 @@ export const getVCs = async () => {
  * Invoke the "saveVC" method from the snap.
  */
 
-export const saveVC = async (vc: VerifiableCredential) => {
+export const saveVC = async (vc: VerifiableCredential | {}) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: [
@@ -190,6 +207,23 @@ export const createExampleVC = async (name: string, value: string) => {
 };
 
 /**
+ * Invoke the "verifyVC" method from the snap.
+ */
+
+export const verifyVC = async (vc: VerifiableCredential | {}) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: [
+      defaultSnapOrigin,
+      {
+        method: 'verifyVC',
+        params: { verifiableCredential: vc },
+      },
+    ],
+  });
+};
+
+/**
  * Invoke the "getVP" method from the snap.
  */
 
@@ -223,17 +257,17 @@ export const getVP = async (vcId: string, challenge?: boolean) => {
 };
 
 /**
- * Invoke the "resolveDID" method from the snap.
+ * Invoke the "verifyVP" method from the snap.
  */
 
-export const resolveDID = async (did?: string) => {
+export const verifyVP = async (vp: VerifiablePresentation | {}) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: [
       defaultSnapOrigin,
       {
-        method: 'resolveDID',
-        params: { did },
+        method: 'verifyVP',
+        params: { verifiablePresentation: vp },
       },
     ],
   });
