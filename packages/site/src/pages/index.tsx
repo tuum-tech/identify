@@ -1,7 +1,7 @@
 import {
   IVerifyResult,
   VerifiableCredential,
-  VerifiablePresentation,
+  VerifiablePresentation
 } from '@veramo/core';
 import { useContext, useState } from 'react';
 import styled from 'styled-components';
@@ -10,7 +10,7 @@ import {
   ConnectButton,
   InstallFlaskButton,
   ReconnectButton,
-  SendHelloButton,
+  SendHelloButton
 } from '../components';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
 import {
@@ -26,7 +26,7 @@ import {
   sendHello,
   shouldDisplayReconnectButton,
   verifyVC,
-  verifyVP,
+  verifyVP
 } from '../utils';
 
 const Container = styled.div`
@@ -527,7 +527,7 @@ const Index = () => {
                   Enter your Verifiable Credential
                   <input
                     type="text"
-                    value={vcId}
+                    value={JSON.stringify(vc)}
                     onChange={(e) => setVc(e.target.value)}
                   />
                 </label>
@@ -588,7 +588,7 @@ const Index = () => {
                   Enter your Verifiable Presentation
                   <input
                     type="text"
-                    value={vcId}
+                    value={JSON.stringify(vp)}
                     onChange={(e) => setVp(e.target.value)}
                   />
                 </label>
