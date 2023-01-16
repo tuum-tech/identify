@@ -2,7 +2,6 @@ import { IVCManager, VCManager } from '@blockchain-lab-um/veramo-vc-manager';
 import { AbstractVCStore } from '@blockchain-lab-um/veramo-vc-manager/build/vc-store/abstract-vc-store';
 import { Web3Provider } from '@ethersproject/providers';
 import { SnapProvider } from '@metamask/snap-types';
-import { getDidPkhResolver, PkhDIDProvider } from '@tuum-tech/did-provider-pkh';
 import {
   createAgent,
   ICredentialPlugin,
@@ -10,7 +9,7 @@ import {
   IDIDManager,
   IKeyManager,
   IResolver,
-  TAgent,
+  TAgent
 } from '@veramo/core';
 import { CredentialPlugin, W3cMessageHandler } from '@veramo/credential-w3c';
 import { JwtMessageHandler } from '@veramo/did-jwt';
@@ -25,11 +24,14 @@ import { Resolver } from 'did-resolver';
 import { IdentitySnapState } from '../interfaces';
 import { getHederaChainIDs } from '../utils/config';
 import { getCurrentNetwork } from '../utils/snapUtils';
+import { PkhDIDProvider } from './plugins/did-provider-pkh/src/pkh-did-provider';
+import { getResolver as getDidPkhResolver } from './plugins/did-provider-pkh/src/resolver';
+
 import {
   SnapDIDStore,
   SnapKeyStore,
   SnapPrivateKeyStore,
-  SnapVCStore,
+  SnapVCStore
 } from './plugins/snapDataStore';
 
 /* eslint-disable */

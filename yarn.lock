@@ -4686,6 +4686,7 @@ __metadata:
     "@babel/runtime": ^7.20.1
     "@blockchain-lab-um/veramo-vc-manager": ^1.0.7
     "@ethersproject/providers": ^5.7.2
+    "@ethersproject/transactions": ^5.7.0
     "@hashgraph/sdk": ^2.18.6
     "@lavamoat/allow-scripts": ^2.0.3
     "@metamask/auto-changelog": ^2.6.0

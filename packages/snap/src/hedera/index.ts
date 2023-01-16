@@ -40,7 +40,7 @@ export class HederaServiceImpl implements HederaService {
 }
 
 /** Does the operator key belong to the operator account */
-async function testClientOperatorMatch(client: Client) {
+export async function testClientOperatorMatch(client: Client) {
   const { TransferTransaction, Hbar, Status, StatusError } = await import(
     '@hashgraph/sdk'
   );
