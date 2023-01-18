@@ -1,11 +1,9 @@
-import { AccountId, PrivateKey } from '@hashgraph/sdk';
+import { PrivateKey } from '@hashgraph/sdk';
 import { IdentitySnapState } from '../../interfaces';
 import { getHederaChainIDs } from '../../utils/config';
 import { getCurrentNetwork } from '../../utils/snapUtils';
 import { updateSnapState } from '../../utils/stateUtils';
-import { HederaServiceImpl } from '../../veramo/plugins/did-provider-pkh/src/hedera';
-import { WalletHedera } from '../../veramo/plugins/did-provider-pkh/src/hedera/wallet/abstract';
-import { PrivateKeySoftwareWallet } from '../../veramo/plugins/did-provider-pkh/src/hedera/wallet/software-private-key';
+import { toHederaAccountInfo } from '../../veramo/plugins/did-provider-pkh/src/pkh-did-provider';
 
 /* eslint-disable */
 export async function configureHederaAccount(
@@ -16,31 +14,24 @@ export async function configureHederaAccount(
   const hederaChainIDs = getHederaChainIDs();
   const chain_id = await getCurrentNetwork(wallet);
   if (Array.from(hederaChainIDs.keys()).includes(chain_id)) {
-    const accountId = AccountId.fromString(_accountId);
-    const privateKey = PrivateKey.fromStringECDSA(_privateKey);
-    const publicKey = privateKey.publicKey;
-    const walletHedera: WalletHedera = new PrivateKeySoftwareWallet(privateKey);
-    const hedera = new HederaServiceImpl();
-
-    const client = await hedera.createClient({
-      walletHedera,
-      keyIndex: 0,
-      accountId: accountId,
-      network: hederaChainIDs.get(chain_id) as string,
-    });
-    if (client != null) {
-      const info = await client.getAccountInfo(_accountId);
-      state.hederaAccount.evmAddress = info.contractAccountId;
+    const hederaAccountInfo = await toHederaAccountInfo(
+      _privateKey,
+      _accountId,
+      hederaChainIDs.get(chain_id) as string
+    );
+    if (hederaAccountInfo !== null) {
+      state.hederaAccount.evmAddress = hederaAccountInfo.contractAccountId;
       if (state.hederaAccount.evmAddress !== state.currentAccount) {
         state.currentAccount = state.hederaAccount.evmAddress;
       }
-      state.hederaAccount.privateKey = privateKey.toStringRaw();
-      state.hederaAccount.publicKey = publicKey.toStringRaw();
-      state.hederaAccount.accountId = accountId.toString();
+      state.hederaAccount.privateKey = _privateKey;
+      state.hederaAccount.publicKey =
+        PrivateKey.fromStringECDSA(_privateKey).publicKey.toStringRaw();
+      state.hederaAccount.accountId = _accountId;
       await updateSnapState(wallet, state);
       return true;
     } else {
-      console.error('Invalid private key or account Id');
+      console.error('Could not retrieve hedera account info');
       return false;
     }
   } else {
