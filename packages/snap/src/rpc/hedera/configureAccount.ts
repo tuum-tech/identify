@@ -1,11 +1,11 @@
 import { AccountId, PrivateKey } from '@hashgraph/sdk';
-import { HederaServiceImpl } from '../../hedera';
-import { WalletHedera } from '../../hedera/wallet/abstract';
-import { PrivateKeySoftwareWallet } from '../../hedera/wallet/software-private-key';
 import { IdentitySnapState } from '../../interfaces';
 import { getHederaChainIDs } from '../../utils/config';
 import { getCurrentNetwork } from '../../utils/snapUtils';
 import { updateSnapState } from '../../utils/stateUtils';
+import { HederaServiceImpl } from '../../veramo/plugins/did-provider-pkh/src/hedera';
+import { WalletHedera } from '../../veramo/plugins/did-provider-pkh/src/hedera/wallet/abstract';
+import { PrivateKeySoftwareWallet } from '../../veramo/plugins/did-provider-pkh/src/hedera/wallet/software-private-key';
 
 /* eslint-disable */
 export async function configureHederaAccount(

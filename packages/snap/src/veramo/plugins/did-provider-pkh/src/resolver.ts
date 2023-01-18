@@ -1,11 +1,15 @@
 import { AccountId, ChainIdParams } from 'caip';
-import type { DIDResolutionOptions, DIDResolutionResult, ParsedDID, Resolvable, ResolverRegistry } from 'did-resolver';
+import type {
+  DIDResolutionOptions,
+  DIDResolutionResult,
+  ParsedDID,
+  Resolvable,
+  ResolverRegistry,
+} from 'did-resolver';
 
 const DID_LD_JSON = 'application/did+ld+json';
 const DID_JSON = 'application/did+json';
-const SECPK1_NAMESPACES = ['eip155', 'bip122', 'hedera'];
-const TZ_NAMESPACE = 'tezos';
-
+const SECPK1_NAMESPACES = ['eip155', 'hedera'];
 
 function toDidDoc(did: string, accountId: string): any {
   const { namespace } = AccountId.parse(accountId).chainId as ChainIdParams;
@@ -17,7 +21,8 @@ function toDidDoc(did: string, accountId: string): any {
         blockchainAccountId: 'https://w3id.org/security#blockchainAccountId',
         EcdsaSecp256k1RecoveryMethod2020:
           'https://identity.foundation/EcdsaSecp256k1RecoverySignature2020#EcdsaSecp256k1RecoveryMethod2020',
-        Ed25519VerificationKey2018: 'https://w3id.org/security#Ed25519VerificationKey2018',
+        Ed25519VerificationKey2018:
+          'https://w3id.org/security#Ed25519VerificationKey2018',
       },
     ],
     id: did,
@@ -31,24 +36,11 @@ function toDidDoc(did: string, accountId: string): any {
     ],
     authentication: [vmId],
     assertionMethod: [vmId],
-  }
-  if (SECPK1_NAMESPACES.includes(namespace)) {
-    // nothing to do here
-  } else if (namespace === TZ_NAMESPACE) {
-    (doc['@context'][1] as any).TezosMethod2021 = 'https://w3id.org/security#TezosMethod2021';
-    const tzId = did + '#TezosMethod2021';
-    doc.verificationMethod.push({
-      id: tzId,
-      type: 'TezosMethod2021',
-      controller: did,
-      blockchainAccountId: accountId,
-    })
-    doc.authentication.push(tzId);
-    doc.assertionMethod.push(tzId);
-  } else {
+  };
+  if (!SECPK1_NAMESPACES.includes(namespace)) {
     throw new Error(`chain namespace not supported ${namespace}`);
   }
-  return doc
+  return doc;
 }
 
 export function getResolver(): ResolverRegistry {
@@ -64,9 +56,9 @@ export function getResolver(): ResolverRegistry {
         didResolutionMetadata: { contentType },
         didDocument: null,
         didDocumentMetadata: {},
-      }
+      };
       try {
-        const doc = toDidDoc(did, parsed.id)
+        const doc = toDidDoc(did, parsed.id);
         if (contentType === DID_LD_JSON) {
           response.didDocument = doc;
         } else if (contentType === DID_JSON) {
@@ -82,5 +74,5 @@ export function getResolver(): ResolverRegistry {
       }
       return response;
     },
-  }
+  };
 }

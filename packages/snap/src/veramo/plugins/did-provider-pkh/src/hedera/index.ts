@@ -1,4 +1,11 @@
-import { AccountId, Client } from '@hashgraph/sdk';
+import {
+  AccountId,
+  Client,
+  Hbar,
+  Status,
+  StatusError,
+  TransferTransaction,
+} from '@hashgraph/sdk';
 
 import { HederaService, SimpleHederaClient } from './service';
 import { WalletHedera } from './wallet/abstract';
@@ -13,8 +20,6 @@ export class HederaServiceImpl implements HederaService {
     keyIndex: number;
     accountId: AccountId;
   }): Promise<SimpleHederaClient | null> {
-    const { Client } = await import('@hashgraph/sdk');
-
     const client = Client.forNetwork(options.network as any);
     const transactionSigner = await options.walletHedera.getTransactionSigner(
       options.keyIndex
@@ -40,11 +45,7 @@ export class HederaServiceImpl implements HederaService {
 }
 
 /** Does the operator key belong to the operator account */
-export async function testClientOperatorMatch(client: Client) {
-  const { TransferTransaction, Hbar, Status, StatusError } = await import(
-    '@hashgraph/sdk'
-  );
-
+async function testClientOperatorMatch(client: Client) {
   const tx = new TransferTransaction()
     /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
     .addHbarTransfer(client.operatorAccountId!, Hbar.fromTinybars(0))

@@ -45,7 +45,7 @@ export interface SimpleHederaClient {
   }): Promise<AccountId | null>;
 }
 
-export interface HederaAccountInfo {
+export type HederaAccountInfo = {
   accountId: AccountId;
   aliasKey: PublicKey;
   autoRenewPeriod: Duration;
@@ -69,4 +69,4 @@ export interface HederaAccountInfo {
   stakingInfo: StakingInfo;
   tokenAllowances: Object;
   tokenRelationships: TokenRelationship;
-}
+};

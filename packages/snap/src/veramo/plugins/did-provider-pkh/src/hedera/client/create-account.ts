@@ -1,4 +1,5 @@
 import type { AccountId, Client, PublicKey } from '@hashgraph/sdk';
+import { AccountCreateTransaction, Hbar } from '@hashgraph/sdk';
 import { BigNumber } from 'bignumber.js';
 
 /* eslint-disable */
@@ -9,8 +10,7 @@ export async function createAccount(
     initialBalance: BigNumber;
   }
 ): Promise<AccountId | null> {
-  const { AccountCreateTransaction, Hbar } = await import('@hashgraph/sdk');
-  const tx = await new AccountCreateTransaction()
+  const tx = new AccountCreateTransaction()
     .setInitialBalance(Hbar.fromTinybars(options.initialBalance))
     .setMaxTransactionFee(new Hbar(1))
     .setKey(options.publicKey);
