@@ -51,6 +51,10 @@ bundleString = bundleString.replaceAll(
   "if(root) {var coreJsData = root['__core-js_shared__'];}"
 );
 
+
+// workaround to be able to find the keys for a did:pkh:hedera. 
+bundleString = bundleString.replace('let vmEthAddr = getEthereumAddress(verificationMethod);', "if (verificationMethod.blockchainAccountId?.startsWith('hedera')) { return true; };let vmEthAddr = getEthereumAddress(verificationMethod);");
+
 bundleString = bundleString.replaceAll(
   'var Symbol = root.Symbol',
   'if(root)var Symbol = root.Symbol'
