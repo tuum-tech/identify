@@ -1471,7 +1471,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.0.0, @babel/runtime@npm:^7.10.2, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.15.4, @babel/runtime@npm:^7.18.0, @babel/runtime@npm:^7.18.9, @babel/runtime@npm:^7.20.1, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.9.2":
+"@babel/runtime@npm:^7.0.0, @babel/runtime@npm:^7.10.2, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.15.4, @babel/runtime@npm:^7.18.0, @babel/runtime@npm:^7.18.9, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.9.2":
   version: 7.20.1
   resolution: "@babel/runtime@npm:7.20.1"
   dependencies:
@@ -4661,20 +4661,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tuum-tech/did-provider-pkh@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "@tuum-tech/did-provider-pkh@npm:4.0.0"
-  dependencies:
-    "@ethersproject/bignumber": ^5.7.0
-    "@ethersproject/signing-key": ^5.7.0
-    "@ethersproject/transactions": ^5.7.0
-    "@veramo/core": ^4.0.0
-    "@veramo/did-manager": ^4.0.0
-    debug: ^4.3.3
-  checksum: 72d0fe39bfa73b0803a5595110f233743e837a57a902f30ab1c9014aae9290fbb68ac0b42032f5c1038f453516a6efc47e2512b5c25576388f777ba161f6d7a5
-  languageName: node
-  linkType: hard
-
 "@tuum-tech/identity-snap@workspace:packages/snap":
   version: 0.0.0-use.local
   resolution: "@tuum-tech/identity-snap@workspace:packages/snap"
@@ -4683,7 +4669,6 @@ __metadata:
     "@babel/preset-env": ^7.20.2
     "@babel/preset-typescript": ^7.18.6
     "@babel/register": ^7.18.9
-    "@babel/runtime": ^7.20.1
     "@blockchain-lab-um/veramo-vc-manager": ^1.0.7
     "@ethersproject/providers": ^5.7.2
     "@ethersproject/transactions": ^5.7.0
@@ -4698,7 +4683,6 @@ __metadata:
     "@metamask/snap-types": ^0.22.0
     "@metamask/snaps-cli": ^0.22.0
     "@metamask/snaps-webpack-plugin": ^0.23.0
-    "@tuum-tech/did-provider-pkh": ^4.0.0
     "@types/jest": ^29.2.2
     "@types/lodash.clonedeep": ^4.5.7
     "@types/uuid": ^9.0.0
@@ -5564,7 +5548,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@veramo/core@npm:^4.0.0, @veramo/core@npm:^4.1.1":
+"@veramo/core@npm:^4.1.1":
   version: 4.1.1
   resolution: "@veramo/core@npm:4.1.1"
   dependencies:
@@ -5657,7 +5641,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@veramo/did-manager@npm:^4.0.0, @veramo/did-manager@npm:^4.1.1":
+"@veramo/did-manager@npm:^4.1.1":
   version: 4.1.1
   resolution: "@veramo/did-manager@npm:4.1.1"
   dependencies:
