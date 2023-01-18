@@ -21,7 +21,7 @@ export const getSnaps = async (): Promise<GetSnapsResponse> => {
  */
 export const connectSnap = async (
   snapId: string = defaultSnapOrigin,
-  params: Record<'version' | string, unknown> = {},
+  params: Record<'version' | string, unknown> = {}
 ) => {
   await window.ethereum.request({
     method: 'wallet_enable',
@@ -49,7 +49,7 @@ export const getSnap = async (version?: string): Promise<Snap | undefined> => {
 
     return Object.values(snaps).find(
       (snap) =>
-        snap.id === defaultSnapOrigin && (!version || snap.version === version),
+        snap.id === defaultSnapOrigin && (!version || snap.version === version)
     );
   } catch (e) {
     console.log('Failed to obtain installed snap', e);
@@ -77,12 +77,10 @@ export const sendHello = async () => {
  *
  * Invoke "configureHederaAccount" method from the snap
  *
- * @param privateKey
- * @param accountId
  */
 export const configureHederaAccount = async (
   privateKey: string,
-  accountId: string,
+  accountId: string
 ) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
