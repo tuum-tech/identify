@@ -1,5 +1,5 @@
 {
-  "version": "0.1.1",
+  "version": "0.1.23",
   "description": "A snap for managing Decentralized Identifiers(DIDs)",
   "proposedName": "Identity Snap",
   "repository": {
