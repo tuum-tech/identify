@@ -1,9 +1,6 @@
 import { ProofInfo } from '@tuum-tech/identity-snap/src/types/params';
-import {
-  IVerifyResult,
-  VerifiableCredential,
-  VerifiablePresentation,
-} from '@veramo/core';
+import { GetVCsRequestResult } from '@tuum-tech/identity-snap/src/types/results';
+import { IVerifyResult, VerifiablePresentation } from '@veramo/core';
 import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import {
@@ -216,13 +213,13 @@ const Index = () => {
         store: 'snap',
         returnStore: true,
       };
-      const vcs = (await getVCs(undefined, options)) as VerifiableCredential[];
+      const vcs = (await getVCs(undefined, options)) as GetVCsRequestResult[];
       console.log(`Your VCs are: ${JSON.stringify(vcs, null, 4)}`);
       const vcsJson = JSON.parse(JSON.stringify(vcs));
       const keys = vcsJson.map((vc: { metadata: any }) => vc.metadata.id);
       if (keys) {
         setVcId(keys[keys.length - 1]);
-        setVc(vcs[keys.length - 1]);
+        setVc(vcs[keys.length - 1].data);
       }
       alert(`Your VC IDs are: ${keys}`);
     } catch (e) {
@@ -242,7 +239,7 @@ const Index = () => {
         store: 'snap',
         returnStore: true,
       };
-      const credTypes = ['ProfileNames'];
+      const credTypes = ['ProfileNamesCredential'];
       const saved = await createVC(vcKey, vcValue, options, credTypes);
       console.log('created and saved VC: ', saved);
     } catch (e) {
@@ -278,7 +275,7 @@ const Index = () => {
       const vcs = [vcId];
       const proofInfo: ProofInfo = {
         proofFormat: 'jwt',
-        type: 'ProfileNames',
+        type: 'ProfileNamesPresentation',
         domain: 'identity.tuum.tech',
         challenge: vcId,
       };

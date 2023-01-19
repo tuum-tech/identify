@@ -18,7 +18,7 @@ export async function saveVC(
     description: `Would you like to save the following VC in ${
       typeof store === 'string' ? store : store.join(', ')
     }?`,
-    textAreaContent: JSON.stringify(verifiableCredential).substring(0, 100),
+    textAreaContent: JSON.stringify(verifiableCredential, null, 4),
   };
 
   if (await snapConfirm(wallet, promptObj)) {

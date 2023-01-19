@@ -17,9 +17,13 @@ export async function createVC(
   const promptObj = {
     prompt: 'Create and Save VC',
     description: `Would you like to create and save the following VC in snap?`,
-    textAreaContent: JSON.stringify({
-      [vcKey]: vcValue,
-    }),
+    textAreaContent: JSON.stringify(
+      {
+        [vcKey]: vcValue,
+      },
+      null,
+      4
+    ),
   };
   if (await snapConfirm(wallet, promptObj)) {
     return await veramoCreateVC(

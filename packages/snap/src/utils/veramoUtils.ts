@@ -7,6 +7,7 @@ import {
   VerifiablePresentation,
   W3CVerifiableCredential,
 } from '@veramo/core';
+import cloneDeep from 'lodash.clonedeep';
 import { IdentitySnapState } from '../interfaces';
 import { CreateVPRequestParams, GetVCsOptions } from '../types/params';
 import { GetVCsRequestResult } from '../types/results';
@@ -75,16 +76,27 @@ export async function veramoCreateVC(
   // GET DID
   const did = await veramoImportMetaMaskAccount(wallet, state);
   const agent = await getAgent(wallet, state);
+
+  const issuanceDate = new Date();
+  const expirationDate = cloneDeep(issuanceDate);
+  expirationDate.setFullYear(
+    issuanceDate.getFullYear() + 1,
+    issuanceDate.getMonth(),
+    issuanceDate.getDate()
+  );
   const verifiableCredential = await agent.createVerifiableCredential({
     credential: {
-      issuer: { id: did },
-      issuanceDate: new Date().toISOString(),
+      issuer: { id: did }, // the entity that issued the credential
+      issuanceDate: issuanceDate.toISOString(), // when the credential was issued
+      expirationDate: expirationDate.toISOString(), // when the credential will expire
+      // claims about the subjects of the credential
       credentialSubject: {
-        id: did,
-        [vcKey]: vcValue,
+        id: did, // identifier for the only subject of the credential
+        [vcKey]: vcValue, // assertion about the only subject of the credential
       },
       type: credTypes,
     },
+    // digital proof that makes the credential tamper-evident
     proofFormat: 'jwt',
   });
   console.log(
@@ -146,18 +158,19 @@ export async function veramoCreateVP(
   const promptObj = {
     prompt: 'Alert',
     description: 'Do you wish to create a VP from the following VC?',
-    textAreaContent: 'Multiple VCs',
+    textAreaContent: JSON.stringify(vcs, null, 4),
   };
+
   if (config.dApp.disablePopups || (await snapConfirm(wallet, promptObj))) {
     const vp = await agent.createVerifiablePresentation({
       presentation: {
-        holder: did,
+        holder: did, //
         type: ['VerifiablePresentation', type],
         verifiableCredential: vcs,
       },
-      proofFormat: proofFormat,
-      domain: domain,
-      challenge: challenge,
+      proofFormat: proofFormat, // The desired format for the VerifiablePresentation to be created
+      domain: domain, // Optional string domain parameter to add to the verifiable presentation
+      challenge: challenge, // Optional (only JWT) string challenge parameter to add to the verifiable presentation
     });
     return vp;
   }
