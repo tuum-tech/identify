@@ -45,7 +45,7 @@ export class SnapKeyStore extends AbstractKeyStore {
     if (this.isHederaAccount) {
       account = this.state.hederaAccount.accountId;
     }
-    if (!account) throw Error('User denied error');
+    if (!account) throw Error('Cannot get current account');
 
     const key = this.state.accountState[account].snapKeyStore[kid];
     if (!key) throw Error('Key not found');
@@ -57,7 +57,7 @@ export class SnapKeyStore extends AbstractKeyStore {
     if (this.isHederaAccount) {
       account = this.state.hederaAccount.accountId;
     }
-    if (!account) throw Error('User denied error');
+    if (!account) throw Error('Cannot get current account');
 
     if (!this.state.accountState[account].snapKeyStore[kid])
       throw Error('Key not found');
@@ -72,7 +72,7 @@ export class SnapKeyStore extends AbstractKeyStore {
     if (this.isHederaAccount) {
       account = this.state.hederaAccount.accountId;
     }
-    if (!account) throw Error('User denied error');
+    if (!account) throw Error('Cannot get current account');
 
     this.state.accountState[account].snapKeyStore[args.kid] = { ...args };
     await updateSnapState(this.wallet, this.state);
@@ -84,7 +84,7 @@ export class SnapKeyStore extends AbstractKeyStore {
     if (this.isHederaAccount) {
       account = this.state.hederaAccount.accountId;
     }
-    if (!account) throw Error('User denied error');
+    if (!account) throw Error('Cannot get current account');
 
     const safeKeys = Object.values(
       this.state.accountState[account].snapKeyStore
@@ -217,7 +217,7 @@ export class SnapDIDStore extends AbstractDIDStore {
     if (this.isHederaAccount) {
       account = this.state.hederaAccount.accountId;
     }
-    if (!account) throw Error('User denied error');
+    if (!account) throw Error('Cannot get current account');
     const identifiers = this.state.accountState[account].identifiers;
 
     if (did && !alias) {
@@ -246,7 +246,7 @@ export class SnapDIDStore extends AbstractDIDStore {
     if (this.isHederaAccount) {
       account = this.state.hederaAccount.accountId;
     }
-    if (!account) throw Error('User denied error');
+    if (!account) throw Error('Cannot get current account');
 
     if (!this.state.accountState[account].identifiers[did])
       throw Error('Identifier not found');
@@ -261,7 +261,7 @@ export class SnapDIDStore extends AbstractDIDStore {
     if (this.isHederaAccount) {
       account = this.state.hederaAccount.accountId;
     }
-    if (!account) throw Error('User denied error');
+    if (!account) throw Error('Cannot get current account');
 
     const identifier = { ...args };
     for (const key of identifier.keys) {
@@ -282,7 +282,7 @@ export class SnapDIDStore extends AbstractDIDStore {
     if (this.isHederaAccount) {
       account = this.state.hederaAccount.accountId;
     }
-    if (!account) throw Error('User denied error');
+    if (!account) throw Error('Cannot get current account');
 
     let result: IIdentifier[] = [];
     for (const key of Object.keys(
