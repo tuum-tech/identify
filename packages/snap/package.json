@@ -47,7 +47,6 @@
     "test:ci": "yarn test --silent"
   },
   "dependencies": {
-    "@blockchain-lab-um/veramo-vc-manager": "^1.0.7",
     "@ethersproject/providers": "^5.7.2",
     "@ethersproject/transactions": "^5.7.0",
     "@hashgraph/sdk": "^2.18.6",

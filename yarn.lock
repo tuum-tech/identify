@@ -1554,26 +1554,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@blockchain-lab-um/ssi-snap-types@npm:^1.0.7":
-  version: 1.0.11
-  resolution: "@blockchain-lab-um/ssi-snap-types@npm:1.0.11"
-  dependencies:
-    "@veramo/core": ^3.1.6-next.146
-  checksum: 153349b27933a194efdaaad546a5a75a81f13590b08a556e9a4bb4887e9ee6065f6d0a30a37e1e3d45bb452a04744c6ec8ff95c35a2a7a5daf1346b815da6a2d
-  languageName: node
-  linkType: hard
-
-"@blockchain-lab-um/veramo-vc-manager@npm:^1.0.7":
-  version: 1.0.7
-  resolution: "@blockchain-lab-um/veramo-vc-manager@npm:1.0.7"
-  dependencies:
-    "@blockchain-lab-um/ssi-snap-types": ^1.0.7
-    "@veramo/core": ^3.1.6-next.137
-    uuid: ^8.3.2
-  checksum: c518ae6a058c8d07dde492b81c86785f9344f309015c84a057067b4a8b27d62518d99477023b8956e35d829f800bf9d2aa5d7b5b2ec60d3da7c62efa2ca3639d
-  languageName: node
-  linkType: hard
-
 "@builder.io/partytown@npm:^0.5.2":
   version: 0.5.4
   resolution: "@builder.io/partytown@npm:0.5.4"
@@ -4912,7 +4892,6 @@ __metadata:
     "@babel/preset-env": ^7.20.2
     "@babel/preset-typescript": ^7.18.6
     "@babel/register": ^7.18.9
-    "@blockchain-lab-um/veramo-vc-manager": ^1.0.7
     "@ethersproject/providers": ^5.7.2
     "@ethersproject/transactions": ^5.7.0
     "@hashgraph/sdk": ^2.18.6
@@ -5780,18 +5759,6 @@ __metadata:
     crypto-ld: ^7.0.0
     json-stringify-deterministic: ^1.0.7
   checksum: 4932307f4fbcbd93daac96be27cbc39bc384636655390389c1edbfb605e4a2dfd466bebc10c816e87665aace4c25d8eb9732b14990496b69df319980048e98fe
-  languageName: node
-  linkType: hard
-
-"@veramo/core@npm:^3.1.6-next.137, @veramo/core@npm:^3.1.6-next.146":
-  version: 3.1.6-next.172
-  resolution: "@veramo/core@npm:3.1.6-next.172"
-  dependencies:
-    debug: ^4.3.3
-    did-jwt-vc: ^3.1.0
-    events: ^3.2.0
-    z-schema: ^5.0.2
-  checksum: e3b36873b10f8128ebbe3748583057a024598f53599fa3be0efaa99bb2ce9fc165599d22a6a73c02a96217133586ce61cdc044f13994d670f9c2dec195ba9224
   languageName: node
   linkType: hard
 
