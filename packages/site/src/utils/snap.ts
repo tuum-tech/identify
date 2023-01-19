@@ -198,9 +198,10 @@ export type ExampleVCValue = {
  */
 
 export const createVC = async (
-  vcKey: object,
+  vcKey: string,
   vcValue: object,
-  options: GetVCsOptions
+  options: GetVCsOptions,
+  credTypes?: string[]
 ) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
@@ -212,6 +213,7 @@ export const createVC = async (
           vcKey,
           vcValue,
           options,
+          credTypes,
         },
       },
     ],

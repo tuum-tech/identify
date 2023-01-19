@@ -242,7 +242,8 @@ const Index = () => {
         store: 'snap',
         returnStore: true,
       };
-      const saved = await createVC(vcKey, vcValue, options);
+      const credTypes = ['ProfileNames'];
+      const saved = await createVC(vcKey, vcValue, options, credTypes);
       console.log('created and saved VC: ', saved);
     } catch (e) {
       console.error(e);

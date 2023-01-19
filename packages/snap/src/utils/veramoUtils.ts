@@ -69,7 +69,8 @@ export async function veramoCreateVC(
   state: IdentitySnapState,
   vcKey: string,
   vcValue: object,
-  store: string | string[]
+  store: string | string[],
+  credTypes?: string[]
 ): Promise<IDataManagerSaveResult[]> {
   // GET DID
   const did = await veramoImportMetaMaskAccount(wallet, state);
@@ -82,6 +83,7 @@ export async function veramoCreateVC(
         id: did,
         [vcKey]: vcValue,
       },
+      type: credTypes,
     },
     proofFormat: 'jwt',
   });

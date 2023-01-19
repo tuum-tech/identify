@@ -21,8 +21,9 @@ export type SaveVCRequestParams = {
 };
 
 export type CreateVCRequestParams = {
-  vcKey?: string;
   vcValue: object;
+  vcKey?: string;
+  credTypes?: string[];
   options?: SaveVCOptions;
 };
 

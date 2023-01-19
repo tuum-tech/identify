@@ -11,7 +11,7 @@ export async function createVC(
   state: IdentitySnapState,
   params: CreateVCRequestParams
 ): Promise<IDataManagerSaveResult[]> {
-  const { vcKey = 'vcData', vcValue, options } = params || {};
+  const { vcKey = 'vcData', vcValue, credTypes, options } = params || {};
   const { store = 'snap' } = options || {};
 
   const promptObj = {
@@ -22,7 +22,14 @@ export async function createVC(
     }),
   };
   if (await snapConfirm(wallet, promptObj)) {
-    return await veramoCreateVC(wallet, state, vcKey, vcValue, store);
+    return await veramoCreateVC(
+      wallet,
+      state,
+      vcKey,
+      vcValue,
+      store,
+      credTypes
+    );
   }
   throw new Error('User rejected');
 }
