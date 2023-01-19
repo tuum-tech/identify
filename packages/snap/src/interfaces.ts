@@ -1,6 +1,6 @@
-import { IIdentifier, IKey, VerifiableCredential } from '@veramo/core';
+import { IIdentifier, IKey, W3CVerifiableCredential } from '@veramo/core';
 import { ManagedPrivateKey } from '@veramo/key-manager';
-import { availableVCStores } from './veramo/plugins/availableVCStores';
+import { availableVCStores } from './types/constants';
 
 /* eslint-disable */
 export type IdentitySnapState = {
@@ -38,7 +38,7 @@ export interface IdentityAccountState {
   snapPrivateKeyStore: Record<string, ManagedPrivateKey>;
   snapKeyStore: Record<string, IKey>;
   identifiers: Record<string, IIdentifier>;
-  vcs: Record<string, VerifiableCredential>;
+  vcs: Record<string, W3CVerifiableCredential>;
   accountConfig: IdentityAccountConfig;
 }
 
@@ -60,13 +60,4 @@ export type SnapConfirmParams = {
   prompt: string;
   description?: string;
   textAreaContent?: string;
-};
-
-export interface VCQuery {
-  [key: string]: string;
-}
-
-export type ExampleVCValue = {
-  name: string;
-  value: string;
 };

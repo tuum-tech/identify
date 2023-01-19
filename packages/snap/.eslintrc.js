@@ -1,13 +1,19 @@
 module.exports = {
-  extends: [
-    '../../.eslintrc.js',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:@typescript-eslint/recommended-requiring-type-checking',
-    'plugin:prettier/recommended',
+  root: true,
+  extends: ['../../.eslintrc.js'],
+  overrides: [
+    {
+      files: ['tests/**/*.ts'],
+      plugins: ['jest'],
+      extends: ['plugin:jest/recommended'],
+      rules: { 'jest/prefer-expect-assertions': 'off' },
+      env: { jest: true },
+    },
   ],
-  parser: '@typescript-eslint/parser',
   parserOptions: {
+    tsconfigRootDir: __dirname,
     project: './tsconfig.eslint.json',
+    sourceType: 'module',
   },
-  rules: { 'prettier/prettier': ['error', { singleQuote: true }] },
+  ignorePatterns: ['src/post-process/post-process.js'],
 };

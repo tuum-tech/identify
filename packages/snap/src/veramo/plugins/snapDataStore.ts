@@ -1,6 +1,5 @@
-import { AbstractVCStore } from '@blockchain-lab-um/veramo-vc-manager/build/vc-store/abstract-vc-store';
 import { SnapProvider } from '@metamask/snap-types';
-import { IIdentifier, IKey, VerifiableCredential } from '@veramo/core';
+import { IIdentifier, IKey, W3CVerifiableCredential } from '@veramo/core';
 import { AbstractDIDStore } from '@veramo/did-manager';
 import {
   AbstractKeyStore,
@@ -8,9 +7,16 @@ import {
   ImportablePrivateKey,
   ManagedPrivateKey,
 } from '@veramo/key-manager';
+import jsonpath from 'jsonpath';
 import { v4 as uuidv4 } from 'uuid';
 import { IdentitySnapState } from '../../interfaces';
+import { decodeJWT } from '../../utils/jwt';
 import { updateSnapState } from '../../utils/stateUtils';
+import {
+  AbstractDataStore,
+  IFilterArgs,
+  IQueryResult,
+} from './verfiable-creds-manager';
 
 /* eslint-disable */
 /**
@@ -23,13 +29,16 @@ export class SnapKeyStore extends AbstractKeyStore {
   state: IdentitySnapState;
   isHederaAccount: boolean;
 
-  constructor(wallet: SnapProvider, state: IdentitySnapState, isHederaAccount: boolean) {
+  constructor(
+    wallet: SnapProvider,
+    state: IdentitySnapState,
+    isHederaAccount: boolean
+  ) {
     super();
     this.wallet = wallet;
     this.state = state;
     this.isHederaAccount = isHederaAccount;
   }
-  private keys: Record<string, IKey> = {};
 
   async get({ kid }: { kid: string }): Promise<IKey> {
     let account = this.state.currentAccount;
@@ -97,7 +106,11 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
   state: IdentitySnapState;
   isHederaAccount: boolean;
 
-  constructor(wallet: SnapProvider, state: IdentitySnapState, isHederaAccount: boolean) {
+  constructor(
+    wallet: SnapProvider,
+    state: IdentitySnapState,
+    isHederaAccount: boolean
+  ) {
     super();
     this.wallet = wallet;
     this.state = state;
@@ -180,7 +193,11 @@ export class SnapDIDStore extends AbstractDIDStore {
   state: IdentitySnapState;
   isHederaAccount: boolean;
 
-  constructor(wallet: SnapProvider, state: IdentitySnapState, isHederaAccount: boolean) {
+  constructor(
+    wallet: SnapProvider,
+    state: IdentitySnapState,
+    isHederaAccount: boolean
+  ) {
     super();
     this.wallet = wallet;
     this.state = state;
@@ -289,32 +306,84 @@ export class SnapDIDStore extends AbstractDIDStore {
 }
 
 /**
- * An implementation of {@link AbstractVCStore} that holds everything in snap state.
+ * An implementation of {@link AbstractDataStore} that holds everything in snap state.
  *
  * This is usable by {@link @vc-manager/VCManager} to hold the vc data
  */
-export class SnapVCStore extends AbstractVCStore {
+export class SnapVCStore extends AbstractDataStore {
   wallet: SnapProvider;
   state: IdentitySnapState;
   isHederaAccount: boolean;
 
-  constructor(wallet: SnapProvider, state: IdentitySnapState, isHederaAccount: boolean) {
+  constructor(
+    wallet: SnapProvider,
+    state: IdentitySnapState,
+    isHederaAccount: boolean
+  ) {
     super();
     this.wallet = wallet;
     this.state = state;
     this.isHederaAccount = isHederaAccount;
   }
 
-  async get(args: { id: string }): Promise<VerifiableCredential | null> {
+  async query(args: IFilterArgs): Promise<Array<IQueryResult>> {
+    const { filter } = args;
     let account = this.state.currentAccount;
     if (this.isHederaAccount) {
       account = this.state.hederaAccount.accountId;
     }
-    if (!account) throw Error('User denied error');
+    if (!account) throw Error('Cannot get current account');
 
-    if (!this.state.accountState[account].vcs[args.id])
-      throw Error(`not_found: VC with key=${args.id} not found!`);
-    return this.state.accountState[account].vcs[args.id];
+    if (filter && filter.type === 'id') {
+      try {
+        if (this.state.accountState[account].vcs[filter.filter as string]) {
+          let vc = this.state.accountState[account].vcs[
+            filter.filter as string
+          ] as unknown;
+          if (typeof vc === 'string') {
+            vc = decodeJWT(vc);
+          }
+          const obj = [
+            {
+              metadata: { id: filter.filter as string },
+              data: vc,
+            },
+          ];
+          return obj;
+        } else return [];
+      } catch (e) {
+        throw new Error('Invalid id');
+      }
+    }
+    if (filter === undefined || (filter && filter.type === 'none')) {
+      return Object.keys(this.state.accountState[account].vcs).map((k) => {
+        let vc = this.state.accountState[account].vcs[k] as unknown;
+        if (typeof vc === 'string') {
+          vc = decodeJWT(vc);
+        }
+        return {
+          metadata: { id: k },
+          data: vc,
+        };
+      });
+    }
+    if (filter && filter.type === 'JSONPath') {
+      const objects = Object.keys(this.state.accountState[account].vcs).map(
+        (k) => {
+          let vc = this.state.accountState[account].vcs[k] as unknown;
+          if (typeof vc === 'string') {
+            vc = decodeJWT(vc);
+          }
+          return {
+            metadata: { id: k },
+            data: vc,
+          };
+        }
+      );
+      const filteredObjects = jsonpath.query(objects, filter.filter as string);
+      return filteredObjects as Array<IQueryResult>;
+    }
+    return [];
   }
 
   async delete({ id }: { id: string }) {
@@ -322,46 +391,43 @@ export class SnapVCStore extends AbstractVCStore {
     if (this.isHederaAccount) {
       account = this.state.hederaAccount.accountId;
     }
-    if (!account) throw Error('User denied error');
+    if (!account) throw Error('Cannot get current account');
 
-    if (!this.state.accountState[account].vcs[id]) throw Error('VC not found');
+    if (!this.state.accountState[account].vcs[id]) throw Error('ID not found');
 
     delete this.state.accountState[account].vcs[id];
     await updateSnapState(this.wallet, this.state);
     return true;
   }
 
-  async import(args: VerifiableCredential) {
+  async save(args: { data: W3CVerifiableCredential }): Promise<string> {
+    //TODO check if VC is correct type
+
+    const vc = args.data;
     let account = this.state.currentAccount;
     if (this.isHederaAccount) {
       account = this.state.hederaAccount.accountId;
     }
-    if (!account) throw Error('User denied error');
+    if (!account) throw Error('Cannot get current account');
 
-    let alias = uuidv4();
-    while (this.state.accountState[account].vcs[alias]) {
-      alias = uuidv4();
+    let id = uuidv4();
+    while (this.state.accountState[account].vcs[id]) {
+      id = uuidv4();
     }
 
-    this.state.accountState[account].vcs[alias] = { ...args };
+    this.state.accountState[account].vcs[id] = vc;
     await updateSnapState(this.wallet, this.state);
-    return true;
+    return id;
   }
 
-  async list(): Promise<VerifiableCredential[]> {
+  public async clear(args: IFilterArgs): Promise<boolean> {
     let account = this.state.currentAccount;
     if (this.isHederaAccount) {
       account = this.state.hederaAccount.accountId;
     }
-    if (!account) throw Error('User denied error');
-    const result: VerifiableCredential[] = [];
+    if (!account) throw Error('Cannot get current account');
 
-    // TODO: Why we adding key -> we have id ?
-    // Return type doesn't match with what we return
-    Object.keys(this.state.accountState[account].vcs).forEach((key) => {
-      result.push({ ...this.state.accountState[account].vcs[key], key: key });
-    });
-
-    return result;
+    this.state.accountState[account].vcs = {};
+    return true;
   }
 }

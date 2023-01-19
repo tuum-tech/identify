@@ -2,10 +2,9 @@ import SnapsWebpackPlugin from '@metamask/snaps-webpack-plugin';
 import ESLintPlugin from 'eslint-webpack-plugin';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import { resolve } from 'path';
-import { Configuration } from 'webpack';
+import { Configuration, ProvidePlugin } from 'webpack';
 import { merge } from 'webpack-merge';
 import WebpackBarPlugin from 'webpackbar';
-
 // Configuration that is shared between the two bundles
 const common: Configuration = {
   // For simplicity, we don't do any optimisations here. Ideally, this would be
@@ -20,8 +19,9 @@ const common: Configuration = {
   },
   resolve: {
     extensions: ['.ts', '.js'],
-    fallback: { stream: false, 
-       assert: require.resolve('assert'),
+    fallback: {
+      stream: false,
+      assert: require.resolve('assert'),
       buffer: require.resolve('buffer'),
       console: require.resolve('console-browserify'),
       constants: require.resolve('constants-browserify'),
@@ -35,7 +35,7 @@ const common: Configuration = {
       punycode: require.resolve('punycode'),
       process: require.resolve('process/browser'),
       querystring: require.resolve('querystring-es3'),
-      //stream: require.resolve('stream-browserify'),
+      // stream: require.resolve('stream-browserify'),
       string_decoder: require.resolve('string_decoder'),
       sys: require.resolve('util'),
       timers: require.resolve('timers-browserify'),
@@ -44,7 +44,7 @@ const common: Configuration = {
       util: require.resolve('util'),
       vm: require.resolve('vm-browserify'),
       zlib: require.resolve('browserify-zlib'),
-      },
+    },
   },
   module: {
     rules: [
@@ -59,10 +59,15 @@ const common: Configuration = {
           },
         ],
       },
+      { test: /.json$/, type: 'json' },
     ],
   },
   plugins: [
     new WebpackBarPlugin(),
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    new ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+    }),
     new ESLintPlugin({
       extensions: ['ts'],
     }),
@@ -72,6 +77,7 @@ const common: Configuration = {
           semantic: true,
           syntactic: true,
         },
+        configFile: 'tsconfig.build.json',
       },
     }),
   ],

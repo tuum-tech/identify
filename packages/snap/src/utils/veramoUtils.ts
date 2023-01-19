@@ -4,10 +4,16 @@ import {
   IIdentifier,
   IVerifyResult,
   MinimalImportableKey,
-  VerifiableCredential,
   VerifiablePresentation,
+  W3CVerifiableCredential,
 } from '@veramo/core';
-import { ExampleVCValue, IdentitySnapState, VCQuery } from '../interfaces';
+import { IdentitySnapState } from '../interfaces';
+import { CreateVPRequestParams, GetVCsOptions } from '../types/params';
+import { GetVCsRequestResult } from '../types/results';
+import {
+  Filter,
+  IDataManagerSaveResult,
+} from '../veramo/plugins/verfiable-creds-manager';
 import { getAgent } from '../veramo/setup';
 import { getHederaChainIDs } from './config';
 import { getCurrentDid } from './didUtils';
@@ -30,56 +36,70 @@ export async function veramoResolveDID(
   });
 }
 
-export async function veramoListVCs(
+export async function veramoGetVCs(
   wallet: SnapProvider,
   state: IdentitySnapState,
-  query?: VCQuery
-): Promise<VerifiableCredential[]> {
+  options: GetVCsOptions,
+  filter?: Filter
+): Promise<GetVCsRequestResult[]> {
   const agent = await getAgent(wallet, state);
-  const vcsSnap = await agent.listVCS({ store: 'snap', query: query });
-  return vcsSnap.vcs;
+  const result = (await agent.query({
+    filter,
+    options,
+  })) as GetVCsRequestResult[];
+  return result;
 }
 
 export async function veramoSaveVC(
   wallet: SnapProvider,
   state: IdentitySnapState,
-  vc: VerifiableCredential
-): Promise<boolean> {
+  verifiableCredential: W3CVerifiableCredential,
+  store: string | string[]
+): Promise<IDataManagerSaveResult[]> {
   const agent = await getAgent(wallet, state);
-  return await agent.saveVC({ store: 'snap', vc });
+  const result = await agent.save({
+    data: verifiableCredential,
+    options: { store },
+  });
+  return result;
 }
 
-export async function veramoCreateExampleVC(
+export async function veramoCreateVC(
   wallet: SnapProvider,
   state: IdentitySnapState,
-  exampleVCData: ExampleVCValue
-): Promise<boolean> {
+  vcKey: string,
+  vcValue: object,
+  store: string | string[]
+): Promise<IDataManagerSaveResult[]> {
   // GET DID
   const did = await veramoImportMetaMaskAccount(wallet, state);
   const agent = await getAgent(wallet, state);
-  const vc = await agent.createVerifiableCredential({
+  const verifiableCredential = await agent.createVerifiableCredential({
     credential: {
       issuer: { id: did },
       issuanceDate: new Date().toISOString(),
       credentialSubject: {
         id: did,
-        exampleVC: {
-          id: did,
-          name: exampleVCData.name,
-          value: exampleVCData.value,
-        },
+        [vcKey]: vcValue,
       },
     },
     proofFormat: 'jwt',
   });
-  console.log('Created vc: ', JSON.stringify(vc, null, 4));
-  return await agent.saveVC({ store: 'snap', vc });
+  console.log(
+    'Created verifiableCredential: ',
+    JSON.stringify(verifiableCredential, null, 4)
+  );
+  const result = await agent.save({
+    data: verifiableCredential,
+    options: { store },
+  });
+  return result;
 }
 
 export async function veramoVerifyVC(
   wallet: SnapProvider,
   state: IdentitySnapState,
-  vc: VerifiableCredential
+  vc: W3CVerifiableCredential
 ): Promise<IVerifyResult> {
   const agent = await getAgent(wallet, state);
   return await agent.verifyCredential({ credential: vc });
@@ -88,55 +108,58 @@ export async function veramoVerifyVC(
 export async function veramoCreateVP(
   wallet: SnapProvider,
   state: IdentitySnapState,
-  vcId: string,
-  challenge?: string,
-  domain?: string
+  params: CreateVPRequestParams
 ): Promise<VerifiablePresentation | null> {
+  const vcsMetadata = params.vcs;
+  const proofFormat = params.proofInfo?.proofFormat
+    ? params.proofInfo.proofFormat
+    : 'jwt';
+  const type = params.proofInfo?.type ? params.proofInfo.type : 'Custom';
+  const domain = params.proofInfo?.domain;
+  const challenge = params.proofInfo?.challenge;
+
   //GET DID
   const did = await veramoImportMetaMaskAccount(wallet, state);
   //Get Veramo agent
   const agent = await getAgent(wallet, state);
-  let vc;
-  try {
-    // FIXME: getVC should return null not throw an error
-    vc = await agent.getVC({ store: 'snap', id: vcId });
-  } catch (e) {
-    throw new Error('VC not found');
-  }
-  const config = state.snapConfig;
-  console.log(vcId, domain, challenge);
-  if (vc && vc.vc) {
-    const promptObj = {
-      prompt: 'Alert',
-      description: 'Do you wish to create a VP from the following VC?',
-      textAreaContent: JSON.stringify(vc.vc.credentialSubject),
-    };
 
-    if (config.dApp.disablePopups || (await snapConfirm(wallet, promptObj))) {
-      if (challenge) console.log('Challenge:', challenge);
-      if (domain) console.log('Domain:', domain);
-      console.log('DID');
-      console.log(did);
+  const vcs: W3CVerifiableCredential[] = [];
 
-      const vp = await agent.createVerifiablePresentation({
-        presentation: {
-          holder: did,
-          type: ['VerifiablePresentation', 'Custom'],
-          verifiableCredential: [vc.vc],
-        },
-        challenge,
-        domain,
-        proofFormat: 'jwt',
-        // proofFormat: 'EthereumEip712Signature2021',
-        save: false,
-      });
-      console.log('....................VP..................');
-      console.log(vp);
-      return vp;
+  for (const vcId of vcsMetadata) {
+    const vcObj = (await agent.query({
+      filter: {
+        type: 'id',
+        filter: vcId,
+      },
+      options: { store: 'snap' },
+    })) as GetVCsRequestResult[];
+    if (vcObj.length > 0) {
+      const vc: W3CVerifiableCredential = vcObj[0].data;
+      vcs.push(vc);
     }
-    return null;
   }
-  console.log('No VC found...');
+
+  if (vcs.length === 0) return null;
+  const config = state.snapConfig;
+  const promptObj = {
+    prompt: 'Alert',
+    description: 'Do you wish to create a VP from the following VC?',
+    textAreaContent: 'Multiple VCs',
+  };
+  if (config.dApp.disablePopups || (await snapConfirm(wallet, promptObj))) {
+    const vp = await agent.createVerifiablePresentation({
+      presentation: {
+        holder: did,
+        type: ['VerifiablePresentation', type],
+        verifiableCredential: vcs,
+      },
+      proofFormat: proofFormat,
+      domain: domain,
+      challenge: challenge,
+    });
+    return vp;
+  }
+  console.log('No VCs found...');
   return null;
 }
 

@@ -1,28 +1,28 @@
 import { SnapProvider } from '@metamask/snap-types';
 import { IdentitySnapState } from '../../interfaces';
-import { SaveVCRequestParams } from '../../types/params';
+import { CreateVCRequestParams } from '../../types/params';
 import { snapConfirm } from '../../utils/snapUtils';
-import { veramoSaveVC } from '../../utils/veramoUtils';
+import { veramoCreateVC } from '../../utils/veramoUtils';
 import { IDataManagerSaveResult } from '../../veramo/plugins/verfiable-creds-manager';
 
 /* eslint-disable */
-export async function saveVC(
+export async function createVC(
   wallet: SnapProvider,
   state: IdentitySnapState,
-  { verifiableCredential, options }: SaveVCRequestParams
+  params: CreateVCRequestParams
 ): Promise<IDataManagerSaveResult[]> {
+  const { vcKey = 'vcData', vcValue, options } = params || {};
   const { store = 'snap' } = options || {};
 
   const promptObj = {
-    prompt: 'Save VC',
-    description: `Would you like to save the following VC in ${
-      typeof store === 'string' ? store : store.join(', ')
-    }?`,
-    textAreaContent: JSON.stringify(verifiableCredential).substring(0, 100),
+    prompt: 'Create and Save VC',
+    description: `Would you like to create and save the following VC in snap?`,
+    textAreaContent: JSON.stringify({
+      [vcKey]: vcValue,
+    }),
   };
-
   if (await snapConfirm(wallet, promptObj)) {
-    return await veramoSaveVC(wallet, state, verifiableCredential, store);
+    return await veramoCreateVC(wallet, state, vcKey, vcValue, store);
   }
   throw new Error('User rejected');
 }

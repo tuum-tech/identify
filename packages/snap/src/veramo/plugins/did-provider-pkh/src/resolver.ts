@@ -70,7 +70,7 @@ export function getResolver(): ResolverRegistry {
         }
       } catch (e) {
         response.didResolutionMetadata.error = 'invalidDid';
-        response.didResolutionMetadata.message = e.toString();
+        response.didResolutionMetadata.message = (e as Error).message;
       }
       return response;
     },

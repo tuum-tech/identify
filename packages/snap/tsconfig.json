@@ -1,11 +1,15 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "./build"
+    "experimentalDecorators": true,
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "typeRoots": ["./node_modules/@types", "../../node_modules/@types"],
+    "sourceMap": true
   },
   "files": [
     "../../node_modules/@metamask/snap-types/global.d.ts",
     "./json-typings.d.ts"
   ],
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*", "tests/**/*"]
 }

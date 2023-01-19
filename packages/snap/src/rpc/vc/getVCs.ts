@@ -1,21 +1,21 @@
 import { SnapProvider } from '@metamask/snap-types';
-import { VerifiableCredential } from '@veramo/core';
-import { IdentitySnapState, VCQuery } from '../../interfaces';
+import { IdentitySnapState } from '../../interfaces';
+import { GetVCsRequestParams } from '../../types/params';
+import { GetVCsRequestResult } from '../../types/results';
 import { snapConfirm } from '../../utils/snapUtils';
-import { veramoListVCs } from '../../utils/veramoUtils';
+import { veramoGetVCs } from '../../utils/veramoUtils';
 
 /* eslint-disable */
 export async function getVCs(
   wallet: SnapProvider,
   state: IdentitySnapState,
-  query?: VCQuery
-): Promise<VerifiableCredential[]> {
-  console.log('query', query);
-  const vcs = await veramoListVCs(
-    wallet,
-    state,
-    query
-  );
+  params: GetVCsRequestParams
+): Promise<GetVCsRequestResult[]> {
+  const { filter, options } = params || {};
+  const { store = 'snap', returnStore = true } = options || {};
+
+  const vcs = await veramoGetVCs(wallet, state, { store, returnStore }, filter);
+
   console.log('VCs: ', JSON.stringify(vcs, null, 4));
   const promptObj = {
     prompt: 'Send VCs',

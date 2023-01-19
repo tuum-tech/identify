@@ -1,15 +1,14 @@
 import { SnapProvider } from '@metamask/snap-types';
 import { VerifiablePresentation } from '@veramo/core';
 import { IdentitySnapState } from '../../interfaces';
+import { CreateVPRequestParams } from '../../types/params';
 import { veramoCreateVP } from '../../utils/veramoUtils';
 
 /* eslint-disable */
-export async function getVP(
+export async function createVP(
   wallet: SnapProvider,
   state: IdentitySnapState,
-  vcId: string,
-  domain?: string,
-  challenge?: string
+  params: CreateVPRequestParams
 ): Promise<VerifiablePresentation | null> {
-  return await veramoCreateVP(wallet, state, vcId, challenge, domain);
+  return await veramoCreateVP(wallet, state, params);
 }

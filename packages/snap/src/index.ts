@@ -5,18 +5,19 @@ import { getDid } from './rpc/did/getDID';
 import { resolveDID } from './rpc/did/resolveDID';
 import { switchMethod } from './rpc/did/switchMethods';
 import { configureHederaAccount } from './rpc/hedera/configureAccount';
-import { createExampleVC } from './rpc/vc/createExampleVC';
+import { createVC } from './rpc/vc/createVC';
+import { createVP } from './rpc/vc/createVP';
+import { getSupportedProofFormats } from './rpc/vc/getSupportedProofFormats';
 import { getVCs } from './rpc/vc/getVCs';
-import { getVP } from './rpc/vc/getVP';
 import { saveVC } from './rpc/vc/saveVC';
 import { verifyVC } from './rpc/vc/verifyVC';
 import { verifyVP } from './rpc/vc/verifyVP';
 import { init } from './utils/init';
 import { switchNetworkIfNecessary } from './utils/network';
 import {
-  isValidCreateExampleVCRequest,
+  isValidCreateVCRequest,
+  isValidCreateVPRequest,
   isValidGetVCsRequest,
-  isValidGetVPRequest,
   isValidHederaAccountParams,
   isValidResolveDIDRequest,
   isValidSaveVCRequest,
@@ -92,7 +93,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   console.log('Request:', JSON.stringify(request, null, 4));
   console.log('Origin:', origin);
   console.log('-------------------------------------------------------------');
-  console.log('request.params=========', request.params);
+  console.log(
+    'request.params=========',
+    JSON.stringify(request.params, null, 4)
+  );
 
   switch (request.method) {
     case 'hello':
@@ -120,29 +124,23 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     case 'getVCs':
       isValidGetVCsRequest(request.params);
       await switchNetworkIfNecessary(wallet, state);
-      return await getVCs(wallet, state, request.params.query);
+      return await getVCs(wallet, state, request.params);
     case 'saveVC':
       isValidSaveVCRequest(request.params);
       await switchNetworkIfNecessary(wallet, state);
-      return await saveVC(wallet, state, request.params.verifiableCredential);
-    case 'createExampleVC':
-      isValidCreateExampleVCRequest(request.params);
+      return await saveVC(wallet, state, request.params);
+    case 'createVC':
+      isValidCreateVCRequest(request.params);
       await switchNetworkIfNecessary(wallet, state);
-      return await createExampleVC(wallet, state, request.params.exampleVCData);
+      return await createVC(wallet, state, request.params);
     case 'verifyVC':
       isValidVerifyVCRequest(request.params);
       await switchNetworkIfNecessary(wallet, state);
       return await verifyVC(wallet, state, request.params.verifiableCredential);
-    case 'getVP':
-      isValidGetVPRequest(request.params);
+    case 'createVP':
+      isValidCreateVPRequest(request.params);
       await switchNetworkIfNecessary(wallet, state);
-      return await getVP(
-        wallet,
-        state,
-        request.params.vcId,
-        request.params.domain,
-        request.params.challenge
-      );
+      return await createVP(wallet, state, request.params);
     case 'verifyVP':
       isValidVerifyVPRequest(request.params);
       await switchNetworkIfNecessary(wallet, state);
@@ -157,6 +155,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         .didMethod;
     case 'getAvailableMethods':
       return getAvailableMethods();
+    case 'getSupportedProofFormats':
+      return getSupportedProofFormats();
     default:
       console.error('Method not found');
       throw new Error('Method not found');

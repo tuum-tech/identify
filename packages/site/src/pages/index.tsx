@@ -1,7 +1,8 @@
+import { ProofInfo } from '@tuum-tech/identity-snap/src/types/params';
 import {
   IVerifyResult,
   VerifiableCredential,
-  VerifiablePresentation
+  VerifiablePresentation,
 } from '@veramo/core';
 import { useContext, useState } from 'react';
 import styled from 'styled-components';
@@ -10,23 +11,23 @@ import {
   ConnectButton,
   InstallFlaskButton,
   ReconnectButton,
-  SendHelloButton
+  SendHelloButton,
 } from '../components';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
 import {
   configureHederaAccount,
   connectSnap,
-  createExampleVC,
+  createVC,
+  createVP,
   getCurrentDIDMethod,
   getDID,
   getSnap,
   getVCs,
-  getVP,
   resolveDID,
   sendHello,
   shouldDisplayReconnectButton,
   verifyVC,
-  verifyVP
+  verifyVP,
 } from '../utils';
 
 const Container = styled.div`
@@ -121,10 +122,10 @@ const Index = () => {
     '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c'
   );
   const [hederaAccountId, setHederaAccountId] = useState('0.0.48865029');
-  const [createExampleVCName, setCreateExampleVCName] =
-    useState('Tuum Identity Snap');
-  const [createExampleVCValue, setCreateExampleVCValue] =
-    useState('Example VC');
+
+  const [createVCName, setCreateVCName] = useState('Kiran Pachhai');
+  const [createVCNickname, setCreateVCNickname] = useState('KP Woods');
+
   const [vcId, setVcId] = useState('');
   const [vc, setVc] = useState({});
   const [vp, setVp] = useState({});
@@ -207,10 +208,18 @@ const Index = () => {
 
   const handleGetVCsClick = async () => {
     try {
-      const vcs = (await getVCs()) as VerifiableCredential[];
+      /* const filter = {
+        type: 'id',
+        filter: '',
+      }; */
+      const options = {
+        store: 'snap',
+        returnStore: true,
+      };
+      const vcs = (await getVCs(undefined, options)) as VerifiableCredential[];
       console.log(`Your VCs are: ${JSON.stringify(vcs, null, 4)}`);
       const vcsJson = JSON.parse(JSON.stringify(vcs));
-      const keys = vcsJson.map((vc: { key: any }) => vc.key);
+      const keys = vcsJson.map((vc: { metadata: any }) => vc.metadata.id);
       if (keys) {
         setVcId(keys[keys.length - 1]);
         setVc(vcs[keys.length - 1]);
@@ -222,12 +231,18 @@ const Index = () => {
     }
   };
 
-  const handleCreateExampleVCClick = async () => {
+  const handleCreateVCClick = async () => {
     try {
-      const saved = await createExampleVC(
-        createExampleVCName,
-        createExampleVCValue
-      );
+      const vcKey = 'profile';
+      const vcValue = {
+        name: createVCName,
+        nickname: createVCNickname,
+      };
+      const options = {
+        store: 'snap',
+        returnStore: true,
+      };
+      const saved = await createVC(vcKey, vcValue, options);
       console.log('created and saved VC: ', saved);
     } catch (e) {
       console.error(e);
@@ -257,9 +272,16 @@ const Index = () => {
     }
   };
 
-  const handleGetVPClick = async () => {
+  const handleCreateVPClick = async () => {
     try {
-      const vp = (await getVP(vcId)) as VerifiablePresentation;
+      const vcs = [vcId];
+      const proofInfo: ProofInfo = {
+        proofFormat: 'jwt',
+        type: 'ProfileNames',
+        domain: 'identity.tuum.tech',
+        challenge: vcId,
+      };
+      const vp = (await createVP(vcs, proofInfo)) as VerifiablePresentation;
       setVp(vp);
       console.log(`Your VP is: ${JSON.stringify(vp, null, 4)}`);
       alert(`Your VP is: ${JSON.stringify(vp, null, 4)}`);
@@ -480,32 +502,32 @@ const Index = () => {
         />
         <Card
           content={{
-            title: 'createExampleVC',
+            title: 'createVC',
             description: 'Create and Save VerifiableCredential',
             form: (
               <form>
                 <label>
-                  Enter name of your VC
+                  Enter your name
                   <input
                     type="text"
-                    value={createExampleVCName}
-                    onChange={(e) => setCreateExampleVCName(e.target.value)}
+                    value={createVCName}
+                    onChange={(e) => setCreateVCName(e.target.value)}
                   />
                 </label>
                 <br />
                 <label>
-                  Enter value of your VC
+                  Enter your nickname
                   <input
                     type="text"
-                    value={createExampleVCValue}
-                    onChange={(e) => setCreateExampleVCValue(e.target.value)}
+                    value={createVCNickname}
+                    onChange={(e) => setCreateVCNickname(e.target.value)}
                   />
                 </label>
               </form>
             ),
             button: (
               <SendHelloButton
-                onClick={handleCreateExampleVCClick}
+                onClick={handleCreateVCClick}
                 disabled={!state.installedSnap}
               />
             ),
@@ -565,7 +587,7 @@ const Index = () => {
             ),
             button: (
               <SendHelloButton
-                onClick={handleGetVPClick}
+                onClick={handleCreateVPClick}
                 disabled={!state.installedSnap}
               />
             ),

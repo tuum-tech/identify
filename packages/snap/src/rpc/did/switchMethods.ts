@@ -1,6 +1,6 @@
 import { SnapProvider } from '@metamask/snap-types';
-import { availableMethods } from '../../did/didMethods';
 import { IdentitySnapState } from '../../interfaces';
+import { availableMethods, isValidMethod } from '../../types/constants';
 import { snapConfirm } from '../../utils/snapUtils';
 import { updateSnapState } from '../../utils/stateUtils';
 
@@ -12,20 +12,19 @@ export async function switchMethod(
 ): Promise<boolean> {
   const method =
     state.accountState[state.currentAccount].accountConfig.identity.didMethod;
-  const newDidMethod = availableMethods.find((k) => k === didMethod);
-  if (!newDidMethod) {
+  if (!isValidMethod(didMethod)) {
     console.error(
-      'did method not supported. Supported methods are: ["did:pkh"]'
+      `did method '${didMethod}' not supported. Supported methods are: ${availableMethods}`
     );
     throw new Error(
-      'did method not supported. Supported methods are: ["did:pkh"]'
+      `did method ${didMethod}'not supported. Supported methods are: ${availableMethods}`
     );
   }
-  if (method !== newDidMethod) {
+  if (method !== didMethod) {
     const promptObj = {
       prompt: 'Change DID method',
       description: 'Would you like to change did method to the following?',
-      textAreaContent: newDidMethod,
+      textAreaContent: didMethod,
     };
 
     if (await snapConfirm(wallet, promptObj)) {

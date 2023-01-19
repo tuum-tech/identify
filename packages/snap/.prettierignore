@@ -1,7 +1,5 @@
-build
 dist
 index.html
 post-process.js
 node_modules
 coverage
-src/veramo

@@ -1,3 +1,8 @@
+import {
+  GetVCsOptions,
+  ProofInfo,
+} from '@tuum-tech/identity-snap/src/types/params';
+import { Filter } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
 import { VerifiableCredential, VerifiablePresentation } from '@veramo/core';
 import { defaultSnapOrigin } from '../config';
 import { GetSnapsResponse, Snap } from '../types';
@@ -150,14 +155,17 @@ export const resolveDID = async (did?: string) => {
  * Invoke the "getVCs" method from the snap.
  */
 
-export const getVCs = async () => {
+export const getVCs = async (
+  filter: Filter | undefined,
+  options: GetVCsOptions
+) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: [
       defaultSnapOrigin,
       {
         method: 'getVCs',
-        params: { query: {} },
+        params: { filter, options },
       },
     ],
   });
@@ -186,21 +194,24 @@ export type ExampleVCValue = {
 };
 
 /**
- * Invoke the "createExampleVC" method from the snap.
+ * Invoke the "createVC" method from the snap.
  */
 
-export const createExampleVC = async (name: string, value: string) => {
+export const createVC = async (
+  vcKey: object,
+  vcValue: object,
+  options: GetVCsOptions
+) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: [
       defaultSnapOrigin,
       {
-        method: 'createExampleVC',
+        method: 'createVC',
         params: {
-          exampleVCData: {
-            name,
-            value,
-          },
+          vcKey,
+          vcValue,
+          options,
         },
       },
     ],
@@ -225,32 +236,17 @@ export const verifyVC = async (vc: VerifiableCredential | {}) => {
 };
 
 /**
- * Invoke the "getVP" method from the snap.
+ * Invoke the "createVP" method from the snap.
  */
 
-export const getVP = async (vcId: string, challenge?: boolean) => {
-  if (!challenge) {
-    return await window.ethereum.request({
-      method: 'wallet_invokeSnap',
-      params: [
-        defaultSnapOrigin,
-        {
-          method: 'getVP',
-          params: { vcId },
-        },
-      ],
-    });
-  }
+export const createVP = async (vcs: string[], proofInfo: ProofInfo) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: [
       defaultSnapOrigin,
       {
-        method: 'getVP',
-        params: {
-          vcId,
-          challenge: 'ab31aeae-3471-406b-b890-6389767c4cce',
-        },
+        method: 'createVP',
+        params: { vcs, proofInfo },
       },
     ],
   });

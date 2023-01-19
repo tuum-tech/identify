@@ -1,4 +1,4 @@
-import { availableMethods } from '../../did/didMethods';
+import { availableMethods } from '../../types/constants';
 
 /* eslint-disable */
 export function getAvailableMethods(): string[] {

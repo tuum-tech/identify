@@ -1,12 +1,8 @@
 const fs = require('fs');
 const pathUtils = require('path');
-//const snapConfig = require("./snap.config.json");
-
-//import * as snapConfig from "./snap.config";
 
 const bundlePath = pathUtils.join('dist', 'snap.js');
 console.log('Bundle path', bundlePath);
-//const bundlePath = pathUtils.join(cliOptions.dist, cliOptions.outfileName);
 
 let bundleString = fs.readFileSync(bundlePath, 'utf8');
 
@@ -51,10 +47,6 @@ bundleString = bundleString.replaceAll(
   "if(root) {var coreJsData = root['__core-js_shared__'];}"
 );
 
-
-// workaround to be able to find the keys for a did:pkh:hedera. 
-bundleString = bundleString.replace('let vmEthAddr = getEthereumAddress(verificationMethod);', "if (verificationMethod.blockchainAccountId?.startsWith('hedera')) { return true; };let vmEthAddr = getEthereumAddress(verificationMethod);");
-
 bundleString = bundleString.replaceAll(
   'var Symbol = root.Symbol',
   'if(root)var Symbol = root.Symbol'
@@ -65,7 +57,23 @@ bundleString = bundleString.replaceAll(
   'if(root)var Buffer = moduleExports ? root.Buffer : undefined,'
 );
 
+bundleString = bundleString.replaceAll(
+  `process.env.NODE_ENV === 'production'`,
+  `true`
+);
+
+bundleString = bundleString.replaceAll(
+  `Gp[iteratorSymbol]`,
+  `Gp.iteratorSymbol`
+);
+
 // Remove 'use asm' tokens; they cause pointless console warnings
 bundleString = bundleString.replace(/^\s*'use asm';?\n?/gmu, '');
+
+// workaround to be able to find the keys for a did:pkh:hedera.
+bundleString = bundleString.replace(
+  'let vmEthAddr = getEthereumAddress(verificationMethod);',
+  "if (verificationMethod.blockchainAccountId?.startsWith('hedera')) { return true; };let vmEthAddr = getEthereumAddress(verificationMethod);"
+);
 
 fs.writeFileSync(bundlePath, bundleString);
