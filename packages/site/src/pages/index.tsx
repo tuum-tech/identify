@@ -225,13 +225,13 @@ const Index = () => {
         options
       )) as IDataManagerQueryResult[];
       console.log(`Your VCs are: ${JSON.stringify(vcs, null, 4)}`);
-      const vcsJson = JSON.parse(JSON.stringify(vcs));
-      if (vcsJson.length > 0) {
-        const keys = vcsJson.map((vc: { metadata: any }) => vc.metadata.id);
+      // const vcsJson = JSON.parse(JSON.stringify(vcs));
+      if (vcs.length > 0) {
+        const keys = vcs.map((vc: { metadata: any }) => vc.metadata.id);
         if (keys.length > 0) {
           setVcId(keys.toString());
           setVcIdsToBeRemoved(keys.toString());
-          setVc(keys[keys.length - 1].data as IDataManagerQueryResult);
+          setVc(vcs[keys.length - 1].data as IDataManagerQueryResult);
           alert(`Your VC IDs are: ${keys.toString()}`);
         }
       }
