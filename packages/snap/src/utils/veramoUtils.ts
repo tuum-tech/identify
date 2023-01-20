@@ -12,6 +12,7 @@ import { IdentitySnapState } from '../interfaces';
 import { CreateVPRequestParams, GetVCsOptions } from '../types/params';
 import {
   Filter,
+  IDataManagerClearResult,
   IDataManagerDeleteResult,
   IDataManagerQueryResult,
   IDataManagerSaveResult,
@@ -139,6 +140,20 @@ export async function veramoRemoveVC(
     })
   ).then((data: IDataManagerDeleteResult[][]) => {
     return data.flat();
+  });
+}
+
+export async function veramoDeleteAllVCs(
+  wallet: SnapProvider,
+  state: IdentitySnapState,
+  store: string | string[]
+): Promise<IDataManagerClearResult[]> {
+  const agent = await getAgent(wallet, state);
+  let options: any = undefined;
+  if (store) options = { store };
+
+  return await agent.clear({
+    options,
   });
 }
 

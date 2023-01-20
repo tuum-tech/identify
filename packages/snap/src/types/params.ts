@@ -36,6 +36,10 @@ export type RemoveVCsRequestParams = {
   options?: RemoveVCOptions;
 };
 
+export type DeleteAllVCsRequestParams = {
+  options?: RemoveVCOptions;
+};
+
 export type ProofInfo = {
   proofFormat?: ProofFormat;
   type?: string;

@@ -7,6 +7,7 @@ import { switchMethod } from './rpc/did/switchMethods';
 import { configureHederaAccount } from './rpc/hedera/configureAccount';
 import { createVC } from './rpc/vc/createVC';
 import { createVP } from './rpc/vc/createVP';
+import { deleteAllVCs } from './rpc/vc/deleteAllVCs';
 import { getSupportedProofFormats } from './rpc/vc/getSupportedProofFormats';
 import { getVCs } from './rpc/vc/getVCs';
 import { removeVC } from './rpc/vc/removeVC';
@@ -18,6 +19,7 @@ import { switchNetworkIfNecessary } from './utils/network';
 import {
   isValidCreateVCRequest,
   isValidCreateVPRequest,
+  isValidDeleteAllVCsRequest,
   isValidGetVCsRequest,
   isValidHederaAccountParams,
   isValidRemoveVCRequest,
@@ -143,6 +145,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       isValidRemoveVCRequest(request.params);
       await switchNetworkIfNecessary(wallet, state);
       return await removeVC(wallet, state, request.params);
+    case 'deleteAllVCs':
+      isValidDeleteAllVCsRequest(request.params);
+      await switchNetworkIfNecessary(wallet, state);
+      return await deleteAllVCs(wallet, state, request.params);
     case 'createVP':
       isValidCreateVPRequest(request.params);
       await switchNetworkIfNecessary(wallet, state);

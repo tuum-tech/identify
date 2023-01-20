@@ -4,6 +4,7 @@ import { isValidProofFormat, isValidVCStore } from '../types/constants';
 import {
   CreateVCRequestParams,
   CreateVPRequestParams,
+  DeleteAllVCsRequestParams,
   GetVCsRequestParams,
   RemoveVCsRequestParams,
   SaveVCRequestParams,
@@ -269,6 +270,40 @@ export function isValidRemoveVCRequest(
     return;
   }
   throw new Error('Invalid RemoveVCRequest');
+}
+
+export function isValidDeleteAllVCsRequest(
+  params: unknown
+): asserts params is DeleteAllVCsRequestParams {
+  if (params === null) return;
+  const parameter = params as DeleteAllVCsRequestParams;
+
+  // Check if options is valid
+  if (
+    'options' in parameter &&
+    parameter.options !== null &&
+    typeof parameter.options === 'object'
+  ) {
+    if ('store' in parameter.options && parameter.options?.store !== null) {
+      if (typeof parameter.options?.store === 'string') {
+        if (!isValidVCStore(parameter.options?.store)) {
+          throw new Error('Store is not supported!');
+        }
+      } else if (
+        Array.isArray(parameter.options?.store) &&
+        parameter.options?.store.length > 0
+      ) {
+        (parameter.options?.store as [string]).forEach((store) => {
+          if (!isValidVCStore(store))
+            throw new Error('Store is not supported!');
+        });
+      } else {
+        throw new Error('Store is invalid format');
+      }
+    }
+    return;
+  }
+  throw new Error('Invalid isValidDeleteAllVCsRequest');
 }
 
 export function isValidCreateVPRequest(

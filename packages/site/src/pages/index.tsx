@@ -1,5 +1,6 @@
 import { ProofInfo } from '@tuum-tech/identity-snap/src/types/params';
 import {
+  IDataManagerClearResult,
   IDataManagerDeleteResult,
   IDataManagerQueryResult,
 } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
@@ -19,6 +20,7 @@ import {
   connectSnap,
   createVC,
   createVP,
+  deleteAllVCs,
   getCurrentDIDMethod,
   getDID,
   getSnap,
@@ -296,6 +298,23 @@ const Index = () => {
         vcIdsToBeRemoved,
         options
       )) as IDataManagerDeleteResult[];
+      console.log(`Remove VC Result: ${JSON.stringify(isRemoved, null, 4)}`);
+      setVcIdsToBeRemoved('');
+      setVcId('');
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleDeleteAllVCsClick = async () => {
+    try {
+      const options = {
+        store: 'snap',
+      };
+      const isRemoved = (await deleteAllVCs(
+        options
+      )) as IDataManagerClearResult[];
       console.log(`Remove VC Result: ${JSON.stringify(isRemoved, null, 4)}`);
       setVcIdsToBeRemoved('');
       setVcId('');
@@ -632,6 +651,25 @@ const Index = () => {
             !shouldDisplayReconnectButton(state.installedSnap)
           }
         />
+
+        <Card
+          content={{
+            title: 'deleteAllVCs',
+            description: 'Delete all the VCs from the snap',
+            button: (
+              <SendHelloButton
+                onClick={handleDeleteAllVCsClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
         <Card
           content={{
             title: 'getVP',
@@ -662,7 +700,6 @@ const Index = () => {
             !shouldDisplayReconnectButton(state.installedSnap)
           }
         />
-
         <Card
           content={{
             title: 'verifyVP',

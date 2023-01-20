@@ -259,6 +259,23 @@ export const removeVC = async (
 };
 
 /**
+ * Invoke the "deleteAllVCs" method from the snap.
+ */
+
+export const deleteAllVCs = async (options: RemoveVCOptions) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: [
+      defaultSnapOrigin,
+      {
+        method: 'deleteAllVCs',
+        params: { options },
+      },
+    ],
+  });
+};
+
+/**
  * Invoke the "createVP" method from the snap.
  */
 
