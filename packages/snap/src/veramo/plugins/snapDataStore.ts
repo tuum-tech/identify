@@ -418,7 +418,6 @@ export class SnapVCStore extends AbstractDataStore {
 
     delete this.state.accountState[account].vcs[id];
     await updateSnapState(this.wallet, this.state);
-    // TODO: For some reason, the code doesn't execute after doing updateSnapState so we never get to return true
     return true;
   }
 
@@ -431,7 +430,6 @@ export class SnapVCStore extends AbstractDataStore {
 
     this.state.accountState[account].vcs = {};
     await updateSnapState(this.wallet, this.state);
-    // TODO: For some reason, the code doesn't execute after doing updateSnapState so we never get to return true
     return true;
   }
 }

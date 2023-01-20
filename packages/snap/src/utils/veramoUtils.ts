@@ -130,17 +130,16 @@ export async function veramoRemoveVC(
   let options: any = undefined;
   if (store) options = { store };
 
-  console.log('ids: ', JSON.stringify(ids, null, 4));
-  let result: IDataManagerDeleteResult[][] = [];
-  ids.forEach(async (id) => {
-    const r = await agent.delete({
-      id,
-      options,
-    });
-    result.push(r);
+  return Promise.all(
+    ids.map(async (id) => {
+      return await agent.delete({
+        id,
+        options,
+      });
+    })
+  ).then((data: IDataManagerDeleteResult[][]) => {
+    return data.flat();
   });
-  console.log('result: ', JSON.stringify(result, null, 4));
-  return result.flat();
 }
 
 export async function veramoCreateVP(
