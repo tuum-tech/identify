@@ -5,6 +5,7 @@ export interface ISaveArgs {
 
 export interface IDeleteArgs {
   id: string;
+  options?: unknown;
 }
 
 export interface IFilterArgs {

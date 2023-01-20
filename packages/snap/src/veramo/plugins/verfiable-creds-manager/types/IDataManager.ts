@@ -4,9 +4,11 @@ export interface IDataManager extends IPluginMethodMap {
 
   save(args: IDataManagerSaveArgs): Promise<Array<IDataManagerSaveResult>>;
 
-  delete(args: IDataManagerDeleteArgs): Promise<Array<boolean>>;
+  delete(
+    args: IDataManagerDeleteArgs
+  ): Promise<Array<IDataManagerDeleteResult>>;
 
-  clear(args: IDataManagerClearArgs): Promise<Array<boolean>>;
+  clear(args: IDataManagerClearArgs): Promise<Array<IDataManagerClearResult>>;
 }
 
 /**
@@ -73,4 +75,15 @@ export interface IDataManagerQueryResult {
 export interface IDataManagerSaveResult {
   id: string;
   store: string;
+}
+
+export interface IDataManagerDeleteResult {
+  id: string;
+  store: string;
+  removed: boolean;
+}
+
+export interface IDataManagerClearResult {
+  store: string;
+  removed: boolean;
 }

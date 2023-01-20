@@ -217,7 +217,7 @@ export class SnapDIDStore extends AbstractDIDStore {
     if (this.isHederaAccount) {
       account = this.state.hederaAccount.accountId;
     }
-    if (!account) throw Error('Cannot get current account');
+    if (!account) throw Error(`Cannot get current account: ${account}`);
     const identifiers = this.state.accountState[account].identifiers;
 
     if (did && !alias) {
@@ -246,7 +246,7 @@ export class SnapDIDStore extends AbstractDIDStore {
     if (this.isHederaAccount) {
       account = this.state.hederaAccount.accountId;
     }
-    if (!account) throw Error('Cannot get current account');
+    if (!account) throw Error(`Cannot get current account: ${account}`);
 
     if (!this.state.accountState[account].identifiers[did])
       throw Error('Identifier not found');
@@ -261,7 +261,7 @@ export class SnapDIDStore extends AbstractDIDStore {
     if (this.isHederaAccount) {
       account = this.state.hederaAccount.accountId;
     }
-    if (!account) throw Error('Cannot get current account');
+    if (!account) throw Error(`Cannot get current account: ${account}`);
 
     const identifier = { ...args };
     for (const key of identifier.keys) {
@@ -282,7 +282,7 @@ export class SnapDIDStore extends AbstractDIDStore {
     if (this.isHederaAccount) {
       account = this.state.hederaAccount.accountId;
     }
-    if (!account) throw Error('Cannot get current account');
+    if (!account) throw Error(`Cannot get current account: ${account}`);
 
     let result: IIdentifier[] = [];
     for (const key of Object.keys(
@@ -332,7 +332,7 @@ export class SnapVCStore extends AbstractDataStore {
     if (this.isHederaAccount) {
       account = this.state.hederaAccount.accountId;
     }
-    if (!account) throw Error('Cannot get current account');
+    if (!account) throw Error(`Cannot get current account: ${account}`);
 
     if (filter && filter.type === 'id') {
       try {
@@ -386,20 +386,6 @@ export class SnapVCStore extends AbstractDataStore {
     return [];
   }
 
-  async delete({ id }: { id: string }) {
-    let account = this.state.currentAccount;
-    if (this.isHederaAccount) {
-      account = this.state.hederaAccount.accountId;
-    }
-    if (!account) throw Error('Cannot get current account');
-
-    if (!this.state.accountState[account].vcs[id]) throw Error('ID not found');
-
-    delete this.state.accountState[account].vcs[id];
-    await updateSnapState(this.wallet, this.state);
-    return true;
-  }
-
   async save(args: { data: W3CVerifiableCredential }): Promise<string> {
     //TODO check if VC is correct type
 
@@ -408,7 +394,7 @@ export class SnapVCStore extends AbstractDataStore {
     if (this.isHederaAccount) {
       account = this.state.hederaAccount.accountId;
     }
-    if (!account) throw Error('Cannot get current account');
+    if (!account) throw Error(`Cannot get current account: ${account}`);
 
     let id = uuidv4();
     while (this.state.accountState[account].vcs[id]) {
@@ -420,14 +406,32 @@ export class SnapVCStore extends AbstractDataStore {
     return id;
   }
 
+  async delete({ id }: { id: string }): Promise<boolean> {
+    let account = this.state.currentAccount;
+    if (this.isHederaAccount) {
+      account = this.state.hederaAccount.accountId;
+    }
+    if (!account) throw Error(`Cannot get current account: ${account}`);
+
+    if (!this.state.accountState[account].vcs[id])
+      throw Error(`VC ID '${id}' not found`);
+
+    delete this.state.accountState[account].vcs[id];
+    await updateSnapState(this.wallet, this.state);
+    // TODO: For some reason, the code doesn't execute after doing updateSnapState so we never get to return true
+    return true;
+  }
+
   public async clear(args: IFilterArgs): Promise<boolean> {
     let account = this.state.currentAccount;
     if (this.isHederaAccount) {
       account = this.state.hederaAccount.accountId;
     }
-    if (!account) throw Error('Cannot get current account');
+    if (!account) throw Error(`Cannot get current account: ${account}`);
 
     this.state.accountState[account].vcs = {};
+    await updateSnapState(this.wallet, this.state);
+    // TODO: For some reason, the code doesn't execute after doing updateSnapState so we never get to return true
     return true;
   }
 }

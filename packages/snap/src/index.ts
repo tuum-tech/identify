@@ -9,6 +9,7 @@ import { createVC } from './rpc/vc/createVC';
 import { createVP } from './rpc/vc/createVP';
 import { getSupportedProofFormats } from './rpc/vc/getSupportedProofFormats';
 import { getVCs } from './rpc/vc/getVCs';
+import { removeVC } from './rpc/vc/removeVC';
 import { saveVC } from './rpc/vc/saveVC';
 import { verifyVC } from './rpc/vc/verifyVC';
 import { verifyVP } from './rpc/vc/verifyVP';
@@ -19,6 +20,7 @@ import {
   isValidCreateVPRequest,
   isValidGetVCsRequest,
   isValidHederaAccountParams,
+  isValidRemoveVCRequest,
   isValidResolveDIDRequest,
   isValidSaveVCRequest,
   isValidSwitchMethodRequest,
@@ -137,6 +139,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       isValidVerifyVCRequest(request.params);
       await switchNetworkIfNecessary(wallet, state);
       return await verifyVC(wallet, state, request.params.verifiableCredential);
+    case 'removeVC':
+      isValidRemoveVCRequest(request.params);
+      await switchNetworkIfNecessary(wallet, state);
+      return await removeVC(wallet, state, request.params);
     case 'createVP':
       isValidCreateVPRequest(request.params);
       await switchNetworkIfNecessary(wallet, state);

@@ -27,6 +27,15 @@ export type CreateVCRequestParams = {
   options?: SaveVCOptions;
 };
 
+export type RemoveVCOptions = {
+  store?: string | string[];
+};
+
+export type RemoveVCsRequestParams = {
+  id?: string | string[];
+  options?: RemoveVCOptions;
+};
+
 export type ProofInfo = {
   proofFormat?: ProofFormat;
   type?: string;

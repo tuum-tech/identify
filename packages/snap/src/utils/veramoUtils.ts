@@ -10,9 +10,10 @@ import {
 import cloneDeep from 'lodash.clonedeep';
 import { IdentitySnapState } from '../interfaces';
 import { CreateVPRequestParams, GetVCsOptions } from '../types/params';
-import { GetVCsRequestResult } from '../types/results';
 import {
   Filter,
+  IDataManagerDeleteResult,
+  IDataManagerQueryResult,
   IDataManagerSaveResult,
 } from '../veramo/plugins/verfiable-creds-manager';
 import { getAgent } from '../veramo/setup';
@@ -42,12 +43,12 @@ export async function veramoGetVCs(
   state: IdentitySnapState,
   options: GetVCsOptions,
   filter?: Filter
-): Promise<GetVCsRequestResult[]> {
+): Promise<IDataManagerQueryResult[]> {
   const agent = await getAgent(wallet, state);
   const result = (await agent.query({
     filter,
     options,
-  })) as GetVCsRequestResult[];
+  })) as IDataManagerQueryResult[];
   return result;
 }
 
@@ -119,6 +120,29 @@ export async function veramoVerifyVC(
   return await agent.verifyCredential({ credential: vc });
 }
 
+export async function veramoRemoveVC(
+  wallet: SnapProvider,
+  state: IdentitySnapState,
+  ids: string[],
+  store: string | string[]
+): Promise<IDataManagerDeleteResult[]> {
+  const agent = await getAgent(wallet, state);
+  let options: any = undefined;
+  if (store) options = { store };
+
+  console.log('ids: ', JSON.stringify(ids, null, 4));
+  let result: IDataManagerDeleteResult[][] = [];
+  ids.forEach(async (id) => {
+    const r = await agent.delete({
+      id,
+      options,
+    });
+    result.push(r);
+  });
+  console.log('result: ', JSON.stringify(result, null, 4));
+  return result.flat();
+}
+
 export async function veramoCreateVP(
   wallet: SnapProvider,
   state: IdentitySnapState,
@@ -146,9 +170,10 @@ export async function veramoCreateVP(
         filter: vcId,
       },
       options: { store: 'snap' },
-    })) as GetVCsRequestResult[];
+    })) as IDataManagerQueryResult[];
     if (vcObj.length > 0) {
-      const vc: W3CVerifiableCredential = vcObj[0].data;
+      const vc: W3CVerifiableCredential = vcObj[0]
+        .data as W3CVerifiableCredential;
       vcs.push(vc);
     }
   }
@@ -157,8 +182,8 @@ export async function veramoCreateVP(
   const config = state.snapConfig;
   const promptObj = {
     prompt: 'Alert',
-    description: 'Do you wish to create a VP from the following VC?',
-    textAreaContent: JSON.stringify(vcs, null, 4),
+    description: 'Do you wish to create a VP from the following VCs?',
+    textAreaContent: JSON.stringify(vcs),
   };
 
   if (config.dApp.disablePopups || (await snapConfirm(wallet, promptObj))) {

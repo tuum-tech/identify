@@ -1,6 +1,7 @@
 import {
   GetVCsOptions,
   ProofInfo,
+  RemoveVCOptions,
 } from '@tuum-tech/identity-snap/src/types/params';
 import { Filter } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
 import { VerifiableCredential, VerifiablePresentation } from '@veramo/core';
@@ -232,6 +233,26 @@ export const verifyVC = async (vc: VerifiableCredential | {}) => {
       {
         method: 'verifyVC',
         params: { verifiableCredential: vc },
+      },
+    ],
+  });
+};
+
+/**
+ * Invoke the "removeVC" method from the snap.
+ */
+
+export const removeVC = async (
+  id: string | string[],
+  options: RemoveVCOptions
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: [
+      defaultSnapOrigin,
+      {
+        method: 'removeVC',
+        params: { id, options },
       },
     ],
   });

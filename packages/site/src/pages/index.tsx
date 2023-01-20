@@ -1,5 +1,8 @@
 import { ProofInfo } from '@tuum-tech/identity-snap/src/types/params';
-import { GetVCsRequestResult } from '@tuum-tech/identity-snap/src/types/results';
+import {
+  IDataManagerDeleteResult,
+  IDataManagerQueryResult,
+} from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
 import { IVerifyResult, VerifiablePresentation } from '@veramo/core';
 import { useContext, useState } from 'react';
 import styled from 'styled-components';
@@ -20,6 +23,7 @@ import {
   getDID,
   getSnap,
   getVCs,
+  removeVC,
   resolveDID,
   sendHello,
   shouldDisplayReconnectButton,
@@ -125,6 +129,7 @@ const Index = () => {
 
   const [vcId, setVcId] = useState('');
   const [vc, setVc] = useState({});
+  const [vcIdsToBeRemoved, setVcIdsToBeRemoved] = useState('');
   const [vp, setVp] = useState({});
 
   const handleConnectClick = async () => {
@@ -213,15 +218,21 @@ const Index = () => {
         store: 'snap',
         returnStore: true,
       };
-      const vcs = (await getVCs(undefined, options)) as GetVCsRequestResult[];
+      const vcs = (await getVCs(
+        undefined,
+        options
+      )) as IDataManagerQueryResult[];
       console.log(`Your VCs are: ${JSON.stringify(vcs, null, 4)}`);
       const vcsJson = JSON.parse(JSON.stringify(vcs));
-      const keys = vcsJson.map((vc: { metadata: any }) => vc.metadata.id);
-      if (keys) {
-        setVcId(keys[keys.length - 1]);
-        setVc(vcs[keys.length - 1].data);
+      if (vcsJson.length > 0) {
+        const keys = vcsJson.map((vc: { metadata: any }) => vc.metadata.id);
+        if (keys) {
+          setVcId(keys[keys.length - 1]);
+          setVcIdsToBeRemoved(keys[keys.length - 1]);
+          setVc(vcs[keys.length - 1].data as IDataManagerQueryResult);
+        }
+        alert(`Your VC IDs are: ${keys}`);
       }
-      alert(`Your VC IDs are: ${keys}`);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -241,7 +252,12 @@ const Index = () => {
       };
       const credTypes = ['ProfileNamesCredential'];
       const saved = await createVC(vcKey, vcValue, options, credTypes);
-      console.log('created and saved VC: ', saved);
+      const savedJson = JSON.parse(JSON.stringify(saved));
+      if (savedJson.length > 0) {
+        setVcId(savedJson[0].id);
+        setVcIdsToBeRemoved(savedJson[0].id);
+        console.log('created and saved VC: ', saved);
+      }
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -264,6 +280,25 @@ const Index = () => {
         console.log('VC Verified: ', result.verified);
         alert('Your VC was verified successfully');
       }
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleRemoveVCClick = async () => {
+    try {
+      const options = {
+        store: 'snap',
+      };
+      console.log('vcIdsToBeRemoved: ', vcIdsToBeRemoved);
+      const isRemoved = (await removeVC(
+        vcIdsToBeRemoved,
+        options
+      )) as IDataManagerDeleteResult[];
+      console.log(`Remove VC Result: ${JSON.stringify(isRemoved, null, 4)}`);
+      setVcIdsToBeRemoved('');
+      setVcId('');
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -556,6 +591,36 @@ const Index = () => {
             button: (
               <SendHelloButton
                 onClick={handleVerifyVCClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'removeVC',
+            description: 'Remove one or more VCs from the snap',
+            form: (
+              <form>
+                <label>
+                  Enter your VC IDs to be removed separated by a comma
+                  <input
+                    type="text"
+                    value={vcIdsToBeRemoved}
+                    onChange={(e) => setVcIdsToBeRemoved(e.target.value)}
+                  />
+                </label>
+              </form>
+            ),
+            button: (
+              <SendHelloButton
+                onClick={handleRemoveVCClick}
                 disabled={!state.installedSnap}
               />
             ),

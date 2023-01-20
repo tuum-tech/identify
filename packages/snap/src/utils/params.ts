@@ -5,6 +5,7 @@ import {
   CreateVCRequestParams,
   CreateVPRequestParams,
   GetVCsRequestParams,
+  RemoveVCsRequestParams,
   SaveVCRequestParams,
 } from '../types/params';
 
@@ -226,6 +227,48 @@ export function isValidVerifyVCRequest(
 
   console.error('Invalid VerifyVC request');
   throw new Error('Invalid VerifyVC request');
+}
+
+export function isValidRemoveVCRequest(
+  params: unknown
+): asserts params is RemoveVCsRequestParams {
+  if (params === null) return;
+  const parameter = params as RemoveVCsRequestParams;
+
+  // Check if id exists
+  if ('id' in parameter && parameter.id !== null) {
+    // Check if id is valid
+    if (!Array.isArray(parameter.id) && !(typeof parameter.id === 'string')) {
+      throw new Error('Id should either be a string or an array of strings');
+    }
+
+    // Check if options is valid
+    if (
+      'options' in parameter &&
+      parameter.options !== null &&
+      typeof parameter.options === 'object'
+    ) {
+      if ('store' in parameter.options && parameter.options?.store !== null) {
+        if (typeof parameter.options?.store === 'string') {
+          if (!isValidVCStore(parameter.options?.store)) {
+            throw new Error('Store is not supported!');
+          }
+        } else if (
+          Array.isArray(parameter.options?.store) &&
+          parameter.options?.store.length > 0
+        ) {
+          (parameter.options?.store as [string]).forEach((store) => {
+            if (!isValidVCStore(store))
+              throw new Error('Store is not supported!');
+          });
+        } else {
+          throw new Error('Store is invalid format');
+        }
+      }
+    }
+    return;
+  }
+  throw new Error('Invalid RemoveVCRequest');
 }
 
 export function isValidCreateVPRequest(

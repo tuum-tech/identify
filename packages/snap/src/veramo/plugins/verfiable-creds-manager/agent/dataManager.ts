@@ -3,7 +3,9 @@ import { AbstractDataStore } from '../data-store/abstractDataStore';
 import {
   IDataManager,
   IDataManagerClearArgs,
+  IDataManagerClearResult,
   IDataManagerDeleteArgs,
+  IDataManagerDeleteResult,
   IDataManagerQueryArgs,
   IDataManagerQueryResult,
   IDataManagerSaveArgs,
@@ -98,7 +100,9 @@ export class DataManager implements IAgentPlugin {
     return res;
   }
 
-  public async delete(args: IDataManagerDeleteArgs): Promise<Array<boolean>> {
+  public async delete(
+    args: IDataManagerDeleteArgs
+  ): Promise<Array<IDataManagerDeleteResult>> {
     const { id, options } = args;
     let store;
     if (options === undefined) {
@@ -112,15 +116,15 @@ export class DataManager implements IAgentPlugin {
     if (store === undefined) {
       store = Object.keys(this.stores);
     }
-    const res = [];
+    const res: IDataManagerDeleteResult[] = [];
     for (const storeName of store) {
       const storePlugin = this.stores[storeName];
       if (!storePlugin) {
         throw new Error(`Store plugin ${storeName} not found`);
       }
       try {
-        const deleteResult = await storePlugin.delete({ id: id });
-        res.push(deleteResult);
+        const result = await storePlugin.delete({ id: id });
+        res.push({ id: id, removed: result, store: storeName });
       } catch (e) {
         console.log(e);
       }
@@ -128,7 +132,9 @@ export class DataManager implements IAgentPlugin {
     return res;
   }
 
-  public async clear(args: IDataManagerClearArgs): Promise<Array<boolean>> {
+  public async clear(
+    args: IDataManagerClearArgs
+  ): Promise<Array<IDataManagerClearResult>> {
     const { filter = { type: 'none', filter: {} }, options } = args;
     let store;
     if (options === undefined) {
@@ -143,15 +149,15 @@ export class DataManager implements IAgentPlugin {
     if (typeof store === 'string') {
       store = [store];
     }
-    const res = [];
+    const res: IDataManagerClearResult[] = [];
     for (const storeName of store) {
       const storePlugin = this.stores[storeName];
       if (!storePlugin) {
         throw new Error(`Store plugin ${storeName} not found`);
       }
       try {
-        const deleteResult = await storePlugin.clear({ filter });
-        res.push(deleteResult);
+        const result = await storePlugin.clear({ filter });
+        res.push({ removed: result, store: storeName });
       } catch (e) {
         console.log(e);
       }

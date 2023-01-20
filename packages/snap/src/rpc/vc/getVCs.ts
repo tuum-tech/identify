@@ -1,7 +1,7 @@
 import { SnapProvider } from '@metamask/snap-types';
+import { IDataManagerQueryResult } from 'src/veramo/plugins/verfiable-creds-manager';
 import { IdentitySnapState } from '../../interfaces';
 import { GetVCsRequestParams } from '../../types/params';
-import { GetVCsRequestResult } from '../../types/results';
 import { snapConfirm } from '../../utils/snapUtils';
 import { veramoGetVCs } from '../../utils/veramoUtils';
 
@@ -10,7 +10,7 @@ export async function getVCs(
   wallet: SnapProvider,
   state: IdentitySnapState,
   params: GetVCsRequestParams
-): Promise<GetVCsRequestResult[]> {
+): Promise<IDataManagerQueryResult[]> {
   const { filter, options } = params || {};
   const { store = 'snap', returnStore = true } = options || {};
 
