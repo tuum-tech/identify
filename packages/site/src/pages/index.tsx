@@ -228,12 +228,12 @@ const Index = () => {
       const vcsJson = JSON.parse(JSON.stringify(vcs));
       if (vcsJson.length > 0) {
         const keys = vcsJson.map((vc: { metadata: any }) => vc.metadata.id);
-        if (keys) {
-          setVcId(keys[keys.length - 1]);
-          setVcIdsToBeRemoved(keys[keys.length - 1]);
-          setVc(vcs[keys.length - 1].data as IDataManagerQueryResult);
+        if (keys.length > 0) {
+          setVcId(keys.toString());
+          setVcIdsToBeRemoved(keys.toString());
+          setVc(keys[keys.length - 1].data as IDataManagerQueryResult);
+          alert(`Your VC IDs are: ${keys.toString()}`);
         }
-        alert(`Your VC IDs are: ${keys}`);
       }
     } catch (e) {
       console.error(e);
@@ -256,8 +256,12 @@ const Index = () => {
       const saved = await createVC(vcKey, vcValue, options, credTypes);
       const savedJson = JSON.parse(JSON.stringify(saved));
       if (savedJson.length > 0) {
-        setVcId(savedJson[0].id);
-        setVcIdsToBeRemoved(savedJson[0].id);
+        let vcIdsToAdd: any = [];
+        savedJson.forEach((data: any) => {
+          vcIdsToAdd.push(data.id);
+        });
+        setVcId(vcIdsToAdd.toString());
+        setVcIdsToBeRemoved(vcIdsToAdd.toString());
         console.log('created and saved VC: ', saved);
       }
     } catch (e) {
@@ -295,12 +299,12 @@ const Index = () => {
       };
       console.log('vcIdsToBeRemoved: ', vcIdsToBeRemoved);
       const isRemoved = (await removeVC(
-        vcIdsToBeRemoved,
+        vcIdsToBeRemoved.trim().split(','),
         options
       )) as IDataManagerDeleteResult[];
       console.log(`Remove VC Result: ${JSON.stringify(isRemoved, null, 4)}`);
-      setVcIdsToBeRemoved('');
       setVcId('');
+      setVcIdsToBeRemoved('');
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -316,8 +320,8 @@ const Index = () => {
         options
       )) as IDataManagerClearResult[];
       console.log(`Remove VC Result: ${JSON.stringify(isRemoved, null, 4)}`);
-      setVcIdsToBeRemoved('');
       setVcId('');
+      setVcIdsToBeRemoved('');
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -326,14 +330,16 @@ const Index = () => {
 
   const handleCreateVPClick = async () => {
     try {
-      const vcs = [vcId];
       const proofInfo: ProofInfo = {
         proofFormat: 'jwt',
         type: 'ProfileNamesPresentation',
         domain: 'identity.tuum.tech',
-        challenge: vcId,
       };
-      const vp = (await createVP(vcs, proofInfo)) as VerifiablePresentation;
+      console.log('vcId: ', vcId);
+      const vp = (await createVP(
+        vcId.trim().split(','),
+        proofInfo
+      )) as VerifiablePresentation;
       setVp(vp);
       console.log(`Your VP is: ${JSON.stringify(vp, null, 4)}`);
       alert(`Your VP is: ${JSON.stringify(vp, null, 4)}`);

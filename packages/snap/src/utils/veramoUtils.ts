@@ -196,8 +196,8 @@ export async function veramoCreateVP(
   const config = state.snapConfig;
   const promptObj = {
     prompt: 'Alert',
-    description: 'Do you wish to create a VP from the following VCs?',
-    textAreaContent: JSON.stringify(vcs),
+    description: 'Do you wish to create a VP from the following VC IDs?',
+    textAreaContent: JSON.stringify(vcsMetadata),
   };
 
   if (config.dApp.disablePopups || (await snapConfirm(wallet, promptObj))) {
