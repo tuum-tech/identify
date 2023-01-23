@@ -74,7 +74,7 @@ const CardContainer = styled.div`
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-between;
-  max-width: 64.8rem;
+  max-width: 125rem;
   width: 100%;
   height: 100%;
   margin-top: 1.5rem;
@@ -210,12 +210,32 @@ const Index = () => {
     }
   };
 
+  const handleGetSpecificVCClick = async () => {
+    try {
+      const filter = {
+        type: 'id',
+        filter: vcId ? vcId.trim().split(',')[0] : undefined,
+      };
+      const options = {
+        store: 'snap',
+        returnStore: true,
+      };
+      const vcs = (await getVCs(filter, options)) as IDataManagerQueryResult[];
+      console.log(`Your VC is: ${JSON.stringify(vcs, null, 4)}`);
+      if (vcs.length > 0) {
+        const keys = vcs.map((vc: { metadata: any }) => vc.metadata.id);
+        if (keys.length > 0) {
+          setVc(vcs[keys.length - 1].data as IDataManagerQueryResult);
+        }
+      }
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
   const handleGetVCsClick = async () => {
     try {
-      /* const filter = {
-        type: 'id',
-        filter: '',
-      }; */
       const options = {
         store: 'snap',
         returnStore: true,
@@ -225,7 +245,6 @@ const Index = () => {
         options
       )) as IDataManagerQueryResult[];
       console.log(`Your VCs are: ${JSON.stringify(vcs, null, 4)}`);
-      // const vcsJson = JSON.parse(JSON.stringify(vcs));
       if (vcs.length > 0) {
         const keys = vcs.map((vc: { metadata: any }) => vc.metadata.id);
         if (keys.length > 0) {
@@ -294,12 +313,15 @@ const Index = () => {
 
   const handleRemoveVCClick = async () => {
     try {
+      const vcId = vcIdsToBeRemoved
+        ? vcIdsToBeRemoved.trim().split(',')[0]
+        : '';
       const options = {
         store: 'snap',
       };
       console.log('vcIdsToBeRemoved: ', vcIdsToBeRemoved);
       const isRemoved = (await removeVC(
-        vcIdsToBeRemoved.trim().split(','),
+        vcId,
         options
       )) as IDataManagerDeleteResult[];
       console.log(`Remove VC Result: ${JSON.stringify(isRemoved, null, 4)}`);
@@ -428,6 +450,7 @@ const Index = () => {
             disabled={!state.installedSnap}
           />
         )}
+        {/* =============================================================================== */}
         <Card
           content={{
             title: 'Send Hello message',
@@ -435,6 +458,7 @@ const Index = () => {
               'Display a custom message within a confirmation screen in MetaMask.',
             button: (
               <SendHelloButton
+                buttonText="Send message"
                 onClick={handleSendHelloClick}
                 disabled={!state.installedSnap}
               />
@@ -447,6 +471,7 @@ const Index = () => {
             !shouldDisplayReconnectButton(state.installedSnap)
           }
         />
+        {/* =============================================================================== */}
         <Card
           content={{
             title: 'configureHederaAccount',
@@ -474,6 +499,7 @@ const Index = () => {
             ),
             button: (
               <SendHelloButton
+                buttonText="Configure"
                 onClick={handleConfigureHederaAccountClick}
                 disabled={!state.installedSnap}
               />
@@ -486,12 +512,14 @@ const Index = () => {
             !shouldDisplayReconnectButton(state.installedSnap)
           }
         />
+        {/* =============================================================================== */}
         <Card
           content={{
             title: 'getCurrentDIDMethod',
             description: 'Get the current DID method to use',
             button: (
               <SendHelloButton
+                buttonText="Get DID method"
                 onClick={handleGetCurrentDIDMethodClick}
                 disabled={!state.installedSnap}
               />
@@ -510,6 +538,7 @@ const Index = () => {
             description: 'Get the current DID of the user',
             button: (
               <SendHelloButton
+                buttonText="Get DID"
                 onClick={handleGetDIDClick}
                 disabled={!state.installedSnap}
               />
@@ -528,6 +557,7 @@ const Index = () => {
             description: 'Resolve the DID and return a DID document',
             button: (
               <SendHelloButton
+                buttonText="Resolve DID"
                 onClick={handleResolveDIDClick}
                 disabled={!state.installedSnap}
               />
@@ -542,10 +572,42 @@ const Index = () => {
         />
         <Card
           content={{
-            title: 'getVCs',
-            description: 'Get the VCs of the user',
+            title: 'getSpecificVC',
+            description: 'Get specific VC of the user',
+            form: (
+              <form>
+                <label>
+                  Enter your VC Id
+                  <input
+                    type="text"
+                    value={vcId ? vcId.trim().split(',')[0] : ''}
+                    onChange={(e) => setVcId(e.target.value)}
+                  />
+                </label>
+              </form>
+            ),
             button: (
               <SendHelloButton
+                buttonText="Retrieve VC"
+                onClick={handleGetSpecificVCClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'getAllVCs',
+            description: 'Get all the VCs of the user',
+            button: (
+              <SendHelloButton
+                buttonText="Retrieve all VCs"
                 onClick={handleGetVCsClick}
                 disabled={!state.installedSnap}
               />
@@ -585,6 +647,7 @@ const Index = () => {
             ),
             button: (
               <SendHelloButton
+                buttonText="Generate VC"
                 onClick={handleCreateVCClick}
                 disabled={!state.installedSnap}
               />
@@ -615,6 +678,7 @@ const Index = () => {
             ),
             button: (
               <SendHelloButton
+                buttonText="Verify VC"
                 onClick={handleVerifyVCClick}
                 disabled={!state.installedSnap}
               />
@@ -637,7 +701,11 @@ const Index = () => {
                   Enter your VC IDs to be removed separated by a comma
                   <input
                     type="text"
-                    value={vcIdsToBeRemoved}
+                    value={
+                      vcIdsToBeRemoved
+                        ? vcIdsToBeRemoved.trim().split(',')[0]
+                        : ''
+                    }
                     onChange={(e) => setVcIdsToBeRemoved(e.target.value)}
                   />
                 </label>
@@ -645,6 +713,7 @@ const Index = () => {
             ),
             button: (
               <SendHelloButton
+                buttonText="Delete VC"
                 onClick={handleRemoveVCClick}
                 disabled={!state.installedSnap}
               />
@@ -657,13 +726,13 @@ const Index = () => {
             !shouldDisplayReconnectButton(state.installedSnap)
           }
         />
-
         <Card
           content={{
             title: 'deleteAllVCs',
             description: 'Delete all the VCs from the snap',
             button: (
               <SendHelloButton
+                buttonText="Delete all VCs"
                 onClick={handleDeleteAllVCsClick}
                 disabled={!state.installedSnap}
               />
@@ -694,6 +763,7 @@ const Index = () => {
             ),
             button: (
               <SendHelloButton
+                buttonText="Generate VP"
                 onClick={handleCreateVPClick}
                 disabled={!state.installedSnap}
               />
@@ -724,6 +794,7 @@ const Index = () => {
             ),
             button: (
               <SendHelloButton
+                buttonText="Verify VP"
                 onClick={handleVerifyVPClick}
                 disabled={!state.installedSnap}
               />
@@ -736,14 +807,68 @@ const Index = () => {
             !shouldDisplayReconnectButton(state.installedSnap)
           }
         />
-        <Notice>
-          <p>
-            Please note that the <b>snap.manifest.json</b> and{' '}
-            <b>package.json</b> must be located in the server root directory and
-            the bundle must be hosted at the location specified by the location
-            field.
-          </p>
-        </Notice>
+        <Card
+          content={{
+            title: 'todo',
+            description: 'TODO',
+            /* form: (
+              <form>
+                <label>
+                  Enter your Verifiable Presentation
+                  <input
+                    type="text"
+                    value={JSON.stringify(vp)}
+                    onChange={(e) => setVp(e.target.value)}
+                  />
+                </label>
+              </form>
+            ), */
+            button: (
+              <SendHelloButton
+                buttonText="todo"
+                onClick={handleVerifyVPClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'todo',
+            description: 'TODO',
+            /* form: (
+              <form>
+                <label>
+                  Enter your Verifiable Presentation
+                  <input
+                    type="text"
+                    value={JSON.stringify(vp)}
+                    onChange={(e) => setVp(e.target.value)}
+                  />
+                </label>
+              </form>
+            ), */
+            button: (
+              <SendHelloButton
+                buttonText="todo"
+                onClick={handleVerifyVPClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
       </CardContainer>
     </Container>
   );
