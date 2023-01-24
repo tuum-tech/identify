@@ -4,6 +4,7 @@ import {
   IIdentifier,
   IVerifyResult,
   MinimalImportableKey,
+  ProofFormat,
   VerifiablePresentation,
   W3CVerifiableCredential,
 } from '@veramo/core';
@@ -99,7 +100,7 @@ export async function veramoCreateVC(
       type: credTypes,
     },
     // digital proof that makes the credential tamper-evident
-    proofFormat: 'jwt',
+    proofFormat: 'jwt' as ProofFormat,
   });
   console.log(
     'Created verifiableCredential: ',
@@ -165,7 +166,7 @@ export async function veramoCreateVP(
   const vcsMetadata = params.vcs;
   const proofFormat = params.proofInfo?.proofFormat
     ? params.proofInfo.proofFormat
-    : 'jwt';
+    : ('jwt' as ProofFormat);
   const type = params.proofInfo?.type ? params.proofInfo.type : 'Custom';
   const domain = params.proofInfo?.domain;
   const challenge = params.proofInfo?.challenge;
