@@ -19,23 +19,26 @@ export async function getCurrentAccount(
   state: IdentitySnapState
 ): Promise<string | null> {
   try {
-    if (
+    /*     if (
       wallet.selectedAddress &&
       wallet.selectedAddress !== state.currentAccount
     ) {
       state.currentAccount = wallet.selectedAddress;
       await updateSnapState(wallet, state);
-    }
-
+    } */
     const chain_id = await getCurrentNetwork(wallet);
     const hederaChainIDs = getHederaChainIDs();
     if (Array.from(hederaChainIDs.keys()).includes(chain_id)) {
       // Handle Hedera
       if (isHederaAccountImported(state)) {
         console.log(
-          `Hedera Metamask accounts: EVM Address: ${state.hederaAccount.evmAddress}, AccountId: ${state.hederaAccount.accountId}`
+          `Hedera Metamask accounts: EVM Address: ${
+            state.accountState[state.currentAccount].hederaAccount.evmAddress
+          }, AccountId: ${
+            state.accountState[state.currentAccount].hederaAccount.accountId
+          }`
         );
-        return state.hederaAccount.accountId;
+        return state.accountState[state.currentAccount].hederaAccount.accountId;
       } else {
         console.error(
           'Hedera Network was selected but Hedera Account has not yet been configured. Please configure it first by calling "configureHederaAccount" API'
@@ -43,6 +46,14 @@ export async function getCurrentAccount(
         return null;
       }
     } else {
+      // TODO: Maybe we don't need this block at all?
+      if (
+        wallet.selectedAddress &&
+        wallet.selectedAddress !== state.currentAccount
+      ) {
+        state.currentAccount = wallet.selectedAddress;
+        await updateSnapState(wallet, state);
+      }
       // Handle everything else
       const accounts = (await wallet.request({
         method: 'eth_requestAccounts',

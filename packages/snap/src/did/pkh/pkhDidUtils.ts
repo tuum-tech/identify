@@ -17,7 +17,7 @@ export async function getDidPkhIdentifier(
   ) {
     // Handle Hedera
     return `hedera:${hederaChainIDs.get(chain_id)}:${
-      state.hederaAccount.accountId
+      state.accountState[state.currentAccount].hederaAccount.accountId
     }`;
   } else {
     // Handle everything else

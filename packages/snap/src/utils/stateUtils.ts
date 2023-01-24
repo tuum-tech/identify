@@ -95,9 +95,9 @@ export async function initSnapState(
  **/
 export async function initAccountState(
   wallet: SnapProvider,
-  state: IdentitySnapState
+  state: IdentitySnapState,
+  currentAccount: string
 ): Promise<void> {
-  state.accountState[state.currentAccount] = getEmptyAccountState();
-  9;
+  state.accountState[currentAccount] = getEmptyAccountState();
   await updateSnapState(wallet, state);
 }

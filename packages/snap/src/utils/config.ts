@@ -1,5 +1,6 @@
 import cloneDeep from 'lodash.clonedeep';
 import {
+  HederaAccount,
   IdentityAccountConfig,
   IdentityAccountState,
   IdentitySnapState,
@@ -27,6 +28,7 @@ const emptyAccountState = {
       vcStore: 'snap',
     },
   } as IdentityAccountConfig,
+  hederaAccount: {} as HederaAccount,
 } as IdentityAccountState;
 
 export const getEmptyAccountState = () => {
@@ -44,12 +46,6 @@ const initialSnapState: IdentitySnapState = {
     snap: {
       acceptedTerms: true,
     },
-  },
-  hederaAccount: {
-    privateKey: '',
-    publicKey: '',
-    accountId: '',
-    evmAddress: '',
   },
 };
 

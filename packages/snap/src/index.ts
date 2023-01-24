@@ -56,7 +56,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   origin,
   request,
 }) => {
-  console.log('wallet: ', wallet);
   let state = await getSnapStateUnchecked(wallet);
 
   if (state === null) {
@@ -91,7 +90,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   }
 
   if (!(account in state.accountState)) {
-    await initAccountState(wallet, state);
+    await initAccountState(wallet, state, account);
   }
 
   console.log('Request:', JSON.stringify(request, null, 4));

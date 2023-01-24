@@ -1,6 +1,5 @@
 import { IIdentifier, IKey, W3CVerifiableCredential } from '@veramo/core';
 import { ManagedPrivateKey } from '@veramo/key-manager';
-import { availableVCStores } from './types/constants';
 
 /* eslint-disable */
 export type IdentitySnapState = {
@@ -14,11 +13,6 @@ export type IdentitySnapState = {
    * Configuration for IdentitySnap
    */
   snapConfig: IdentitySnapConfig;
-
-  /**
-   * Configuration for Hedera Account
-   */
-  hederaAccount: HederaAccount;
 };
 
 export interface IdentitySnapConfig {
@@ -40,18 +34,17 @@ export interface IdentityAccountState {
   identifiers: Record<string, IIdentifier>;
   vcs: Record<string, W3CVerifiableCredential>;
   accountConfig: IdentityAccountConfig;
+  hederaAccount: HederaAccount;
 }
 
 export interface IdentityAccountConfig {
   identity: {
     didMethod: string;
-    vcStore: typeof availableVCStores[number];
+    vcStore: string;
   };
 }
 
 export interface HederaAccount {
-  privateKey: string;
-  publicKey: string;
   accountId: string;
   evmAddress: string;
 }

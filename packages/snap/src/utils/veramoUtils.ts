@@ -1,27 +1,35 @@
 import { SnapProvider } from '@metamask/snap-types';
 import {
   DIDResolutionResult,
+  ICredentialIssuer,
+  IDataStore,
+  IDIDManager,
   IIdentifier,
+  IKeyManager,
+  IResolver,
   IVerifyResult,
   MinimalImportableKey,
   ProofFormat,
+  TAgent,
   VerifiablePresentation,
   W3CVerifiableCredential,
 } from '@veramo/core';
 import cloneDeep from 'lodash.clonedeep';
+import { KeyPair } from 'src/types/crypto';
 import { IdentitySnapState } from '../interfaces';
 import { CreateVPRequestParams, GetVCsOptions } from '../types/params';
 import {
   Filter,
+  IDataManager,
   IDataManagerClearResult,
   IDataManagerDeleteResult,
   IDataManagerQueryResult,
   IDataManagerSaveResult,
 } from '../veramo/plugins/verfiable-creds-manager';
 import { getAgent } from '../veramo/setup';
-import { getHederaChainIDs } from './config';
 import { getCurrentDid } from './didUtils';
-import { getCurrentNetwork, snapConfirm } from './snapUtils';
+import { getKeyPair } from './hederaUtils';
+import { snapConfirm } from './snapUtils';
 
 /* eslint-disable */
 export async function veramoResolveDID(
@@ -30,11 +38,14 @@ export async function veramoResolveDID(
   didUrl?: string
 ): Promise<DIDResolutionResult> {
   let did = didUrl;
+  // Get agent
+  const agent = await getAgent(wallet, state);
+  const keyPair = await getKeyPairFromAgent(wallet, state, agent);
+
   // GET DID if not exists
   if (!did) {
-    did = await veramoImportMetaMaskAccount(wallet, state);
+    did = await veramoImportMetaMaskAccount(wallet, state, keyPair);
   }
-  const agent = await getAgent(wallet, state);
   return await agent.resolveDid({
     didUrl: did,
   });
@@ -76,9 +87,10 @@ export async function veramoCreateVC(
   store: string | string[],
   credTypes?: string[]
 ): Promise<IDataManagerSaveResult[]> {
-  // GET DID
-  const did = await veramoImportMetaMaskAccount(wallet, state);
   const agent = await getAgent(wallet, state);
+  const keyPair = await getKeyPairFromAgent(wallet, state, agent);
+  // GET DID
+  const did = await veramoImportMetaMaskAccount(wallet, state, keyPair);
 
   const issuanceDate = new Date();
   const expirationDate = cloneDeep(issuanceDate);
@@ -171,10 +183,12 @@ export async function veramoCreateVP(
   const domain = params.proofInfo?.domain;
   const challenge = params.proofInfo?.challenge;
 
-  //GET DID
-  const did = await veramoImportMetaMaskAccount(wallet, state);
   //Get Veramo agent
   const agent = await getAgent(wallet, state);
+
+  //GET DID
+  const keyPair = await getKeyPairFromAgent(wallet, state, agent);
+  const did = await veramoImportMetaMaskAccount(wallet, state, keyPair);
 
   const vcs: W3CVerifiableCredential[] = [];
 
@@ -227,9 +241,36 @@ export async function veramoVerifyVP(
   return await agent.verifyPresentation({ presentation: vp });
 }
 
+export async function getKeyPairFromAgent(
+  wallet: SnapProvider,
+  state: IdentitySnapState,
+  agent: TAgent<
+    IKeyManager &
+      IDIDManager &
+      IResolver &
+      IDataManager &
+      ICredentialIssuer &
+      IDataStore
+  >
+): Promise<KeyPair> {
+  let keyPair = {} as KeyPair;
+  const controllerKeyId = `metamask-${state.currentAccount}`;
+  try {
+    const privateKey = (await agent.keyManagerGet({ kid: controllerKeyId }))
+      .privateKeyHex;
+    if (privateKey !== undefined) {
+      keyPair = await getKeyPair(privateKey);
+    }
+  } catch (error) {
+    console.log(`Error: ${error}`);
+  }
+  return keyPair;
+}
+
 export async function veramoImportMetaMaskAccount(
   wallet: SnapProvider,
-  state: IdentitySnapState
+  state: IdentitySnapState,
+  keyPair: KeyPair
 ): Promise<string> {
   const agent = await getAgent(wallet, state);
   const method =
@@ -249,54 +290,21 @@ export async function veramoImportMetaMaskAccount(
     return did;
   }
 
-  let controllerKeyId = `metamask-${state.currentAccount}`;
-
-  const chain_id = await getCurrentNetwork(wallet);
-  const hederaChainIDs = getHederaChainIDs();
-  if (Array.from(hederaChainIDs.keys()).includes(chain_id)) {
-    controllerKeyId = `metamask-${state.hederaAccount.accountId}`;
-    await agent.didManagerImport({
-      did,
-      provider: method,
-      controllerKeyId,
-      keys: [
-        {
-          kid: controllerKeyId,
-          type: 'Secp256k1',
-          kms: 'snap',
-          privateKeyHex: state.hederaAccount.privateKey,
-          publicKeyHex: state.hederaAccount.publicKey,
-        } as MinimalImportableKey,
-      ],
-    });
-  } else {
-    await agent.didManagerImport({
-      did,
-      provider: method,
-      controllerKeyId,
-      keys: [
-        {
-          kid: controllerKeyId,
-          type: 'Secp256k1',
-          kms: 'web3',
-          privateKeyHex: '',
-          publicKeyHex: '',
-          meta: {
-            provider: 'metamask',
-            account: state.currentAccount.toLowerCase(),
-            algorithms: [
-              'ES256K',
-              'ES256K-R',
-              'eth_signTransaction',
-              'eth_signTypedData',
-              'eth_signMessage',
-              'eth_rawSign',
-            ],
-          },
-        } as MinimalImportableKey,
-      ],
-    });
-  }
+  const controllerKeyId = `metamask-${state.currentAccount}`;
+  await agent.didManagerImport({
+    did,
+    provider: method,
+    controllerKeyId,
+    keys: [
+      {
+        kid: controllerKeyId,
+        type: 'Secp256k1',
+        kms: 'snap',
+        privateKeyHex: keyPair.privateKey,
+        publicKeyHex: keyPair.publicKey,
+      } as MinimalImportableKey,
+    ],
+  });
   console.log(
     `Importing using did=${did}, provider=${method}, controllerKeyId=${controllerKeyId}...`
   );

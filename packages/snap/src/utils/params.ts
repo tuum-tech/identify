@@ -37,9 +37,9 @@ export function isValidHederaAccountParams(
 
 export function isHederaAccountImported(state: IdentitySnapState): boolean {
   if (
-    state.hederaAccount.privateKey !== '' &&
-    state.hederaAccount.publicKey !== '' &&
-    state.hederaAccount.accountId !== ''
+    state.accountState[state.currentAccount].hederaAccount.accountId ===
+      state.currentAccount &&
+    state.accountState[state.currentAccount].hederaAccount.evmAddress !== ''
   ) {
     return true;
   } else {

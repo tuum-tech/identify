@@ -1,8 +1,9 @@
-import { PrivateKey } from '@hashgraph/sdk';
 import { IdentitySnapState } from '../../interfaces';
 import { getHederaChainIDs } from '../../utils/config';
+import { getKeyPair } from '../../utils/hederaUtils';
 import { getCurrentNetwork } from '../../utils/snapUtils';
-import { updateSnapState } from '../../utils/stateUtils';
+import { initAccountState, updateSnapState } from '../../utils/stateUtils';
+import { veramoImportMetaMaskAccount } from '../../utils/veramoUtils';
 import { toHederaAccountInfo } from '../../veramo/plugins/did-provider-pkh/src/pkh-did-provider';
 
 /* eslint-disable */
@@ -20,15 +21,17 @@ export async function configureHederaAccount(
       hederaChainIDs.get(chain_id) as string
     );
     if (hederaAccountInfo !== null) {
-      state.hederaAccount.evmAddress = hederaAccountInfo.contractAccountId;
-      if (state.hederaAccount.evmAddress !== state.currentAccount) {
-        state.currentAccount = state.hederaAccount.evmAddress;
+      state.currentAccount = _accountId;
+      if (!(_accountId in state.accountState)) {
+        await initAccountState(wallet, state, _accountId);
       }
-      state.hederaAccount.privateKey = _privateKey;
-      state.hederaAccount.publicKey =
-        PrivateKey.fromStringECDSA(_privateKey).publicKey.toStringRaw();
-      state.hederaAccount.accountId = _accountId;
+      state.accountState[state.currentAccount].hederaAccount.evmAddress =
+        hederaAccountInfo.contractAccountId;
+      state.accountState[state.currentAccount].hederaAccount.accountId =
+        _accountId;
       await updateSnapState(wallet, state);
+      const keyPair = await getKeyPair(_privateKey);
+      await veramoImportMetaMaskAccount(wallet, state, keyPair);
       return true;
     } else {
       console.error('Could not retrieve hedera account info');

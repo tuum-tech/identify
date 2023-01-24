@@ -43,9 +43,12 @@ export class SnapKeyStore extends AbstractKeyStore {
   async get({ kid }: { kid: string }): Promise<IKey> {
     let account = this.state.currentAccount;
     if (this.isHederaAccount) {
-      account = this.state.hederaAccount.accountId;
+      account =
+        this.state.accountState[this.state.currentAccount].hederaAccount
+          .accountId;
     }
-    if (!account) throw Error('Cannot get current account');
+    if (!account)
+      throw Error(`SnapKeyStore - Cannot get current account: ${account}`);
 
     const key = this.state.accountState[account].snapKeyStore[kid];
     if (!key) throw Error('Key not found');
@@ -55,9 +58,12 @@ export class SnapKeyStore extends AbstractKeyStore {
   async delete({ kid }: { kid: string }) {
     let account = this.state.currentAccount;
     if (this.isHederaAccount) {
-      account = this.state.hederaAccount.accountId;
+      account =
+        this.state.accountState[this.state.currentAccount].hederaAccount
+          .accountId;
     }
-    if (!account) throw Error('Cannot get current account');
+    if (!account)
+      throw Error(`SnapKeyStore - Cannot get current account: ${account}`);
 
     if (!this.state.accountState[account].snapKeyStore[kid])
       throw Error('Key not found');
@@ -70,9 +76,12 @@ export class SnapKeyStore extends AbstractKeyStore {
   async import(args: IKey) {
     let account = this.state.currentAccount;
     if (this.isHederaAccount) {
-      account = this.state.hederaAccount.accountId;
+      account =
+        this.state.accountState[this.state.currentAccount].hederaAccount
+          .accountId;
     }
-    if (!account) throw Error('Cannot get current account');
+    if (!account)
+      throw Error(`SnapKeyStore - Cannot get current account: ${account}`);
 
     this.state.accountState[account].snapKeyStore[args.kid] = { ...args };
     await updateSnapState(this.wallet, this.state);
@@ -82,9 +91,12 @@ export class SnapKeyStore extends AbstractKeyStore {
   async list(): Promise<Exclude<IKey, 'privateKeyHex'>[]> {
     let account = this.state.currentAccount;
     if (this.isHederaAccount) {
-      account = this.state.hederaAccount.accountId;
+      account =
+        this.state.accountState[this.state.currentAccount].hederaAccount
+          .accountId;
     }
-    if (!account) throw Error('Cannot get current account');
+    if (!account)
+      throw Error(`SnapKeyStore - Cannot get current account: ${account}`);
 
     const safeKeys = Object.values(
       this.state.accountState[account].snapKeyStore
@@ -120,9 +132,14 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
   async get({ alias }: { alias: string }): Promise<ManagedPrivateKey> {
     let account = this.state.currentAccount;
     if (this.isHederaAccount) {
-      account = this.state.hederaAccount.accountId;
+      account =
+        this.state.accountState[this.state.currentAccount].hederaAccount
+          .accountId;
     }
-    if (!account) throw Error('User denied error');
+    if (!account)
+      throw Error(
+        `SnapPrivateKeyStore - Cannot get current account: ${account}`
+      );
 
     const key = this.state.accountState[account].snapPrivateKeyStore[alias];
     if (!key) throw Error(`not_found: PrivateKey not found for alias=${alias}`);
@@ -132,9 +149,14 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
   async delete({ alias }: { alias: string }) {
     let account = this.state.currentAccount;
     if (this.isHederaAccount) {
-      account = this.state.hederaAccount.accountId;
+      account =
+        this.state.accountState[this.state.currentAccount].hederaAccount
+          .accountId;
     }
-    if (!account) throw Error('User denied error');
+    if (!account)
+      throw Error(
+        `SnapPrivateKeyStore - Cannot get current account: ${account}`
+      );
 
     if (!this.state.accountState[account].snapPrivateKeyStore[alias])
       throw Error('Key not found');
@@ -147,9 +169,14 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
   async import(args: ImportablePrivateKey) {
     let account = this.state.currentAccount;
     if (this.isHederaAccount) {
-      account = this.state.hederaAccount.accountId;
+      account =
+        this.state.accountState[this.state.currentAccount].hederaAccount
+          .accountId;
     }
-    if (!account) throw Error('User denied error');
+    if (!account)
+      throw Error(
+        `SnapPrivateKeyStore - Cannot get current account: ${account}`
+      );
 
     const alias = args.alias || uuidv4();
     const existingEntry =
@@ -173,9 +200,14 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
   async list(): Promise<Array<ManagedPrivateKey>> {
     let account = this.state.currentAccount;
     if (this.isHederaAccount) {
-      account = this.state.hederaAccount.accountId;
+      account =
+        this.state.accountState[this.state.currentAccount].hederaAccount
+          .accountId;
     }
-    if (!account) throw Error('User denied error');
+    if (!account)
+      throw Error(
+        `SnapPrivateKeyStore - Cannot get current account: ${account}`
+      );
 
     return [
       ...Object.values(this.state.accountState[account].snapPrivateKeyStore),
@@ -215,9 +247,12 @@ export class SnapDIDStore extends AbstractDIDStore {
   }): Promise<IIdentifier> {
     let account = this.state.currentAccount;
     if (this.isHederaAccount) {
-      account = this.state.hederaAccount.accountId;
+      account =
+        this.state.accountState[this.state.currentAccount].hederaAccount
+          .accountId;
     }
-    if (!account) throw Error(`Cannot get current account: ${account}`);
+    if (!account)
+      throw Error(`SnapDIDStore - Cannot get current account: ${account}`);
     const identifiers = this.state.accountState[account].identifiers;
 
     if (did && !alias) {
@@ -244,9 +279,12 @@ export class SnapDIDStore extends AbstractDIDStore {
   async delete({ did }: { did: string }) {
     let account = this.state.currentAccount;
     if (this.isHederaAccount) {
-      account = this.state.hederaAccount.accountId;
+      account =
+        this.state.accountState[this.state.currentAccount].hederaAccount
+          .accountId;
     }
-    if (!account) throw Error(`Cannot get current account: ${account}`);
+    if (!account)
+      throw Error(`SnapDIDStore - Cannot get current account: ${account}`);
 
     if (!this.state.accountState[account].identifiers[did])
       throw Error('Identifier not found');
@@ -259,9 +297,13 @@ export class SnapDIDStore extends AbstractDIDStore {
   async import(args: IIdentifier) {
     let account = this.state.currentAccount;
     if (this.isHederaAccount) {
-      account = this.state.hederaAccount.accountId;
+      account =
+        this.state.accountState[this.state.currentAccount].hederaAccount
+          .accountId;
     }
-    if (!account) throw Error(`Cannot get current account: ${account}`);
+
+    if (!account)
+      throw Error(`SnapDIDStore - Cannot get current account: ${account}`);
 
     const identifier = { ...args };
     for (const key of identifier.keys) {
@@ -280,9 +322,12 @@ export class SnapDIDStore extends AbstractDIDStore {
   }): Promise<IIdentifier[]> {
     let account = this.state.currentAccount;
     if (this.isHederaAccount) {
-      account = this.state.hederaAccount.accountId;
+      account =
+        this.state.accountState[this.state.currentAccount].hederaAccount
+          .accountId;
     }
-    if (!account) throw Error(`Cannot get current account: ${account}`);
+    if (!account)
+      throw Error(`SnapDIDStore - Cannot get current account: ${account}`);
 
     let result: IIdentifier[] = [];
     for (const key of Object.keys(
@@ -330,9 +375,12 @@ export class SnapVCStore extends AbstractDataStore {
     const { filter } = args;
     let account = this.state.currentAccount;
     if (this.isHederaAccount) {
-      account = this.state.hederaAccount.accountId;
+      account =
+        this.state.accountState[this.state.currentAccount].hederaAccount
+          .accountId;
     }
-    if (!account) throw Error(`Cannot get current account: ${account}`);
+    if (!account)
+      throw Error(`SnapVCStore - Cannot get current account: ${account}`);
 
     if (filter && filter.type === 'id') {
       try {
@@ -392,9 +440,12 @@ export class SnapVCStore extends AbstractDataStore {
     const vc = args.data;
     let account = this.state.currentAccount;
     if (this.isHederaAccount) {
-      account = this.state.hederaAccount.accountId;
+      account =
+        this.state.accountState[this.state.currentAccount].hederaAccount
+          .accountId;
     }
-    if (!account) throw Error(`Cannot get current account: ${account}`);
+    if (!account)
+      throw Error(`SnapVCStore - Cannot get current account: ${account}`);
 
     let id = uuidv4();
     while (this.state.accountState[account].vcs[id]) {
@@ -409,9 +460,12 @@ export class SnapVCStore extends AbstractDataStore {
   async delete({ id }: { id: string }): Promise<boolean> {
     let account = this.state.currentAccount;
     if (this.isHederaAccount) {
-      account = this.state.hederaAccount.accountId;
+      account =
+        this.state.accountState[this.state.currentAccount].hederaAccount
+          .accountId;
     }
-    if (!account) throw Error(`Cannot get current account: ${account}`);
+    if (!account)
+      throw Error(`SnapVCStore - Cannot get current account: ${account}`);
 
     if (!this.state.accountState[account].vcs[id])
       throw Error(`VC ID '${id}' not found`);
@@ -424,9 +478,12 @@ export class SnapVCStore extends AbstractDataStore {
   public async clear(args: IFilterArgs): Promise<boolean> {
     let account = this.state.currentAccount;
     if (this.isHederaAccount) {
-      account = this.state.hederaAccount.accountId;
+      account =
+        this.state.accountState[this.state.currentAccount].hederaAccount
+          .accountId;
     }
-    if (!account) throw Error(`Cannot get current account: ${account}`);
+    if (!account)
+      throw Error(`SnapVCStore - Cannot get current account: ${account}`);
 
     this.state.accountState[account].vcs = {};
     await updateSnapState(this.wallet, this.state);
