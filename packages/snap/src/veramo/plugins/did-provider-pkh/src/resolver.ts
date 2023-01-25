@@ -6,13 +6,14 @@ import type {
   Resolvable,
   ResolverRegistry,
 } from 'did-resolver';
+import { isValidNamespace, SECPK1_NAMESPACES } from './pkh-did-provider';
 
 const DID_LD_JSON = 'application/did+ld+json';
 const DID_JSON = 'application/did+json';
-const SECPK1_NAMESPACES = ['eip155', 'hedera'];
 
-function toDidDoc(did: string, accountId: string): any {
-  const { namespace } = AccountId.parse(accountId).chainId as ChainIdParams;
+function toDidDoc(did: string, blockchainAccountId: string): any {
+  const { namespace } = AccountId.parse(blockchainAccountId)
+    .chainId as ChainIdParams;
   const vmId = did + '#blockchainAccountId';
   const doc = {
     '@context': [
@@ -31,14 +32,19 @@ function toDidDoc(did: string, accountId: string): any {
         id: vmId,
         type: 'EcdsaSecp256k1RecoveryMethod2020',
         controller: did,
-        blockchainAccountId: accountId,
+        blockchainAccountId,
       },
     ],
     authentication: [vmId],
     assertionMethod: [vmId],
   };
-  if (!SECPK1_NAMESPACES.includes(namespace)) {
-    throw new Error(`chain namespace not supported ${namespace}`);
+  if (!isValidNamespace(namespace)) {
+    console.error(
+      `Invalid namespace '${namespace}'. Valid namespaces are: ${SECPK1_NAMESPACES}`
+    );
+    throw new Error(
+      `Invalid namespace '${namespace}'. Valid namespaces are: ${SECPK1_NAMESPACES}`
+    );
   }
   return doc;
 }

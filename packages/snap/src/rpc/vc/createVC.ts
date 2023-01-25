@@ -11,7 +11,7 @@ export async function createVC(
   state: IdentitySnapState,
   params: CreateVCRequestParams
 ): Promise<IDataManagerSaveResult[]> {
-  const { vcKey = 'vcData', vcValue, credTypes, options } = params || {};
+  const { vcKey = 'vcData', vcValue, credTypes = [], options } = params || {};
   const { store = 'snap' } = options || {};
 
   const promptObj = {

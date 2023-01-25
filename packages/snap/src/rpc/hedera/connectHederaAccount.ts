@@ -1,32 +1,35 @@
+import { toHederaAccountInfo } from '../../hedera';
+import { getHederaNetwork, validHederaChainID } from '../../hedera/config';
 import { IdentitySnapState } from '../../interfaces';
-import { getHederaChainIDs } from '../../utils/config';
 import { getKeyPair } from '../../utils/hederaUtils';
 import { getCurrentNetwork } from '../../utils/snapUtils';
 import { initAccountState, updateSnapState } from '../../utils/stateUtils';
 import { veramoImportMetaMaskAccount } from '../../utils/veramoUtils';
-import { toHederaAccountInfo } from '../../veramo/plugins/did-provider-pkh/src/pkh-did-provider';
 
 /* eslint-disable */
-export async function configureHederaAccount(
+export async function connectHederaAccount(
   state: IdentitySnapState,
   _privateKey: string,
   _accountId: string
 ): Promise<boolean> {
-  const hederaChainIDs = getHederaChainIDs();
-  const chain_id = await getCurrentNetwork(wallet);
-  if (Array.from(hederaChainIDs.keys()).includes(chain_id)) {
+  const chainId = await getCurrentNetwork(wallet);
+  if (validHederaChainID(chainId)) {
     const hederaAccountInfo = await toHederaAccountInfo(
       _privateKey,
       _accountId,
-      hederaChainIDs.get(chain_id) as string
+      getHederaNetwork(chainId)
     );
     if (hederaAccountInfo !== null) {
-      state.currentAccount = _accountId;
-      if (!(_accountId in state.accountState)) {
-        await initAccountState(wallet, state, _accountId);
+      const evmAddress = hederaAccountInfo.contractAccountId.startsWith('0x')
+        ? hederaAccountInfo.contractAccountId
+        : '0x' + hederaAccountInfo.contractAccountId;
+
+      state.currentAccount = evmAddress;
+      if (!(evmAddress in state.accountState)) {
+        await initAccountState(wallet, state, evmAddress);
       }
       state.accountState[state.currentAccount].hederaAccount.evmAddress =
-        hederaAccountInfo.contractAccountId;
+        evmAddress;
       state.accountState[state.currentAccount].hederaAccount.accountId =
         _accountId;
       await updateSnapState(wallet, state);

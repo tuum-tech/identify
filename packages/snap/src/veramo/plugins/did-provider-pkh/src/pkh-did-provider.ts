@@ -8,32 +8,30 @@ import {
   ManagedKeyInfo,
 } from '@veramo/core';
 
-import { AccountId, PrivateKey } from '@hashgraph/sdk';
 import { AbstractIdentifierProvider } from '@veramo/did-manager';
 
-import { getHederaChainIDs } from './hedera/config';
-import { HederaServiceImpl } from './hedera/index';
-import { HederaAccountInfo } from './hedera/service';
-import { WalletHedera } from './hedera/wallet/abstract';
-import { PrivateKeySoftwareWallet } from './hedera/wallet/software-private-key';
 type IContext = IAgentContext<IKeyManager>;
+
+const isIn = <T>(values: readonly T[], value: any): value is T => {
+  return values.includes(value);
+};
+
+export const SECPK1_NAMESPACES = ['eip155', 'hedera'] as const;
+export const isValidNamespace = (x: string) => isIn(SECPK1_NAMESPACES, x);
 
 /**
  * Options for creating a did:ethr
  * @beta
  */
 export interface CreateDidPkhOptions {
-  network: 'eip155' | 'hedera';
+  namespace: string;
+  privateKey: string;
   /**
    * This can be hex encoded chain ID (string) or a chainId number
    *
    * If this is not specified, `1` is assumed.
    */
   chainId?: string;
-  hederaAccount?: {
-    privateKey: string;
-    accountId: string;
-  };
 }
 
 /**
@@ -45,30 +43,6 @@ export function toEthereumAddress(hexPublicKey: string): string {
     ? hexPublicKey
     : '0x' + hexPublicKey;
   return computeAddress(publicKey);
-}
-
-export async function toHederaAccountInfo(
-  _privateKey: string,
-  _accountId: string,
-  _network: string
-): Promise<HederaAccountInfo | null> {
-  const accountId = AccountId.fromString(_accountId);
-  const privateKey = PrivateKey.fromStringECDSA(_privateKey);
-  const walletHedera: WalletHedera = new PrivateKeySoftwareWallet(privateKey);
-  const hedera = new HederaServiceImpl();
-
-  const client = await hedera.createClient({
-    walletHedera,
-    keyIndex: 0,
-    accountId: accountId,
-    network: _network,
-  });
-  if (client != null) {
-    return await client.getAccountInfo(_accountId);
-  } else {
-    console.error('Invalid private key or account Id');
-    return null;
-  }
 }
 
 /**
@@ -90,63 +64,27 @@ export class PkhDIDProvider extends AbstractIdentifierProvider {
     { kms, options }: { kms?: string; options?: CreateDidPkhOptions },
     context: IContext
   ): Promise<Omit<IIdentifier, 'provider'>> {
-    let key: ManagedKeyInfo | null = null;
+    const namespace = options?.namespace ? options.namespace : 'eip155';
 
-    const network = options?.network ? options.network : 'eip155';
-    let publicAddress: string = '';
-
-    if (network === 'eip155') {
-      key = await context.agent.keyManagerCreate({
-        kms: kms || this.defaultKms,
-        type: 'Secp256k1',
-      });
-      publicAddress = toEthereumAddress(key.publicKeyHex);
-    } else if (network === 'hedera') {
-      const hederaChainIDs = getHederaChainIDs();
-      if (Array.from(hederaChainIDs.keys()).includes(this.chainId)) {
-        if (
-          options?.hederaAccount &&
-          options.hederaAccount.privateKey.length !== 0 &&
-          options.hederaAccount.accountId.length !== 0
-        ) {
-          const privateKey = options.hederaAccount.privateKey;
-          const accountId = options.hederaAccount.accountId;
-
-          publicAddress = accountId;
-          const hederaAccountInfo = await toHederaAccountInfo(
-            privateKey,
-            accountId,
-            hederaChainIDs.get(this.chainId) as string
-          );
-
-          if (hederaAccountInfo === null) {
-            throw new Error('Could not retrieve hedera account info');
-          }
-
-          key = await context.agent.keyManagerImport({
-            kms: kms || this.defaultKms,
-            type: 'Secp256k1',
-            privateKeyHex: privateKey as string,
-          });
-        } else {
-          console.error('Hedera Account private key or account Id was not set');
-          throw new Error(
-            'Hedera Account private key or account Id was not set'
-          );
-        }
-      } else {
-        console.error(
-          'Invalid Chain ID. Valid chainIDs for Hedera: [0x127: mainnet, 0x128: testnet, 0x129: previewnet, 0x12a: localnet]'
-        );
-        throw new Error(
-          'Non-Hedera network was selected on Metamask while trying to configure the Hedera network. Please switch the network to Hedera Network first'
-        );
-      }
+    if (!isValidNamespace(namespace)) {
+      console.error(
+        `Invalid namespace '${namespace}'. Valid namespaces are: ${SECPK1_NAMESPACES}`
+      );
+      throw new Error(
+        `Invalid namespace '${namespace}'. Valid namespaces are: ${SECPK1_NAMESPACES}`
+      );
     }
+
+    const key: ManagedKeyInfo | null = await context.agent.keyManagerImport({
+      kms: kms || this.defaultKms,
+      type: 'Secp256k1',
+      privateKeyHex: options?.privateKey as string,
+    });
+    const evmAddress: string = toEthereumAddress(key.publicKeyHex);
 
     if (key !== null) {
       const identifier: Omit<IIdentifier, 'provider'> = {
-        did: 'did:pkh:' + network + ':' + this.chainId + ':' + publicAddress,
+        did: 'did:pkh:' + namespace + ':' + this.chainId + ':' + evmAddress,
         controllerKeyId: key.kid,
         keys: [key],
         services: [],

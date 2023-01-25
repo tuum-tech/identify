@@ -4,7 +4,7 @@ import { getAvailableMethods } from './rpc/did/getAvailableMethods';
 import { getDid } from './rpc/did/getDID';
 import { resolveDID } from './rpc/did/resolveDID';
 import { switchMethod } from './rpc/did/switchMethods';
-import { configureHederaAccount } from './rpc/hedera/configureAccount';
+import { connectHederaAccount } from './rpc/hedera/connectHederaAccount';
 import { createVC } from './rpc/vc/createVC';
 import { createVP } from './rpc/vc/createVP';
 import { deleteAllVCs } from './rpc/vc/deleteAllVCs';
@@ -69,9 +69,9 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     To avoid the error, we are calling this method in the beginning 
     To set the account for Hedera, we need to set the private key and the accountId first
    */
-  if (request.method == 'configureHederaAccount') {
+  if (request.method == 'connectHederaAccount') {
     isValidHederaAccountParams(request.params);
-    return configureHederaAccount(
+    return connectHederaAccount(
       state,
       request.params.privateKey,
       request.params.accountId

@@ -5,7 +5,7 @@ import {
   IDataManagerQueryResult,
 } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
 import { IVerifyResult, VerifiablePresentation } from '@veramo/core';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import {
   Card,
@@ -16,12 +16,13 @@ import {
 } from '../components';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
 import {
-  configureHederaAccount,
+  connectHederaAccount,
   connectSnap,
   createVC,
   createVP,
   deleteAllVCs,
   getCurrentDIDMethod,
+  getCurrentNetwork,
   getDID,
   getSnap,
   getVCs,
@@ -32,6 +33,7 @@ import {
   verifyVC,
   verifyVP,
 } from '../utils';
+import { validHederaChainID } from '../utils/hedera';
 
 const Container = styled.div`
   display: flex;
@@ -119,7 +121,8 @@ const ErrorMessage = styled.div`
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
-  const [hederaAccountConfigure, setHederaAccountConfigure] = useState(false);
+  const [currentChainId, setCurrentChainId] = useState('');
+  const [hederaAccountConnected, setHederaAccountConnected] = useState(false);
 
   const [hederaPrivateKey, setHederaPrivateKey] = useState(
     '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c'
@@ -134,9 +137,16 @@ const Index = () => {
   const [vcIdsToBeRemoved, setVcIdsToBeRemoved] = useState('');
   const [vp, setVp] = useState({});
 
+  useEffect(() => {
+    if (!validHederaChainID(currentChainId)) {
+      setHederaAccountConnected(false);
+    }
+  }, [currentChainId]);
+
   const handleConnectClick = async () => {
     try {
       await connectSnap();
+      setCurrentChainId(await getCurrentNetwork());
       const installedSnap = await getSnap();
 
       dispatch({
@@ -149,24 +159,15 @@ const Index = () => {
     }
   };
 
-  const handleSendHelloClick = async () => {
-    try {
-      await sendHello();
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
   const handleConfigureHederaAccountClick = async () => {
     try {
-      const configured = await configureHederaAccount(
+      const configured = await connectHederaAccount(
         hederaPrivateKey,
         hederaAccountId
       );
       console.log('configured: ', configured);
       if (configured) {
-        setHederaAccountConfigure(true);
+        setHederaAccountConnected(true);
         alert('Hedera Account configuration was successful');
       } else {
         console.log('Hedera Account was not configured correctly');
@@ -177,8 +178,19 @@ const Index = () => {
     }
   };
 
+  const handleSendHelloClick = async () => {
+    try {
+      setCurrentChainId(await getCurrentNetwork());
+      await sendHello();
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
   const handleGetCurrentDIDMethodClick = async () => {
     try {
+      setCurrentChainId(await getCurrentNetwork());
       const currentDIDMethod = await getCurrentDIDMethod();
       console.log(`Your current DID method is: ${currentDIDMethod}`);
       alert(`Your current DID method is: ${currentDIDMethod}`);
@@ -190,6 +202,7 @@ const Index = () => {
 
   const handleGetDIDClick = async () => {
     try {
+      setCurrentChainId(await getCurrentNetwork());
       const did = await getDID();
       console.log(`Your DID is: ${did}`);
       alert(`Your DID is: ${did}`);
@@ -201,6 +214,7 @@ const Index = () => {
 
   const handleResolveDIDClick = async () => {
     try {
+      setCurrentChainId(await getCurrentNetwork());
       const doc = await resolveDID();
       console.log(`Your DID document is is: ${JSON.stringify(doc, null, 4)}`);
       alert(`Your DID document is: ${JSON.stringify(doc, null, 4)}`);
@@ -212,6 +226,7 @@ const Index = () => {
 
   const handleGetSpecificVCClick = async () => {
     try {
+      setCurrentChainId(await getCurrentNetwork());
       const filter = {
         type: 'id',
         filter: vcId ? vcId.trim().split(',')[0] : undefined,
@@ -236,6 +251,7 @@ const Index = () => {
 
   const handleGetVCsClick = async () => {
     try {
+      setCurrentChainId(await getCurrentNetwork());
       const options = {
         store: 'snap',
         returnStore: true,
@@ -262,6 +278,7 @@ const Index = () => {
 
   const handleCreateVCClick = async () => {
     try {
+      setCurrentChainId(await getCurrentNetwork());
       const vcKey = 'profile';
       const vcValue = {
         name: createVCName,
@@ -291,6 +308,7 @@ const Index = () => {
 
   const handleVerifyVCClick = async () => {
     try {
+      setCurrentChainId(await getCurrentNetwork());
       const result = (await verifyVC(vc)) as IVerifyResult;
       if (result.verified === false) {
         console.log('VC Verification Error: ', result.error);
@@ -313,6 +331,7 @@ const Index = () => {
 
   const handleRemoveVCClick = async () => {
     try {
+      setCurrentChainId(await getCurrentNetwork());
       const vcId = vcIdsToBeRemoved
         ? vcIdsToBeRemoved.trim().split(',')[0]
         : '';
@@ -335,6 +354,7 @@ const Index = () => {
 
   const handleDeleteAllVCsClick = async () => {
     try {
+      setCurrentChainId(await getCurrentNetwork());
       const options = {
         store: 'snap',
       };
@@ -352,6 +372,7 @@ const Index = () => {
 
   const handleCreateVPClick = async () => {
     try {
+      setCurrentChainId(await getCurrentNetwork());
       const proofInfo: ProofInfo = {
         proofFormat: 'jwt',
         type: 'ProfileNamesPresentation',
@@ -373,6 +394,7 @@ const Index = () => {
 
   const handleVerifyVPClick = async () => {
     try {
+      setCurrentChainId(await getCurrentNetwork());
       const result = (await verifyVP(vc)) as IVerifyResult;
       if (result.verified === false) {
         console.log('VP Verification Error: ', result.error);
@@ -421,9 +443,9 @@ const Index = () => {
         {!state.installedSnap && (
           <Card
             content={{
-              title: 'Connect',
+              title: 'Connect to Metamask Snap',
               description:
-                'Get started by connecting to and installing the example snap.',
+                'Get started by connecting to and installing the Identity Snap.',
               button: (
                 <ConnectButton
                   onClick={handleConnectClick}
@@ -437,9 +459,9 @@ const Index = () => {
         {shouldDisplayReconnectButton(state.installedSnap) && (
           <Card
             content={{
-              title: 'Reconnect',
+              title: 'Reconnect to Metamask Snap',
               description:
-                'While connected to a local running snap this button will always be displayed in order to update the snap if a change is made.',
+                "While connected to a local running snap, this button will always be displayed in order to update the snap if a change is made. Note that you'll need to reconnect if you switch the network on Metamask at any point in time as that will cause your metamask state to change",
               button: (
                 <ReconnectButton
                   onClick={handleConnectClick}
@@ -451,367 +473,443 @@ const Index = () => {
           />
         )}
         {/* =============================================================================== */}
-        <Card
-          content={{
-            title: 'Send Hello message',
-            description:
-              'Display a custom message within a confirmation screen in MetaMask.',
-            button: (
-              <SendHelloButton
-                buttonText="Send message"
-                onClick={handleSendHelloClick}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
+        {validHederaChainID(currentChainId) && !hederaAccountConnected && (
+          <Card
+            content={{
+              title: 'connectHederaAccount',
+              description:
+                'Connect to Hedera Account. NOTE that you will need to reconnect to Hedera Account if you switch the network on Metamask at any point in time as that will cause your metamask state to point to your non-hedera account on metamask',
+              form: (
+                <form>
+                  <label>
+                    Enter your Hedera Private Key
+                    <input
+                      type="text"
+                      value={hederaPrivateKey}
+                      onChange={(e) => setHederaPrivateKey(e.target.value)}
+                    />
+                  </label>
+                  <br />
+                  <label>
+                    Enter your Hedera Account ID
+                    <input
+                      type="text"
+                      value={hederaAccountId}
+                      onChange={(e) => setHederaAccountId(e.target.value)}
+                    />
+                  </label>
+                </form>
+              ),
+              button: (
+                <SendHelloButton
+                  buttonText="Connect to Hedera Account"
+                  onClick={handleConfigureHederaAccountClick}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        )}
         {/* =============================================================================== */}
-        <Card
-          content={{
-            title: 'configureHederaAccount',
-            description: 'Configure your Hedera Account',
-            form: (
-              <form>
-                <label>
-                  Enter your Hedera Private Key
-                  <input
-                    type="text"
-                    value={hederaPrivateKey}
-                    onChange={(e) => setHederaPrivateKey(e.target.value)}
-                  />
-                </label>
-                <br />
-                <label>
-                  Enter your Hedera Account ID
-                  <input
-                    type="text"
-                    value={hederaAccountId}
-                    onChange={(e) => setHederaAccountId(e.target.value)}
-                  />
-                </label>
-              </form>
-            ),
-            button: (
-              <SendHelloButton
-                buttonText="Configure"
-                onClick={handleConfigureHederaAccountClick}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
+        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
+        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+          <Card
+            content={{
+              title: 'Send Hello message',
+              description:
+                'Display a custom message within a confirmation screen in MetaMask.',
+              button: (
+                <SendHelloButton
+                  buttonText="Send message"
+                  onClick={handleSendHelloClick}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        ) : (
+          ''
+        )}
         {/* =============================================================================== */}
-        <Card
-          content={{
-            title: 'getCurrentDIDMethod',
-            description: 'Get the current DID method to use',
-            button: (
-              <SendHelloButton
-                buttonText="Get DID method"
-                onClick={handleGetCurrentDIDMethodClick}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
-            title: 'getDID',
-            description: 'Get the current DID of the user',
-            button: (
-              <SendHelloButton
-                buttonText="Get DID"
-                onClick={handleGetDIDClick}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
-            title: 'resolveDID',
-            description: 'Resolve the DID and return a DID document',
-            button: (
-              <SendHelloButton
-                buttonText="Resolve DID"
-                onClick={handleResolveDIDClick}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
-            title: 'getSpecificVC',
-            description: 'Get specific VC of the user',
-            form: (
-              <form>
-                <label>
-                  Enter your VC Id
-                  <input
-                    type="text"
-                    value={vcId ? vcId.trim().split(',')[0] : ''}
-                    onChange={(e) => setVcId(e.target.value)}
-                  />
-                </label>
-              </form>
-            ),
-            button: (
-              <SendHelloButton
-                buttonText="Retrieve VC"
-                onClick={handleGetSpecificVCClick}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
-            title: 'getAllVCs',
-            description: 'Get all the VCs of the user',
-            button: (
-              <SendHelloButton
-                buttonText="Retrieve all VCs"
-                onClick={handleGetVCsClick}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
-            title: 'createVC',
-            description: 'Create and Save VerifiableCredential',
-            form: (
-              <form>
-                <label>
-                  Enter your name
-                  <input
-                    type="text"
-                    value={createVCName}
-                    onChange={(e) => setCreateVCName(e.target.value)}
-                  />
-                </label>
-                <br />
-                <label>
-                  Enter your nickname
-                  <input
-                    type="text"
-                    value={createVCNickname}
-                    onChange={(e) => setCreateVCNickname(e.target.value)}
-                  />
-                </label>
-              </form>
-            ),
-            button: (
-              <SendHelloButton
-                buttonText="Generate VC"
-                onClick={handleCreateVCClick}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
-            title: 'verifyVC',
-            description: 'Verify a VC JWT, LDS format or EIP712',
-            form: (
-              <form>
-                <label>
-                  Enter your Verifiable Credential
-                  <input
-                    type="text"
-                    value={JSON.stringify(vc)}
-                    onChange={(e) => setVc(e.target.value)}
-                  />
-                </label>
-              </form>
-            ),
-            button: (
-              <SendHelloButton
-                buttonText="Verify VC"
-                onClick={handleVerifyVCClick}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
-            title: 'removeVC',
-            description: 'Remove one or more VCs from the snap',
-            form: (
-              <form>
-                <label>
-                  Enter your VC IDs to be removed separated by a comma
-                  <input
-                    type="text"
-                    value={
-                      vcIdsToBeRemoved
-                        ? vcIdsToBeRemoved.trim().split(',')[0]
-                        : ''
-                    }
-                    onChange={(e) => setVcIdsToBeRemoved(e.target.value)}
-                  />
-                </label>
-              </form>
-            ),
-            button: (
-              <SendHelloButton
-                buttonText="Delete VC"
-                onClick={handleRemoveVCClick}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
-            title: 'deleteAllVCs',
-            description: 'Delete all the VCs from the snap',
-            button: (
-              <SendHelloButton
-                buttonText="Delete all VCs"
-                onClick={handleDeleteAllVCsClick}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
-            title: 'getVP',
-            description: 'Generate Verifiable Presentation from your VC',
-            form: (
-              <form>
-                <label>
-                  Enter the Verifiable Credential ID
-                  <input
-                    type="text"
-                    value={vcId}
-                    onChange={(e) => setVcId(e.target.value)}
-                  />
-                </label>
-              </form>
-            ),
-            button: (
-              <SendHelloButton
-                buttonText="Generate VP"
-                onClick={handleCreateVPClick}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
-            title: 'verifyVP',
-            description: 'Verify a VP JWT or LDS format',
-            form: (
-              <form>
-                <label>
-                  Enter your Verifiable Presentation
-                  <input
-                    type="text"
-                    value={JSON.stringify(vp)}
-                    onChange={(e) => setVp(e.target.value)}
-                  />
-                </label>
-              </form>
-            ),
-            button: (
-              <SendHelloButton
-                buttonText="Verify VP"
-                onClick={handleVerifyVPClick}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
-            title: 'todo',
-            description: 'TODO',
-            /* form: (
+        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
+        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+          <Card
+            content={{
+              title: 'getCurrentDIDMethod',
+              description: 'Get the current DID method to use',
+              button: (
+                <SendHelloButton
+                  buttonText="Get DID method"
+                  onClick={handleGetCurrentDIDMethodClick}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        ) : (
+          ''
+        )}
+        {/* =============================================================================== */}
+        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
+        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+          <Card
+            content={{
+              title: 'getDID',
+              description: 'Get the current DID of the user',
+              button: (
+                <SendHelloButton
+                  buttonText="Get DID"
+                  onClick={handleGetDIDClick}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        ) : (
+          ''
+        )}
+        {/* =============================================================================== */}
+        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
+        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+          <Card
+            content={{
+              title: 'resolveDID',
+              description: 'Resolve the DID and return a DID document',
+              button: (
+                <SendHelloButton
+                  buttonText="Resolve DID"
+                  onClick={handleResolveDIDClick}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        ) : (
+          ''
+        )}
+        {/* =============================================================================== */}
+        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
+        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+          <Card
+            content={{
+              title: 'getSpecificVC',
+              description: 'Get specific VC of the user',
+              form: (
+                <form>
+                  <label>
+                    Enter your VC Id
+                    <input
+                      type="text"
+                      value={vcId ? vcId.trim().split(',')[0] : ''}
+                      onChange={(e) => setVcId(e.target.value)}
+                    />
+                  </label>
+                </form>
+              ),
+              button: (
+                <SendHelloButton
+                  buttonText="Retrieve VC"
+                  onClick={handleGetSpecificVCClick}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        ) : (
+          ''
+        )}
+        {/* =============================================================================== */}
+        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
+        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+          <Card
+            content={{
+              title: 'getAllVCs',
+              description: 'Get all the VCs of the user',
+              button: (
+                <SendHelloButton
+                  buttonText="Retrieve all VCs"
+                  onClick={handleGetVCsClick}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        ) : (
+          ''
+        )}
+        {/* =============================================================================== */}
+        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
+        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+          <Card
+            content={{
+              title: 'createVC',
+              description: 'Create and Save VerifiableCredential',
+              form: (
+                <form>
+                  <label>
+                    Enter your name
+                    <input
+                      type="text"
+                      value={createVCName}
+                      onChange={(e) => setCreateVCName(e.target.value)}
+                    />
+                  </label>
+                  <br />
+                  <label>
+                    Enter your nickname
+                    <input
+                      type="text"
+                      value={createVCNickname}
+                      onChange={(e) => setCreateVCNickname(e.target.value)}
+                    />
+                  </label>
+                </form>
+              ),
+              button: (
+                <SendHelloButton
+                  buttonText="Generate VC"
+                  onClick={handleCreateVCClick}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        ) : (
+          ''
+        )}
+        {/* =============================================================================== */}
+        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
+        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+          <Card
+            content={{
+              title: 'verifyVC',
+              description: 'Verify a VC JWT, LDS format or EIP712',
+              form: (
+                <form>
+                  <label>
+                    Enter your Verifiable Credential
+                    <input
+                      type="text"
+                      value={JSON.stringify(vc)}
+                      onChange={(e) => setVc(e.target.value)}
+                    />
+                  </label>
+                </form>
+              ),
+              button: (
+                <SendHelloButton
+                  buttonText="Verify VC"
+                  onClick={handleVerifyVCClick}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        ) : (
+          ''
+        )}
+        {/* =============================================================================== */}
+        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
+        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+          <Card
+            content={{
+              title: 'removeVC',
+              description: 'Remove one or more VCs from the snap',
+              form: (
+                <form>
+                  <label>
+                    Enter your VC IDs to be removed separated by a comma
+                    <input
+                      type="text"
+                      value={
+                        vcIdsToBeRemoved
+                          ? vcIdsToBeRemoved.trim().split(',')[0]
+                          : ''
+                      }
+                      onChange={(e) => setVcIdsToBeRemoved(e.target.value)}
+                    />
+                  </label>
+                </form>
+              ),
+              button: (
+                <SendHelloButton
+                  buttonText="Delete VC"
+                  onClick={handleRemoveVCClick}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        ) : (
+          ''
+        )}
+        {/* =============================================================================== */}
+        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
+        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+          <Card
+            content={{
+              title: 'deleteAllVCs',
+              description: 'Delete all the VCs from the snap',
+              button: (
+                <SendHelloButton
+                  buttonText="Delete all VCs"
+                  onClick={handleDeleteAllVCsClick}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        ) : (
+          ''
+        )}
+        {/* =============================================================================== */}
+        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
+        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+          <Card
+            content={{
+              title: 'getVP',
+              description: 'Generate Verifiable Presentation from your VC',
+              form: (
+                <form>
+                  <label>
+                    Enter the Verifiable Credential ID
+                    <input
+                      type="text"
+                      value={vcId}
+                      onChange={(e) => setVcId(e.target.value)}
+                    />
+                  </label>
+                </form>
+              ),
+              button: (
+                <SendHelloButton
+                  buttonText="Generate VP"
+                  onClick={handleCreateVPClick}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        ) : (
+          ''
+        )}
+        {/* =============================================================================== */}
+        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
+        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+          <Card
+            content={{
+              title: 'verifyVP',
+              description: 'Verify a VP JWT or LDS format',
+              form: (
+                <form>
+                  <label>
+                    Enter your Verifiable Presentation
+                    <input
+                      type="text"
+                      value={JSON.stringify(vp)}
+                      onChange={(e) => setVp(e.target.value)}
+                    />
+                  </label>
+                </form>
+              ),
+              button: (
+                <SendHelloButton
+                  buttonText="Verify VP"
+                  onClick={handleVerifyVPClick}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        ) : (
+          ''
+        )}
+        {/* =============================================================================== */}
+        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
+        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+          <Card
+            content={{
+              title: 'todo',
+              description: 'TODO',
+              /* form: (
               <form>
                 <label>
                   Enter your Verifiable Presentation
@@ -823,26 +921,32 @@ const Index = () => {
                 </label>
               </form>
             ), */
-            button: (
-              <SendHelloButton
-                buttonText="todo"
-                onClick={handleVerifyVPClick}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
-        <Card
-          content={{
-            title: 'todo',
-            description: 'TODO',
-            /* form: (
+              button: (
+                <SendHelloButton
+                  buttonText="todo"
+                  onClick={handleVerifyVPClick}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        ) : (
+          ''
+        )}
+        {/* =============================================================================== */}
+        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
+        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+          <Card
+            content={{
+              title: 'todo',
+              description: 'TODO',
+              /* form: (
               <form>
                 <label>
                   Enter your Verifiable Presentation
@@ -854,21 +958,24 @@ const Index = () => {
                 </label>
               </form>
             ), */
-            button: (
-              <SendHelloButton
-                buttonText="todo"
-                onClick={handleVerifyVPClick}
-                disabled={!state.installedSnap}
-              />
-            ),
-          }}
-          disabled={!state.installedSnap}
-          fullWidth={
-            state.isFlask &&
-            Boolean(state.installedSnap) &&
-            !shouldDisplayReconnectButton(state.installedSnap)
-          }
-        />
+              button: (
+                <SendHelloButton
+                  buttonText="todo"
+                  onClick={handleVerifyVPClick}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        ) : (
+          ''
+        )}
       </CardContainer>
     </Container>
   );

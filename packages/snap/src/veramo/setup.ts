@@ -25,8 +25,6 @@ import { MessageHandler } from '@veramo/message-handler';
 import { SdrMessageHandler } from '@veramo/selective-disclosure';
 import { Resolver } from 'did-resolver';
 import { IdentitySnapState } from '../interfaces';
-import { getHederaChainIDs } from '../utils/config';
-import { getCurrentNetwork } from '../utils/snapUtils';
 import { PkhDIDProvider } from './plugins/did-provider-pkh/src/pkh-did-provider';
 import { getResolver as getDidPkhResolver } from './plugins/did-provider-pkh/src/resolver';
 import {
@@ -57,13 +55,6 @@ export async function getAgent(
       IDataStore
   >
 > {
-  let isHederaAccount: boolean = false;
-  const chain_id = await getCurrentNetwork(wallet);
-  const hederaChainIDs = getHederaChainIDs();
-  if (Array.from(hederaChainIDs.keys()).includes(chain_id)) {
-    isHederaAccount = true;
-  }
-
   const web3Providers: Record<string, Web3Provider> = {};
   const didProviders: Record<string, AbstractIdentifierProvider> = {};
   const vcStorePlugins: Record<string, AbstractDataStore> = {};
@@ -71,7 +62,7 @@ export async function getAgent(
   web3Providers['metamask'] = new Web3Provider(wallet as any);
 
   didProviders['did:pkh'] = new PkhDIDProvider({ defaultKms: 'snap' });
-  vcStorePlugins['snap'] = new SnapVCStore(wallet, state, isHederaAccount);
+  vcStorePlugins['snap'] = new SnapVCStore(wallet, state);
 
   const agent = createAgent<
     IKeyManager &
@@ -83,16 +74,14 @@ export async function getAgent(
   >({
     plugins: [
       new KeyManager({
-        store: new SnapKeyStore(wallet, state, isHederaAccount),
+        store: new SnapKeyStore(wallet, state),
         kms: {
           web3: new Web3KeyManagementSystem(web3Providers),
-          snap: new KeyManagementSystem(
-            new SnapPrivateKeyStore(wallet, state, isHederaAccount)
-          ),
+          snap: new KeyManagementSystem(new SnapPrivateKeyStore(wallet, state)),
         },
       }),
       new DIDManager({
-        store: new SnapDIDStore(wallet, state, isHederaAccount),
+        store: new SnapDIDStore(wallet, state),
         defaultProvider: 'metamask',
         providers: didProviders,
       }),

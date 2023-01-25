@@ -15,8 +15,9 @@ import {
   W3CVerifiableCredential,
 } from '@veramo/core';
 import cloneDeep from 'lodash.clonedeep';
-import { KeyPair } from 'src/types/crypto';
+import { validHederaChainID } from '../hedera/config';
 import { IdentitySnapState } from '../interfaces';
+import { KeyPair } from '../types/crypto';
 import { CreateVPRequestParams, GetVCsOptions } from '../types/params';
 import {
   Filter,
@@ -29,7 +30,7 @@ import {
 import { getAgent } from '../veramo/setup';
 import { getCurrentDid } from './didUtils';
 import { getKeyPair } from './hederaUtils';
-import { snapConfirm } from './snapUtils';
+import { getCurrentNetwork, snapConfirm } from './snapUtils';
 
 /* eslint-disable */
 export async function veramoResolveDID(
@@ -85,7 +86,7 @@ export async function veramoCreateVC(
   vcKey: string,
   vcValue: object,
   store: string | string[],
-  credTypes?: string[]
+  credTypes: string[]
 ): Promise<IDataManagerSaveResult[]> {
   const agent = await getAgent(wallet, state);
   const keyPair = await getKeyPairFromAgent(wallet, state, agent);
@@ -99,21 +100,33 @@ export async function veramoCreateVC(
     issuanceDate.getMonth(),
     issuanceDate.getDate()
   );
+
+  const credential = new Map<string, unknown>();
+  credential.set('issuanceDate', issuanceDate.toISOString()); // the entity that issued the credential+
+  credential.set('expirationDate', expirationDate.toISOString()); // when the credential was issued
+  credential.set('type', credTypes);
+
+  let issuer: { id: string; hederaAccountId?: string } = { id: did };
+  let credentialSubject: { id: string; hederaAccountId?: string } = {
+    id: did, // identifier for the only subject of the credential
+    [vcKey]: vcValue, // assertion about the only subject of the credential
+  };
+  const chainId = await getCurrentNetwork(wallet);
+  if (validHederaChainID(chainId)) {
+    const hederaAccountId =
+      state.accountState[state.currentAccount].hederaAccount.accountId;
+    issuer.hederaAccountId = hederaAccountId;
+    credentialSubject.hederaAccountId = hederaAccountId;
+  }
+  credential.set('issuer', issuer); // the entity that issued the credential
+  credential.set('credentialSubject', credentialSubject);
+
   const verifiableCredential = await agent.createVerifiableCredential({
-    credential: {
-      issuer: { id: did }, // the entity that issued the credential
-      issuanceDate: issuanceDate.toISOString(), // when the credential was issued
-      expirationDate: expirationDate.toISOString(), // when the credential will expire
-      // claims about the subjects of the credential
-      credentialSubject: {
-        id: did, // identifier for the only subject of the credential
-        [vcKey]: vcValue, // assertion about the only subject of the credential
-      },
-      type: credTypes,
-    },
+    credential: JSON.parse(JSON.stringify(Object.fromEntries(credential))),
     // digital proof that makes the credential tamper-evident
     proofFormat: 'jwt' as ProofFormat,
   });
+
   console.log(
     'Created verifiableCredential: ',
     JSON.stringify(verifiableCredential, null, 4)

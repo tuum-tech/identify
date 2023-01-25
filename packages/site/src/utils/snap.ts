@@ -63,6 +63,36 @@ export const getSnap = async (version?: string): Promise<Snap | undefined> => {
   }
 };
 
+export const getCurrentNetwork = async (): Promise<string> => {
+  return (await window.ethereum.request({
+    method: 'eth_chainId',
+  })) as string;
+};
+
+/**
+ *
+ * Invoke "connectHederaAccount" method from the snap
+ *
+ */
+export const connectHederaAccount = async (
+  privateKey: string,
+  accountId: string
+) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: [
+      defaultSnapOrigin,
+      {
+        method: 'connectHederaAccount',
+        params: {
+          privateKey,
+          accountId,
+        },
+      },
+    ],
+  });
+};
+
 /**
  * Invoke the "hello" method from the snap.
  */
@@ -74,30 +104,6 @@ export const sendHello = async () => {
       defaultSnapOrigin,
       {
         method: 'hello',
-      },
-    ],
-  });
-};
-
-/**
- *
- * Invoke "configureHederaAccount" method from the snap
- *
- */
-export const configureHederaAccount = async (
-  privateKey: string,
-  accountId: string
-) => {
-  return await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: [
-      defaultSnapOrigin,
-      {
-        method: 'configureHederaAccount',
-        params: {
-          privateKey,
-          accountId,
-        },
       },
     ],
   });

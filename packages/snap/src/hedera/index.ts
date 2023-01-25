@@ -2,15 +2,21 @@ import {
   AccountId,
   Client,
   Hbar,
+  PrivateKey,
   Status,
   StatusError,
   TransferTransaction,
 } from '@hashgraph/sdk';
 
-import { HederaService, SimpleHederaClient } from './service';
+import {
+  HederaAccountInfo,
+  HederaService,
+  SimpleHederaClient,
+} from './service';
 import { WalletHedera } from './wallet/abstract';
 
 import { SimpleHederaClientImpl } from './client';
+import { PrivateKeySoftwareWallet } from './wallet/software-private-key';
 
 /* eslint-disable */
 export class HederaServiceImpl implements HederaService {
@@ -45,7 +51,7 @@ export class HederaServiceImpl implements HederaService {
 }
 
 /** Does the operator key belong to the operator account */
-async function testClientOperatorMatch(client: Client) {
+export async function testClientOperatorMatch(client: Client) {
   const tx = new TransferTransaction()
     /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
     .addHbarTransfer(client.operatorAccountId!, Hbar.fromTinybars(0))
@@ -76,4 +82,28 @@ async function testClientOperatorMatch(client: Client) {
   throw new Error(
     'unexpected success of intentionally-erroneous transaction to confirm account ID'
   );
+}
+
+export async function toHederaAccountInfo(
+  _privateKey: string,
+  _accountId: string,
+  _network: string
+): Promise<HederaAccountInfo | null> {
+  const accountId = AccountId.fromString(_accountId);
+  const privateKey = PrivateKey.fromStringECDSA(_privateKey);
+  const walletHedera: WalletHedera = new PrivateKeySoftwareWallet(privateKey);
+  const hedera = new HederaServiceImpl();
+
+  const client = await hedera.createClient({
+    walletHedera,
+    keyIndex: 0,
+    accountId: accountId,
+    network: _network,
+  });
+  if (client != null) {
+    return await client.getAccountInfo(_accountId);
+  } else {
+    console.error('Invalid private key or account Id');
+    return null;
+  }
 }

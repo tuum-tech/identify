@@ -37,9 +37,9 @@ export function isValidHederaAccountParams(
 
 export function isHederaAccountImported(state: IdentitySnapState): boolean {
   if (
-    state.accountState[state.currentAccount].hederaAccount.accountId ===
+    state.accountState[state.currentAccount].hederaAccount.evmAddress ===
       state.currentAccount &&
-    state.accountState[state.currentAccount].hederaAccount.evmAddress !== ''
+    state.accountState[state.currentAccount].hederaAccount.accountId !== ''
   ) {
     return true;
   } else {

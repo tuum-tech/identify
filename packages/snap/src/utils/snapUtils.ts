@@ -1,6 +1,6 @@
 import { SnapProvider } from '@metamask/snap-types';
+import { validHederaChainID } from '../hedera/config';
 import { IdentitySnapState, SnapConfirmParams } from '../interfaces';
-import { getHederaChainIDs } from './config';
 import { isHederaAccountImported } from './params';
 import { updateSnapState } from './stateUtils';
 
@@ -26,9 +26,8 @@ export async function getCurrentAccount(
       state.currentAccount = wallet.selectedAddress;
       await updateSnapState(wallet, state);
     } */
-    const chain_id = await getCurrentNetwork(wallet);
-    const hederaChainIDs = getHederaChainIDs();
-    if (Array.from(hederaChainIDs.keys()).includes(chain_id)) {
+    const chainId = await getCurrentNetwork(wallet);
+    if (validHederaChainID(chainId)) {
       // Handle Hedera
       if (isHederaAccountImported(state)) {
         console.log(
@@ -38,7 +37,8 @@ export async function getCurrentAccount(
             state.accountState[state.currentAccount].hederaAccount.accountId
           }`
         );
-        return state.accountState[state.currentAccount].hederaAccount.accountId;
+        return state.accountState[state.currentAccount].hederaAccount
+          .evmAddress;
       } else {
         console.error(
           'Hedera Network was selected but Hedera Account has not yet been configured. Please configure it first by calling "configureHederaAccount" API'
