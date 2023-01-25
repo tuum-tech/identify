@@ -1,5 +1,5 @@
 import { SnapProvider } from '@metamask/snap-types';
-import { IVerifyResult, VerifiablePresentation } from '@veramo/core';
+import { VerifiablePresentation } from '@veramo/core';
 import { IdentitySnapState } from '../../interfaces';
 import { veramoVerifyVP } from '../../utils/veramoUtils';
 
@@ -7,7 +7,14 @@ import { veramoVerifyVP } from '../../utils/veramoUtils';
 export async function verifyVP(
   wallet: SnapProvider,
   state: IdentitySnapState,
-  vc: VerifiablePresentation
-): Promise<IVerifyResult | null> {
-  return await veramoVerifyVP(wallet, state, vc);
+  vp: VerifiablePresentation
+): Promise<boolean | null> {
+  const result = await veramoVerifyVP(wallet, state, vp);
+  if (result.verified === false) {
+    console.log(
+      'VP Verification Error: ',
+      JSON.stringify(result.error, null, 4)
+    );
+  }
+  return result.verified;
 }

@@ -4,7 +4,7 @@ import {
   IDataManagerDeleteResult,
   IDataManagerQueryResult,
 } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
-import { IVerifyResult, VerifiablePresentation } from '@veramo/core';
+import { VerifiablePresentation } from '@veramo/core';
 import { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import {
@@ -309,20 +309,9 @@ const Index = () => {
   const handleVerifyVCClick = async () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
-      const result = (await verifyVC(vc)) as IVerifyResult;
-      if (result.verified === false) {
-        console.log('VC Verification Error: ', result.error);
-        alert(
-          `Your VC Verification Error is: ${JSON.stringify(
-            result.error,
-            null,
-            4
-          )}`
-        );
-      } else {
-        console.log('VC Verified: ', result.verified);
-        alert('Your VC was verified successfully');
-      }
+      const verified = await verifyVC(vc);
+      console.log('VC Verified: ', verified);
+      alert(`VC Verified: ${verified}`);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -376,7 +365,6 @@ const Index = () => {
       const proofInfo: ProofInfo = {
         proofFormat: 'jwt',
         type: 'ProfileNamesPresentation',
-        domain: 'identity.tuum.tech',
       };
       console.log('vcId: ', vcId);
       const vp = (await createVP(
@@ -395,20 +383,9 @@ const Index = () => {
   const handleVerifyVPClick = async () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
-      const result = (await verifyVP(vc)) as IVerifyResult;
-      if (result.verified === false) {
-        console.log('VP Verification Error: ', result.error);
-        alert(
-          `Your VP Verification Error is: ${JSON.stringify(
-            result.error,
-            null,
-            4
-          )}`
-        );
-      } else {
-        console.log('VP Verified: ', result.verified);
-        alert('Your VP was verified successfully');
-      }
+      const verified = await verifyVP(vp);
+      console.log('VP Verified: ', verified);
+      alert(`VP Verified: ${verified}`);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });

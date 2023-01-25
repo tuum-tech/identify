@@ -1,5 +1,5 @@
 import { SnapProvider } from '@metamask/snap-types';
-import { getHederaNetwork, validHederaChainID } from '../../hedera/config';
+import { validHederaChainID } from '../../hedera/config';
 import { IdentitySnapState } from '../../interfaces';
 import { convertChainIdFromHex } from '../../utils/network';
 import { isHederaAccountImported } from '../../utils/params';
@@ -13,7 +13,9 @@ export async function getDidPkhIdentifier(
   const chainId = await getCurrentNetwork(wallet);
   if (validHederaChainID(chainId) && isHederaAccountImported(state)) {
     // Handle Hedera
-    return `hedera:${getHederaNetwork(chainId)}:${state.currentAccount}`;
+    // TODO: Uncomment the below line once CAIP2 supports this did format for hedera
+    // return `hedera:${getHederaNetwork(chainId)}:${state.currentAccount}`;
+    return `eip155:${convertChainIdFromHex(chainId)}:${state.currentAccount}`;
   } else {
     // Handle everything else
     return `eip155:${convertChainIdFromHex(chainId)}:${state.currentAccount}`;

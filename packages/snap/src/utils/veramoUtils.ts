@@ -235,9 +235,9 @@ export async function veramoCreateVP(
         type: ['VerifiablePresentation', type],
         verifiableCredential: vcs,
       },
-      proofFormat: proofFormat, // The desired format for the VerifiablePresentation to be created
-      domain: domain, // Optional string domain parameter to add to the verifiable presentation
-      challenge: challenge, // Optional (only JWT) string challenge parameter to add to the verifiable presentation
+      proofFormat, // The desired format for the VerifiablePresentation to be created
+      domain, // Optional string domain parameter to add to the verifiable presentation
+      challenge, // Optional (only JWT) string challenge parameter to add to the verifiable presentation
     });
     return vp;
   }
