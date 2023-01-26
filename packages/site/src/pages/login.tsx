@@ -1,24 +1,22 @@
-import * as React from 'react';
-import { useContext, useState } from 'react';
 import axios from 'axios';
+import { useState } from 'react';
 // import * as dotenv from 'dotenv';
 
 import {
-  Card,
-  ConnectButton,
-  InstallFlaskButton,
-  ReconnectButton,
-  SendHelloButton,
+  Card, SendHelloButton
 } from '../components';
 
 // dotenv.config();
 
 function LoginPage() {
-  const [loginName, setLoginName] = useState('Kiran Pachhai');
+  const [loginName, setLoginName] = useState('dchagastelles');
   const [identifier, setIdentifier] = useState(
     'did:pkh:hedera:testnet:0.0.5373',
   );
-  const [ret, setRet] = useState('undefined');
+  
+  const [presentation, setPresentation] = useState('');
+
+  const [ret, setRet] = useState('');
 
   const handleCreateVC = async () => {
     // Send a POST request
@@ -35,6 +33,23 @@ function LoginPage() {
 
     setRet(JSON.stringify(ret));
   };
+
+
+  const handleSignIn = async () => {
+    // Send a POST request
+
+    const backend_url = process.env.GATSBY_BACKEND_URL;
+    const ret = await axios({
+      method: 'post',
+      url: `${backend_url}api/v1/credential/signin`,
+      data: {
+        presentation
+      },
+    });
+
+    setRet(JSON.stringify(ret));
+  };
+
 
   return (
     <>
@@ -74,6 +89,33 @@ function LoginPage() {
         disabled={false}
       />
       <p>{ret}</p>
+      <Card
+        content={{
+          title: 'Sign In',
+          description: 'Present VerifiableCredential so we could verify',
+          form: (
+            <form>
+              <label>
+                Enter your VerifiablePresentation
+                <input
+                  type="text"
+                  value={presentation}
+                  onChange={(e) => setPresentation(e.target.value)}
+                />
+              </label>
+            </form>
+          ),
+          button: (
+            <SendHelloButton
+              buttonText="SignIn"
+              onClick={handleSignIn}
+              disabled={false}
+            />
+          ),
+        }}
+        disabled={false}
+      />
+      
     </>
   );
 }
