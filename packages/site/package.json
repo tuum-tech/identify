@@ -29,7 +29,9 @@
     "@tuum-tech/identity-snap": "0.2.1",
     "@veramo/core": "^4.1.1",
     "axios": "^1.2.4",
+    "bootstrap": "^5.2.3",
     "react": "^18.2.0",
+    "react-bootstrap": "^2.7.0",
     "react-dom": "^18.2.0",
     "react-is": "^18.2.0",
     "styled-components": "5.3.3"
