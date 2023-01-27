@@ -16,7 +16,7 @@ const isIn = <T>(values: readonly T[], value: any): value is T => {
   return values.includes(value);
 };
 
-export const SECPK1_NAMESPACES = ['eip155', 'hedera'] as const;
+export const SECPK1_NAMESPACES = ['eip155'] as const;
 export const isValidNamespace = (x: string) => isIn(SECPK1_NAMESPACES, x);
 
 /**
