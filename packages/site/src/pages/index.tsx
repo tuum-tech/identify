@@ -30,9 +30,11 @@ import {
   resolveDID,
   sendHello,
   shouldDisplayReconnectButton,
+  uploadToGoogleDrive,
   verifyVC,
   verifyVP,
 } from '../utils';
+import { getAccessToken } from '../utils/google';
 import { validHederaChainID } from '../utils/hedera';
 import {
   CardContainer,
@@ -60,6 +62,8 @@ const Index = () => {
   const [vc, setVc] = useState({});
   const [vcIdsToBeRemoved, setVcIdsToBeRemoved] = useState('');
   const [vp, setVp] = useState({});
+  const [fileName, setFileName] = useState('vc.txt');
+  const [content, setContent] = useState('Sample Text');
 
   useEffect(() => {
     if (!validHederaChainID(currentChainId)) {
@@ -77,6 +81,20 @@ const Index = () => {
         type: MetamaskActions.SetInstalled,
         payload: installedSnap,
       });
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleUploadToGoogleDrive = async () => {
+    try {
+      const accessToken = await getAccessToken();
+      if (!accessToken) {
+        return;
+      }
+      const saved = await uploadToGoogleDrive(fileName, content, accessToken);
+      console.log('uploaded the VC: ', saved);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -808,24 +826,33 @@ const Index = () => {
         (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
           <Card
             content={{
-              title: 'todo',
-              description: 'TODO',
-              /* form: (
-              <form>
-                <label>
-                  Enter your Verifiable Presentation
-                  <input
-                    type="text"
-                    value={JSON.stringify(vp)}
-                    onChange={(e) => setVp(e.target.value)}
-                  />
-                </label>
-              </form>
-            ), */
+              title: 'uploadToGoogleDrive',
+              description: 'Upload VC to google drive',
+              form: (
+                <form>
+                  <label>
+                    Enter file name
+                    <input
+                      type="text"
+                      value={fileName}
+                      onChange={(e) => setFileName(e.target.value)}
+                    />
+                  </label>
+                  <br />
+                  <label>
+                    Enter value of content
+                    <input
+                      type="text"
+                      value={content}
+                      onChange={(e) => setContent(e.target.value)}
+                    />
+                  </label>
+                </form>
+              ),
               button: (
                 <SendHelloButton
-                  buttonText="todo"
-                  onClick={handleVerifyVPClick}
+                  buttonText="Upload to google drive"
+                  onClick={handleUploadToGoogleDrive}
                   disabled={!state.installedSnap}
                 />
               ),
