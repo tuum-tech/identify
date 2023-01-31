@@ -65,6 +65,7 @@ node_modules/
 # dotenv environment variables file
 .env
 .env.test
+.env.development
 
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
