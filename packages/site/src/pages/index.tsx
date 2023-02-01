@@ -14,6 +14,14 @@ import {
   ReconnectButton,
   SendHelloButton,
 } from '../components';
+import {
+  CardContainer,
+  Container,
+  ErrorMessage,
+  Heading,
+  Span,
+  Subtitle,
+} from '../config/styles';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
 import {
   connectHederaAccount,
@@ -36,14 +44,6 @@ import {
 } from '../utils';
 import { getAccessToken } from '../utils/google';
 import { validHederaChainID } from '../utils/hedera';
-import {
-  CardContainer,
-  Container,
-  ErrorMessage,
-  Heading,
-  Span,
-  Subtitle,
-} from './styles';
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
