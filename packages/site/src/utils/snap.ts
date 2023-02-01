@@ -27,7 +27,7 @@ export const getSnaps = async (): Promise<GetSnapsResponse> => {
  */
 export const connectSnap = async (
   snapId: string = defaultSnapOrigin,
-  params: Record<'version' | string, unknown> = {}
+  params: Record<'version' | string, unknown> = {},
 ) => {
   await window.ethereum.request({
     method: 'wallet_enable',
@@ -55,7 +55,7 @@ export const getSnap = async (version?: string): Promise<Snap | undefined> => {
 
     return Object.values(snaps).find(
       (snap) =>
-        snap.id === defaultSnapOrigin && (!version || snap.version === version)
+        snap.id === defaultSnapOrigin && (!version || snap.version === version),
     );
   } catch (e) {
     console.log('Failed to obtain installed snap', e);
@@ -70,13 +70,12 @@ export const getCurrentNetwork = async (): Promise<string> => {
 };
 
 /**
- *
  * Invoke "connectHederaAccount" method from the snap
- *
  */
+
 export const connectHederaAccount = async (
   privateKey: string,
-  accountId: string
+  accountId: string,
 ) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
@@ -164,7 +163,7 @@ export const resolveDID = async (did?: string) => {
 
 export const getVCs = async (
   filter: Filter | undefined,
-  options: GetVCsOptions
+  options: GetVCsOptions,
 ) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
@@ -208,7 +207,7 @@ export const createVC = async (
   vcKey: string,
   vcValue: object,
   options: GetVCsOptions,
-  credTypes?: string[]
+  credTypes?: string[],
 ) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
@@ -234,7 +233,7 @@ export const createVC = async (
 export const uploadToGoogleDrive = async (
   fileName: string,
   content: string,
-  accessToken: string
+  accessToken: string,
 ) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
@@ -277,7 +276,7 @@ export const verifyVC = async (vc: VerifiableCredential | {}) => {
 
 export const removeVC = async (
   id: string | string[],
-  options: RemoveVCOptions
+  options: RemoveVCOptions,
 ) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
