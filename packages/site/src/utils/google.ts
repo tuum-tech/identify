@@ -2,7 +2,7 @@ import { gapi, loadClientAuth2 } from 'gapi-script';
 
 export const getAccessToken = async () => {
   if (!gapi.auth) {
-    const clientId = process.env.REACT_APP_GOOGLE_DRIVE_CLIENT_ID || '';
+    const clientId = process.env.GATSBY_GOOGLE_DRIVE_CLIENT_ID || '';
     if (!clientId) {
       console.error('Google Drive Client id is missing.');
       return null;
