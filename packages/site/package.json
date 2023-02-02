@@ -1,6 +1,6 @@
 {
   "name": "@tuum-tech/identity-snap-example-site",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "private": true,
   "license": "(MIT-0 OR Apache-2.0)",
   "scripts": {
@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@metamask/providers": "^9.0.0",
-    "@tuum-tech/identity-snap": "0.2.1",
+    "@tuum-tech/identity-snap": "0.3.1",
     "@veramo/core": "^4.1.1",
     "axios": "^1.2.4",
     "bootstrap": "^5.2.3",

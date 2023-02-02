@@ -178,6 +178,3 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       throw new Error('Method not found');
   }
 };
-
-export * as identitySnapTypes from './types';
-export * as identitySnapVCM from './veramo/plugins/verfiable-creds-manager';

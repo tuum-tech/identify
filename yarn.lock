@@ -4884,7 +4884,7 @@ __metadata:
     "@testing-library/jest-dom": ^5.16.4
     "@testing-library/react": ^13.3.0
     "@testing-library/user-event": ^13.5.0
-    "@tuum-tech/identity-snap": 0.2.1
+    "@tuum-tech/identity-snap": 0.3.1
     "@types/jest": ^27.5.2
     "@types/react": ^18.0.15
     "@types/react-dom": ^18.0.6
@@ -4943,38 +4943,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@tuum-tech/identity-snap@npm:0.2.1":
-  version: 0.2.1
-  resolution: "@tuum-tech/identity-snap@npm:0.2.1"
-  dependencies:
-    "@ethersproject/providers": ^5.7.2
-    "@ethersproject/transactions": ^5.7.0
-    "@hashgraph/sdk": ^2.18.6
-    "@metamask/key-tree": ^6.0.0
-    "@veramo/core": next
-    "@veramo/credential-eip712": next
-    "@veramo/credential-ld": next
-    "@veramo/credential-w3c": next
-    "@veramo/did-jwt": next
-    "@veramo/did-manager": next
-    "@veramo/did-resolver": next
-    "@veramo/key-manager": next
-    "@veramo/kms-local": next
-    "@veramo/kms-web3": next
-    "@veramo/message-handler": next
-    "@veramo/selective-disclosure": next
-    bignumber.js: ^9.1.0
-    caip: ^1.1.0
-    did-jwt-vc: ^3.1.0
-    did-resolver: ^4.0.1
-    ethers: ^5.7.2
-    jsonpath: ^1.1.1
-    uuid: ^9.0.0
-  checksum: b7a8b953a8dcf93a6560526c7e1b2058b7deadc4732d9f884196b94e852f3ce35a43793422871e1842a42f29f8a5d04b5253f9a8539c54ba92d0f74a65764881
-  languageName: node
-  linkType: hard
-
-"@tuum-tech/identity-snap@workspace:packages/snap":
+"@tuum-tech/identity-snap@0.3.1, @tuum-tech/identity-snap@workspace:packages/snap":
   version: 0.0.0-use.local
   resolution: "@tuum-tech/identity-snap@workspace:packages/snap"
   dependencies:
