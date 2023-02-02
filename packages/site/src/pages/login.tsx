@@ -93,6 +93,10 @@ function LoginPage() {
         });
 
         setVC(JSON.stringify(ret.data));
+        if (ret.status === 200){
+          
+          alert("Register user successful");        
+        }
       }
     })();
   }, [identifier]);
