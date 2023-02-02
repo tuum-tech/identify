@@ -5,6 +5,7 @@ import { getDid } from './rpc/did/getDID';
 import { resolveDID } from './rpc/did/resolveDID';
 import { switchMethod } from './rpc/did/switchMethods';
 import { connectHederaAccount } from './rpc/hedera/connectHederaAccount';
+import { uploadToGoogleDrive } from './rpc/store/gdrive';
 import { createVC } from './rpc/vc/createVC';
 import { createVP } from './rpc/vc/createVP';
 import { deleteAllVCs } from './rpc/vc/deleteAllVCs';
@@ -168,6 +169,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return getAvailableMethods();
     case 'getSupportedProofFormats':
       return getSupportedProofFormats();
+    case 'uploadToGoogleDrive':
+      return await uploadToGoogleDrive((request.params as any).uploadData);
     default:
       console.error('Method not found');
       throw new Error('Method not found');

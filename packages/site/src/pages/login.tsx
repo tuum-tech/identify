@@ -22,9 +22,6 @@ import {
   ReconnectButton,
   SendHelloButton,
 } from '../components';
-import { MetamaskActions, MetaMaskContext } from '../hooks';
-import { shouldDisplayReconnectButton } from '../utils';
-import { validHederaChainID } from '../utils/hedera';
 import {
   CardContainer,
   Container,
@@ -32,7 +29,10 @@ import {
   Heading,
   Span,
   Subtitle,
-} from './styles';
+} from '../config/styles';
+import { MetamaskActions, MetaMaskContext } from '../hooks';
+import { shouldDisplayReconnectButton } from '../utils';
+import { validHederaChainID } from '../utils/hedera';
 
 function LoginPage() {
   const [state, dispatch] = useContext(MetaMaskContext);
