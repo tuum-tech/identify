@@ -109,6 +109,22 @@ export const sendHello = async () => {
 };
 
 /**
+ * Invoke the "togglePopups" method from the snap.
+ */
+
+export const togglePopups = async () => {
+  await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: [
+      defaultSnapOrigin,
+      {
+        method: 'togglePopups',
+      },
+    ],
+  });
+};
+
+/**
  * Invoke the "getCurrentDIDMethod" method from the snap.
  */
 

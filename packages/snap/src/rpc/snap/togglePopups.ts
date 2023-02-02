@@ -2,6 +2,7 @@ import { SnapProvider } from '@metamask/snap-types';
 import { IdentitySnapState } from '../../interfaces';
 import { snapConfirm, updatePopups } from '../../utils/snapUtils';
 
+/* eslint-disable */
 export async function togglePopups(
   wallet: SnapProvider,
   state: IdentitySnapState
