@@ -227,6 +227,25 @@ export const createVC = async (
 };
 
 /**
+ * Invoke the "configureGoogleAccount" method from the snap.
+ */
+
+export const configureGoogleAccount = async (accessToken: string) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: [
+      defaultSnapOrigin,
+      {
+        method: 'configureGoogleAccount',
+        params: {
+          accessToken,
+        },
+      },
+    ],
+  });
+};
+
+/**
  * Invoke the "uploadToGoogleDrive" method from the snap.
  */
 

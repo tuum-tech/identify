@@ -5,7 +5,10 @@ import { getDid } from './rpc/did/getDID';
 import { resolveDID } from './rpc/did/resolveDID';
 import { switchMethod } from './rpc/did/switchMethods';
 import { connectHederaAccount } from './rpc/hedera/connectHederaAccount';
-import { uploadToGoogleDrive } from './rpc/store/gdrive';
+import {
+  configureGoogleAccount,
+  uploadToGoogleDrive,
+} from './rpc/store/gdrive';
 import { createVC } from './rpc/vc/createVC';
 import { createVP } from './rpc/vc/createVP';
 import { deleteAllVCs } from './rpc/vc/deleteAllVCs';
@@ -18,6 +21,7 @@ import { verifyVP } from './rpc/vc/verifyVP';
 import { init } from './utils/init';
 import { switchNetworkIfNecessary } from './utils/network';
 import {
+  isValidConfigueGoogleRequest,
   isValidCreateVCRequest,
   isValidCreateVPRequest,
   isValidDeleteAllVCsRequest,
@@ -27,6 +31,7 @@ import {
   isValidResolveDIDRequest,
   isValidSaveVCRequest,
   isValidSwitchMethodRequest,
+  isValidUploadDataRequest,
   isValidVerifyVCRequest,
   isValidVerifyVPRequest,
 } from './utils/params';
@@ -169,8 +174,12 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return getAvailableMethods();
     case 'getSupportedProofFormats':
       return getSupportedProofFormats();
+    case 'configureGoogleAccount':
+      isValidConfigueGoogleRequest(request.params);
+      return await configureGoogleAccount(wallet, state, request.params);
     case 'uploadToGoogleDrive':
-      return await uploadToGoogleDrive((request.params as any).uploadData);
+      isValidUploadDataRequest(request.params);
+      return await uploadToGoogleDrive(request.params.uploadData);
     default:
       console.error('Method not found');
       throw new Error('Method not found');

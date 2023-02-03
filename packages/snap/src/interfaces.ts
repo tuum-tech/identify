@@ -41,6 +41,7 @@ export interface IdentityAccountConfig {
   identity: {
     didMethod: string;
     vcStore: string;
+    googleAccessToken: string;
   };
 }
 
@@ -53,4 +54,14 @@ export type SnapConfirmParams = {
   prompt: string;
   description?: string;
   textAreaContent?: string;
+};
+
+export type UploadData = {
+  fileName: string;
+  content: string;
+  accessToken: string;
+};
+
+export type GoogleToken = {
+  accessToken: string;
 };

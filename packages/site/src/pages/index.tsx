@@ -24,6 +24,7 @@ import {
 } from '../config/styles';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
 import {
+  configureGoogleAccount,
   connectHederaAccount,
   connectSnap,
   createVC,
@@ -51,7 +52,7 @@ const Index = () => {
   const [hederaAccountConnected, setHederaAccountConnected] = useState(false);
 
   const [hederaPrivateKey, setHederaPrivateKey] = useState(
-    '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c'
+    '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c',
   );
   const [hederaAccountId, setHederaAccountId] = useState('0.0.15215');
 
@@ -87,6 +88,16 @@ const Index = () => {
     }
   };
 
+  const handleConfigureGoogleAccount = async () => {
+    const accessToken = await getAccessToken();
+    if (!accessToken) {
+      console.error('Failed to configure google account');
+      return;
+    }
+    const resp = await configureGoogleAccount(accessToken);
+    alert('Google Account configuration was successful');
+  };
+
   const handleUploadToGoogleDrive = async () => {
     try {
       const accessToken = await getAccessToken();
@@ -105,7 +116,7 @@ const Index = () => {
     try {
       const configured = await connectHederaAccount(
         hederaPrivateKey,
-        hederaAccountId
+        hederaAccountId,
       );
       console.log('configured: ', configured);
       if (configured) {
@@ -200,7 +211,7 @@ const Index = () => {
       };
       const vcs = (await getVCs(
         undefined,
-        options
+        options,
       )) as IDataManagerQueryResult[];
       console.log(`Your VCs are: ${JSON.stringify(vcs, null, 4)}`);
       if (vcs.length > 0) {
@@ -272,7 +283,7 @@ const Index = () => {
       console.log('vcIdsToBeRemoved: ', vcIdsToBeRemoved);
       const isRemoved = (await removeVC(
         vcId,
-        options
+        options,
       )) as IDataManagerDeleteResult[];
       console.log(`Remove VC Result: ${JSON.stringify(isRemoved, null, 4)}`);
       setVcId('');
@@ -290,7 +301,7 @@ const Index = () => {
         store: 'snap',
       };
       const isRemoved = (await deleteAllVCs(
-        options
+        options,
       )) as IDataManagerClearResult[];
       console.log(`Remove VC Result: ${JSON.stringify(isRemoved, null, 4)}`);
       setVcId('');
@@ -311,7 +322,7 @@ const Index = () => {
       console.log('vcId: ', vcId);
       const vp = (await createVP(
         vcId.trim().split(','),
-        proofInfo
+        proofInfo,
       )) as VerifiablePresentation;
       setVp(vp);
       console.log(`Your VP is: ${JSON.stringify(vp, null, 4)}`);
@@ -807,6 +818,32 @@ const Index = () => {
                 <SendHelloButton
                   buttonText="Verify VP"
                   onClick={handleVerifyVPClick}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        ) : (
+          ''
+        )}
+        {/* =============================================================================== */}
+        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
+        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+          <Card
+            content={{
+              title: 'configureGoogleAccount',
+              description: 'Configure Google Account',
+              form: null,
+              button: (
+                <SendHelloButton
+                  buttonText="Configure Google Account"
+                  onClick={handleConfigureGoogleAccount}
                   disabled={!state.installedSnap}
                 />
               ),
