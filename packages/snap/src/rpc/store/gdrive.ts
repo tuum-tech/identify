@@ -2,11 +2,18 @@ import { SnapProvider } from '@metamask/snap-types';
 import { GoogleToken, IdentitySnapState, UploadData } from 'src/interfaces';
 import { updateSnapState } from '../../utils/stateUtils';
 
-export const uploadToGoogleDrive = async ({
-  fileName,
-  content,
-  accessToken,
-}: UploadData) => {
+export const uploadToGoogleDrive = async (
+  state: IdentitySnapState,
+  { fileName, content }: UploadData,
+) => {
+  const accessToken =
+    state.accountState[state.currentAccount].accountConfig.identity
+      .googleAccessToken;
+  if (!accessToken) {
+    console.error('Access token not found');
+    return false;
+  }
+
   const metadata = {
     name: fileName,
     mimeType: 'text/plain',
@@ -23,22 +30,25 @@ export const uploadToGoogleDrive = async ({
   multipartRequestBody += `\r\n${content}`;
   multipartRequestBody += closeDelim;
 
-  const res = await fetch(
-    'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',
-    {
-      method: 'POST',
-      headers: new Headers({
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': `multipart/related; boundary=${boundary}`,
-      }),
-      body: multipartRequestBody,
-    },
-  );
-  console.log({ res });
-  const val = res.json();
-  console.log({ val });
+  try {
+    const res = await fetch(
+      'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',
+      {
+        method: 'POST',
+        headers: new Headers({
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': `multipart/related; boundary=${boundary}`,
+        }),
+        body: multipartRequestBody,
+      },
+    );
+    const val = res.json();
+    console.log({ val });
 
-  return val;
+    return val;
+  } catch (error) {
+    console.error('Could not upload to google drive', error);
+  }
 };
 
 export const configureGoogleAccount = async (

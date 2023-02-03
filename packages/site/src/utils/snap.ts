@@ -252,7 +252,6 @@ export const configureGoogleAccount = async (accessToken: string) => {
 export const uploadToGoogleDrive = async (
   fileName: string,
   content: string,
-  accessToken: string,
 ) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
@@ -264,7 +263,6 @@ export const uploadToGoogleDrive = async (
           uploadData: {
             fileName,
             content,
-            accessToken,
           },
         },
       },

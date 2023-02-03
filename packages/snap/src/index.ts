@@ -80,7 +80,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     return connectHederaAccount(
       state,
       request.params.privateKey,
-      request.params.accountId
+      request.params.accountId,
     );
   }
   const account = await getCurrentAccount(wallet, state);
@@ -89,7 +89,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   // FIXME: HANDLE NULL maybe throw ?
   if (account === null) {
     throw new Error(
-      'Error while trying to get the account. Please connect to an account first'
+      'Error while trying to get the account. Please connect to an account first',
     );
   } else {
     state.currentAccount = account;
@@ -104,7 +104,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   console.log('-------------------------------------------------------------');
   console.log(
     'request.params=========',
-    JSON.stringify(request.params, null, 4)
+    JSON.stringify(request.params, null, 4),
   );
 
   switch (request.method) {
@@ -164,7 +164,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return await verifyVP(
         wallet,
         state,
-        request.params.verifiablePresentation
+        request.params.verifiablePresentation,
       );
     case 'getCurrentDIDMethod':
       await switchNetworkIfNecessary(wallet, state);
@@ -179,7 +179,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return await configureGoogleAccount(wallet, state, request.params);
     case 'uploadToGoogleDrive':
       isValidUploadDataRequest(request.params);
-      return await uploadToGoogleDrive(request.params.uploadData);
+      return await uploadToGoogleDrive(state, request.params.uploadData);
     default:
       console.error('Method not found');
       throw new Error('Method not found');

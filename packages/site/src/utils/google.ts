@@ -19,7 +19,7 @@ export const getAccessToken = async () => {
       console.log(gapi.auth.getToken());
     });
   }
-  const accessToken = gapi.auth.getToken().access_token; // Here gapi is used for retrieving the access token.
+  const accessToken = gapi.auth.getToken()?.access_token; // Here gapi is used for retrieving the access token.
 
   return accessToken;
 };

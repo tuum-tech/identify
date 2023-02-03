@@ -59,7 +59,6 @@ export type SnapConfirmParams = {
 export type UploadData = {
   fileName: string;
   content: string;
-  accessToken: string;
 };
 
 export type GoogleToken = {

@@ -100,11 +100,7 @@ const Index = () => {
 
   const handleUploadToGoogleDrive = async () => {
     try {
-      const accessToken = await getAccessToken();
-      if (!accessToken) {
-        return;
-      }
-      const saved = await uploadToGoogleDrive(fileName, content, accessToken);
+      const saved = await uploadToGoogleDrive(fileName, content);
       console.log('uploaded the VC: ', saved);
     } catch (e) {
       console.error(e);
