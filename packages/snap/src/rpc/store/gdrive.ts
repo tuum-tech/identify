@@ -48,6 +48,7 @@ export const uploadToGoogleDrive = async (
     return val;
   } catch (error) {
     console.error('Could not upload to google drive', error);
+    return false;
   }
 };
 

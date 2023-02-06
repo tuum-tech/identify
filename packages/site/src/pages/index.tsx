@@ -65,6 +65,7 @@ const Index = () => {
   const [vp, setVp] = useState({});
   const [fileName, setFileName] = useState('vc.txt');
   const [content, setContent] = useState('Sample Text');
+  const [loadingState, setLoadingState] = useState<string | null>(null);
 
   useEffect(() => {
     if (!validHederaChainID(currentChainId)) {
@@ -89,16 +90,23 @@ const Index = () => {
   };
 
   const handleConfigureGoogleAccount = async () => {
-    const accessToken = await getAccessToken();
-    if (!accessToken) {
-      console.error('Failed to configure google account');
-      return;
+    setLoadingState('configureGoogleAccount');
+    try {
+      const accessToken = await getAccessToken();
+      if (!accessToken) {
+        console.error('Failed to configure google account');
+        return;
+      }
+      const resp = await configureGoogleAccount(accessToken);
+      alert('Google Account configuration was successful');
+    } catch (e) {
+      dispatch({ type: MetamaskActions.SetError, payload: e });
     }
-    const resp = await configureGoogleAccount(accessToken);
-    alert('Google Account configuration was successful');
+    setLoadingState(null);
   };
 
   const handleUploadToGoogleDrive = async () => {
+    setLoadingState('uploadToGoogleDrive');
     try {
       const saved = await uploadToGoogleDrive(fileName, content);
       console.log('uploaded the VC: ', saved);
@@ -106,9 +114,11 @@ const Index = () => {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
+    setLoadingState(null);
   };
 
   const handleConfigureHederaAccountClick = async () => {
+    setLoadingState('connectHederaAccount');
     try {
       const configured = await connectHederaAccount(
         hederaPrivateKey,
@@ -125,6 +135,7 @@ const Index = () => {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
+    setLoadingState(null);
   };
 
   const handleSendHelloClick = async () => {
@@ -431,6 +442,7 @@ const Index = () => {
                   buttonText="Connect to Hedera Account"
                   onClick={handleConfigureHederaAccountClick}
                   disabled={!state.installedSnap}
+                  loading={loadingState === 'connectHederaAccount'}
                 />
               ),
             }}
@@ -841,6 +853,7 @@ const Index = () => {
                   buttonText="Configure Google Account"
                   onClick={handleConfigureGoogleAccount}
                   disabled={!state.installedSnap}
+                  loading={loadingState === 'configureGoogleAccount'}
                 />
               ),
             }}
@@ -887,6 +900,7 @@ const Index = () => {
                   buttonText="Upload to google drive"
                   onClick={handleUploadToGoogleDrive}
                   disabled={!state.installedSnap}
+                  loading={loadingState === 'uploadToGoogleDrive'}
                 />
               ),
             }}
