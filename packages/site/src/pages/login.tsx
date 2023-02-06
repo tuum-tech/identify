@@ -8,7 +8,7 @@ import {
   getDID,
   getSnap,
   getVCs,
-  saveVC,
+  saveVC
 } from './../utils/snap';
 
 import { ProofInfo } from '@tuum-tech/identity-snap/src/types/params';
@@ -20,7 +20,7 @@ import {
   ConnectButton,
   InstallFlaskButton,
   ReconnectButton,
-  SendHelloButton,
+  SendHelloButton
 } from '../components';
 import {
   CardContainer,
@@ -28,7 +28,7 @@ import {
   ErrorMessage,
   Heading,
   Span,
-  Subtitle,
+  Subtitle
 } from '../config/styles';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
 import { shouldDisplayReconnectButton } from '../utils';
@@ -184,7 +184,10 @@ function LoginPage() {
         returnStore: true,
       };
       const vcs = (await getVCs(
-        undefined,
+        {
+          type: 'type',
+          filter: 'SiteLoginCredential'
+        },
         options
       )) as IDataManagerQueryResult[];
 
@@ -219,7 +222,7 @@ function LoginPage() {
             <div key={cred.metadata.id}>
               <span
                 onClick={() => handleVCClicked(cred.metadata.id)}
-              >{`Login : ${cred.data.credentialSubject.loginName}  Issuance: ${cred.data.issuanceDate}`}</span>
+              >{`Login : ${cred.data.credentialSubject.loginName} Issuance: ${cred.data.issuanceDate}` }</span>
             </div>
           ))}
         </Modal.Body>

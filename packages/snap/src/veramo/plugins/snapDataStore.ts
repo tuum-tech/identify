@@ -5,7 +5,7 @@ import {
   AbstractKeyStore,
   AbstractPrivateKeyStore,
   ImportablePrivateKey,
-  ManagedPrivateKey,
+  ManagedPrivateKey
 } from '@veramo/key-manager';
 import jsonpath from 'jsonpath';
 import { v4 as uuidv4 } from 'uuid';
@@ -15,7 +15,7 @@ import { updateSnapState } from '../../utils/stateUtils';
 import {
   AbstractDataStore,
   IFilterArgs,
-  IQueryResult,
+  IQueryResult
 } from './verfiable-creds-manager';
 
 /* eslint-disable */
@@ -287,6 +287,7 @@ export class SnapVCStore extends AbstractDataStore {
   }
 
   async query(args: IFilterArgs): Promise<Array<IQueryResult>> {
+    
     const { filter } = args;
     const account = this.state.currentAccount;
     if (!account)
@@ -313,6 +314,21 @@ export class SnapVCStore extends AbstractDataStore {
         throw new Error('Invalid id');
       }
     }
+    if (filter && filter.type === 'type') {
+     return Object.keys(this.state.accountState[account].vcs).map((k) => {
+        let vc = this.state.accountState[account].vcs[k] as unknown;
+        if (typeof vc === 'string') {
+          vc = decodeJWT(vc);
+        }
+          return {
+            metadata: { id: k },
+            data: vc,
+          };
+      }).filter((item:any) => {
+        return item.data.type?.includes(filter.filter as string);
+      });
+    }
+
     if (filter === undefined || (filter && filter.type === 'none')) {
       return Object.keys(this.state.accountState[account].vcs).map((k) => {
         let vc = this.state.accountState[account].vcs[k] as unknown;
