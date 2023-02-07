@@ -10,9 +10,10 @@ export const publicKey =
 export const signedMsg =
   '0x30eb4dbf93e7bfdb109ed03f7803f2378fa27d18ddc233cb3d121b5ba13253fe2515076d1ba66f3dc282c182479b843c925c62eb1f5a0676bcaf995e8e7552941c';
 
-export const exampleDIDPkh = `did:pkh:eip155:0x4:${address}`;
+export const exampleDIDPkh = `did:pkh:eip155:4:${address}`;
 
 const defaultSnapState: IdentitySnapState = {
+  currentAccount: "0xb6665128eE91D84590f70c3268765384A9CAfBCd", 
   accountState: {
     '0xb6665128eE91D84590f70c3268765384A9CAfBCd': getEmptyAccountState(),
   },
@@ -28,7 +29,7 @@ const defaultSnapState: IdentitySnapState = {
 };
 
 export const getDefaultSnapState = (): IdentitySnapState => {
-  defaultSnapState.accountState[address].publicKey = publicKey;
+  //defaultSnapState.accountState[address].publicKey = publicKey;
   return cloneDeep(defaultSnapState);
 };
 

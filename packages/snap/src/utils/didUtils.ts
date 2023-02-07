@@ -9,9 +9,10 @@ export async function getCurrentDid(
   state: IdentitySnapState
 ): Promise<string> {
   let did: string = '';
+  console.log("account State" + JSON.stringify(state.accountState));
+  console.log("current account" + JSON.stringify(state.currentAccount));
   const method =
     state.accountState[state.currentAccount].accountConfig.identity.didMethod;
-
   if (!isValidMethod(method)) {
     console.error(
       `did method '${method}' not supported. Supported methods are: ${availableMethods}`
