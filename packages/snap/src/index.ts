@@ -42,8 +42,7 @@ import { getSnapStateUnchecked, initAccountState } from './utils/stateUtils';
  * @param originString - The origin string.
  * @returns A message based on the origin.
  */
-export const getMessage = (originString: string): string =>
-  `Hello, ${originString}!`;
+const getMessage = (originString: string): string => `Hello, ${originString}!`;
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -55,9 +54,6 @@ export const getMessage = (originString: string): string =>
  * @throws If the `snap_confirm` call failed.
  */
 export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
-  console.log('snap: ', snap);
-  console.log('ethereum: ', ethereum);
-
   let state = await getSnapStateUnchecked(snap);
 
   if (state === null) {
@@ -118,7 +114,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
         method: 'snap_confirm',
         params: [
           {
-            prompt: getMessage(origin),
+            prompt: getMessage(account),
             description: 'This is what description will look like',
             textAreaContent: 'This is what content will look like',
           },

@@ -362,7 +362,7 @@ const Index = () => {
         {!state.isFlask && (
           <Card
             content={{
-              title: 'Install',
+              title: 'Install Metamask Flask',
               description:
                 'Snaps is pre-release software only available in MetaMask Flask, a canary distribution for developers with access to upcoming features.',
               button: <InstallFlaskButton />,
@@ -373,7 +373,7 @@ const Index = () => {
         {!state.installedSnap && (
           <Card
             content={{
-              title: 'Connect to Metamask Snap',
+              title: 'Connect to Identity Snap',
               description:
                 'Get started by connecting to and installing the Identity Snap.',
               button: (
@@ -389,7 +389,7 @@ const Index = () => {
         {shouldDisplayReconnectButton(state.installedSnap) && (
           <Card
             content={{
-              title: 'Reconnect to Metamask Snap',
+              title: 'Reconnect to Identity Snap',
               description:
                 "While connected to a local running snap, this button will always be displayed in order to update the snap if a change is made. Note that you'll need to reconnect if you switch the network on Metamask at any point in time as that will cause your metamask state to change",
               button: (
