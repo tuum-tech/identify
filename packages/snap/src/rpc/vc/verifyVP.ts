@@ -7,9 +7,9 @@ export async function verifyVP(
   identitySnapParams: IdentitySnapParams,
   vp: VerifiablePresentation
 ): Promise<boolean | null> {
-  const { snap, metamask } = identitySnapParams;
+  const { snap } = identitySnapParams;
 
-  const result = await veramoVerifyVP(snap, metamask, vp);
+  const result = await veramoVerifyVP(snap, vp);
   if (result.verified === false) {
     console.log(
       'VP Verification Error: ',

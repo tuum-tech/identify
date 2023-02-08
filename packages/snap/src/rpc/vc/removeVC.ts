@@ -9,7 +9,7 @@ export async function removeVC(
   identitySnapParams: IdentitySnapParams,
   vcRequestParams: RemoveVCsRequestParams
 ): Promise<IDataManagerDeleteResult[] | null> {
-  const { snap, metamask } = identitySnapParams;
+  const { snap } = identitySnapParams;
 
   const { id = '', options } = vcRequestParams || {};
   const { store = 'snap' } = options || {};
@@ -24,7 +24,7 @@ export async function removeVC(
   };
 
   if (await snapConfirm(snap, promptObj)) {
-    return await veramoRemoveVC(snap, metamask, ids, store);
+    return await veramoRemoveVC(snap, ids, store);
   }
   throw new Error('User rejected');
 }

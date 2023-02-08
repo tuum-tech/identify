@@ -9,7 +9,7 @@ export async function deleteAllVCs(
   identitySnapParams: IdentitySnapParams,
   vcRequestParams: DeleteAllVCsRequestParams
 ): Promise<IDataManagerClearResult[] | null> {
-  const { snap, metamask } = identitySnapParams;
+  const { snap } = identitySnapParams;
 
   const { options } = vcRequestParams || {};
   const { store = 'snap' } = options || {};
@@ -21,7 +21,7 @@ export async function deleteAllVCs(
   };
 
   if (await snapConfirm(snap, promptObj)) {
-    return await veramoDeleteAllVCs(snap, metamask, store);
+    return await veramoDeleteAllVCs(snap, store);
   }
   throw new Error('User rejected');
 }

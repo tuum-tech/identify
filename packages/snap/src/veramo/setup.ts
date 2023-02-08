@@ -30,9 +30,7 @@ import {
   IDataManager,
 } from './plugins/verfiable-creds-manager';
 
-import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
-import { getSnapState } from '../utils/stateUtils';
 import {
   SnapDIDStore,
   SnapKeyStore,
@@ -40,23 +38,17 @@ import {
   SnapVCStore,
 } from './plugins/snapDataStore';
 
-/* eslint-disable */
-export async function getAgent(
-  snap: SnapsGlobalObject,
-  metamask: MetaMaskInpageProvider
-): Promise<
-  TAgent<
-    IKeyManager &
-      IDIDManager &
-      IResolver &
-      IDataManager &
-      ICredentialIssuer &
-      IDataStore
-  >
-> {
-  const state = await getSnapState(snap);
-  const account = state.currentAccount;
+export type Agent = TAgent<
+  IKeyManager &
+    IDIDManager &
+    IResolver &
+    IDataManager &
+    ICredentialIssuer &
+    IDataStore
+>;
 
+/* eslint-disable */
+export const getAgent = async (snap: SnapsGlobalObject): Promise<Agent> => {
   const didProviders: Record<string, AbstractIdentifierProvider> = {};
   const vcStorePlugins: Record<string, AbstractDataStore> = {};
 
@@ -106,4 +98,4 @@ export async function getAgent(
   });
 
   return agent;
-}
+};

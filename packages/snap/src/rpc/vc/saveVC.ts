@@ -9,7 +9,7 @@ export async function saveVC(
   params: IdentitySnapParams,
   { verifiableCredential, options }: SaveVCRequestParams
 ): Promise<IDataManagerSaveResult[]> {
-  const { snap, metamask } = params;
+  const { snap } = params;
 
   const { store = 'snap' } = options || {};
 
@@ -22,7 +22,7 @@ export async function saveVC(
   };
 
   if (await snapConfirm(snap, promptObj)) {
-    return await veramoSaveVC(snap, metamask, verifiableCredential, store);
+    return await veramoSaveVC(snap, verifiableCredential, store);
   }
   throw new Error('User rejected');
 }

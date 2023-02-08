@@ -42,7 +42,7 @@ import { getSnapStateUnchecked, initAccountState } from './utils/stateUtils';
  * @param originString - The origin string.
  * @returns A message based on the origin.
  */
-const getMessage = (originString: string): string => `Hello, ${originString}!`;
+const getMessage = (): string => `Hello, Identity Snap User!`;
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -97,7 +97,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
 
   if (!(account in state.accountState)) {
     await initAccountState(snap, state, state.currentAccount);
-    identitySnapParams.bip44CoinTypeNode = await getAddressKeyDeriver(snap);
   }
 
   console.log('Request:', JSON.stringify(request, null, 4));
@@ -114,7 +113,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
         method: 'snap_confirm',
         params: [
           {
-            prompt: getMessage(account),
+            prompt: getMessage(),
             description: 'This is what description will look like',
             textAreaContent: 'This is what content will look like',
           },

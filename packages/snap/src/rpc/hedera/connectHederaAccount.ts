@@ -3,10 +3,10 @@ import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { toHederaAccountInfo } from '../../hedera';
 import { getHederaNetwork, validHederaChainID } from '../../hedera/config';
 import { IdentitySnapState } from '../../interfaces';
-import { getKeyPair } from '../../utils/hederaUtils';
 import { getCurrentNetwork } from '../../utils/snapUtils';
 import { initAccountState, updateSnapState } from '../../utils/stateUtils';
-import { veramoImportMetaMaskAccount } from '../../utils/veramoUtils';
+import { veramoConnectHederaAccount } from '../../utils/veramoUtils';
+import { getAgent } from '../../veramo/setup';
 
 /* eslint-disable */
 export async function connectHederaAccount(
@@ -37,16 +37,12 @@ export async function connectHederaAccount(
       state.accountState[state.currentAccount].hederaAccount.accountId =
         _accountId;
       await updateSnapState(snap, state);
-      const keyPair = await getKeyPair(_privateKey);
-      await veramoImportMetaMaskAccount(
-        {
-          snap,
-          state,
-          metamask,
-        },
-        keyPair
+      const agent = await getAgent(snap);
+      return await veramoConnectHederaAccount(
+        agent,
+        state.currentAccount,
+        _privateKey
       );
-      return true;
     } else {
       console.error('Could not retrieve hedera account info');
       return false;

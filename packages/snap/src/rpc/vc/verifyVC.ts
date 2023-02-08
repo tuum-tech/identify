@@ -7,9 +7,9 @@ export async function verifyVC(
   identitySnapParams: IdentitySnapParams,
   vc: W3CVerifiableCredential
 ): Promise<boolean | null> {
-  const { snap, metamask } = identitySnapParams;
+  const { snap } = identitySnapParams;
 
-  const result = await veramoVerifyVC(snap, metamask, vc);
+  const result = await veramoVerifyVC(snap, vc);
   if (result.verified === false) {
     console.log(
       'VC Verification Error: ',

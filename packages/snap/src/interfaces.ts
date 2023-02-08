@@ -1,4 +1,3 @@
-import { BIP44CoinTypeNode } from '@metamask/key-tree';
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { IIdentifier, IKey, W3CVerifiableCredential } from '@veramo/core';
@@ -33,8 +32,8 @@ export interface IdentitySnapConfig {
  * Identity Snap State for a MetaMask address
  */
 export interface IdentityAccountState {
-  snapPrivateKeyStore: Record<string, ManagedPrivateKey>;
   snapKeyStore: Record<string, IKey>;
+  snapPrivateKeyStore: Record<string, ManagedPrivateKey>;
   identifiers: Record<string, IIdentifier>;
   vcs: Record<string, W3CVerifiableCredential>;
 
@@ -54,7 +53,6 @@ export interface IdentitySnapParams {
   snap: SnapsGlobalObject;
   state: IdentitySnapState;
   metamask: MetaMaskInpageProvider;
-  bip44CoinTypeNode?: BIP44CoinTypeNode;
 }
 
 export interface HederaAccount {
