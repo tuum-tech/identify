@@ -1,5 +1,3 @@
-import { Web3Provider } from '@ethersproject/providers';
-import { SnapProvider } from '@metamask/snap-types';
 import {
   createAgent,
   ICredentialIssuer,
@@ -24,7 +22,6 @@ import { KeyManagementSystem } from '@veramo/kms-local';
 import { MessageHandler } from '@veramo/message-handler';
 import { SdrMessageHandler } from '@veramo/selective-disclosure';
 import { Resolver } from 'did-resolver';
-import { IdentitySnapState } from '../interfaces';
 import { PkhDIDProvider } from './plugins/did-provider-pkh/src/pkh-did-provider';
 import { getResolver as getDidPkhResolver } from './plugins/did-provider-pkh/src/resolver';
 import {
@@ -33,7 +30,9 @@ import {
   IDataManager,
 } from './plugins/verfiable-creds-manager';
 
-import { Web3KeyManagementSystem } from '@veramo/kms-web3';
+import { MetaMaskInpageProvider } from '@metamask/providers';
+import { SnapsGlobalObject } from '@metamask/snaps-types';
+import { getSnapState } from '../utils/stateUtils';
 import {
   SnapDIDStore,
   SnapKeyStore,
@@ -43,8 +42,8 @@ import {
 
 /* eslint-disable */
 export async function getAgent(
-  wallet: SnapProvider,
-  state: IdentitySnapState
+  snap: SnapsGlobalObject,
+  metamask: MetaMaskInpageProvider
 ): Promise<
   TAgent<
     IKeyManager &
@@ -55,14 +54,14 @@ export async function getAgent(
       IDataStore
   >
 > {
-  const web3Providers: Record<string, Web3Provider> = {};
+  const state = await getSnapState(snap);
+  const account = state.currentAccount;
+
   const didProviders: Record<string, AbstractIdentifierProvider> = {};
   const vcStorePlugins: Record<string, AbstractDataStore> = {};
 
-  web3Providers['metamask'] = new Web3Provider(wallet as any);
-
   didProviders['did:pkh'] = new PkhDIDProvider({ defaultKms: 'snap' });
-  vcStorePlugins['snap'] = new SnapVCStore(wallet, state);
+  vcStorePlugins['snap'] = new SnapVCStore(snap);
 
   const agent = createAgent<
     IKeyManager &
@@ -74,14 +73,13 @@ export async function getAgent(
   >({
     plugins: [
       new KeyManager({
-        store: new SnapKeyStore(wallet, state),
+        store: new SnapKeyStore(snap),
         kms: {
-          web3: new Web3KeyManagementSystem(web3Providers),
-          snap: new KeyManagementSystem(new SnapPrivateKeyStore(wallet, state)),
+          snap: new KeyManagementSystem(new SnapPrivateKeyStore(snap)),
         },
       }),
       new DIDManager({
-        store: new SnapDIDStore(wallet, state),
+        store: new SnapDIDStore(snap),
         defaultProvider: 'metamask',
         providers: didProviders,
       }),

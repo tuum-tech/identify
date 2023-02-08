@@ -1,15 +1,15 @@
-import { SnapProvider } from '@metamask/snap-types';
-import { IdentitySnapState } from '../../interfaces';
+import { IdentitySnapParams } from '../../interfaces';
 import { availableMethods, isValidMethod } from '../../types/constants';
 import { snapConfirm } from '../../utils/snapUtils';
 import { updateSnapState } from '../../utils/stateUtils';
 
 /* eslint-disable */
 export async function switchMethod(
-  wallet: SnapProvider,
-  state: IdentitySnapState,
+  identitySnapParams: IdentitySnapParams,
   didMethod: string
 ): Promise<boolean> {
+  const { snap, state } = identitySnapParams;
+
   const method =
     state.accountState[state.currentAccount].accountConfig.identity.didMethod;
   if (!isValidMethod(didMethod)) {
@@ -27,11 +27,11 @@ export async function switchMethod(
       textAreaContent: didMethod,
     };
 
-    if (await snapConfirm(wallet, promptObj)) {
+    if (await snapConfirm(snap, promptObj)) {
       state.accountState[
         state.currentAccount
       ].accountConfig.identity.didMethod = didMethod;
-      await updateSnapState(wallet, state);
+      await updateSnapState(snap, state);
       return true;
     }
 

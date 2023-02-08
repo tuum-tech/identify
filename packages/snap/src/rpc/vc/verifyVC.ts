@@ -1,15 +1,15 @@
-import { SnapProvider } from '@metamask/snap-types';
 import { W3CVerifiableCredential } from '@veramo/core';
-import { IdentitySnapState } from '../../interfaces';
+import { IdentitySnapParams } from '../../interfaces';
 import { veramoVerifyVC } from '../../utils/veramoUtils';
 
 /* eslint-disable */
 export async function verifyVC(
-  wallet: SnapProvider,
-  state: IdentitySnapState,
+  identitySnapParams: IdentitySnapParams,
   vc: W3CVerifiableCredential
 ): Promise<boolean | null> {
-  const result = await veramoVerifyVC(wallet, state, vc);
+  const { snap, metamask } = identitySnapParams;
+
+  const result = await veramoVerifyVC(snap, metamask, vc);
   if (result.verified === false) {
     console.log(
       'VC Verification Error: ',

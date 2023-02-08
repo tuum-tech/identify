@@ -1,3 +1,5 @@
+import { MetaMaskInpageProvider } from '@metamask/providers';
+import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { toHederaAccountInfo } from '../../hedera';
 import { getHederaNetwork, validHederaChainID } from '../../hedera/config';
 import { IdentitySnapState } from '../../interfaces';
@@ -8,11 +10,13 @@ import { veramoImportMetaMaskAccount } from '../../utils/veramoUtils';
 
 /* eslint-disable */
 export async function connectHederaAccount(
+  snap: SnapsGlobalObject,
   state: IdentitySnapState,
+  metamask: MetaMaskInpageProvider,
   _privateKey: string,
   _accountId: string
 ): Promise<boolean> {
-  const chainId = await getCurrentNetwork(wallet);
+  const chainId = await getCurrentNetwork(metamask);
   if (validHederaChainID(chainId)) {
     const hederaAccountInfo = await toHederaAccountInfo(
       _privateKey,
@@ -25,16 +29,23 @@ export async function connectHederaAccount(
         : '0x' + hederaAccountInfo.contractAccountId;
 
       state.currentAccount = evmAddress;
-      if (!(evmAddress in state.accountState)) {
-        await initAccountState(wallet, state, evmAddress);
+      if (!(state.currentAccount in state.accountState)) {
+        await initAccountState(snap, state, state.currentAccount);
       }
       state.accountState[state.currentAccount].hederaAccount.evmAddress =
         evmAddress;
       state.accountState[state.currentAccount].hederaAccount.accountId =
         _accountId;
-      await updateSnapState(wallet, state);
+      await updateSnapState(snap, state);
       const keyPair = await getKeyPair(_privateKey);
-      await veramoImportMetaMaskAccount(wallet, state, keyPair);
+      await veramoImportMetaMaskAccount(
+        {
+          snap,
+          state,
+          metamask,
+        },
+        keyPair
+      );
       return true;
     } else {
       console.error('Could not retrieve hedera account info');
