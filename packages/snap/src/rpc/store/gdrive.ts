@@ -2,6 +2,31 @@ import { SnapProvider } from '@metamask/snap-types';
 import { GoogleToken, IdentitySnapState, UploadData } from 'src/interfaces';
 import { updateSnapState } from '../../utils/stateUtils';
 
+export const GOOGLE_DRIVE_VCS_FILE_NAME = 'identity-snap-vcs.json';
+
+const searchFile = async (accessToken: string, fileName: string) => {
+  try {
+    const res = await fetch(
+      `https://www.googleapis.com/drive/v3/files?q=name = '${fileName}' and trashed = false`,
+      {
+        method: 'GET',
+        headers: new Headers({
+          Authorization: `Bearer ${accessToken}`,
+        }),
+      },
+    );
+    const data = await res.json();
+    console.log('searchFile: ', { data });
+
+    const count = data.files.length;
+
+    return { count, id: count === 1 ? data.files[0].id : null };
+  } catch (error) {
+    console.error('Failed to search file', error);
+    throw error;
+  }
+};
+
 export const uploadToGoogleDrive = async (
   state: IdentitySnapState,
   { fileName, content }: UploadData,
@@ -13,6 +38,8 @@ export const uploadToGoogleDrive = async (
     console.error('Access token not found');
     return false;
   }
+
+  const existFile = await searchFile(accessToken, fileName);
 
   const metadata = {
     name: fileName,
@@ -31,18 +58,33 @@ export const uploadToGoogleDrive = async (
   multipartRequestBody += closeDelim;
 
   try {
-    const res = await fetch(
-      'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',
-      {
-        method: 'POST',
-        headers: new Headers({
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': `multipart/related; boundary=${boundary}`,
-        }),
-        body: multipartRequestBody,
-      },
-    );
-    const val = res.json();
+    let res;
+    if (existFile.id) {
+      res = await fetch(
+        `https://www.googleapis.com/upload/drive/v3/files/${existFile.id}?uploadType=multipart&fields=id`,
+        {
+          method: 'PATCH',
+          headers: new Headers({
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': `multipart/related; boundary=${boundary}`,
+          }),
+          body: multipartRequestBody,
+        },
+      );
+    } else {
+      res = await fetch(
+        'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',
+        {
+          method: 'POST',
+          headers: new Headers({
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': `multipart/related; boundary=${boundary}`,
+          }),
+          body: multipartRequestBody,
+        },
+      );
+    }
+    const val = await res.json();
     console.log({ val });
 
     return val;

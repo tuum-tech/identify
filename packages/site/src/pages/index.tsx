@@ -252,7 +252,7 @@ const Index = () => {
       const saved = await createVC(vcKey, vcValue, options, credTypes);
       const savedJson = JSON.parse(JSON.stringify(saved));
       if (savedJson.length > 0) {
-        let vcIdsToAdd: any = [];
+        const vcIdsToAdd: any = [];
         savedJson.forEach((data: any) => {
           vcIdsToAdd.push(data.id);
         });
