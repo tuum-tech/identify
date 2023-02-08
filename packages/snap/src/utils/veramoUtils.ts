@@ -12,7 +12,7 @@ import {
   ProofFormat,
   TAgent,
   VerifiablePresentation,
-  W3CVerifiableCredential,
+  W3CVerifiableCredential
 } from '@veramo/core';
 import cloneDeep from 'lodash.clonedeep';
 import { validHederaChainID } from '../hedera/config';
@@ -25,7 +25,7 @@ import {
   IDataManagerClearResult,
   IDataManagerDeleteResult,
   IDataManagerQueryResult,
-  IDataManagerSaveResult,
+  IDataManagerSaveResult
 } from '../veramo/plugins/verfiable-creds-manager';
 import { getAgent } from '../veramo/setup';
 import { getCurrentDid } from './didUtils';
@@ -41,7 +41,10 @@ export async function veramoResolveDID(
   let did = didUrl;
   // Get agent
   const agent = await getAgent(wallet, state);
+
+  
   const keyPair = await getKeyPairFromAgent(wallet, state, agent);
+
 
   // GET DID if not exists
   if (!did) {
@@ -271,6 +274,7 @@ export async function getKeyPairFromAgent(
   try {
     const privateKey = (await agent.keyManagerGet({ kid: controllerKeyId }))
       .privateKeyHex;
+
     if (privateKey !== undefined) {
       keyPair = await getKeyPair(privateKey);
     }
@@ -289,6 +293,8 @@ export async function veramoImportMetaMaskAccount(
   const method =
     state.accountState[state.currentAccount].accountConfig.identity.didMethod;
   const did = await getCurrentDid(wallet, state);
+
+  console.log("current did " + did );
   const identifiers = await agent.didManagerFind();
 
   let exists = false;

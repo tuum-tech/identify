@@ -12,6 +12,8 @@ export const signedMsg =
 
 export const exampleDIDPkh = `did:pkh:eip155:4:${address}`;
 
+export const exampleDIDResolved = `{'didDocument': {'@context': ['https://www.w3.org/ns/did/v1', {'EcdsaSecp256k1RecoveryMethod2020': 'https://identity.foundation/EcdsaSecp256k1RecoverySignature2020#EcdsaSecp256k1RecoveryMethod2020', 'Ed25519VerificationKey2018': 'https://w3id.org/security#Ed25519VerificationKey2018', 'blockchainAccountId': 'https://w3id.org/security#blockchainAccountId'}], 'assertionMethod': ['did:pkh:eip155:4:0xb6665128eE91D84590f70c3268765384A9CAfBCd#blockchainAccountId'], 'authentication': ['did:pkh:eip155:4:0xb6665128eE91D84590f70c3268765384A9CAfBCd#blockchainAccountId'], 'id': 'did:pkh:eip155:4:0xb6665128eE91D84590f70c3268765384A9CAfBCd', 'verificationMethod': [{'blockchainAccountId': 'eip155:4:0xb6665128eE91D84590f70c3268765384A9CAfBCd', 'controller': 'did:pkh:eip155:4:0xb6665128eE91D84590f70c3268765384A9CAfBCd', 'id': 'did:pkh:eip155:4:0xb6665128eE91D84590f70c3268765384A9CAfBCd#blockchainAccountId', 'type': 'EcdsaSecp256k1RecoveryMethod2020'}]}, 'didDocumentMetadata': {}, 'didResolutionMetadata': {'contentType': 'application/did+ld+json'}}`;
+
 const defaultSnapState: IdentitySnapState = {
   currentAccount: "0xb6665128eE91D84590f70c3268765384A9CAfBCd", 
   accountState: {
