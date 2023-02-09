@@ -9,7 +9,7 @@ export async function init(wallet: SnapProvider): Promise<IdentitySnapState> {
     prompt: 'Terms and Conditions',
     description: 'Risks about using Identity Snap',
     textAreaContent:
-      'Identity Snap does not access your private keys. You are in control of what VCs and VPs you sign and what you use your DIDs for.',
+      'Applications do NOT have access to your private keys. You are in control of what VCs and VPs you sign and what you use your DIDs for.',
   };
 
   // Accept terms and conditions

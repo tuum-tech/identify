@@ -5,6 +5,7 @@ import { getDid } from './rpc/did/getDID';
 import { resolveDID } from './rpc/did/resolveDID';
 import { switchMethod } from './rpc/did/switchMethods';
 import { connectHederaAccount } from './rpc/hedera/connectHederaAccount';
+import { togglePopups } from './rpc/snap/togglePopups';
 import {
   configureGoogleAccount,
   uploadToGoogleDrive,
@@ -120,10 +121,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           },
         ],
       });
-
-    case 'switchMethod':
-      isValidSwitchMethodRequest(request.params);
-      return await switchMethod(wallet, state, request.params.didMethod);
+    case 'togglePopups':
+      return await togglePopups(wallet, state);
     case 'getDID':
       await switchNetworkIfNecessary(wallet, state);
       return await getDid(wallet, state);
@@ -167,12 +166,15 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         state,
         request.params.verifiablePresentation,
       );
+    case 'getAvailableMethods':
+      return getAvailableMethods();
     case 'getCurrentDIDMethod':
       await switchNetworkIfNecessary(wallet, state);
       return state.accountState[state.currentAccount].accountConfig.identity
         .didMethod;
-    case 'getAvailableMethods':
-      return getAvailableMethods();
+    case 'switchMethod':
+      isValidSwitchMethodRequest(request.params);
+      return await switchMethod(wallet, state, request.params.didMethod);
     case 'getSupportedProofFormats':
       return getSupportedProofFormats();
     case 'configureGoogleAccount':
