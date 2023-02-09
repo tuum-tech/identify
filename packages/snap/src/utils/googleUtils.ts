@@ -1,6 +1,4 @@
-import { SnapProvider } from '@metamask/snap-types';
-import { GoogleToken, IdentitySnapState, UploadData } from 'src/interfaces';
-import { updateSnapState } from '../../utils/stateUtils';
+import { IdentitySnapState, UploadData } from 'src/interfaces';
 
 export const GOOGLE_DRIVE_VCS_FILE_NAME = 'identity-snap-vcs.json';
 
@@ -90,23 +88,6 @@ export const uploadToGoogleDrive = async (
     return val;
   } catch (error) {
     console.error('Could not upload to google drive', error);
-    return false;
-  }
-};
-
-export const configureGoogleAccount = async (
-  wallet: SnapProvider,
-  state: IdentitySnapState,
-  params: GoogleToken,
-) => {
-  try {
-    state.accountState[
-      state.currentAccount
-    ].accountConfig.identity.googleAccessToken = params.accessToken;
-    await updateSnapState(wallet, state);
-    return true;
-  } catch (error) {
-    console.error('Could not configure google account', error);
     return false;
   }
 };

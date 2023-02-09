@@ -6,7 +6,7 @@ import { resolveDID } from './rpc/did/resolveDID';
 import { switchMethod } from './rpc/did/switchMethods';
 import { connectHederaAccount } from './rpc/hedera/connectHederaAccount';
 import { togglePopups } from './rpc/snap/togglePopups';
-import { configureGoogleAccount } from './rpc/store/gdrive';
+import { configureGoogleAccount } from './rpc/store/configureGoogleAccount';
 import { createVC } from './rpc/vc/createVC';
 import { createVP } from './rpc/vc/createVP';
 import { deleteAllVCs } from './rpc/vc/deleteAllVCs';

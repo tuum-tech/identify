@@ -1,12 +1,12 @@
 import { SnapProvider } from '@metamask/snap-types';
 import { IdentitySnapState } from '../../interfaces';
-import { snapConfirm } from '../../utils/snapUtils';
-import { updateSnapState } from '../../utils/stateUtils';
 import {
   getGoogleVCs,
   GOOGLE_DRIVE_VCS_FILE_NAME,
   uploadToGoogleDrive,
-} from '../store/gdrive';
+} from '../../utils/googleUtils';
+import { snapConfirm } from '../../utils/snapUtils';
+import { updateSnapState } from '../../utils/stateUtils';
 
 /* eslint-disable */
 export async function syncGoogleVCs(

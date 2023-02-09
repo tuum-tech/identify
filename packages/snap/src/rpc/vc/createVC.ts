@@ -1,13 +1,13 @@
 import { SnapProvider } from '@metamask/snap-types';
 import { IdentitySnapState } from '../../interfaces';
 import { CreateVCRequestParams } from '../../types/params';
-import { snapConfirm } from '../../utils/snapUtils';
-import { veramoCreateVC } from '../../utils/veramoUtils';
-import { IDataManagerSaveResult } from '../../veramo/plugins/verfiable-creds-manager';
 import {
   GOOGLE_DRIVE_VCS_FILE_NAME,
   uploadToGoogleDrive,
-} from '../store/gdrive';
+} from '../../utils/googleUtils';
+import { snapConfirm } from '../../utils/snapUtils';
+import { veramoCreateVC } from '../../utils/veramoUtils';
+import { IDataManagerSaveResult } from '../../veramo/plugins/verfiable-creds-manager';
 
 /* eslint-disable */
 export async function createVC(
