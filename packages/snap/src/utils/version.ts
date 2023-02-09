@@ -1,7 +1,7 @@
 import { SnapProvider } from '@metamask/snap-types';
 
 export const getMetamaskVersion = async (
-  wallet: SnapProvider
+  wallet: SnapProvider,
 ): Promise<string> =>
   (await wallet.request({
     method: 'web3_clientVersion',
@@ -10,9 +10,11 @@ export const getMetamaskVersion = async (
 
 export const isNewerVersion = (
   current: string,
-  comparingWith: string
+  comparingWith: string,
 ): boolean => {
-  if (current === comparingWith) return false;
+  if (current === comparingWith) {
+    return false;
+  }
 
   const regex = /[^\d.]/gu;
   const currentFragments = current.replace(regex, '').split('.');
@@ -26,8 +28,9 @@ export const isNewerVersion = (
     if (
       (Number(currentFragments[i]) || 0) ===
       (Number(comparingWithFragments[i]) || 0)
-    )
+    ) {
       continue;
+    }
     return (
       (Number(comparingWithFragments[i]) || 0) >
       (Number(currentFragments[i]) || 0)

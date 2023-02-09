@@ -10,7 +10,7 @@ import {
   TAgent,
 } from '@veramo/core';
 import { CredentialIssuerEIP712 } from '@veramo/credential-eip712';
-/*import {
+/* import {
   CredentialIssuerLD,
   LdDefaultContexts,
   VeramoEcdsaSecp256k1RecoverySignature2020,
@@ -24,6 +24,7 @@ import { KeyManagementSystem } from '@veramo/kms-local';
 import { MessageHandler } from '@veramo/message-handler';
 import { SdrMessageHandler } from '@veramo/selective-disclosure';
 import { Resolver } from 'did-resolver';
+import { Web3KeyManagementSystem } from '@veramo/kms-web3';
 import { IdentitySnapState } from '../interfaces';
 import { PkhDIDProvider } from './plugins/did-provider-pkh/src/pkh-did-provider';
 import { getResolver as getDidPkhResolver } from './plugins/did-provider-pkh/src/resolver';
@@ -33,7 +34,6 @@ import {
   IDataManager,
 } from './plugins/verfiable-creds-manager';
 
-import { Web3KeyManagementSystem } from '@veramo/kms-web3';
 import {
   SnapDIDStore,
   SnapKeyStore,
