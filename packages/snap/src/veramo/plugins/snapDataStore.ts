@@ -314,7 +314,7 @@ export class SnapVCStore extends AbstractDataStore {
         throw new Error('Invalid id');
       }
     }
-    if (filter && filter.type === 'type') {
+    if (filter && filter.type === 'vcType') {
      return Object.keys(this.state.accountState[account].vcs).map((k) => {
         let vc = this.state.accountState[account].vcs[k] as unknown;
         if (typeof vc === 'string') {

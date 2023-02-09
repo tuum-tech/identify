@@ -218,7 +218,7 @@ function LoginPage() {
       };
       const vcs = (await getVCs(
         {
-          type: 'type',
+          type: 'vcType',
           filter: 'SiteLoginCredential'
         },
         options
