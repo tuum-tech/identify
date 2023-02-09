@@ -18,13 +18,6 @@ export async function createVC(
   const { vcKey = 'vcData', vcValue, credTypes = [], options } = params || {};
   const { store = 'snap' } = options || {};
 
-  const currentVCs = state.accountState[state.currentAccount].vcs;
-  const gdriveResponse = await uploadToGoogleDrive(state, {
-    fileName: GOOGLE_DRIVE_VCS_FILE_NAME,
-    content: JSON.stringify({ ...currentVCs, [vcKey]: vcValue }),
-  });
-  console.log({ gdriveResponse });
-
   const promptObj = {
     prompt: 'Create and Save VC',
     description: `Would you like to create and save the following VC in snap?`,
@@ -41,6 +34,14 @@ export async function createVC(
       store,
       credTypes,
     );
+
+    const currentVCs = state.accountState[state.currentAccount].vcs;
+    const gdriveResponse = await uploadToGoogleDrive(state, {
+      fileName: GOOGLE_DRIVE_VCS_FILE_NAME,
+      content: JSON.stringify(currentVCs),
+    });
+    console.log({ gdriveResponse });
+
     return snapResponse;
   }
   throw new Error('User rejected');
