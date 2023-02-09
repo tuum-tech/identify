@@ -51,6 +51,7 @@ function LoginPage() {
     VerifiablePresentation | undefined
   >(undefined);
 
+  const [challenge, setChallenge] = useState('');
   const [vc, setVC] = useState('');
   const [vcId, setVcId] = useState('');
   const [vcList, setVcList] = useState([] as any);
@@ -61,6 +62,12 @@ function LoginPage() {
       await handleSaveVC();
     })();
   }, [vc]);
+
+  useEffect(() => {
+    (async () => {
+      await handleSignIn();
+    })();
+  }, [challenge]);
 
   useEffect(() => {
     (async () => {
@@ -164,6 +171,7 @@ function LoginPage() {
       const proofInfo: ProofInfo = {
         proofFormat: 'jwt',
         type: 'ProfileNamesPresentation',
+        challenge: challenge
       };
       console.log('vcId: ', vcId);
       const vp = (await createVP([vcId], proofInfo)) as VerifiablePresentation;
@@ -175,6 +183,31 @@ function LoginPage() {
       //dispatch({ type: MetamaskActions.SetError, payload: e });
     }
   };
+
+
+  const handleChallenge = async () => {
+    try {
+      setCurrentChainId(await getCurrentNetwork());
+      let identifier = await getDID() as string;
+      const backend_url = process.env.GATSBY_BACKEND_URL;
+      const ret = await axios({
+        method: 'post',
+        url: `${backend_url}api/v1/credential/challenge`,
+        data: {
+          did: identifier
+        },
+      });
+
+      if (ret.status === 200){
+        
+        setChallenge(ret.data.challenge);
+        alert("challenge " + ret.data.challenge);        
+      }
+    } catch(e){
+      
+    }
+
+  }
 
   const handleSignIn = async () => {
     try {
@@ -196,7 +229,7 @@ function LoginPage() {
         setVcList(vcs);
         setShowVcsModal(true);
       } else {
-        // no need to select
+        alert('no Vcs found');
       }
     } catch (e) {
       console.error(e);
@@ -373,7 +406,7 @@ function LoginPage() {
               button: (
                 <SendHelloButton
                   buttonText="SignIn"
-                  onClick={handleSignIn}
+                  onClick={handleChallenge}
                   disabled={false}
                 />
               ),
