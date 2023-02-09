@@ -1,6 +1,6 @@
 {
   "name": "@tuum-tech/identity-snap-monorepo",
-  "version": "0.3.0",
+  "version": "0.3.3",
   "private": true,
   "description": "",
   "homepage": "https://github.com/tuum-tech/identity-snap#readme",
@@ -46,6 +46,6 @@
   },
   "packageManager": "yarn@3.2.1",
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.13.0"
   }
 }

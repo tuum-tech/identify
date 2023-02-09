@@ -19,13 +19,6 @@ export async function getCurrentAccount(
   state: IdentitySnapState
 ): Promise<string | null> {
   try {
-    /*     if (
-      wallet.selectedAddress &&
-      wallet.selectedAddress !== state.currentAccount
-    ) {
-      state.currentAccount = wallet.selectedAddress;
-      await updateSnapState(wallet, state);
-    } */
     const chainId = await getCurrentNetwork(wallet);
     if (validHederaChainID(chainId)) {
       // Handle Hedera
@@ -77,7 +70,7 @@ export async function getCurrentNetwork(wallet: SnapProvider): Promise<string> {
  * Function that toggles the disablePopups flag in the config.
  *
  */
-export async function togglePopups(
+export async function updatePopups(
   wallet: SnapProvider,
   state: IdentitySnapState
 ) {

@@ -38,6 +38,7 @@ import {
   resolveDID,
   sendHello,
   shouldDisplayReconnectButton,
+  togglePopups,
   uploadToGoogleDrive,
   verifyVC,
   verifyVP,
@@ -124,6 +125,16 @@ const Index = () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
       await sendHello();
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleTogglePopupsClick = async () => {
+    try {
+      setCurrentChainId(await getCurrentNetwork());
+      await togglePopups();
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -447,6 +458,32 @@ const Index = () => {
                 <SendHelloButton
                   buttonText="Send message"
                   onClick={handleSendHelloClick}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        ) : (
+          ''
+        )}
+        {/* =============================================================================== */}
+        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
+        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+          <Card
+            content={{
+              title: 'Toggle Metamask popups',
+              description:
+                'You can enable/disable the popups at anytime by calling this API',
+              button: (
+                <SendHelloButton
+                  buttonText="Toggle"
+                  onClick={handleTogglePopupsClick}
                   disabled={!state.installedSnap}
                 />
               ),
@@ -853,6 +890,154 @@ const Index = () => {
                 <SendHelloButton
                   buttonText="Upload to google drive"
                   onClick={handleUploadToGoogleDrive}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        ) : (
+          ''
+        )}
+        {/* =============================================================================== */}
+        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
+        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+          <Card
+            content={{
+              title: 'todo',
+              description: 'TODO',
+              /* form: (
+              <form>
+                <label>
+                  Enter your Verifiable Presentation
+                  <input
+                    type="text"
+                    value={JSON.stringify(vp)}
+                    onChange={(e) => setVp(e.target.value)}
+                  />
+                </label>
+              </form>
+            ), */
+              button: (
+                <SendHelloButton
+                  buttonText="todo"
+                  onClick={handleVerifyVPClick}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        ) : (
+          ''
+        )}
+        {/* =============================================================================== */}
+        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
+        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+          <Card
+            content={{
+              title: 'todo',
+              description: 'TODO',
+              /* form: (
+              <form>
+                <label>
+                  Enter your Verifiable Presentation
+                  <input
+                    type="text"
+                    value={JSON.stringify(vp)}
+                    onChange={(e) => setVp(e.target.value)}
+                  />
+                </label>
+              </form>
+            ), */
+              button: (
+                <SendHelloButton
+                  buttonText="todo"
+                  onClick={handleVerifyVPClick}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        ) : (
+          ''
+        )}
+        {/* =============================================================================== */}
+        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
+        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+          <Card
+            content={{
+              title: 'todo',
+              description: 'TODO',
+              /* form: (
+              <form>
+                <label>
+                  Enter your Verifiable Presentation
+                  <input
+                    type="text"
+                    value={JSON.stringify(vp)}
+                    onChange={(e) => setVp(e.target.value)}
+                  />
+                </label>
+              </form>
+            ), */
+              button: (
+                <SendHelloButton
+                  buttonText="todo"
+                  onClick={handleVerifyVPClick}
+                  disabled={!state.installedSnap}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        ) : (
+          ''
+        )}
+        {/* =============================================================================== */}
+        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
+        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+          <Card
+            content={{
+              title: 'todo',
+              description: 'TODO',
+              /* form: (
+              <form>
+                <label>
+                  Enter your Verifiable Presentation
+                  <input
+                    type="text"
+                    value={JSON.stringify(vp)}
+                    onChange={(e) => setVp(e.target.value)}
+                  />
+                </label>
+              </form>
+            ), */
+              button: (
+                <SendHelloButton
+                  buttonText="todo"
+                  onClick={handleVerifyVPClick}
                   disabled={!state.installedSnap}
                 />
               ),
