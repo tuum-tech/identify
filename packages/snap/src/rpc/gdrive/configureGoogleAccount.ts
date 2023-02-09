@@ -15,6 +15,6 @@ export const configureGoogleAccount = async (
     return true;
   } catch (error) {
     console.error('Could not configure google account', error);
-    return false;
+    throw error;
   }
 };

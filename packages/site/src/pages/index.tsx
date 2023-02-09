@@ -106,6 +106,7 @@ const Index = () => {
   };
 
   const handleSyncGoogleVCs = async () => {
+    setLoadingState('syncGoogleVCs');
     try {
       const resp = await syncGoogleVCs();
       console.log('Synced with google drive: ', resp);
@@ -113,6 +114,7 @@ const Index = () => {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
+    setLoadingState(null);
   };
 
   const handleConfigureHederaAccountClick = async () => {
@@ -913,6 +915,7 @@ const Index = () => {
                   buttonText="Sync Google VCs"
                   onClick={handleSyncGoogleVCs}
                   disabled={!state.installedSnap}
+                  loading={loadingState === 'syncGoogleVCs'}
                 />
               ),
             }}
