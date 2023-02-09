@@ -39,6 +39,7 @@ import {
   resolveDID,
   sendHello,
   shouldDisplayReconnectButton,
+  syncGoogleVCs,
   uploadToGoogleDrive,
   verifyVC,
   verifyVP,
@@ -115,6 +116,16 @@ const Index = () => {
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
     setLoadingState(null);
+  };
+
+  const handleSyncGoogleVCs = async () => {
+    try {
+      const resp = await syncGoogleVCs();
+      console.log('Synced with google drive: ', resp);
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
   };
 
   const handleConfigureHederaAccountClick = async () => {
@@ -919,24 +930,12 @@ const Index = () => {
         (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
           <Card
             content={{
-              title: 'todo',
-              description: 'TODO',
-              /* form: (
-              <form>
-                <label>
-                  Enter your Verifiable Presentation
-                  <input
-                    type="text"
-                    value={JSON.stringify(vp)}
-                    onChange={(e) => setVp(e.target.value)}
-                  />
-                </label>
-              </form>
-            ), */
+              title: 'syncGoogleVCs',
+              description: 'Sync VCs with google drive',
               button: (
                 <SendHelloButton
-                  buttonText="todo"
-                  onClick={handleVerifyVPClick}
+                  buttonText="Sync Google VCs"
+                  onClick={handleSyncGoogleVCs}
                   disabled={!state.installedSnap}
                 />
               ),

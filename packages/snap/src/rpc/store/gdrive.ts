@@ -16,7 +16,7 @@ const searchFile = async (accessToken: string, fileName: string) => {
       },
     );
     const data = await res.json();
-    console.log('searchFile: ', { data });
+    console.log('searchFile: ', { data: JSON.stringify(data) });
 
     const count = data.files.length;
 
@@ -109,4 +109,38 @@ export const configureGoogleAccount = async (
     console.error('Could not configure google account', error);
     return false;
   }
+};
+
+export const getFileContent = async (accessToken: string, fileId: string) => {
+  const res = await fetch(
+    `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
+    {
+      method: 'GET',
+      headers: new Headers({
+        Authorization: `Bearer ${accessToken}`,
+      }),
+    },
+  );
+  return res.json();
+};
+
+export const getGoogleVCs = async (
+  state: IdentitySnapState,
+  fileName: string,
+) => {
+  const accessToken =
+    state.accountState[state.currentAccount].accountConfig.identity
+      .googleAccessToken;
+  if (!accessToken) {
+    console.error('Access token not found');
+    return false;
+  }
+
+  const existFile = await searchFile(accessToken, fileName);
+
+  if (existFile.id) {
+    const content = await getFileContent(accessToken, existFile.id);
+    return JSON.parse(content);
+  }
+  return null;
 };

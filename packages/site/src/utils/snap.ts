@@ -271,6 +271,23 @@ export const uploadToGoogleDrive = async (
 };
 
 /**
+ * Invoke the "syncGoogleVCs" method from the snap.
+ */
+
+export const syncGoogleVCs = async () => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: [
+      defaultSnapOrigin,
+      {
+        method: 'syncGoogleVCs',
+        params: {},
+      },
+    ],
+  });
+};
+
+/**
  * Invoke the "verifyVC" method from the snap.
  */
 

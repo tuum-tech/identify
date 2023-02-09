@@ -16,6 +16,7 @@ import { getSupportedProofFormats } from './rpc/vc/getSupportedProofFormats';
 import { getVCs } from './rpc/vc/getVCs';
 import { removeVC } from './rpc/vc/removeVC';
 import { saveVC } from './rpc/vc/saveVC';
+import { syncGoogleVCs } from './rpc/vc/syncGoogleVCs';
 import { verifyVC } from './rpc/vc/verifyVC';
 import { verifyVP } from './rpc/vc/verifyVP';
 import { init } from './utils/init';
@@ -180,6 +181,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     case 'uploadToGoogleDrive':
       isValidUploadDataRequest(request.params);
       return await uploadToGoogleDrive(state, request.params.uploadData);
+    case 'syncGoogleVCs':
+      return await syncGoogleVCs(wallet, state);
     default:
       console.error('Method not found');
       throw new Error('Method not found');
