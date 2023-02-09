@@ -140,7 +140,7 @@ export const getGoogleVCs = async (
 
   if (existFile.id) {
     const content = await getFileContent(accessToken, existFile.id);
-    return JSON.parse(content);
+    return content;
   }
   return null;
 };

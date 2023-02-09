@@ -95,8 +95,7 @@ const Index = () => {
     try {
       const accessToken = await getAccessToken();
       if (!accessToken) {
-        console.error('Failed to configure google account');
-        return;
+        throw new Error('Failed to configure google account');
       }
       const resp = await configureGoogleAccount(accessToken);
       alert('Google Account configuration was successful');

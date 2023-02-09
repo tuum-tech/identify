@@ -32,7 +32,7 @@ export async function syncGoogleVCs(
   if (await snapConfirm(wallet, promptObj)) {
     state.accountState[state.currentAccount].vcs = {
       ...currentVCs,
-      ...diffVCIds.reduce((acc, id) => ({ ...acc, id: googleVCs[id] }), {}),
+      ...diffVCIds.reduce((acc, id) => ({ ...acc, [id]: googleVCs[id] }), {}),
     };
     await updateSnapState(wallet, state);
 
