@@ -35,12 +35,19 @@ export async function createVC(
       credTypes,
     );
 
-    const currentVCs = state.accountState[state.currentAccount].vcs;
-    const gdriveResponse = await uploadToGoogleDrive(state, {
-      fileName: GOOGLE_DRIVE_VCS_FILE_NAME,
-      content: JSON.stringify(currentVCs),
-    });
-    console.log({ gdriveResponse });
+    const accessToken =
+      state.accountState[state.currentAccount].accountConfig.identity
+        .googleAccessToken;
+    if (accessToken) {
+      const currentVCs = state.accountState[state.currentAccount].vcs;
+      const gdriveResponse = await uploadToGoogleDrive(state, {
+        fileName: GOOGLE_DRIVE_VCS_FILE_NAME,
+        content: JSON.stringify(currentVCs),
+      });
+      console.log({ gdriveResponse });
+    } else {
+      console.error('Google account was not configured');
+    }
 
     return snapResponse;
   }
