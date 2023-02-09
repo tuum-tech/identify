@@ -1,5 +1,5 @@
 import { VerifiablePresentation, W3CVerifiableCredential } from '@veramo/core';
-import { GoogleToken, IdentitySnapState, UploadData } from '../interfaces';
+import { GoogleToken, IdentitySnapState } from '../interfaces';
 import { isValidProofFormat, isValidVCStore } from '../types/constants';
 import {
   CreateVCRequestParams,
@@ -377,18 +377,6 @@ export function isValidVerifyVPRequest(
 
   console.error('Invalid VerifyVP request');
   throw new Error('Invalid VerifyVP request');
-}
-
-type UploadDataParams = { uploadData: UploadData };
-
-export function isValidUploadDataRequest(
-  params: unknown
-): asserts params is UploadDataParams {
-  if (params !== null && typeof params === 'object' && 'uploadData' in params)
-    return;
-
-  console.error('Invalid UploadData request');
-  throw new Error('Invalid UploadData request');
 }
 
 export function isValidConfigueGoogleRequest(

@@ -41,7 +41,6 @@ import {
   shouldDisplayReconnectButton,
   syncGoogleVCs,
   togglePopups,
-  uploadToGoogleDrive,
   verifyVC,
   verifyVP,
 } from '../utils';
@@ -101,18 +100,6 @@ const Index = () => {
       const resp = await configureGoogleAccount(accessToken);
       alert('Google Account configuration was successful');
     } catch (e) {
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-    setLoadingState(null);
-  };
-
-  const handleUploadToGoogleDrive = async () => {
-    setLoadingState('uploadToGoogleDrive');
-    try {
-      const saved = await uploadToGoogleDrive(fileName, content);
-      console.log('uploaded the VC: ', saved);
-    } catch (e) {
-      console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
     setLoadingState(null);
@@ -901,53 +888,6 @@ const Index = () => {
                   onClick={handleConfigureGoogleAccount}
                   disabled={!state.installedSnap}
                   loading={loadingState === 'configureGoogleAccount'}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        ) : (
-          ''
-        )}
-        {/* =============================================================================== */}
-        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
-        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
-          <Card
-            content={{
-              title: 'uploadToGoogleDrive',
-              description: 'Upload VC to google drive',
-              form: (
-                <form>
-                  <label>
-                    Enter file name
-                    <input
-                      type="text"
-                      value={fileName}
-                      onChange={(e) => setFileName(e.target.value)}
-                    />
-                  </label>
-                  <br />
-                  <label>
-                    Enter value of content
-                    <input
-                      type="text"
-                      value={content}
-                      onChange={(e) => setContent(e.target.value)}
-                    />
-                  </label>
-                </form>
-              ),
-              button: (
-                <SendHelloButton
-                  buttonText="Upload to google drive"
-                  onClick={handleUploadToGoogleDrive}
-                  disabled={!state.installedSnap}
-                  loading={loadingState === 'uploadToGoogleDrive'}
                 />
               ),
             }}

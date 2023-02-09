@@ -262,31 +262,6 @@ export const configureGoogleAccount = async (accessToken: string) => {
 };
 
 /**
- * Invoke the "uploadToGoogleDrive" method from the snap.
- */
-
-export const uploadToGoogleDrive = async (
-  fileName: string,
-  content: string,
-) => {
-  return await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: [
-      defaultSnapOrigin,
-      {
-        method: 'uploadToGoogleDrive',
-        params: {
-          uploadData: {
-            fileName,
-            content,
-          },
-        },
-      },
-    ],
-  });
-};
-
-/**
  * Invoke the "syncGoogleVCs" method from the snap.
  */
 

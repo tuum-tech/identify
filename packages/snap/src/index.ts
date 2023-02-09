@@ -6,10 +6,7 @@ import { resolveDID } from './rpc/did/resolveDID';
 import { switchMethod } from './rpc/did/switchMethods';
 import { connectHederaAccount } from './rpc/hedera/connectHederaAccount';
 import { togglePopups } from './rpc/snap/togglePopups';
-import {
-  configureGoogleAccount,
-  uploadToGoogleDrive,
-} from './rpc/store/gdrive';
+import { configureGoogleAccount } from './rpc/store/gdrive';
 import { createVC } from './rpc/vc/createVC';
 import { createVP } from './rpc/vc/createVP';
 import { deleteAllVCs } from './rpc/vc/deleteAllVCs';
@@ -33,7 +30,6 @@ import {
   isValidResolveDIDRequest,
   isValidSaveVCRequest,
   isValidSwitchMethodRequest,
-  isValidUploadDataRequest,
   isValidVerifyVCRequest,
   isValidVerifyVPRequest,
 } from './utils/params';
@@ -180,9 +176,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     case 'configureGoogleAccount':
       isValidConfigueGoogleRequest(request.params);
       return await configureGoogleAccount(wallet, state, request.params);
-    case 'uploadToGoogleDrive':
-      isValidUploadDataRequest(request.params);
-      return await uploadToGoogleDrive(state, request.params.uploadData);
     case 'syncGoogleVCs':
       return await syncGoogleVCs(wallet, state);
     default:
