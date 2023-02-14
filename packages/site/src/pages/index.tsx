@@ -313,7 +313,7 @@ const Index = () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
       const options = {
-        store: 'snap',
+        store: ['snap', 'googleDrive'],
       };
       const isRemoved = (await deleteAllVCs(
         options,

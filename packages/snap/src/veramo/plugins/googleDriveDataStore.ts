@@ -146,14 +146,12 @@ export class GoogleDriveVCStore extends AbstractDataStore {
   }
 
   public async clear(args: IFilterArgs): Promise<boolean> {
-    const account = this.state.currentAccount;
-    if (!account)
-      throw Error(
-        `GoogleDriveVCStore - Cannot get current account: ${account}`,
-      );
+    const gdriveResponse = await uploadToGoogleDrive(this.state, {
+      fileName: GOOGLE_DRIVE_VCS_FILE_NAME,
+      content: JSON.stringify({}),
+    });
+    console.log({ gdriveResponse });
 
-    // this.state.accountState[account].vcs = {};
-    // await updateSnapState(this.wallet, this.state);
     return true;
   }
 }
