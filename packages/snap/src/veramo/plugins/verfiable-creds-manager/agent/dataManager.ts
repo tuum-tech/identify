@@ -69,10 +69,12 @@ export class DataManager implements IAgentPlugin {
       } else {
         store = Object.keys(this.stores);
       }
+
       if (options.returnStore !== undefined) {
         returnStore = options.returnStore;
       }
     }
+
     if (typeof store === 'string') {
       store = [store];
     }
@@ -92,9 +94,8 @@ export class DataManager implements IAgentPlugin {
               data: r.data,
               metadata: { id: r.metadata.id, store: storeName },
             };
-          } else {
-            return { data: r.data, metadata: { id: r.metadata.id } };
           }
+          return { data: r.data, metadata: { id: r.metadata.id } };
         });
         res = [...res, ...mappedResult];
       } catch (e) {

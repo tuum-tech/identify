@@ -223,7 +223,7 @@ const Index = () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
       const options = {
-        store: 'snap',
+        store: ['snap', 'googleDrive'],
         returnStore: true,
       };
       const vcs = (await getVCs(

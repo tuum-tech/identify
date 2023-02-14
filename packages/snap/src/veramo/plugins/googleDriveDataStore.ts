@@ -1,5 +1,6 @@
 import { SnapProvider } from '@metamask/snap-types';
 import { W3CVerifiableCredential } from '@veramo/core';
+import jsonpath from 'jsonpath';
 import { v4 as uuidv4 } from 'uuid';
 import { IdentitySnapState } from '../../interfaces';
 import {
@@ -7,6 +8,7 @@ import {
   GOOGLE_DRIVE_VCS_FILE_NAME,
   uploadToGoogleDrive,
 } from '../../utils/googleUtils';
+import { decodeJWT } from '../../utils/jwt';
 import {
   AbstractDataStore,
   IFilterArgs,
@@ -31,61 +33,60 @@ export class GoogleDriveVCStore extends AbstractDataStore {
 
   async query(args: IFilterArgs): Promise<Array<IQueryResult>> {
     const { filter } = args;
-    const account = this.state.currentAccount;
-    if (!account)
-      throw Error(
-        `GoogleDriveVCStore - Cannot get current account: ${account}`,
-      );
+    const googleVCs = await getGoogleVCs(
+      this.state,
+      GOOGLE_DRIVE_VCS_FILE_NAME,
+    );
 
-    // if (filter && filter.type === 'id') {
-    //   try {
-    //     if (this.state.accountState[account].vcs[filter.filter as string]) {
-    //       let vc = this.state.accountState[account].vcs[
-    //         filter.filter as string
-    //       ] as unknown;
-    //       if (typeof vc === 'string') {
-    //         vc = decodeJWT(vc);
-    //       }
-    //       const obj = [
-    //         {
-    //           metadata: { id: filter.filter as string },
-    //           data: vc,
-    //         },
-    //       ];
-    //       return obj;
-    //     } else return [];
-    //   } catch (e) {
-    //     throw new Error('Invalid id');
-    //   }
-    // }
-    // if (filter === undefined || (filter && filter.type === 'none')) {
-    //   return Object.keys(this.state.accountState[account].vcs).map((k) => {
-    //     let vc = this.state.accountState[account].vcs[k] as unknown;
-    //     if (typeof vc === 'string') {
-    //       vc = decodeJWT(vc);
-    //     }
-    //     return {
-    //       metadata: { id: k },
-    //       data: vc,
-    //     };
-    //   });
-    // }
-    // if (filter && filter.type === 'JSONPath') {
-    //   const objects = Object.keys(this.state.accountState[account].vcs).map(
-    //     (k) => {
-    //       let vc = this.state.accountState[account].vcs[k] as unknown;
-    //       if (typeof vc === 'string') {
-    //         vc = decodeJWT(vc);
-    //       }
-    //       return {
-    //         metadata: { id: k },
-    //         data: vc,
-    //       };
-    //     },
-    //   );
-    //   const filteredObjects = jsonpath.query(objects, filter.filter as string);
-    //   return filteredObjects as Array<IQueryResult>;
-    // }
+    if (!googleVCs) {
+      throw new Error('Invalid vcs file');
+    }
+
+    if (filter && filter.type === 'id') {
+      try {
+        if (googleVCs[filter.filter as string]) {
+          let vc = googleVCs[filter.filter as string] as unknown;
+          if (typeof vc === 'string') {
+            vc = decodeJWT(vc);
+          }
+          const obj = [
+            {
+              metadata: { id: filter.filter as string },
+              data: vc,
+            },
+          ];
+          return obj;
+        } else return [];
+      } catch (e) {
+        throw new Error('Invalid id');
+      }
+    }
+    if (filter === undefined || (filter && filter.type === 'none')) {
+      return Object.keys(googleVCs).map((k) => {
+        let vc = googleVCs[k] as unknown;
+        if (typeof vc === 'string') {
+          vc = decodeJWT(vc);
+        }
+        return {
+          metadata: { id: k },
+          data: vc,
+        };
+      });
+    }
+    if (filter && filter.type === 'JSONPath') {
+      const objects = Object.keys(googleVCs).map((k) => {
+        let vc = googleVCs[k] as unknown;
+        if (typeof vc === 'string') {
+          vc = decodeJWT(vc);
+        }
+        return {
+          metadata: { id: k },
+          data: vc,
+        };
+      });
+      const filteredObjects = jsonpath.query(objects, filter.filter as string);
+      return filteredObjects as Array<IQueryResult>;
+    }
     return [];
   }
 
