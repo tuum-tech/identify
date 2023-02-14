@@ -1,10 +1,6 @@
 import { SnapProvider } from '@metamask/snap-types';
 import { IdentitySnapState } from '../../interfaces';
 import { CreateVCRequestParams } from '../../types/params';
-import {
-  GOOGLE_DRIVE_VCS_FILE_NAME,
-  uploadToGoogleDrive,
-} from '../../utils/googleUtils';
 import { snapConfirm } from '../../utils/snapUtils';
 import { veramoCreateVC } from '../../utils/veramoUtils';
 import { IDataManagerSaveResult } from '../../veramo/plugins/verfiable-creds-manager';
@@ -26,30 +22,7 @@ export async function createVC(
     }),
   };
   if (await snapConfirm(wallet, promptObj)) {
-    const snapResponse = await veramoCreateVC(
-      wallet,
-      state,
-      vcKey,
-      vcValue,
-      store,
-      credTypes,
-    );
-
-    const accessToken =
-      state.accountState[state.currentAccount].accountConfig.identity
-        .googleAccessToken;
-    if (accessToken) {
-      const currentVCs = state.accountState[state.currentAccount].vcs;
-      const gdriveResponse = await uploadToGoogleDrive(state, {
-        fileName: GOOGLE_DRIVE_VCS_FILE_NAME,
-        content: JSON.stringify(currentVCs),
-      });
-      console.log({ gdriveResponse });
-    } else {
-      console.error('Google account was not configured');
-    }
-
-    return snapResponse;
+    return veramoCreateVC(wallet, state, vcKey, vcValue, store, credTypes);
   }
   throw new Error('User rejected');
 }

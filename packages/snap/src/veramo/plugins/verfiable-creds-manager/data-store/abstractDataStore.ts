@@ -1,6 +1,7 @@
 export interface ISaveArgs {
   data: unknown;
   options?: unknown;
+  id?: string;
 }
 
 export interface IDeleteArgs {

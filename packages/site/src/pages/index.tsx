@@ -255,7 +255,7 @@ const Index = () => {
         nickname: createVCNickname,
       };
       const options = {
-        store: 'snap',
+        store: ['snap', 'googleDrive'],
         returnStore: true,
       };
       const credTypes = ['ProfileNamesCredential'];

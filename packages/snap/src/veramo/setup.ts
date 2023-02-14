@@ -21,10 +21,10 @@ import { AbstractIdentifierProvider, DIDManager } from '@veramo/did-manager';
 import { DIDResolverPlugin } from '@veramo/did-resolver';
 import { KeyManager } from '@veramo/key-manager';
 import { KeyManagementSystem } from '@veramo/kms-local';
+import { Web3KeyManagementSystem } from '@veramo/kms-web3';
 import { MessageHandler } from '@veramo/message-handler';
 import { SdrMessageHandler } from '@veramo/selective-disclosure';
 import { Resolver } from 'did-resolver';
-import { Web3KeyManagementSystem } from '@veramo/kms-web3';
 import { IdentitySnapState } from '../interfaces';
 import { PkhDIDProvider } from './plugins/did-provider-pkh/src/pkh-did-provider';
 import { getResolver as getDidPkhResolver } from './plugins/did-provider-pkh/src/resolver';
@@ -34,6 +34,7 @@ import {
   IDataManager,
 } from './plugins/verfiable-creds-manager';
 
+import { GoogleDriveVCStore } from './plugins/googleDriveDataStore';
 import {
   SnapDIDStore,
   SnapKeyStore,
@@ -44,7 +45,7 @@ import {
 /* eslint-disable */
 export async function getAgent(
   wallet: SnapProvider,
-  state: IdentitySnapState
+  state: IdentitySnapState,
 ): Promise<
   TAgent<
     IKeyManager &
@@ -63,6 +64,7 @@ export async function getAgent(
 
   didProviders['did:pkh'] = new PkhDIDProvider({ defaultKms: 'snap' });
   vcStorePlugins['snap'] = new SnapVCStore(wallet, state);
+  vcStorePlugins['googleDrive'] = new GoogleDriveVCStore(wallet, state);
 
   const agent = createAgent<
     IKeyManager &

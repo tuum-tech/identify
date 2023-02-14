@@ -5,7 +5,7 @@ export const isIn = <T>(values: readonly T[], value: any): value is T => {
   return values.includes(value);
 };
 
-export const availableVCStores = ['snap'] as const;
+export const availableVCStores = ['snap', 'googleDrive'] as const;
 export const isValidVCStore = (x: string) => isIn(availableVCStores, x);
 
 export const availableMethods = ['did:pkh'] as const;

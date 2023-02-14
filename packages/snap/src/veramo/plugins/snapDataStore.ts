@@ -73,7 +73,7 @@ export class SnapKeyStore extends AbstractKeyStore {
       throw Error(`SnapKeyStore - Cannot get current account: ${account}`);
 
     const safeKeys = Object.values(
-      this.state.accountState[account].snapKeyStore
+      this.state.accountState[account].snapKeyStore,
     ).map((key) => {
       const { privateKeyHex, ...safeKey } = key;
       return safeKey;
@@ -101,7 +101,7 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
     const account = this.state.currentAccount;
     if (!account)
       throw Error(
-        `SnapPrivateKeyStore - Cannot get current account: ${account}`
+        `SnapPrivateKeyStore - Cannot get current account: ${account}`,
       );
 
     const key = this.state.accountState[account].snapPrivateKeyStore[alias];
@@ -113,7 +113,7 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
     const account = this.state.currentAccount;
     if (!account)
       throw Error(
-        `SnapPrivateKeyStore - Cannot get current account: ${account}`
+        `SnapPrivateKeyStore - Cannot get current account: ${account}`,
       );
 
     if (!this.state.accountState[account].snapPrivateKeyStore[alias])
@@ -128,7 +128,7 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
     const account = this.state.currentAccount;
     if (!account)
       throw Error(
-        `SnapPrivateKeyStore - Cannot get current account: ${account}`
+        `SnapPrivateKeyStore - Cannot get current account: ${account}`,
       );
 
     const alias = args.alias || uuidv4();
@@ -136,10 +136,10 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
       this.state.accountState[account].snapPrivateKeyStore[alias];
     if (existingEntry && existingEntry.privateKeyHex !== args.privateKeyHex) {
       console.error(
-        'key_already_exists: key exists with different data, please use a different alias'
+        'key_already_exists: key exists with different data, please use a different alias',
       );
       throw new Error(
-        'key_already_exists: key exists with different data, please use a different alias'
+        'key_already_exists: key exists with different data, please use a different alias',
       );
     }
     this.state.accountState[account].snapPrivateKeyStore[alias] = {
@@ -154,7 +154,7 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
     const account = this.state.currentAccount;
     if (!account)
       throw Error(
-        `SnapPrivateKeyStore - Cannot get current account: ${account}`
+        `SnapPrivateKeyStore - Cannot get current account: ${account}`,
       );
 
     return [
@@ -209,7 +209,7 @@ export class SnapDIDStore extends AbstractDIDStore {
       throw Error('invalid_argument: Get requires did or (alias and provider)');
     }
     throw Error(
-      `not_found: IIdentifier not found with alias=${alias} provider=${provider}`
+      `not_found: IIdentifier not found with alias=${alias} provider=${provider}`,
     );
   }
 
@@ -252,7 +252,7 @@ export class SnapDIDStore extends AbstractDIDStore {
 
     let result: IIdentifier[] = [];
     for (const key of Object.keys(
-      this.state.accountState[account].identifiers
+      this.state.accountState[account].identifiers,
     )) {
       result.push(this.state.accountState[account].identifiers[key]);
     }
@@ -263,7 +263,7 @@ export class SnapDIDStore extends AbstractDIDStore {
       result = result.filter((i) => i.provider === args.provider);
     } else if (args.provider && args.alias) {
       result = result.filter(
-        (i) => i.provider === args.provider && i.alias === args.alias
+        (i) => i.provider === args.provider && i.alias === args.alias,
       );
     }
 
@@ -336,7 +336,7 @@ export class SnapVCStore extends AbstractDataStore {
             metadata: { id: k },
             data: vc,
           };
-        }
+        },
       );
       const filteredObjects = jsonpath.query(objects, filter.filter as string);
       return filteredObjects as Array<IQueryResult>;
@@ -344,22 +344,22 @@ export class SnapVCStore extends AbstractDataStore {
     return [];
   }
 
-  async save(args: { data: W3CVerifiableCredential }): Promise<string> {
-    //TODO check if VC is correct type
+  async save(args: {
+    data: W3CVerifiableCredential;
+    id: string;
+  }): Promise<string> {
+    // TODO check if VC is correct type
 
-    const vc = args.data;
+    const { data: vc, id } = args;
     const account = this.state.currentAccount;
     if (!account)
       throw Error(`SnapVCStore - Cannot get current account: ${account}`);
 
-    let id = uuidv4();
-    while (this.state.accountState[account].vcs[id]) {
-      id = uuidv4();
-    }
+    let newId = id || uuidv4();
 
-    this.state.accountState[account].vcs[id] = vc;
+    this.state.accountState[account].vcs[newId] = vc;
     await updateSnapState(this.wallet, this.state);
-    return id;
+    return newId;
   }
 
   async delete({ id }: { id: string }): Promise<boolean> {

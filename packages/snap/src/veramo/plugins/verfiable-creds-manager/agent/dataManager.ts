@@ -1,4 +1,5 @@
 import { IAgentPlugin } from '@veramo/core';
+import { v4 as uuidv4 } from 'uuid';
 import { AbstractDataStore } from '../data-store/abstractDataStore';
 import {
   IDataManager,
@@ -27,22 +28,25 @@ export class DataManager implements IAgentPlugin {
   }
 
   public async save(
-    args: IDataManagerSaveArgs
-  ): Promise<Array<IDataManagerSaveResult>> {
-    const data: unknown = args.data;
-    const options = args.options;
-    let { store } = args.options;
+    args: IDataManagerSaveArgs,
+  ): Promise<IDataManagerSaveResult[]> {
+    const { data, options } = args;
+    let { store } = options;
     if (typeof store === 'string') {
       store = [store];
     }
+
+    const id = uuidv4();
+
     const res: IDataManagerSaveResult[] = [];
     for (const storeName of store) {
       const storePlugin = this.stores[storeName];
       if (!storePlugin) {
         throw new Error(`Store plugin ${storeName} not found`);
       }
+
       try {
-        const result = await storePlugin.save({ data, options });
+        const result = await storePlugin.save({ data, options, id });
         res.push({ id: result, store: storeName });
       } catch (e) {
         console.log(e);
@@ -52,8 +56,8 @@ export class DataManager implements IAgentPlugin {
   }
 
   public async query(
-    args: IDataManagerQueryArgs
-  ): Promise<Array<IDataManagerQueryResult>> {
+    args: IDataManagerQueryArgs,
+  ): Promise<IDataManagerQueryResult[]> {
     const { filter = { type: 'none', filter: {} }, options } = args;
     let store;
     let returnStore = true;
@@ -101,7 +105,7 @@ export class DataManager implements IAgentPlugin {
   }
 
   public async delete(
-    args: IDataManagerDeleteArgs
+    args: IDataManagerDeleteArgs,
   ): Promise<Array<IDataManagerDeleteResult>> {
     const { id, options } = args;
     let store;
@@ -133,7 +137,7 @@ export class DataManager implements IAgentPlugin {
   }
 
   public async clear(
-    args: IDataManagerClearArgs
+    args: IDataManagerClearArgs,
   ): Promise<Array<IDataManagerClearResult>> {
     const { filter = { type: 'none', filter: {} }, options } = args;
     let store;
