@@ -106,7 +106,7 @@ export class DataManager implements IAgentPlugin {
 
   public async delete(
     args: IDataManagerDeleteArgs,
-  ): Promise<Array<IDataManagerDeleteResult>> {
+  ): Promise<IDataManagerDeleteResult[]> {
     const { id, options } = args;
     let store;
     if (options === undefined) {
@@ -114,9 +114,11 @@ export class DataManager implements IAgentPlugin {
     } else {
       store = options.store;
     }
+
     if (typeof store === 'string') {
       store = [store];
     }
+
     if (store === undefined) {
       store = Object.keys(this.stores);
     }
@@ -126,9 +128,10 @@ export class DataManager implements IAgentPlugin {
       if (!storePlugin) {
         throw new Error(`Store plugin ${storeName} not found`);
       }
+
       try {
-        const result = await storePlugin.delete({ id: id });
-        res.push({ id: id, removed: result, store: storeName });
+        const result = await storePlugin.delete({ id });
+        res.push({ id, removed: result, store: storeName });
       } catch (e) {
         console.log(e);
       }

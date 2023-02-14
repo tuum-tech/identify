@@ -114,7 +114,7 @@ export const getGoogleVCs = async (
       .googleAccessToken;
   if (!accessToken) {
     console.error('Access token not found');
-    return false;
+    throw new Error('Google account was not configured');
   }
 
   const existFile = await searchFile(accessToken, fileName);

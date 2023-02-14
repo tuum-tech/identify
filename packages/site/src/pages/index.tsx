@@ -291,15 +291,13 @@ const Index = () => {
   const handleRemoveVCClick = async () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
-      const vcId = vcIdsToBeRemoved
-        ? vcIdsToBeRemoved.trim().split(',')[0]
-        : '';
+      const id = vcIdsToBeRemoved ? vcIdsToBeRemoved.trim().split(',')[0] : '';
       const options = {
-        store: 'snap',
+        store: ['snap', 'googleDrive'],
       };
       console.log('vcIdsToBeRemoved: ', vcIdsToBeRemoved);
       const isRemoved = (await removeVC(
-        vcId,
+        id,
         options,
       )) as IDataManagerDeleteResult[];
       console.log(`Remove VC Result: ${JSON.stringify(isRemoved, null, 4)}`);

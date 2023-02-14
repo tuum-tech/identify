@@ -104,12 +104,6 @@ export class GoogleDriveVCStore extends AbstractDataStore {
 
     let newId = id || uuidv4();
 
-    const accessToken =
-      this.state.accountState[account].accountConfig.identity.googleAccessToken;
-    if (!accessToken) {
-      throw new Error('Google account was not configured');
-    }
-
     const googleVCs = await getGoogleVCs(
       this.state,
       GOOGLE_DRIVE_VCS_FILE_NAME,
@@ -130,17 +124,24 @@ export class GoogleDriveVCStore extends AbstractDataStore {
   }
 
   async delete({ id }: { id: string }): Promise<boolean> {
-    const account = this.state.currentAccount;
-    if (!account)
-      throw Error(
-        `GoogleDriveVCStore - Cannot get current account: ${account}`,
-      );
+    const googleVCs = await getGoogleVCs(
+      this.state,
+      GOOGLE_DRIVE_VCS_FILE_NAME,
+    );
 
-    if (!this.state.accountState[account].vcs[id])
-      throw Error(`VC ID '${id}' not found`);
+    if (!googleVCs) {
+      throw new Error('Invalid vcs file');
+    }
 
-    // delete this.state.accountState[account].vcs[id];
-    // await updateSnapState(this.wallet, this.state);
+    if (!googleVCs[id]) throw Error(`VC ID '${id}' not found`);
+
+    delete googleVCs[id];
+    const gdriveResponse = await uploadToGoogleDrive(this.state, {
+      fileName: GOOGLE_DRIVE_VCS_FILE_NAME,
+      content: JSON.stringify(googleVCs),
+    });
+    console.log({ gdriveResponse });
+
     return true;
   }
 
