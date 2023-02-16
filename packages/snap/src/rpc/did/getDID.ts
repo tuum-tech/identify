@@ -1,11 +1,10 @@
-import { SnapProvider } from '@metamask/snap-types';
-import { IdentitySnapState } from '../../interfaces';
+import { IdentitySnapParams } from '../../interfaces';
 import { getCurrentDid } from '../../utils/didUtils';
 
 /* eslint-disable */
 export async function getDid(
-  wallet: SnapProvider,
-  state: IdentitySnapState
+  identitySnapParams: IdentitySnapParams
 ): Promise<string> {
-  return await getCurrentDid(wallet, state);
+  const { state, metamask } = identitySnapParams;
+  return await getCurrentDid(state, metamask);
 }

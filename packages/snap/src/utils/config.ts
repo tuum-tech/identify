@@ -11,6 +11,7 @@ const emptyAccountState = {
   snapKeyStore: {},
   identifiers: {},
   vcs: {},
+  index: 0,
   accountConfig: {
     identity: {
       didMethod: 'did:pkh',

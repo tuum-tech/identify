@@ -1,17 +1,17 @@
-import { SnapProvider } from '@metamask/snap-types';
 import { IDataManagerDeleteResult } from 'src/veramo/plugins/verfiable-creds-manager';
-import { IdentitySnapState } from '../../interfaces';
+import { IdentitySnapParams } from '../../interfaces';
 import { RemoveVCsRequestParams } from '../../types/params';
 import { snapConfirm } from '../../utils/snapUtils';
 import { veramoRemoveVC } from '../../utils/veramoUtils';
 
 /* eslint-disable */
 export async function removeVC(
-  wallet: SnapProvider,
-  state: IdentitySnapState,
-  params: RemoveVCsRequestParams
+  identitySnapParams: IdentitySnapParams,
+  vcRequestParams: RemoveVCsRequestParams
 ): Promise<IDataManagerDeleteResult[] | null> {
-  const { id = '', options } = params || {};
+  const { snap } = identitySnapParams;
+
+  const { id = '', options } = vcRequestParams || {};
   const { store = 'snap' } = options || {};
 
   const ids = typeof id === 'string' ? [id] : id;
@@ -23,8 +23,8 @@ export async function removeVC(
     textAreaContent: JSON.stringify(id),
   };
 
-  if (await snapConfirm(wallet, promptObj)) {
-    return await veramoRemoveVC(wallet, state, ids, store);
+  if (await snapConfirm(snap, promptObj)) {
+    return await veramoRemoveVC(snap, ids, store);
   }
   throw new Error('User rejected');
 }

@@ -1,14 +1,14 @@
-import { SnapProvider } from '@metamask/snap-types';
+import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { W3CVerifiableCredential } from '@veramo/core';
 import jsonpath from 'jsonpath';
 import { v4 as uuidv4 } from 'uuid';
-import { IdentitySnapState } from '../../interfaces';
 import {
   getGoogleVCs,
   GOOGLE_DRIVE_VCS_FILE_NAME,
   uploadToGoogleDrive,
 } from '../../utils/googleUtils';
 import { decodeJWT } from '../../utils/jwt';
+import { getSnapState } from '../../utils/stateUtils';
 import {
   AbstractDataStore,
   IFilterArgs,
@@ -22,21 +22,17 @@ import {
  * This is usable by {@link @vc-manager/VCManager} to hold the vc data
  */
 export class GoogleDriveVCStore extends AbstractDataStore {
-  wallet: SnapProvider;
-  state: IdentitySnapState;
+  snap: SnapsGlobalObject;
 
-  constructor(wallet: SnapProvider, state: IdentitySnapState) {
+  constructor(snap: SnapsGlobalObject) {
     super();
-    this.wallet = wallet;
-    this.state = state;
+    this.snap = snap;
   }
 
   async query(args: IFilterArgs): Promise<Array<IQueryResult>> {
     const { filter } = args;
-    const googleVCs = await getGoogleVCs(
-      this.state,
-      GOOGLE_DRIVE_VCS_FILE_NAME,
-    );
+    const state = await getSnapState(this.snap);
+    const googleVCs = await getGoogleVCs(state, GOOGLE_DRIVE_VCS_FILE_NAME);
 
     if (!googleVCs) {
       throw new Error('Invalid vcs file');
@@ -95,27 +91,24 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     id: string;
   }): Promise<string> {
     // TODO check if VC is correct type
-
     const { data: vc, id } = args;
-    const account = this.state.currentAccount;
+    const state = await getSnapState(this.snap);
+    const account = state.currentAccount;
     if (!account)
       throw Error(
-        `GoogleDriveVCStore - Cannot get current account: ${account}`,
+        `GoogleDriveVCStore - Cannot get current account: ${account}`
       );
 
     let newId = id || uuidv4();
 
-    const googleVCs = await getGoogleVCs(
-      this.state,
-      GOOGLE_DRIVE_VCS_FILE_NAME,
-    );
+    const googleVCs = await getGoogleVCs(state, GOOGLE_DRIVE_VCS_FILE_NAME);
 
     if (!googleVCs) {
       throw new Error('Invalid vcs file');
     }
 
     const newVCs = { ...googleVCs, [newId]: vc };
-    const gdriveResponse = await uploadToGoogleDrive(this.state, {
+    const gdriveResponse = await uploadToGoogleDrive(state, {
       fileName: GOOGLE_DRIVE_VCS_FILE_NAME,
       content: JSON.stringify(newVCs),
     });
@@ -125,10 +118,8 @@ export class GoogleDriveVCStore extends AbstractDataStore {
   }
 
   async delete({ id }: { id: string }): Promise<boolean> {
-    const googleVCs = await getGoogleVCs(
-      this.state,
-      GOOGLE_DRIVE_VCS_FILE_NAME,
-    );
+    const state = await getSnapState(this.snap);
+    const googleVCs = await getGoogleVCs(state, GOOGLE_DRIVE_VCS_FILE_NAME);
 
     if (!googleVCs) {
       throw new Error('Invalid vcs file');
@@ -137,7 +128,7 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     if (!googleVCs[id]) throw Error(`VC ID '${id}' not found`);
 
     delete googleVCs[id];
-    const gdriveResponse = await uploadToGoogleDrive(this.state, {
+    const gdriveResponse = await uploadToGoogleDrive(state, {
       fileName: GOOGLE_DRIVE_VCS_FILE_NAME,
       content: JSON.stringify(googleVCs),
     });
@@ -147,7 +138,8 @@ export class GoogleDriveVCStore extends AbstractDataStore {
   }
 
   public async clear(args: IFilterArgs): Promise<boolean> {
-    const gdriveResponse = await uploadToGoogleDrive(this.state, {
+    const state = await getSnapState(this.snap);
+    const gdriveResponse = await uploadToGoogleDrive(state, {
       fileName: GOOGLE_DRIVE_VCS_FILE_NAME,
       content: JSON.stringify({}),
     });

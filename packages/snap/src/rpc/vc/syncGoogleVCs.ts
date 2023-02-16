@@ -1,5 +1,4 @@
-import { SnapProvider } from '@metamask/snap-types';
-import { IdentitySnapState } from '../../interfaces';
+import { IdentitySnapParams } from '../../interfaces';
 import {
   getGoogleVCs,
   GOOGLE_DRIVE_VCS_FILE_NAME,
@@ -10,9 +9,10 @@ import { updateSnapState } from '../../utils/stateUtils';
 
 /* eslint-disable */
 export async function syncGoogleVCs(
-  wallet: SnapProvider,
-  state: IdentitySnapState,
+  identitySnapParams: IdentitySnapParams
 ): Promise<boolean> {
+  const { snap, state } = identitySnapParams;
+
   const currentVCs = state.accountState[state.currentAccount].vcs;
   const googleVCs = await getGoogleVCs(state, GOOGLE_DRIVE_VCS_FILE_NAME);
 
@@ -29,12 +29,12 @@ export async function syncGoogleVCs(
     description: `Would you like to sync VCs in snap with google drive?`,
     textAreaContent: JSON.stringify(diffVCIds),
   };
-  if (await snapConfirm(wallet, promptObj)) {
+  if (await snapConfirm(snap, promptObj)) {
     state.accountState[state.currentAccount].vcs = {
       ...currentVCs,
       ...diffVCIds.reduce((acc, id) => ({ ...acc, [id]: googleVCs[id] }), {}),
     };
-    await updateSnapState(wallet, state);
+    await updateSnapState(snap, state);
 
     // Save to google drive
     const gdriveResponse = await uploadToGoogleDrive(state, {

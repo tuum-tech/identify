@@ -1,17 +1,17 @@
-import { SnapProvider } from '@metamask/snap-types';
 import { IDataManagerClearResult } from 'src/veramo/plugins/verfiable-creds-manager';
-import { IdentitySnapState } from '../../interfaces';
+import { IdentitySnapParams } from '../../interfaces';
 import { DeleteAllVCsRequestParams } from '../../types/params';
 import { snapConfirm } from '../../utils/snapUtils';
 import { veramoDeleteAllVCs } from '../../utils/veramoUtils';
 
 /* eslint-disable */
 export async function deleteAllVCs(
-  wallet: SnapProvider,
-  state: IdentitySnapState,
-  params: DeleteAllVCsRequestParams
+  identitySnapParams: IdentitySnapParams,
+  vcRequestParams: DeleteAllVCsRequestParams
 ): Promise<IDataManagerClearResult[] | null> {
-  const { options } = params || {};
+  const { snap } = identitySnapParams;
+
+  const { options } = vcRequestParams || {};
   const { store = 'snap' } = options || {};
 
   const promptObj = {
@@ -20,8 +20,8 @@ export async function deleteAllVCs(
     textAreaContent: `Note that this action cannot be reversed and you will need to recreate all your VCs if you go through with it`,
   };
 
-  if (await snapConfirm(wallet, promptObj)) {
-    return await veramoDeleteAllVCs(wallet, state, store);
+  if (await snapConfirm(snap, promptObj)) {
+    return await veramoDeleteAllVCs(snap, store);
   }
   throw new Error('User rejected');
 }

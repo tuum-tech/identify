@@ -1,18 +1,22 @@
+import { MetaMaskInpageProvider } from '@metamask/providers';
+import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { toHederaAccountInfo } from '../../hedera';
 import { getHederaNetwork, validHederaChainID } from '../../hedera/config';
 import { IdentitySnapState } from '../../interfaces';
-import { getKeyPair } from '../../utils/hederaUtils';
 import { getCurrentNetwork } from '../../utils/snapUtils';
 import { initAccountState, updateSnapState } from '../../utils/stateUtils';
-import { veramoImportMetaMaskAccount } from '../../utils/veramoUtils';
+import { veramoConnectHederaAccount } from '../../utils/veramoUtils';
+import { getAgent } from '../../veramo/setup';
 
 /* eslint-disable */
 export async function connectHederaAccount(
+  snap: SnapsGlobalObject,
   state: IdentitySnapState,
+  metamask: MetaMaskInpageProvider,
   _privateKey: string,
   _accountId: string
 ): Promise<boolean> {
-  const chainId = await getCurrentNetwork(wallet);
+  const chainId = await getCurrentNetwork(metamask);
   if (validHederaChainID(chainId)) {
     const hederaAccountInfo = await toHederaAccountInfo(
       _privateKey,
@@ -25,17 +29,20 @@ export async function connectHederaAccount(
         : '0x' + hederaAccountInfo.contractAccountId;
 
       state.currentAccount = evmAddress;
-      if (!(evmAddress in state.accountState)) {
-        await initAccountState(wallet, state, evmAddress);
+      if (!(state.currentAccount in state.accountState)) {
+        await initAccountState(snap, state, state.currentAccount);
       }
       state.accountState[state.currentAccount].hederaAccount.evmAddress =
         evmAddress;
       state.accountState[state.currentAccount].hederaAccount.accountId =
         _accountId;
-      await updateSnapState(wallet, state);
-      const keyPair = await getKeyPair(_privateKey);
-      await veramoImportMetaMaskAccount(wallet, state, keyPair);
-      return true;
+      await updateSnapState(snap, state);
+      const agent = await getAgent(snap);
+      return await veramoConnectHederaAccount(
+        agent,
+        state.currentAccount,
+        _privateKey
+      );
     } else {
       console.error('Could not retrieve hedera account info');
       return false;

@@ -1,17 +1,16 @@
-import { SnapProvider } from '@metamask/snap-types';
-import { GoogleToken, IdentitySnapState } from 'src/interfaces';
+import { GoogleToken, IdentitySnapParams } from '../../interfaces';
 import { updateSnapState } from '../../utils/stateUtils';
 
 export const configureGoogleAccount = async (
-  wallet: SnapProvider,
-  state: IdentitySnapState,
-  params: GoogleToken,
+  identitySnapParams: IdentitySnapParams,
+  googleTokenParams: GoogleToken,
 ) => {
+  const { snap, state } = identitySnapParams;
   try {
     state.accountState[
       state.currentAccount
-    ].accountConfig.identity.googleAccessToken = params.accessToken;
-    await updateSnapState(wallet, state);
+    ].accountConfig.identity.googleAccessToken = googleTokenParams.accessToken;
+    await updateSnapState(snap, state);
     return true;
   } catch (error) {
     console.error('Could not configure google account', error);

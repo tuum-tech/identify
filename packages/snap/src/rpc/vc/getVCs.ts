@@ -1,20 +1,20 @@
-import { SnapProvider } from '@metamask/snap-types';
 import { IDataManagerQueryResult } from 'src/veramo/plugins/verfiable-creds-manager';
-import { IdentitySnapState } from '../../interfaces';
+import { IdentitySnapParams } from '../../interfaces';
 import { GetVCsRequestParams } from '../../types/params';
 import { snapConfirm } from '../../utils/snapUtils';
 import { veramoGetVCs } from '../../utils/veramoUtils';
 
 /* eslint-disable */
 export async function getVCs(
-  wallet: SnapProvider,
-  state: IdentitySnapState,
-  params: GetVCsRequestParams
+  identitySnapParams: IdentitySnapParams,
+  vcRequestParams: GetVCsRequestParams
 ): Promise<IDataManagerQueryResult[]> {
-  const { filter, options } = params || {};
+  const { snap, state } = identitySnapParams;
+
+  const { filter, options } = vcRequestParams || {};
   const { store = 'snap', returnStore = true } = options || {};
 
-  const vcs = await veramoGetVCs(wallet, state, { store, returnStore }, filter);
+  const vcs = await veramoGetVCs(snap, { store, returnStore }, filter);
 
   console.log('VCs: ', JSON.stringify(vcs, null, 4));
   const promptObj = {
@@ -25,7 +25,7 @@ export async function getVCs(
 
   if (
     state.snapConfig.dApp.disablePopups ||
-    (await snapConfirm(wallet, promptObj))
+    (await snapConfirm(snap, promptObj))
   ) {
     return vcs;
   }

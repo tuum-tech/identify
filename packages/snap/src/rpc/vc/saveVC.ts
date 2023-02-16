@@ -1,5 +1,4 @@
-import { SnapProvider } from '@metamask/snap-types';
-import { IdentitySnapState } from '../../interfaces';
+import { IdentitySnapParams } from '../../interfaces';
 import { SaveVCRequestParams } from '../../types/params';
 import { snapConfirm } from '../../utils/snapUtils';
 import { veramoSaveVC } from '../../utils/veramoUtils';
@@ -7,10 +6,11 @@ import { IDataManagerSaveResult } from '../../veramo/plugins/verfiable-creds-man
 
 /* eslint-disable */
 export async function saveVC(
-  wallet: SnapProvider,
-  state: IdentitySnapState,
+  params: IdentitySnapParams,
   { verifiableCredential, options }: SaveVCRequestParams
 ): Promise<IDataManagerSaveResult[]> {
+  const { snap } = params;
+
   const { store = 'snap' } = options || {};
 
   const promptObj = {
@@ -21,8 +21,8 @@ export async function saveVC(
     textAreaContent: JSON.stringify(verifiableCredential),
   };
 
-  if (await snapConfirm(wallet, promptObj)) {
-    return await veramoSaveVC(wallet, state, verifiableCredential, store);
+  if (await snapConfirm(snap, promptObj)) {
+    return await veramoSaveVC(snap, verifiableCredential, store);
   }
   throw new Error('User rejected');
 }

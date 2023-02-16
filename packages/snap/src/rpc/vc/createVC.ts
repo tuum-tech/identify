@@ -1,5 +1,4 @@
-import { SnapProvider } from '@metamask/snap-types';
-import { IdentitySnapState } from '../../interfaces';
+import { IdentitySnapParams } from '../../interfaces';
 import { CreateVCRequestParams } from '../../types/params';
 import { snapConfirm } from '../../utils/snapUtils';
 import { veramoCreateVC } from '../../utils/veramoUtils';
@@ -7,11 +6,17 @@ import { IDataManagerSaveResult } from '../../veramo/plugins/verfiable-creds-man
 
 /* eslint-disable */
 export async function createVC(
-  wallet: SnapProvider,
-  state: IdentitySnapState,
-  params: CreateVCRequestParams,
+  identitySnapParams: IdentitySnapParams,
+  vcRequestParams: CreateVCRequestParams
 ): Promise<IDataManagerSaveResult[]> {
-  const { vcKey = 'vcData', vcValue, credTypes = [], options } = params || {};
+  const { snap } = identitySnapParams;
+
+  const {
+    vcKey = 'vcData',
+    vcValue,
+    credTypes = [],
+    options,
+  } = vcRequestParams || {};
   const { store = 'snap' } = options || {};
 
   const promptObj = {
@@ -21,8 +26,14 @@ export async function createVC(
       [vcKey]: vcValue,
     }),
   };
-  if (await snapConfirm(wallet, promptObj)) {
-    return veramoCreateVC(wallet, state, vcKey, vcValue, store, credTypes);
+  if (await snapConfirm(snap, promptObj)) {
+    return await veramoCreateVC(
+      identitySnapParams,
+      vcKey,
+      vcValue,
+      store,
+      credTypes
+    );
   }
   throw new Error('User rejected');
 }

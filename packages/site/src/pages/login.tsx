@@ -8,7 +8,7 @@ import {
   getDID,
   getSnap,
   getVCs,
-  saveVC,
+  saveVC
 } from './../utils/snap';
 
 import { ProofInfo } from '@tuum-tech/identity-snap/src/types/params';
@@ -20,7 +20,7 @@ import {
   ConnectButton,
   InstallFlaskButton,
   ReconnectButton,
-  SendHelloButton,
+  SendHelloButton
 } from '../components';
 import {
   CardContainer,
@@ -28,7 +28,7 @@ import {
   ErrorMessage,
   Heading,
   Span,
-  Subtitle,
+  Subtitle
 } from '../config/styles';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
 import { shouldDisplayReconnectButton } from '../utils';
@@ -51,6 +51,7 @@ function LoginPage() {
     VerifiablePresentation | undefined
   >(undefined);
 
+  const [challenge, setChallenge] = useState('');
   const [vc, setVC] = useState('');
   const [vcId, setVcId] = useState('');
   const [vcList, setVcList] = useState([] as any);
@@ -61,6 +62,12 @@ function LoginPage() {
       await handleSaveVC();
     })();
   }, [vc]);
+
+  useEffect(() => {
+    (async () => {
+      await handleSignIn();
+    })();
+  }, [challenge]);
 
   useEffect(() => {
     (async () => {
@@ -93,6 +100,10 @@ function LoginPage() {
         });
 
         setVC(JSON.stringify(ret.data));
+        if (ret.status === 200){
+          
+          alert("Register user successful");        
+        }
       }
     })();
   }, [identifier]);
@@ -160,6 +171,7 @@ function LoginPage() {
       const proofInfo: ProofInfo = {
         proofFormat: 'jwt',
         type: 'ProfileNamesPresentation',
+        challenge: challenge
       };
       console.log('vcId: ', vcId);
       const vp = (await createVP([vcId], proofInfo)) as VerifiablePresentation;
@@ -172,6 +184,31 @@ function LoginPage() {
     }
   };
 
+
+  const handleChallenge = async () => {
+    try {
+      setCurrentChainId(await getCurrentNetwork());
+      let identifier = await getDID() as string;
+      const backend_url = process.env.GATSBY_BACKEND_URL;
+      const ret = await axios({
+        method: 'post',
+        url: `${backend_url}api/v1/credential/challenge`,
+        data: {
+          did: identifier
+        },
+      });
+
+      if (ret.status === 200){
+        
+        setChallenge(ret.data.challenge);
+        alert("challenge " + ret.data.challenge);        
+      }
+    } catch(e){
+      
+    }
+
+  }
+
   const handleSignIn = async () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
@@ -180,7 +217,10 @@ function LoginPage() {
         returnStore: true,
       };
       const vcs = (await getVCs(
-        undefined,
+        {
+          type: 'vcType',
+          filter: 'SiteLoginCredential'
+        },
         options
       )) as IDataManagerQueryResult[];
 
@@ -189,7 +229,7 @@ function LoginPage() {
         setVcList(vcs);
         setShowVcsModal(true);
       } else {
-        // no need to select
+        alert('no Vcs found');
       }
     } catch (e) {
       console.error(e);
@@ -215,7 +255,7 @@ function LoginPage() {
             <div key={cred.metadata.id}>
               <span
                 onClick={() => handleVCClicked(cred.metadata.id)}
-              >{`Login : ${cred.data.credentialSubject.loginName}  Issuance: ${cred.data.issuanceDate}`}</span>
+              >{`Login : ${cred.data.credentialSubject.loginName} Issuance: ${cred.data.issuanceDate}` }</span>
             </div>
           ))}
         </Modal.Body>
@@ -366,7 +406,7 @@ function LoginPage() {
               button: (
                 <SendHelloButton
                   buttonText="SignIn"
-                  onClick={handleSignIn}
+                  onClick={handleChallenge}
                   disabled={false}
                 />
               ),

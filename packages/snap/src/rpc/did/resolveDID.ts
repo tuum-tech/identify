@@ -1,13 +1,11 @@
-import { SnapProvider } from '@metamask/snap-types';
 import { DIDResolutionResult } from '@veramo/core';
-import { IdentitySnapState } from '../../interfaces';
+import { IdentitySnapParams } from '../../interfaces';
 import { veramoResolveDID } from '../../utils/veramoUtils';
 
 /* eslint-disable */
 export async function resolveDID(
-  wallet: SnapProvider,
-  state: IdentitySnapState,
+  identitySnapParams: IdentitySnapParams,
   didUrl?: string
 ): Promise<DIDResolutionResult | null> {
-  return await veramoResolveDID(wallet, state, didUrl);
+  return await veramoResolveDID(identitySnapParams, didUrl);
 }

@@ -25,21 +25,12 @@ export const getSnaps = async (): Promise<GetSnapsResponse> => {
  * @param snapId - The ID of the snap.
  * @param params - The params to pass with the snap to connect.
  */
-export const connectSnap = async (
-  snapId: string = defaultSnapOrigin,
-  params: Record<'version' | string, unknown> = {},
-) => {
+export const connectSnap = async (snapId: string = defaultSnapOrigin) => {
   await window.ethereum.request({
-    method: 'wallet_enable',
-    params: [
-      {
-        wallet_snap: {
-          [snapId]: {
-            ...params,
-          },
-        },
-      },
-    ],
+    method: 'wallet_requestSnaps',
+    params: {
+      [snapId]: { version: 'latest' },
+    },
   });
 };
 
@@ -78,17 +69,14 @@ export const connectHederaAccount = async (
   accountId: string,
 ) => {
   return await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: [
-      defaultSnapOrigin,
-      {
-        method: 'connectHederaAccount',
-        params: {
-          privateKey,
-          accountId,
-        },
+    method: `wallet_snap_${defaultSnapOrigin}`,
+    params: {
+      method: 'connectHederaAccount',
+      params: {
+        privateKey,
+        accountId,
       },
-    ],
+    },
   });
 };
 
@@ -98,13 +86,11 @@ export const connectHederaAccount = async (
 
 export const sendHello = async () => {
   await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: [
-      defaultSnapOrigin,
-      {
-        method: 'hello',
-      },
-    ],
+    method: `wallet_snap_${defaultSnapOrigin}`,
+    params: {
+      method: 'hello',
+      params: {},
+    },
   });
 };
 
@@ -114,13 +100,11 @@ export const sendHello = async () => {
 
 export const togglePopups = async () => {
   await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: [
-      defaultSnapOrigin,
-      {
-        method: 'togglePopups',
-      },
-    ],
+    method: `wallet_snap_${defaultSnapOrigin}`,
+    params: {
+      method: 'togglePopups',
+      params: {},
+    },
   });
 };
 
@@ -130,13 +114,11 @@ export const togglePopups = async () => {
 
 export const getCurrentDIDMethod = async () => {
   return await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: [
-      defaultSnapOrigin,
-      {
-        method: 'getCurrentDIDMethod',
-      },
-    ],
+    method: `wallet_snap_${defaultSnapOrigin}`,
+    params: {
+      method: 'getCurrentDIDMethod',
+      params: {},
+    },
   });
 };
 
@@ -146,13 +128,11 @@ export const getCurrentDIDMethod = async () => {
 
 export const getDID = async () => {
   return await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: [
-      defaultSnapOrigin,
-      {
-        method: 'getDID',
-      },
-    ],
+    method: `wallet_snap_${defaultSnapOrigin}`,
+    params: {
+      method: 'getDID',
+      params: {},
+    },
   });
 };
 
@@ -162,14 +142,11 @@ export const getDID = async () => {
 
 export const resolveDID = async (did?: string) => {
   return await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: [
-      defaultSnapOrigin,
-      {
-        method: 'resolveDID',
-        params: { did },
-      },
-    ],
+    method: `wallet_snap_${defaultSnapOrigin}`,
+    params: {
+      method: 'resolveDID',
+      params: { did },
+    },
   });
 };
 
@@ -182,14 +159,11 @@ export const getVCs = async (
   options: GetVCsOptions,
 ) => {
   return await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: [
-      defaultSnapOrigin,
-      {
-        method: 'getVCs',
-        params: { filter, options },
-      },
-    ],
+    method: `wallet_snap_${defaultSnapOrigin}`,
+    params: {
+      method: 'getVCs',
+      params: { filter, options },
+    },
   });
 };
 
@@ -199,14 +173,11 @@ export const getVCs = async (
 
 export const saveVC = async (vc: VerifiableCredential | {}) => {
   return await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: [
-      defaultSnapOrigin,
-      {
-        method: 'saveVC',
-        params: { verifiableCredential: vc },
-      },
-    ],
+    method: `wallet_snap_${defaultSnapOrigin}`,
+    params: {
+      method: 'saveVC',
+      params: { verifiableCredential: vc },
+    },
   });
 };
 
@@ -226,19 +197,16 @@ export const createVC = async (
   credTypes?: string[],
 ) => {
   return await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: [
-      defaultSnapOrigin,
-      {
-        method: 'createVC',
-        params: {
-          vcKey,
-          vcValue,
-          options,
-          credTypes,
-        },
+    method: `wallet_snap_${defaultSnapOrigin}`,
+    params: {
+      method: 'createVC',
+      params: {
+        vcKey,
+        vcValue,
+        options,
+        credTypes,
       },
-    ],
+    },
   });
 };
 
@@ -248,16 +216,13 @@ export const createVC = async (
 
 export const configureGoogleAccount = async (accessToken: string) => {
   return await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: [
-      defaultSnapOrigin,
-      {
-        method: 'configureGoogleAccount',
-        params: {
-          accessToken,
-        },
+    method: `wallet_snap_${defaultSnapOrigin}`,
+    params: {
+      method: 'configureGoogleAccount',
+      params: {
+        accessToken,
       },
-    ],
+    },
   });
 };
 
@@ -267,14 +232,11 @@ export const configureGoogleAccount = async (accessToken: string) => {
 
 export const syncGoogleVCs = async () => {
   return await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: [
-      defaultSnapOrigin,
-      {
-        method: 'syncGoogleVCs',
-        params: {},
-      },
-    ],
+    method: `wallet_snap_${defaultSnapOrigin}`,
+    params: {
+      method: 'syncGoogleVCs',
+      params: {},
+    },
   });
 };
 
@@ -284,14 +246,11 @@ export const syncGoogleVCs = async () => {
 
 export const verifyVC = async (vc: VerifiableCredential | {}) => {
   return await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: [
-      defaultSnapOrigin,
-      {
-        method: 'verifyVC',
-        params: { verifiableCredential: vc },
-      },
-    ],
+    method: `wallet_snap_${defaultSnapOrigin}`,
+    params: {
+      method: 'verifyVC',
+      params: { verifiableCredential: vc },
+    },
   });
 };
 
@@ -304,14 +263,11 @@ export const removeVC = async (
   options: RemoveVCOptions,
 ) => {
   return await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: [
-      defaultSnapOrigin,
-      {
-        method: 'removeVC',
-        params: { id, options },
-      },
-    ],
+    method: `wallet_snap_${defaultSnapOrigin}`,
+    params: {
+      method: 'removeVC',
+      params: { id, options },
+    },
   });
 };
 
@@ -321,14 +277,11 @@ export const removeVC = async (
 
 export const deleteAllVCs = async (options: RemoveVCOptions) => {
   return await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: [
-      defaultSnapOrigin,
-      {
-        method: 'deleteAllVCs',
-        params: { options },
-      },
-    ],
+    method: `wallet_snap_${defaultSnapOrigin}`,
+    params: {
+      method: 'deleteAllVCs',
+      params: { options },
+    },
   });
 };
 
@@ -338,14 +291,11 @@ export const deleteAllVCs = async (options: RemoveVCOptions) => {
 
 export const createVP = async (vcs: string[], proofInfo: ProofInfo) => {
   return await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: [
-      defaultSnapOrigin,
-      {
-        method: 'createVP',
-        params: { vcs, proofInfo },
-      },
-    ],
+    method: `wallet_snap_${defaultSnapOrigin}`,
+    params: {
+      method: 'createVP',
+      params: { vcs, proofInfo },
+    },
   });
 };
 
@@ -355,14 +305,11 @@ export const createVP = async (vcs: string[], proofInfo: ProofInfo) => {
 
 export const verifyVP = async (vp: VerifiablePresentation | {}) => {
   return await window.ethereum.request({
-    method: 'wallet_invokeSnap',
-    params: [
-      defaultSnapOrigin,
-      {
-        method: 'verifyVP',
-        params: { verifiablePresentation: vp },
-      },
-    ],
+    method: `wallet_snap_${defaultSnapOrigin}`,
+    params: {
+      method: 'verifyVP',
+      params: { verifiablePresentation: vp },
+    },
   });
 };
 

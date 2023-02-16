@@ -1,4 +1,4 @@
-import { SnapProvider } from '@metamask/snap-types';
+import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { IdentitySnapState } from '../interfaces';
 import { getEmptyAccountState, getInitialSnapState } from './config';
 
@@ -14,12 +14,12 @@ import { getEmptyAccountState, getInitialSnapState } from './config';
  *
  **/
 export async function updateSnapState(
-  wallet: SnapProvider,
+  snap: SnapsGlobalObject,
   snapState: IdentitySnapState
 ) {
-  await wallet.request({
+  await snap.request({
     method: 'snap_manageState',
-    params: ['update', snapState],
+    params: { operation: 'update', newState: snapState },
   });
 }
 
@@ -34,11 +34,11 @@ export async function updateSnapState(
  *
  **/
 export async function getSnapState(
-  wallet: SnapProvider
+  snap: SnapsGlobalObject
 ): Promise<IdentitySnapState> {
-  const state = (await wallet.request({
+  const state = (await snap.request({
     method: 'snap_manageState',
-    params: ['get'],
+    params: { operation: 'get' },
   })) as IdentitySnapState | null;
 
   if (!state) throw Error('IdentitySnapState is not initialized!');
@@ -56,11 +56,11 @@ export async function getSnapState(
  *
  **/
 export async function getSnapStateUnchecked(
-  wallet: SnapProvider
+  snap: SnapsGlobalObject
 ): Promise<IdentitySnapState | null> {
-  return (await wallet.request({
+  return (await snap.request({
     method: 'snap_manageState',
-    params: ['get'],
+    params: { operation: 'get' },
   })) as IdentitySnapState | null;
 }
 
@@ -75,10 +75,10 @@ export async function getSnapStateUnchecked(
  *
  **/
 export async function initSnapState(
-  wallet: SnapProvider
+  snap: SnapsGlobalObject
 ): Promise<IdentitySnapState> {
   const state = getInitialSnapState();
-  await updateSnapState(wallet, state);
+  await updateSnapState(snap, state);
   return state;
 }
 
@@ -94,10 +94,10 @@ export async function initSnapState(
  *
  **/
 export async function initAccountState(
-  wallet: SnapProvider,
+  snap: SnapsGlobalObject,
   state: IdentitySnapState,
   currentAccount: string
 ): Promise<void> {
   state.accountState[currentAccount] = getEmptyAccountState();
-  await updateSnapState(wallet, state);
+  await updateSnapState(snap, state);
 }
