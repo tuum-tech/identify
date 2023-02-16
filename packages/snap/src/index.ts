@@ -6,6 +6,7 @@ import { getDid } from './rpc/did/getDID';
 import { resolveDID } from './rpc/did/resolveDID';
 import { switchMethod } from './rpc/did/switchMethods';
 import { connectHederaAccount } from './rpc/hedera/connectHederaAccount';
+import { getHederaAccountId } from './rpc/hedera/getHederaAccountId';
 import { togglePopups } from './rpc/snap/togglePopups';
 import { uploadToGoogleDrive } from './rpc/store/gdrive';
 import { createVC } from './rpc/vc/createVC';
@@ -18,7 +19,6 @@ import { saveVC } from './rpc/vc/saveVC';
 import { verifyVC } from './rpc/vc/verifyVC';
 import { verifyVP } from './rpc/vc/verifyVP';
 import { init } from './utils/init';
-import { getAddressKeyDeriver } from './utils/keyPair';
 import { switchNetworkIfNecessary } from './utils/network';
 import {
   isValidCreateVCRequest,
@@ -177,6 +177,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
       return await switchMethod(identitySnapParams, request.params.didMethod);
     case 'getSupportedProofFormats':
       return getSupportedProofFormats();
+    case 'getHederaAccountId':
+      return await getHederaAccountId(identitySnapParams);
     case 'uploadToGoogleDrive':
       return await uploadToGoogleDrive((request.params as any).uploadData);
     default:

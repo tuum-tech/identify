@@ -32,6 +32,7 @@ import {
   getCurrentDIDMethod,
   getCurrentNetwork,
   getDID,
+  getHederaAccountId,
   getSnap,
   getVCs,
   removeVC,
@@ -339,6 +340,18 @@ const Index = () => {
       const verified = await verifyVP(vp);
       console.log('VP Verified: ', verified);
       alert(`VP Verified: ${verified}`);
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleGetHederaAccountIdClick = async () => {
+    try {
+      setCurrentChainId(await getCurrentNetwork());
+      const accountId = await getHederaAccountId();
+      console.log(`Your Hedera Account Id is: ${accountId}`);
+      alert(`Your Hedera Account Id is: ${accountId}`);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -905,28 +918,15 @@ const Index = () => {
           ''
         )}
         {/* =============================================================================== */}
-        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
-        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+        {validHederaChainID(currentChainId) && hederaAccountConnected ? (
           <Card
             content={{
-              title: 'todo',
-              description: 'TODO',
-              /* form: (
-              <form>
-                <label>
-                  Enter your Verifiable Presentation
-                  <input
-                    type="text"
-                    value={JSON.stringify(vp)}
-                    onChange={(e) => setVp(e.target.value)}
-                  />
-                </label>
-              </form>
-            ), */
+              title: 'getHederaAccountId',
+              description: 'Retrieve Hedera Account Id',
               button: (
                 <SendHelloButton
-                  buttonText="todo"
-                  onClick={handleVerifyVPClick}
+                  buttonText="Get Account Id"
+                  onClick={handleGetHederaAccountIdClick}
                   disabled={!state.installedSnap}
                 />
               ),
