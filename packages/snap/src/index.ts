@@ -7,6 +7,7 @@ import { resolveDID } from './rpc/did/resolveDID';
 import { switchMethod } from './rpc/did/switchMethods';
 import { configureGoogleAccount } from './rpc/gdrive/configureGoogleAccount';
 import { connectHederaAccount } from './rpc/hedera/connectHederaAccount';
+import { getHederaAccountId } from './rpc/hedera/getHederaAccountId';
 import { togglePopups } from './rpc/snap/togglePopups';
 import { createVC } from './rpc/vc/createVC';
 import { createVP } from './rpc/vc/createVP';
@@ -75,7 +76,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
       state,
       ethereum,
       request.params.privateKey,
-      request.params.accountId
+      request.params.accountId,
     );
   }
   const account = await getCurrentAccount(state, ethereum);
@@ -84,7 +85,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
   // FIXME: HANDLE NULL maybe throw ?
   if (account === null) {
     throw new Error(
-      'Error while trying to get the account. Please connect to an account first'
+      'Error while trying to get the account. Please connect to an account first',
     );
   } else {
     state.currentAccount = account;
@@ -105,7 +106,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
   console.log('-------------------------------------------------------------');
   console.log(
     'request.params=========',
-    JSON.stringify(request.params, null, 4)
+    JSON.stringify(request.params, null, 4),
   );
 
   switch (request.method) {
@@ -146,7 +147,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
       await switchNetworkIfNecessary(identitySnapParams);
       return await verifyVC(
         identitySnapParams,
-        request.params.verifiableCredential
+        request.params.verifiableCredential,
       );
     case 'removeVC':
       isValidRemoveVCRequest(request.params);
@@ -165,7 +166,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
       await switchNetworkIfNecessary(identitySnapParams);
       return await verifyVP(
         identitySnapParams,
-        request.params.verifiablePresentation
+        request.params.verifiablePresentation,
       );
     case 'getAvailableMethods':
       return getAvailableMethods();
@@ -183,6 +184,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
       return await configureGoogleAccount(identitySnapParams, request.params);
     case 'syncGoogleVCs':
       return await syncGoogleVCs(identitySnapParams);
+    case 'getHederaAccountId':
+      return await getHederaAccountId(identitySnapParams);
     default:
       console.error('Method not found');
       throw new Error('Method not found');

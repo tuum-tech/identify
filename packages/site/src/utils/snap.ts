@@ -313,4 +313,18 @@ export const verifyVP = async (vp: VerifiablePresentation | {}) => {
   });
 };
 
+/**
+ * Invoke the "getHederaAccountId" method from the snap.
+ */
+
+export const getHederaAccountId = async () => {
+  return await window.ethereum.request({
+    method: `wallet_snap_${defaultSnapOrigin}`,
+    params: {
+      method: 'getHederaAccountId',
+      params: {},
+    },
+  });
+};
+
 export const isLocalSnap = (snapId: string) => snapId.startsWith('local:');
