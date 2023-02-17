@@ -872,52 +872,6 @@ const Index = () => {
           ''
         )}
         {/* =============================================================================== */}
-        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
-        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
-          <Card
-            content={{
-              title: 'uploadToGoogleDrive',
-              description: 'Upload VC to google drive',
-              form: (
-                <form>
-                  <label>
-                    Enter file name
-                    <input
-                      type="text"
-                      value={fileName}
-                      onChange={(e) => setFileName(e.target.value)}
-                    />
-                  </label>
-                  <br />
-                  <label>
-                    Enter value of content
-                    <input
-                      type="text"
-                      value={content}
-                      onChange={(e) => setContent(e.target.value)}
-                    />
-                  </label>
-                </form>
-              ),
-              button: (
-                <SendHelloButton
-                  buttonText="Upload to google drive"
-                  onClick={handleUploadToGoogleDrive}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        ) : (
-          ''
-        )}
-        {/* =============================================================================== */}
         {validHederaChainID(currentChainId) && hederaAccountConnected ? (
           <Card
             content={{
