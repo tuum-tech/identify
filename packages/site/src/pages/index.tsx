@@ -1,3 +1,4 @@
+import { useGoogleLogin } from '@react-oauth/google';
 import { ProofInfo } from '@tuum-tech/identity-snap/src/types/params';
 import {
   IDataManagerClearResult,
@@ -45,7 +46,6 @@ import {
   verifyVC,
   verifyVP,
 } from '../utils';
-import { getAccessToken } from '../utils/google';
 import { validHederaChainID } from '../utils/hedera';
 
 const Index = () => {
@@ -91,20 +91,17 @@ const Index = () => {
     }
   };
 
-  const handleConfigureGoogleAccount = async () => {
-    setLoadingState('configureGoogleAccount');
-    try {
-      const accessToken = await getAccessToken();
-      if (!accessToken) {
-        throw new Error('Failed to configure google account');
-      }
-      const resp = await configureGoogleAccount(accessToken);
+  const handleConfigureGoogleAccount = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setLoadingState('configureGoogleAccount');
+      const resp = await configureGoogleAccount(tokenResponse.access_token);
       alert('Google Account configuration was successful');
-    } catch (e) {
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-    setLoadingState(null);
-  };
+      setLoadingState(null);
+    },
+    onError: (error) => {
+      console.log('Login Failed', error);
+    },
+  });
 
   const handleSyncGoogleVCs = async () => {
     setLoadingState('syncGoogleVCs');

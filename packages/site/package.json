@@ -26,12 +26,11 @@
   },
   "dependencies": {
     "@metamask/providers": "^9.0.0",
+    "@react-oauth/google": "^0.7.0",
     "@tuum-tech/identity-snap": "0.3.2",
     "@veramo/core": "^4.1.1",
     "axios": "^1.2.4",
     "bootstrap": "^5.2.3",
-    "gapi-script": "^1.2.0",
-    "googleapis": "^110.0.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.0",
     "react-dom": "^18.2.0",

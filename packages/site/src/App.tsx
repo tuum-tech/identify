@@ -1,3 +1,4 @@
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import { FunctionComponent, ReactNode, useContext } from 'react';
 import styled from 'styled-components';
 import { Footer, Header } from './components';
@@ -26,7 +27,11 @@ export const App: FunctionComponent<AppProps> = ({ children }) => {
       <GlobalStyle />
       <Wrapper>
         <Header handleToggleClick={toggleTheme} />
-        {children}
+        <GoogleOAuthProvider
+          clientId={`${process.env.GATSBY_GOOGLE_DRIVE_CLIENT_ID}`}
+        >
+          {children}
+        </GoogleOAuthProvider>
         <Footer />
       </Wrapper>
     </>
