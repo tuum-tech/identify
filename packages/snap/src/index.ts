@@ -1,5 +1,6 @@
 /* eslint-disable */
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
+import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import { IdentitySnapParams } from './interfaces';
 import { getAvailableMethods } from './rpc/did/getAvailableMethods';
 import { getDid } from './rpc/did/getDID';
@@ -51,7 +52,6 @@ const getMessage = (): string => `Hello, Identity Snap User!`;
  * @param args.request - A validated JSON-RPC request object.
  * @returns `null` if the request succeeded.
  * @throws If the request method is not valid for this snap.
- * @throws If the `snap_confirm` call failed.
  */
 export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
   let state = await getSnapStateUnchecked(snap);
@@ -110,14 +110,16 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
   switch (request.method) {
     case 'hello':
       return snap.request({
-        method: 'snap_confirm',
-        params: [
-          {
-            prompt: getMessage(),
-            description: 'This is what description will look like',
-            textAreaContent: 'This is what content will look like',
-          },
-        ],
+        method: 'snap_dialog',
+        params: {
+          type: 'Alert', // Type can be 'Alert', 'Confirmation' or 'Prompt'
+          content: panel([
+            heading('This is what the header looks like'),
+            text('This is what text area looks like before the divider'),
+            divider(),
+            text('This is what text area looks like after the divider'),
+          ]),
+        },
       });
     case 'togglePopups':
       return await togglePopups(identitySnapParams);

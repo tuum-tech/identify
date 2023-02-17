@@ -52,6 +52,7 @@
     "@metamask/key-tree": "^6.0.0",
     "@metamask/providers": "10.2.1",
     "@metamask/snaps-types": "^0.27.1",
+    "@metamask/snaps-ui": "^0.29.0",
     "@veramo/core": "next",
     "@veramo/credential-eip712": "next",
     "@veramo/credential-ld": "next",

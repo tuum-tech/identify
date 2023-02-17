@@ -1,5 +1,6 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
+import { Panel } from '@metamask/snaps-ui';
 import { IIdentifier, IKey, W3CVerifiableCredential } from '@veramo/core';
 import { ManagedPrivateKey } from '@veramo/key-manager';
 
@@ -60,8 +61,8 @@ export interface HederaAccount {
   evmAddress: string;
 }
 
-export type SnapConfirmParams = {
-  prompt: string;
-  description?: string;
-  textAreaContent?: string;
+export type SnapDialogParams = {
+  type: string;
+  content: Panel;
+  promptPlaceholder?: string;
 };

@@ -1,6 +1,7 @@
-import { IdentitySnapParams } from '../../interfaces';
+import { divider, heading, panel, text } from '@metamask/snaps-ui';
+import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
 import { SaveVCRequestParams } from '../../types/params';
-import { snapConfirm } from '../../utils/snapUtils';
+import { snapDialog } from '../../utils/snapUtils';
 import { veramoSaveVC } from '../../utils/veramoUtils';
 import { IDataManagerSaveResult } from '../../veramo/plugins/verfiable-creds-manager';
 
@@ -13,15 +14,21 @@ export async function saveVC(
 
   const { store = 'snap' } = options || {};
 
-  const promptObj = {
-    prompt: 'Save VC',
-    description: `Would you like to save the following VC in ${
-      typeof store === 'string' ? store : store.join(', ')
-    }?`,
-    textAreaContent: JSON.stringify(verifiableCredential),
+  const dialogParams: SnapDialogParams = {
+    type: 'Confirmation',
+    content: panel([
+      heading('Save Verifiable Credential'),
+      text(
+        `Would you like to save the following VC in ${
+          typeof store === 'string' ? store : store.join(', ')
+        }?`
+      ),
+      divider(),
+      text(JSON.stringify(verifiableCredential)),
+    ]),
   };
 
-  if (await snapConfirm(snap, promptObj)) {
+  if (await snapDialog(snap, dialogParams)) {
     return await veramoSaveVC(snap, verifiableCredential, store);
   }
   throw new Error('User rejected');

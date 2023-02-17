@@ -1,7 +1,7 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { validHederaChainID } from '../hedera/config';
-import { IdentitySnapState, SnapConfirmParams } from '../interfaces';
+import { IdentitySnapState, SnapDialogParams } from '../interfaces';
 import { isHederaAccountImported } from './params';
 import { updateSnapState } from './stateUtils';
 
@@ -135,12 +135,12 @@ export async function removeFriendlyDapp(
   return ethers.utils.recoverPublicKey(msgHashBytes, signedMsg);
 } */
 
-export async function snapConfirm(
+export async function snapDialog(
   snap: SnapsGlobalObject,
-  params: SnapConfirmParams
-): Promise<boolean> {
+  params: SnapDialogParams
+): Promise<string | boolean | null> {
   return (await snap.request({
-    method: 'snap_confirm',
-    params: [params],
+    method: 'snap_dialog',
+    params: params,
   })) as boolean;
 }
