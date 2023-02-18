@@ -7,7 +7,7 @@ import { getDefaultSnapState } from '../testUtils/constants';
 import { createMockWallet, WalletMock } from '../testUtils/wallet.mock';
 jest.mock('uuid');
 
-  describe.skip('getVCs', () => {
+  describe('getVCs', () => {
     let walletMock: SnapProvider & WalletMock;
     let snapState: IdentitySnapState; 
 
@@ -16,6 +16,10 @@ jest.mock('uuid');
       snapState = getDefaultSnapState();
       walletMock = createMockWallet();
       walletMock.rpcMocks.eth_chainId.mockReturnValue('0x128');
+            
+      // Setup snap confirm return
+      walletMock.rpcMocks.snap_confirm.mockReturnValue(true);
+      
 
       let privateKey = '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c';
       let connected = await connectHederaAccount(snapState, privateKey, '0.0.15215', walletMock);
@@ -25,7 +29,8 @@ jest.mock('uuid');
 
     it('should succeed returning VCS', async () => {
 
-      let snapState = getDefaultSnapState();
+      walletMock.rpcMocks.snap_confirm.mockReturnValue(true);
+
       await createVC(walletMock, snapState, { vcValue: {'prop':10} });
       await createVC(walletMock, snapState, { vcValue: {'prop':20} });
 
@@ -39,7 +44,6 @@ jest.mock('uuid');
 
      it.skip('should return only LoginType VCs', async () => {
 
-      let snapState = getDefaultSnapState();
       await createVC(walletMock, snapState, { vcValue: {'prop':10}, credTypes: ['Login'] });
       await createVC(walletMock, snapState, { vcValue: {'prop':20} });
 
@@ -56,13 +60,13 @@ jest.mock('uuid');
 
      it('should return empty if user rejects confirm', async () => {
 
-     let snapState = getDefaultSnapState();
+      walletMock.rpcMocks.snap_confirm.mockReturnValue(true);
+
       await createVC(walletMock, snapState, { vcValue: {'prop':10} });
       await createVC(walletMock, snapState, { vcValue: {'prop':20} });
 
       walletMock.rpcMocks.snap_confirm.mockReturnValue(false);
 
-      let vcsReturned  = await getVCs(walletMock, snapState, {});
       await expect(getVCs(walletMock, snapState, {})).rejects.toThrowError();
 
       expect.assertions(1);
