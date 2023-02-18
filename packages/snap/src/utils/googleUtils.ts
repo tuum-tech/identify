@@ -1,6 +1,7 @@
 import { IdentitySnapState, UploadData } from 'src/interfaces';
 
 export const GOOGLE_DRIVE_VCS_FILE_NAME = 'identity-snap-vcs.json';
+const BOUNDARY = '314159265358979323846';
 
 const searchFile = async (accessToken: string, fileName: string) => {
   try {
@@ -25,6 +26,25 @@ const searchFile = async (accessToken: string, fileName: string) => {
   }
 };
 
+const getRequestBodyToUpload = ({ fileName, content }: UploadData) => {
+  const metadata = {
+    name: fileName,
+    mimeType: 'text/plain',
+    // parents: ["root"], // Folder ID at Google Drive
+  };
+
+  const delimiter = `\r\n--${BOUNDARY}\r\n`;
+  const closeDelim = `\r\n--${BOUNDARY}--`;
+
+  let multipartRequestBody = `${delimiter}Content-Type: application/json\r\n\r\n${JSON.stringify(
+    metadata,
+  )}${delimiter}Content-Type: text/plain\r\n`;
+  multipartRequestBody += `\r\n${content}`;
+  multipartRequestBody += closeDelim;
+
+  return multipartRequestBody;
+};
+
 export const uploadToGoogleDrive = async (
   state: IdentitySnapState,
   { fileName, content }: UploadData,
@@ -38,22 +58,7 @@ export const uploadToGoogleDrive = async (
   }
 
   const existFile = await searchFile(accessToken, fileName);
-
-  const metadata = {
-    name: fileName,
-    mimeType: 'text/plain',
-    // parents: ["root"], // Folder ID at Google Drive
-  };
-
-  const boundary = '314159265358979323846';
-  const delimiter = `\r\n--${boundary}\r\n`;
-  const closeDelim = `\r\n--${boundary}--`;
-
-  let multipartRequestBody = `${delimiter}Content-Type: application/json\r\n\r\n${JSON.stringify(
-    metadata,
-  )}${delimiter}Content-Type: text/plain\r\n`;
-  multipartRequestBody += `\r\n${content}`;
-  multipartRequestBody += closeDelim;
+  const multipartRequestBody = getRequestBodyToUpload({ fileName, content });
 
   try {
     let res;
@@ -64,7 +69,7 @@ export const uploadToGoogleDrive = async (
           method: 'PATCH',
           headers: new Headers({
             Authorization: `Bearer ${accessToken}`,
-            'Content-Type': `multipart/related; boundary=${boundary}`,
+            'Content-Type': `multipart/related; boundary=${BOUNDARY}`,
           }),
           body: multipartRequestBody,
         },
@@ -76,7 +81,7 @@ export const uploadToGoogleDrive = async (
           method: 'POST',
           headers: new Headers({
             Authorization: `Bearer ${accessToken}`,
-            'Content-Type': `multipart/related; boundary=${boundary}`,
+            'Content-Type': `multipart/related; boundary=${BOUNDARY}`,
           }),
           body: multipartRequestBody,
         },
@@ -88,6 +93,44 @@ export const uploadToGoogleDrive = async (
     return val;
   } catch (error) {
     console.error('Could not upload to google drive', error);
+    return false;
+  }
+};
+
+export const createEmptyFile = async (
+  state: IdentitySnapState,
+  fileName: string,
+) => {
+  const accessToken =
+    state.accountState[state.currentAccount].accountConfig.identity
+      .googleAccessToken;
+  if (!accessToken) {
+    console.error('Access token not found');
+    return false;
+  }
+
+  const multipartRequestBody = getRequestBodyToUpload({
+    fileName,
+    content: '{}',
+  });
+
+  try {
+    const res = await fetch(
+      'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',
+      {
+        method: 'POST',
+        headers: new Headers({
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': `multipart/related; boundary=${BOUNDARY}`,
+        }),
+        body: multipartRequestBody,
+      },
+    );
+    const val = await res.json();
+
+    return val;
+  } catch (error) {
+    console.error('Could not create file on google drive', error);
     return false;
   }
 };

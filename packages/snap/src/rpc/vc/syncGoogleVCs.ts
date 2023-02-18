@@ -1,5 +1,6 @@
 import { IdentitySnapParams } from '../../interfaces';
 import {
+  createEmptyFile,
   getGoogleVCs,
   GOOGLE_DRIVE_VCS_FILE_NAME,
   uploadToGoogleDrive,
@@ -9,15 +10,16 @@ import { updateSnapState } from '../../utils/stateUtils';
 
 /* eslint-disable */
 export async function syncGoogleVCs(
-  identitySnapParams: IdentitySnapParams
+  identitySnapParams: IdentitySnapParams,
 ): Promise<boolean> {
   const { snap, state } = identitySnapParams;
 
   const currentVCs = state.accountState[state.currentAccount].vcs;
-  const googleVCs = await getGoogleVCs(state, GOOGLE_DRIVE_VCS_FILE_NAME);
+  let googleVCs = await getGoogleVCs(state, GOOGLE_DRIVE_VCS_FILE_NAME);
 
   if (!googleVCs) {
-    throw new Error('Invalid vcs file');
+    await createEmptyFile(state, GOOGLE_DRIVE_VCS_FILE_NAME);
+    googleVCs = {};
   }
 
   const snapVCIds = Object.keys(currentVCs);

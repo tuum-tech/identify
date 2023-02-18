@@ -3,6 +3,7 @@ import { W3CVerifiableCredential } from '@veramo/core';
 import jsonpath from 'jsonpath';
 import { v4 as uuidv4 } from 'uuid';
 import {
+  createEmptyFile,
   getGoogleVCs,
   GOOGLE_DRIVE_VCS_FILE_NAME,
   uploadToGoogleDrive,
@@ -35,7 +36,8 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     const googleVCs = await getGoogleVCs(state, GOOGLE_DRIVE_VCS_FILE_NAME);
 
     if (!googleVCs) {
-      throw new Error('Invalid vcs file');
+      console.log('Invalid vcs file');
+      return [];
     }
 
     if (filter && filter.type === 'id') {
@@ -96,15 +98,17 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     const account = state.currentAccount;
     if (!account)
       throw Error(
-        `GoogleDriveVCStore - Cannot get current account: ${account}`
+        `GoogleDriveVCStore - Cannot get current account: ${account}`,
       );
 
     let newId = id || uuidv4();
 
-    const googleVCs = await getGoogleVCs(state, GOOGLE_DRIVE_VCS_FILE_NAME);
+    let googleVCs = await getGoogleVCs(state, GOOGLE_DRIVE_VCS_FILE_NAME);
 
     if (!googleVCs) {
-      throw new Error('Invalid vcs file');
+      // throw new Error('Invalid vcs file');
+      await createEmptyFile(state, GOOGLE_DRIVE_VCS_FILE_NAME);
+      googleVCs = {};
     }
 
     const newVCs = { ...googleVCs, [newId]: vc };
@@ -122,7 +126,8 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     const googleVCs = await getGoogleVCs(state, GOOGLE_DRIVE_VCS_FILE_NAME);
 
     if (!googleVCs) {
-      throw new Error('Invalid vcs file');
+      console.log('Invalid vcs file');
+      return false;
     }
 
     if (!googleVCs[id]) throw Error(`VC ID '${id}' not found`);
