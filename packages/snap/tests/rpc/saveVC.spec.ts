@@ -36,9 +36,6 @@ jest.mock('uuid');
       let credential = await getDefaultCredential(agent, identifier.did);
       let params: SaveVCRequestParams = {
         verifiableCredential: credential,
-        // options: {
-          
-        // }
         
       };
 

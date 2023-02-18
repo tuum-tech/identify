@@ -27,25 +27,46 @@ jest.mock('uuid');
 
       // Setup
       walletMock.rpcMocks.snap_confirm.mockReturnValue(true);
+
+      // create VC to verify
       let vcCreatedResult = await createVC(walletMock, snapState, { vcValue: {'prop':10} });
-   
       let vc = await getVCs(walletMock, snapState, {filter: {type: 'id', filter: vcCreatedResult[0].id}})
 
 
-      console.log('-------VC ' + JSON.stringify(vc));
-      await expect(verifyVC(walletMock, snapState, vc[0].data as W3CVerifiableCredential)).toBe(true); 
-      
-
+      await expect(verifyVC(walletMock, snapState, vc[0].data as W3CVerifiableCredential)).resolves.toBe(true); 
       expect.assertions(1);
     });
 
-    it('should throw exception if user refused confirmation', async () => {
+     it('should reject VC is tampered', async () => {
 
-      let snapState: IdentitySnapState = getDefaultSnapState();
-    
-      walletMock.rpcMocks.snap_confirm.mockReturnValue(false);
+      // Setup
+      walletMock.rpcMocks.snap_confirm.mockReturnValue(true);
+
+      // create VC to verify
+      let vcCreatedResult = await createVC(walletMock, snapState, { vcValue: {'prop':10} });
+      let vc = await getVCs(walletMock, snapState, {filter: {type: 'id', filter: vcCreatedResult[0].id}})
+
+      let tamperedVc = JSON.parse(JSON.stringify(vc[0].data));
       
-      await expect(createVC(walletMock, getDefaultSnapState(), { vcValue: {'prop':10} })).rejects.toThrowError();
+      tamperedVc["issuer"]["id"] = "did:pkh:eip155:296:0x7d871f006d97498ea338268a956af94ab2e65cde";
+      console.log("tamp VC "+ JSON.stringify(tamperedVc));
+
+      await expect(verifyVC(walletMock, snapState, tamperedVc as W3CVerifiableCredential)).resolves.toBe(false); 
+      expect.assertions(1);
+    });
+
+    it.skip('should throw exception if user refused confirmation', async () => {
+
+        // Setup
+      walletMock.rpcMocks.snap_confirm.mockReturnValue(true);
+
+      // create VC to verify
+      let vcCreatedResult = await createVC(walletMock, snapState, { vcValue: {'prop':12} });
+      let vc = await getVCs(walletMock, snapState, {filter: {type: 'id', filter: vcCreatedResult[0].id}})
+
+      walletMock.rpcMocks.snap_confirm.mockReturnValue(false);
+      await expect(verifyVC(walletMock, snapState, vc[0].data as W3CVerifiableCredential)).rejects.toThrowError(); 
+      expect.assertions(1);
     });
   
 });

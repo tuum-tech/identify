@@ -7,14 +7,15 @@ import {
 } from '../testUtils/constants';
 import { createMockWallet, WalletMock } from '../testUtils/wallet.mock';
 
-describe.skip('Utils [did]', () => {
+describe('getCurrentDid', () => {
+ 
+ 
   let walletMock: SnapProvider & WalletMock;
 
   beforeEach(() => {
     walletMock = createMockWallet();
   });
 
-  describe('getCurrentDid', () => {
     it('should return did:pkh', async () => {
       const initialState = getDefaultSnapState();
 
@@ -37,4 +38,3 @@ describe.skip('Utils [did]', () => {
       expect.assertions(1);
     });
   });
-});

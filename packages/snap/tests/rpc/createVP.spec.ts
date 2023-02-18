@@ -35,11 +35,8 @@ jest.mock('uuid');
         verifiableCredential: createCredentialResult[0].id
       }
 
-
       // Act and assert
       await expect(createVP(walletMock, snapState, {vcs: [createCredentialResult[0].id as string]})).resolves.not.toBeUndefined();
-
-
 
       expect.assertions(1);
     });

@@ -1,4 +1,5 @@
 import { SnapProvider } from '@metamask/snap-types';
+import { IdentitySnapState } from 'src/interfaces';
 import { resolveDID } from '../../src/rpc/did/resolveDID';
 import { connectHederaAccount } from '../../src/rpc/hedera/connectHederaAccount';
 import { exampleDIDPkh, getDefaultSnapState } from '../testUtils/constants';
@@ -9,23 +10,21 @@ jest.mock('uuid');
 
   describe('resolveDID', () => {
     let walletMock: SnapProvider & WalletMock;
+    let snapState: IdentitySnapState; 
 
-    beforeEach(() => {
-
+    beforeEach(async() => {
+      snapState = getDefaultSnapState();
       walletMock = createMockWallet();
-      walletMock.rpcMocks.snap_manageState('update', getDefaultSnapState());
-      
+      walletMock.rpcMocks.eth_chainId.mockReturnValue('0x128');
 
-      
-      //walletMock.rpcMocks.snap_confirm()
-      //global.wallet = walletMock;
+      let privateKey = '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c';
+      let connected = await connectHederaAccount(snapState, privateKey, '0.0.15215', walletMock);
     });
     it('should succeed returning current did resolved', async () => {
      
-      let resolvedDid = await resolveDID(walletMock, getDefaultSnapState(), exampleDIDPkh);
+      let resolvedDid = await resolveDID(walletMock, snapState, exampleDIDPkh);
 
       console.log("resolved did:" + JSON.stringify(resolvedDid));
-      //let exampleDid = JSON.parse(exampleDIDResolved);
       let id = resolvedDid?.didDocument!["id"];
 
       expect(id).toEqual(exampleDIDPkh); 
@@ -35,20 +34,8 @@ jest.mock('uuid');
 
     it('should resolve current did when didUrl undefined', async () => {
 
-      let snapState = getDefaultSnapState();
-      walletMock.rpcMocks.eth_chainId.mockReturnValue('0x128');
-
-      let privateKey = '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c';
-      let connected = await connectHederaAccount(snapState, privateKey, '0.0.15215', walletMock);
-
-
-      console.log("is connected " + connected);
-      console.log("snap state "+ JSON.stringify(snapState));
-      
       let resolvedDid = await resolveDID(walletMock, snapState, undefined);
 
-      console.log("resolved did2:" + JSON.stringify(resolvedDid));
-      //let exampleDid = JSON.parse(exampleDIDResolved);
       let id = resolvedDid?.didDocument!["id"];
 
       expect(id).toEqual(snapState.accountState['0x7d871f006d97498ea338268a956af94ab2e65cdd'].identifiers[id as string].did); 

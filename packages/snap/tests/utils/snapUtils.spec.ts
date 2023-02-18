@@ -21,21 +21,7 @@ describe.skip('Utils [snap]', () => {
     walletMock = createMockWallet();
   });
 
-  describe('getCurrentAccount', () => {
-    // it('should succeed and return test account', async () => {
-    //   await expect(getCurrentAccount(walletMock)).resolves.toEqual(address);
 
-    //   expect.assertions(1);
-    // });
-
-    // it('should catch error and return null (user rejection)', async () => {
-    //   walletMock.rpcMocks.eth_requestAccounts.mockRejectedValue(new Error());
-
-    //   await expect(getCurrentAccount(walletMock)).resolves.toBeNull();
-
-    //   expect.assertions(1);
-    // });
-  });
 
   describe('getCurrentNetwork', () => {
     it('should succeed for mainnet (0x1)', async () => {

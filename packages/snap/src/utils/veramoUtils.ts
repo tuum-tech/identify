@@ -257,7 +257,7 @@ export async function veramoVerifyVP(
   vp: VerifiablePresentation
 ): Promise<IVerifyResult> {
   const agent = await getAgent(wallet, state);
-  return await agent.verifyPresentation({ presentation: vp });
+    return await agent.verifyPresentation({ presentation: vp });
 }
 
 export async function getKeyPairFromAgent(

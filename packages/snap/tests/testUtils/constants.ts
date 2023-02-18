@@ -4,6 +4,12 @@ import { getEmptyAccountState } from '../../src/utils/config';
 
 export const privateKey =
   '0x63ce0077f0d617dbf54d5f335de2983313c6356f25b45e0f68f85bee1490a6ae';
+
+
+
+export const hedera_privateKey = '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c';
+export const hedera_accountId = '0.0.15215';
+
 export const address = '0xb6665128eE91D84590f70c3268765384A9CAfBCd';
 export const publicKey =
   '0x0480a9cd48fd436f8c1f81b156eb615618cd573c3eb1e6d937a17b8222027cae850a9f561d414001a8bdefdb713c619d2caf08a0c9655b0cf42de065bc51e0169a';
