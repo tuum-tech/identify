@@ -5,7 +5,7 @@ import {
   IKey,
   IKeyManager,
   IService,
-  ManagedKeyInfo,
+  ManagedKeyInfo
 } from '@veramo/core';
 
 import { AbstractIdentifierProvider } from '@veramo/did-manager';
@@ -75,11 +75,19 @@ export class PkhDIDProvider extends AbstractIdentifierProvider {
       );
     }
 
-    const key: ManagedKeyInfo | null = await context.agent.keyManagerImport({
-      kms: kms || this.defaultKms,
-      type: 'Secp256k1',
-      privateKeyHex: options?.privateKey as string,
-    });
+    let key: ManagedKeyInfo | null;
+    if (options?.privateKey !== undefined){
+      key = await context.agent.keyManagerImport({
+        kms: kms || this.defaultKms,
+        type: 'Secp256k1',
+        privateKeyHex: options?.privateKey as string,
+      });
+    } else {
+      key = await context.agent.keyManagerCreate({ 
+        kms: kms || this.defaultKms, 
+        type: 'Secp256k1' 
+      });
+    }
     const evmAddress: string = toEthereumAddress(key.publicKeyHex);
 
     if (key !== null) {

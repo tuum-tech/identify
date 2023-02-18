@@ -1,3 +1,6 @@
+/* eslint-disable */
+
+
 import { SnapProvider } from '@metamask/snap-types';
 import {
   DIDResolutionResult,
@@ -243,9 +246,9 @@ export async function veramoCreateVP(
       challenge, // Optional (only JWT) string challenge parameter to add to the verifiable presentation
     });
     return vp;
+  } else {
+      throw new Error('User rejected');
   }
-  console.log('No VCs found...');
-  return null;
 }
 
 export async function veramoVerifyVP(

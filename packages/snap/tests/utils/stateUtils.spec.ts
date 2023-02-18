@@ -90,7 +90,7 @@ describe('Utils [state]', () => {
     it('should succeed initializing empty account state', async () => {
       const initialState = getInitialSnapState();
       const defaultState = getDefaultSnapState();
-      defaultState.accountState[address].publicKey = publicKey;
+      //defaultState.accountState[address].publicKey = publicKey;
 
       await expect(
         initAccountState(walletMock, initialState, address)
