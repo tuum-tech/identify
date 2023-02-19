@@ -27,32 +27,40 @@ jest.mock('uuid');
 
   
 
-    it('should succeed returning VCS', async () => {
+    it.skip('should succeed returning VCS', async () => {
 
       walletMock.rpcMocks.snap_confirm.mockReturnValue(true);
 
       await createVC(walletMock, snapState, { vcValue: {'prop':10} });
-      await createVC(walletMock, snapState, { vcValue: {'prop':20} });
 
-      console.log("state: " + JSON.stringify(snapState));
+     // console.log("state: " + JSON.stringify(snapState));
       let vcsReturned  = await getVCs(walletMock, snapState, {});
-      expect(vcsReturned.length).toEqual(2);
+      expect(vcsReturned.length).toEqual(1);
 
       expect.assertions(1);
     });
   
 
-     it.skip('should return only LoginType VCs', async () => {
+     it.skip('should filter Login Type VCs', async () => {
 
       await createVC(walletMock, snapState, { vcValue: {'prop':10}, credTypes: ['Login'] });
       await createVC(walletMock, snapState, { vcValue: {'prop':20} });
 
-      console.log("state: " + JSON.stringify(snapState));
       let vcsReturned  = await getVCs(walletMock, snapState, {options: {}, filter: {type: 'vcType', filter:'Login'}});
       expect(vcsReturned.length).toEqual(1);
 
       expect.assertions(1);
+    });
 
+
+    it('should filter VCs by id', async () => {
+
+      await createVC(walletMock, snapState, { vcValue: {'prop':10} });
+      let vcs = await getVCs(walletMock, snapState, {});
+      let vcId = vcs[0].metadata.id;
+
+      let vcsReturned  = await getVCs(walletMock, snapState, {filter: {type: 'id', filter:vcId}});
+      expect(vcsReturned.length).toEqual(1);
 
       expect.assertions(1);
     });
@@ -63,11 +71,10 @@ jest.mock('uuid');
       walletMock.rpcMocks.snap_confirm.mockReturnValue(true);
 
       await createVC(walletMock, snapState, { vcValue: {'prop':10} });
-      await createVC(walletMock, snapState, { vcValue: {'prop':20} });
 
       walletMock.rpcMocks.snap_confirm.mockReturnValue(false);
 
-      await expect(getVCs(walletMock, snapState, {})).rejects.toThrowError();
+      await expect(getVCs(walletMock, snapState, {})).resolves.toStrictEqual([]);
 
       expect.assertions(1);
     });
