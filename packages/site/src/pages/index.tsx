@@ -32,6 +32,7 @@ import {
   getCurrentDIDMethod,
   getCurrentNetwork,
   getDID,
+  getHederaAccountId,
   getSnap,
   getVCs,
   removeVC,
@@ -345,6 +346,18 @@ const Index = () => {
     }
   };
 
+  const handleGetHederaAccountIdClick = async () => {
+    try {
+      setCurrentChainId(await getCurrentNetwork());
+      const accountId = await getHederaAccountId();
+      console.log(`Your Hedera Account Id is: ${accountId}`);
+      alert(`Your Hedera Account Id is: ${accountId}`);
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
   return (
     <Container>
       <Heading>
@@ -362,7 +375,7 @@ const Index = () => {
         {!state.isFlask && (
           <Card
             content={{
-              title: 'Install',
+              title: 'Install Metamask Flask',
               description:
                 'Snaps is pre-release software only available in MetaMask Flask, a canary distribution for developers with access to upcoming features.',
               button: <InstallFlaskButton />,
@@ -373,7 +386,7 @@ const Index = () => {
         {!state.installedSnap && (
           <Card
             content={{
-              title: 'Connect to Metamask Snap',
+              title: 'Connect to Identity Snap',
               description:
                 'Get started by connecting to and installing the Identity Snap.',
               button: (
@@ -389,7 +402,7 @@ const Index = () => {
         {shouldDisplayReconnectButton(state.installedSnap) && (
           <Card
             content={{
-              title: 'Reconnect to Metamask Snap',
+              title: 'Reconnect to Identity Snap',
               description:
                 "While connected to a local running snap, this button will always be displayed in order to update the snap if a change is made. Note that you'll need to reconnect if you switch the network on Metamask at any point in time as that will cause your metamask state to change",
               button: (
@@ -859,74 +872,15 @@ const Index = () => {
           ''
         )}
         {/* =============================================================================== */}
-        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
-        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+        {validHederaChainID(currentChainId) && hederaAccountConnected ? (
           <Card
             content={{
-              title: 'uploadToGoogleDrive',
-              description: 'Upload VC to google drive',
-              form: (
-                <form>
-                  <label>
-                    Enter file name
-                    <input
-                      type="text"
-                      value={fileName}
-                      onChange={(e) => setFileName(e.target.value)}
-                    />
-                  </label>
-                  <br />
-                  <label>
-                    Enter value of content
-                    <input
-                      type="text"
-                      value={content}
-                      onChange={(e) => setContent(e.target.value)}
-                    />
-                  </label>
-                </form>
-              ),
+              title: 'getHederaAccountId',
+              description: 'Retrieve Hedera Account Id',
               button: (
                 <SendHelloButton
-                  buttonText="Upload to google drive"
-                  onClick={handleUploadToGoogleDrive}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        ) : (
-          ''
-        )}
-        {/* =============================================================================== */}
-        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
-        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
-          <Card
-            content={{
-              title: 'todo',
-              description: 'TODO',
-              /* form: (
-              <form>
-                <label>
-                  Enter your Verifiable Presentation
-                  <input
-                    type="text"
-                    value={JSON.stringify(vp)}
-                    onChange={(e) => setVp(e.target.value)}
-                  />
-                </label>
-              </form>
-            ), */
-              button: (
-                <SendHelloButton
-                  buttonText="todo"
-                  onClick={handleVerifyVPClick}
+                  buttonText="Get Account Id"
+                  onClick={handleGetHederaAccountIdClick}
                   disabled={!state.installedSnap}
                 />
               ),

@@ -1,30 +1,35 @@
-import { SnapProvider } from '@metamask/snap-types';
+import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import { IDataManagerDeleteResult } from 'src/veramo/plugins/verfiable-creds-manager';
-import { IdentitySnapState } from '../../interfaces';
+import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
 import { RemoveVCsRequestParams } from '../../types/params';
-import { snapConfirm } from '../../utils/snapUtils';
+import { snapDialog } from '../../utils/snapUtils';
 import { veramoRemoveVC } from '../../utils/veramoUtils';
 
 /* eslint-disable */
 export async function removeVC(
-  wallet: SnapProvider,
-  state: IdentitySnapState,
-  params: RemoveVCsRequestParams
+  identitySnapParams: IdentitySnapParams,
+  vcRequestParams: RemoveVCsRequestParams
 ): Promise<IDataManagerDeleteResult[] | null> {
-  const { id = '', options } = params || {};
+  const { snap } = identitySnapParams;
+
+  const { id = '', options } = vcRequestParams || {};
   const { store = 'snap' } = options || {};
 
   const ids = typeof id === 'string' ? [id] : id;
   if (ids.length === 0) return null;
 
-  const promptObj = {
-    prompt: 'Remove VC',
-    description: `Would you like to remove the following VC IDs?`,
-    textAreaContent: JSON.stringify(id),
+  const dialogParams: SnapDialogParams = {
+    type: 'Confirmation',
+    content: panel([
+      heading('Remove specific Verifiable Credentials'),
+      text('Would you like to remove the following VC IDs?'),
+      divider(),
+      text(JSON.stringify(id)),
+    ]),
   };
 
-  if (await snapConfirm(wallet, promptObj)) {
-    return await veramoRemoveVC(wallet, state, ids, store);
+  if (await snapDialog(snap, dialogParams)) {
+    return await veramoRemoveVC(snap, ids, store);
   }
   throw new Error('User rejected');
 }

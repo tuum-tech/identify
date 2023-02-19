@@ -1,57 +1,53 @@
-/* eslint-disable */
-
-
-import { SnapProvider } from '@metamask/snap-types';
+import { BIP44CoinTypeNode } from '@metamask/key-tree';
+import { SnapsGlobalObject } from '@metamask/snaps-types';
+import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import {
   DIDResolutionResult,
-  ICredentialIssuer,
-  IDataStore,
-  IDIDManager,
   IIdentifier,
-  IKeyManager,
-  IResolver,
   IVerifyResult,
   MinimalImportableKey,
   ProofFormat,
-  TAgent,
+  VerifiableCredential,
   VerifiablePresentation,
   W3CVerifiableCredential
 } from '@veramo/core';
 import cloneDeep from 'lodash.clonedeep';
 import { validHederaChainID } from '../hedera/config';
-import { IdentitySnapState } from '../interfaces';
+import { IdentitySnapParams, SnapDialogParams } from '../interfaces';
 import { KeyPair } from '../types/crypto';
 import { CreateVPRequestParams, GetVCsOptions } from '../types/params';
 import {
   Filter,
-  IDataManager,
   IDataManagerClearResult,
   IDataManagerDeleteResult,
   IDataManagerQueryResult,
   IDataManagerSaveResult
 } from '../veramo/plugins/verfiable-creds-manager';
-import { getAgent } from '../veramo/setup';
+import { Agent, getAgent } from '../veramo/setup';
 import { getCurrentDid } from './didUtils';
 import { getKeyPair } from './hederaUtils';
-import { getCurrentNetwork, snapConfirm } from './snapUtils';
+import { getAddressKeyDeriver, snapGetKeysFromAddress } from './keyPair';
+import { getCurrentNetwork, snapDialog } from './snapUtils';
 
 /* eslint-disable */
 export async function veramoResolveDID(
-  wallet: SnapProvider,
-  state: IdentitySnapState,
+  identitySnapParams: IdentitySnapParams,
   didUrl?: string
 ): Promise<DIDResolutionResult> {
+  const { snap } = identitySnapParams;
   let did = didUrl;
-  // Get agent
-  const agent = await getAgent(wallet, state);
 
-  
-  const keyPair = await getKeyPairFromAgent(wallet, state, agent);
+  // Get agent
+  const agent = await getAgent(snap);
 
 
   // GET DID if not exists
   if (!did) {
-    did = await veramoImportMetaMaskAccount(wallet, state, keyPair);
+    const identifier = await veramoImportMetaMaskAccount(
+      identitySnapParams,
+      agent
+    );
+    did = identifier.did;
   }
   return await agent.resolveDid({
     didUrl: did,
@@ -59,12 +55,11 @@ export async function veramoResolveDID(
 }
 
 export async function veramoGetVCs(
-  wallet: SnapProvider,
-  state: IdentitySnapState,
+  snap: SnapsGlobalObject,
   options: GetVCsOptions,
   filter?: Filter
 ): Promise<IDataManagerQueryResult[]> {
-  const agent = await getAgent(wallet, state);
+  const agent = await getAgent(snap);
   const result = (await agent.query({
     filter,
     options,
@@ -73,12 +68,11 @@ export async function veramoGetVCs(
 }
 
 export async function veramoSaveVC(
-  wallet: SnapProvider,
-  state: IdentitySnapState,
+  snap: SnapsGlobalObject,
   verifiableCredential: W3CVerifiableCredential,
   store: string | string[]
 ): Promise<IDataManagerSaveResult[]> {
-  const agent = await getAgent(wallet, state);
+  const agent = await getAgent(snap);
   const result = await agent.save({
     data: verifiableCredential,
     options: { store },
@@ -87,17 +81,23 @@ export async function veramoSaveVC(
 }
 
 export async function veramoCreateVC(
-  wallet: SnapProvider,
-  state: IdentitySnapState,
+  identitySnapParams: IdentitySnapParams,
   vcKey: string,
   vcValue: object,
   store: string | string[],
   credTypes: string[]
 ): Promise<IDataManagerSaveResult[]> {
-  const agent = await getAgent(wallet, state);
-  const keyPair = await getKeyPairFromAgent(wallet, state, agent);
+  const { snap, state, metamask } = identitySnapParams;
+
+  // Get agent
+  const agent = await getAgent(snap);
+
   // GET DID
-  const did = await veramoImportMetaMaskAccount(wallet, state, keyPair);
+  const identifier = await veramoImportMetaMaskAccount(
+    identitySnapParams,
+    agent
+  );
+  const did = identifier.did;
 
   const issuanceDate = new Date();
   const expirationDate = cloneDeep(issuanceDate);
@@ -117,7 +117,7 @@ export async function veramoCreateVC(
     id: did, // identifier for the only subject of the credential
     [vcKey]: vcValue, // assertion about the only subject of the credential
   };
-  const chainId = await getCurrentNetwork(wallet);
+  const chainId = await getCurrentNetwork(metamask);
   if (validHederaChainID(chainId)) {
     const hederaAccountId =
       state.accountState[state.currentAccount].hederaAccount.accountId;
@@ -127,11 +127,12 @@ export async function veramoCreateVC(
   credential.set('issuer', issuer); // the entity that issued the credential
   credential.set('credentialSubject', credentialSubject);
 
-  const verifiableCredential = await agent.createVerifiableCredential({
-    credential: JSON.parse(JSON.stringify(Object.fromEntries(credential))),
-    // digital proof that makes the credential tamper-evident
-    proofFormat: 'jwt' as ProofFormat,
-  });
+  const verifiableCredential: W3CVerifiableCredential =
+    await agent.createVerifiableCredential({
+      credential: JSON.parse(JSON.stringify(Object.fromEntries(credential))),
+      // digital proof that makes the credential tamper-evident
+      proofFormat: 'jwt' as ProofFormat,
+    });
 
   console.log(
     'Created verifiableCredential: ',
@@ -145,21 +146,20 @@ export async function veramoCreateVC(
 }
 
 export async function veramoVerifyVC(
-  wallet: SnapProvider,
-  state: IdentitySnapState,
+  snap: SnapsGlobalObject,
   vc: W3CVerifiableCredential
 ): Promise<IVerifyResult> {
-  const agent = await getAgent(wallet, state);
+  // Get agent
+  const agent = await getAgent(snap);
   return await agent.verifyCredential({ credential: vc });
 }
 
 export async function veramoRemoveVC(
-  wallet: SnapProvider,
-  state: IdentitySnapState,
+  snap: SnapsGlobalObject,
   ids: string[],
   store: string | string[]
 ): Promise<IDataManagerDeleteResult[]> {
-  const agent = await getAgent(wallet, state);
+  const agent = await getAgent(snap);
   let options: any = undefined;
   if (store) options = { store };
 
@@ -176,11 +176,10 @@ export async function veramoRemoveVC(
 }
 
 export async function veramoDeleteAllVCs(
-  wallet: SnapProvider,
-  state: IdentitySnapState,
+  snap: SnapsGlobalObject,
   store: string | string[]
 ): Promise<IDataManagerClearResult[]> {
-  const agent = await getAgent(wallet, state);
+  const agent = await getAgent(snap);
   let options: any = undefined;
   if (store) options = { store };
 
@@ -190,26 +189,32 @@ export async function veramoDeleteAllVCs(
 }
 
 export async function veramoCreateVP(
-  wallet: SnapProvider,
-  state: IdentitySnapState,
-  params: CreateVPRequestParams
+  identitySnapParams: IdentitySnapParams,
+  vpRequestParams: CreateVPRequestParams
 ): Promise<VerifiablePresentation | null> {
-  const vcsMetadata = params.vcs;
-  const proofFormat = params.proofInfo?.proofFormat
-    ? params.proofInfo.proofFormat
+  const { snap, state, metamask } = identitySnapParams;
+
+  const vcsMetadata = vpRequestParams.vcs;
+  const proofFormat = vpRequestParams.proofInfo?.proofFormat
+    ? vpRequestParams.proofInfo.proofFormat
     : ('jwt' as ProofFormat);
-  const type = params.proofInfo?.type ? params.proofInfo.type : 'Custom';
-  const domain = params.proofInfo?.domain;
-  const challenge = params.proofInfo?.challenge;
+  const type = vpRequestParams.proofInfo?.type
+    ? vpRequestParams.proofInfo.type
+    : 'Custom';
+  const domain = vpRequestParams.proofInfo?.domain;
+  const challenge = vpRequestParams.proofInfo?.challenge;
 
   //Get Veramo agent
-  const agent = await getAgent(wallet, state);
+  const agent = await getAgent(snap);
 
   //GET DID
-  const keyPair = await getKeyPairFromAgent(wallet, state, agent);
-  const did = await veramoImportMetaMaskAccount(wallet, state, keyPair);
+  const identifier = await veramoImportMetaMaskAccount(
+    identitySnapParams,
+    agent
+  );
+  const did = identifier.did;
 
-  const vcs: W3CVerifiableCredential[] = [];
+  const vcs: VerifiableCredential[] = [];
 
   for (const vcId of vcsMetadata) {
     const vcObj = (await agent.query({
@@ -220,21 +225,36 @@ export async function veramoCreateVP(
       options: { store: 'snap' },
     })) as IDataManagerQueryResult[];
     if (vcObj.length > 0) {
-      const vc: W3CVerifiableCredential = vcObj[0]
-        .data as W3CVerifiableCredential;
+      const vc: VerifiableCredential = vcObj[0].data as VerifiableCredential;
       vcs.push(vc);
     }
   }
 
   if (vcs.length === 0) return null;
   const config = state.snapConfig;
-  const promptObj = {
-    prompt: 'Alert',
-    description: 'Do you wish to create a VP from the following VC IDs?',
-    textAreaContent: JSON.stringify(vcsMetadata),
+
+  const panelToShow = [
+    heading('Create Verifiable Presentation'),
+    text('Do you wish to create a VP from the following VCs?'),
+    divider(),
+  ];
+  vcs.forEach((vcData, index) => {
+    const vcsToShow = {
+      credentialSubject: vcData.credentialSubject,
+      type: vcData.type,
+    };
+    panelToShow.push(divider());
+    panelToShow.push(text(`Credential #${index + 1}`));
+    panelToShow.push(divider());
+    panelToShow.push(text(JSON.stringify(vcsToShow)));
+  });
+
+  const dialogParams: SnapDialogParams = {
+    type: 'Confirmation',
+    content: panel(panelToShow),
   };
 
-  if (config.dApp.disablePopups || (await snapConfirm(wallet, promptObj))) {
+  if (config.dApp.disablePopups || (await snapDialog(snap, dialogParams))) {
     const vp = await agent.createVerifiablePresentation({
       presentation: {
         holder: did, //
@@ -252,68 +272,85 @@ export async function veramoCreateVP(
 }
 
 export async function veramoVerifyVP(
-  wallet: SnapProvider,
-  state: IdentitySnapState,
+  snap: SnapsGlobalObject,
   vp: VerifiablePresentation
 ): Promise<IVerifyResult> {
-  const agent = await getAgent(wallet, state);
-    return await agent.verifyPresentation({ presentation: vp });
+  const agent = await getAgent(snap);
+  return await agent.verifyPresentation({ presentation: vp });
 }
 
-export async function getKeyPairFromAgent(
-  wallet: SnapProvider,
-  state: IdentitySnapState,
-  agent: TAgent<
-    IKeyManager &
-      IDIDManager &
-      IResolver &
-      IDataManager &
-      ICredentialIssuer &
-      IDataStore
-  >
-): Promise<KeyPair> {
-  let keyPair = {} as KeyPair;
-  const controllerKeyId = `metamask-${state.currentAccount}`;
+export async function veramoConnectHederaAccount(
+  agent: Agent,
+  account: string,
+  privateKey: string
+): Promise<boolean> {
+  const controllerKeyId = `metamask-${account}`;
   try {
-    const privateKey = (await agent.keyManagerGet({ kid: controllerKeyId }))
-      .privateKeyHex;
-
-    if (privateKey !== undefined) {
-      keyPair = await getKeyPair(privateKey);
-    }
+    const keyPair: KeyPair = await getKeyPair(privateKey);
+    await agent.keyManagerImport({
+      kid: controllerKeyId,
+      kms: 'snap',
+      type: 'Secp256k1',
+      privateKeyHex: keyPair.privateKey,
+      publicKeyHex: keyPair.publicKey,
+    });
   } catch (error) {
-    console.log(`Error: ${error}`);
+    console.log(`Could not connect to Hedera Account: ${error}`);
+    return false;
   }
-  return keyPair;
+  return true;
 }
 
 export async function veramoImportMetaMaskAccount(
-  wallet: SnapProvider,
-  state: IdentitySnapState,
-  keyPair: KeyPair
-): Promise<string> {
-  const agent = await getAgent(wallet, state);
+  identitySnapParams: IdentitySnapParams,
+  agent: Agent
+): Promise<IIdentifier> {
+  const { snap, state, metamask } = identitySnapParams;
   const method =
     state.accountState[state.currentAccount].accountConfig.identity.didMethod;
-  const did = await getCurrentDid(wallet, state);
-
-  console.log("current did " + did );
-  const identifiers = await agent.didManagerFind();
-
-  let exists = false;
-  identifiers.forEach((id: IIdentifier) => {
-    if (id.did === did) {
-      exists = true;
-    }
-  });
-
-  if (exists) {
-    console.log('DID already exists', did);
-    return did;
-  }
+  const did = await getCurrentDid(state, metamask);
 
   const controllerKeyId = `metamask-${state.currentAccount}`;
-  await agent.didManagerImport({
+
+  const keyPair: KeyPair = { privateKey: '', publicKey: '' };
+  // Use metamask private keys if it's not hedera network since we can directly use those
+  // unlike for hedera where we request the user for their private key and accountId while configuring
+  const chainId = await getCurrentNetwork(metamask);
+  if (validHederaChainID(chainId)) {
+    // TODO: This is a very hacky way to retrieve private key for hedera account. Try to use veramo agent if possible
+    try {
+      const privateKey =
+        state.accountState[state.currentAccount].snapPrivateKeyStore[
+          controllerKeyId
+        ].privateKeyHex;
+      const kp = await getKeyPair(privateKey);
+      keyPair.privateKey = kp.privateKey;
+      keyPair.publicKey = kp.publicKey;
+    } catch (error) {
+      console.log(
+        `Failed to get private keys from Metamask account for Hedera network. Error: ${error}`
+      );
+      throw new Error(
+        `Failed to get private keys from Metamask account for Hedera network. Error: ${error}`
+      );
+    }
+  } else {
+    const bip44CoinTypeNode = await getAddressKeyDeriver(snap);
+    const res = await snapGetKeysFromAddress(
+      bip44CoinTypeNode as BIP44CoinTypeNode,
+      state,
+      state.currentAccount,
+      snap
+    );
+    if (!res) {
+      console.log('Failed to get private keys from Metamask account');
+      throw new Error('Failed to get private keys from Metamask account');
+    }
+    keyPair.privateKey = res.privateKey.split('0x')[1];
+    keyPair.publicKey = res.publicKey.split('0x')[1];
+  }
+
+  const identifier = await agent.didManagerImport({
     did,
     provider: method,
     controllerKeyId,
@@ -332,5 +369,5 @@ export async function veramoImportMetaMaskAccount(
   );
 
   console.log('imported successfully');
-  return did;
+  return identifier;
 }

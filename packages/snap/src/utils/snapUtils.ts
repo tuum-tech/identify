@@ -1,6 +1,7 @@
-import { SnapProvider } from '@metamask/snap-types';
+import { MetaMaskInpageProvider } from '@metamask/providers';
+import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { validHederaChainID } from '../hedera/config';
-import { IdentitySnapState, SnapConfirmParams } from '../interfaces';
+import { IdentitySnapState, SnapDialogParams } from '../interfaces';
 import { isHederaAccountImported } from './params';
 import { updateSnapState } from './stateUtils';
 
@@ -15,11 +16,11 @@ import { updateSnapState } from './stateUtils';
  *
  **/
 export async function getCurrentAccount(
-  wallet: SnapProvider,
-  state: IdentitySnapState
+  state: IdentitySnapState,
+  metamask: MetaMaskInpageProvider
 ): Promise<string | null> {
   try {
-    const chainId = await getCurrentNetwork(wallet);
+    const chainId = await getCurrentNetwork(metamask);
     if (validHederaChainID(chainId)) {
       // Handle Hedera
       if (isHederaAccountImported(state)) {
@@ -39,16 +40,8 @@ export async function getCurrentAccount(
         return null;
       }
     } else {
-      // TODO: Maybe we don't need this block at all?
-      if (
-        wallet.selectedAddress &&
-        wallet.selectedAddress !== state.currentAccount
-      ) {
-        state.currentAccount = wallet.selectedAddress;
-        await updateSnapState(wallet, state);
-      }
       // Handle everything else
-      const accounts = (await wallet.request({
+      const accounts = (await metamask.request({
         method: 'eth_requestAccounts',
       })) as Array<string>;
       console.log(`MetaMask accounts: EVM Address: ${accounts}`);
@@ -60,8 +53,10 @@ export async function getCurrentAccount(
   }
 }
 
-export async function getCurrentNetwork(wallet: SnapProvider): Promise<string> {
-  return (await wallet.request({
+export async function getCurrentNetwork(
+  metamask: MetaMaskInpageProvider
+): Promise<string> {
+  return (await metamask.request({
     method: 'eth_chainId',
   })) as string;
 }
@@ -71,11 +66,11 @@ export async function getCurrentNetwork(wallet: SnapProvider): Promise<string> {
  *
  */
 export async function updatePopups(
-  wallet: SnapProvider,
+  snap: SnapsGlobalObject,
   state: IdentitySnapState
 ) {
   state.snapConfig.dApp.disablePopups = !state.snapConfig.dApp.disablePopups;
-  await updateSnapState(wallet, state);
+  await updateSnapState(snap, state);
 }
 
 /**
@@ -83,12 +78,12 @@ export async function updatePopups(
  *
  */
 export async function addFriendlyDapp(
-  wallet: SnapProvider,
+  snap: SnapsGlobalObject,
   state: IdentitySnapState,
   dapp: string
 ) {
   state.snapConfig.dApp.friendlyDapps.push(dapp);
-  await updateSnapState(wallet, state);
+  await updateSnapState(snap, state);
 }
 
 /**
@@ -96,7 +91,7 @@ export async function addFriendlyDapp(
  *
  */
 export async function removeFriendlyDapp(
-  wallet: SnapProvider,
+  snap: SnapsGlobalObject,
   state: IdentitySnapState,
   dapp: string
 ) {
@@ -105,7 +100,7 @@ export async function removeFriendlyDapp(
   // friendlyDapps = friendlyDapps.filter((d) => d !== dapp);
   state.snapConfig.dApp.friendlyDapps =
     state.snapConfig.dApp.friendlyDapps.filter((d) => d !== dapp);
-  await updateSnapState(wallet, state);
+  await updateSnapState(snap, state);
 }
 
 /**
@@ -140,12 +135,12 @@ export async function removeFriendlyDapp(
   return ethers.utils.recoverPublicKey(msgHashBytes, signedMsg);
 } */
 
-export async function snapConfirm(
-  wallet: SnapProvider,
-  params: SnapConfirmParams
-): Promise<boolean> {
-  return (await wallet.request({
-    method: 'snap_confirm',
-    params: [params],
+export async function snapDialog(
+  snap: SnapsGlobalObject,
+  params: SnapDialogParams
+): Promise<string | boolean | null> {
+  return (await snap.request({
+    method: 'snap_dialog',
+    params: params,
   })) as boolean;
 }

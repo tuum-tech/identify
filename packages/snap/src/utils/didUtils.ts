@@ -1,12 +1,12 @@
-import { SnapProvider } from '@metamask/snap-types';
+import { MetaMaskInpageProvider } from '@metamask/providers';
 import { getDidPkhIdentifier } from '../did/pkh/pkhDidUtils';
 import { IdentitySnapState } from '../interfaces';
 import { availableMethods, isValidMethod } from '../types/constants';
 
 /* eslint-disable */
 export async function getCurrentDid(
-  wallet: SnapProvider,
-  state: IdentitySnapState
+  state: IdentitySnapState,
+  metamask: MetaMaskInpageProvider
 ): Promise<string> {
   let did: string = '';
   console.log("account State" + JSON.stringify(state.accountState));
@@ -23,7 +23,7 @@ export async function getCurrentDid(
   }
 
   if (method === 'did:pkh') {
-    const didUrl = await getDidPkhIdentifier(wallet, state);
+    const didUrl = await getDidPkhIdentifier(state, metamask);
     did = `did:pkh:${didUrl}`;
   }
   return did;

@@ -1,10 +1,13 @@
 /* eslint-disable */
-import { OnRpcRequestHandler } from '@metamask/snap-types';
+import { OnRpcRequestHandler } from '@metamask/snaps-types';
+import { divider, heading, panel, text } from '@metamask/snaps-ui';
+import { IdentitySnapParams } from './interfaces';
 import { getAvailableMethods } from './rpc/did/getAvailableMethods';
 import { getDid } from './rpc/did/getDID';
 import { resolveDID } from './rpc/did/resolveDID';
 import { switchMethod } from './rpc/did/switchMethods';
 import { connectHederaAccount } from './rpc/hedera/connectHederaAccount';
+import { getHederaAccountId } from './rpc/hedera/getHederaAccountId';
 import { togglePopups } from './rpc/snap/togglePopups';
 import { uploadToGoogleDrive } from './rpc/store/gdrive';
 import { createVC } from './rpc/vc/createVC';
@@ -40,28 +43,21 @@ import { getSnapStateUnchecked, initAccountState } from './utils/stateUtils';
  * @param originString - The origin string.
  * @returns A message based on the origin.
  */
-export const getMessage = (originString: string): string =>
-  `Hello, ${originString}!`;
+const getMessage = (): string => `Hello, Identity Snap User!`;
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
  *
  * @param args - The request handler args as object.
- * @param args.origin - The origin of the request, e.g., the website that
- * invoked the snap.
  * @param args.request - A validated JSON-RPC request object.
  * @returns `null` if the request succeeded.
  * @throws If the request method is not valid for this snap.
- * @throws If the `snap_confirm` call failed.
  */
-export const onRpcRequest: OnRpcRequestHandler = async ({
-  origin,
-  request,
-}) => {
-  let state = await getSnapStateUnchecked(wallet);
+export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
+  let state = await getSnapStateUnchecked(snap);
 
   if (state === null) {
-    state = await init(wallet);
+    state = await init(snap);
   }
   console.log('state:', JSON.stringify(state, null, 4));
 
@@ -73,13 +69,15 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
    */
   if (request.method == 'connectHederaAccount') {
     isValidHederaAccountParams(request.params);
-    return connectHederaAccount(
+    return await connectHederaAccount(
+      snap,
       state,
+      ethereum,
       request.params.privateKey,
       request.params.accountId
     );
   }
-  const account = await getCurrentAccount(wallet, state);
+  const account = await getCurrentAccount(state, ethereum);
   console.log('account:', account);
 
   // FIXME: HANDLE NULL maybe throw ?
@@ -91,8 +89,14 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     state.currentAccount = account;
   }
 
+  const identitySnapParams: IdentitySnapParams = {
+    snap,
+    state,
+    metamask: ethereum,
+  };
+
   if (!(account in state.accountState)) {
-    await initAccountState(wallet, state, account);
+    await initAccountState(snap, state, state.currentAccount);
   }
 
   console.log('Request:', JSON.stringify(request, null, 4));
@@ -105,72 +109,78 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
   switch (request.method) {
     case 'hello':
-      return wallet.request({
-        method: 'snap_confirm',
-        params: [
-          {
-            prompt: getMessage(origin),
-            description: 'This is what description will look like',
-            textAreaContent: 'This is what content will look like',
-          },
-        ],
+      return snap.request({
+        method: 'snap_dialog',
+        params: {
+          type: 'Alert', // Type can be 'Alert', 'Confirmation' or 'Prompt'
+          content: panel([
+            heading('This is what the header looks like'),
+            text('This is what text area looks like before the divider'),
+            divider(),
+            text('This is what text area looks like after the divider'),
+          ]),
+        },
       });
     case 'togglePopups':
-      return await togglePopups(wallet, state);
+      return await togglePopups(identitySnapParams);
     case 'getDID':
-      await switchNetworkIfNecessary(wallet, state);
-      return await getDid(wallet, state);
+      await switchNetworkIfNecessary(identitySnapParams);
+      return await getDid(identitySnapParams);
     case 'resolveDID':
       isValidResolveDIDRequest(request.params);
-      await switchNetworkIfNecessary(wallet, state);
-      return await resolveDID(wallet, state, request.params.did);
+      await switchNetworkIfNecessary(identitySnapParams);
+      return await resolveDID(identitySnapParams, request.params.did);
     case 'getVCs':
       isValidGetVCsRequest(request.params);
-      await switchNetworkIfNecessary(wallet, state);
-      return await getVCs(wallet, state, request.params);
+      await switchNetworkIfNecessary(identitySnapParams);
+      return await getVCs(identitySnapParams, request.params);
     case 'saveVC':
       isValidSaveVCRequest(request.params);
-      await switchNetworkIfNecessary(wallet, state);
-      return await saveVC(wallet, state, request.params);
+      await switchNetworkIfNecessary(identitySnapParams);
+      return await saveVC(identitySnapParams, request.params);
     case 'createVC':
       isValidCreateVCRequest(request.params);
-      await switchNetworkIfNecessary(wallet, state);
-      return await createVC(wallet, state, request.params);
+      await switchNetworkIfNecessary(identitySnapParams);
+      return await createVC(identitySnapParams, request.params);
     case 'verifyVC':
       isValidVerifyVCRequest(request.params);
-      await switchNetworkIfNecessary(wallet, state);
-      return await verifyVC(wallet, state, request.params.verifiableCredential);
+      await switchNetworkIfNecessary(identitySnapParams);
+      return await verifyVC(
+        identitySnapParams,
+        request.params.verifiableCredential
+      );
     case 'removeVC':
       isValidRemoveVCRequest(request.params);
-      await switchNetworkIfNecessary(wallet, state);
-      return await removeVC(wallet, state, request.params);
+      await switchNetworkIfNecessary(identitySnapParams);
+      return await removeVC(identitySnapParams, request.params);
     case 'deleteAllVCs':
       isValidDeleteAllVCsRequest(request.params);
-      await switchNetworkIfNecessary(wallet, state);
-      return await deleteAllVCs(wallet, state, request.params);
+      await switchNetworkIfNecessary(identitySnapParams);
+      return await deleteAllVCs(identitySnapParams, request.params);
     case 'createVP':
       isValidCreateVPRequest(request.params);
-      await switchNetworkIfNecessary(wallet, state);
-      return await createVP(wallet, state, request.params);
+      await switchNetworkIfNecessary(identitySnapParams);
+      return await createVP(identitySnapParams, request.params);
     case 'verifyVP':
       isValidVerifyVPRequest(request.params);
-      await switchNetworkIfNecessary(wallet, state);
+      await switchNetworkIfNecessary(identitySnapParams);
       return await verifyVP(
-        wallet,
-        state,
+        identitySnapParams,
         request.params.verifiablePresentation
       );
     case 'getAvailableMethods':
       return getAvailableMethods();
     case 'getCurrentDIDMethod':
-      await switchNetworkIfNecessary(wallet, state);
+      await switchNetworkIfNecessary(identitySnapParams);
       return state.accountState[state.currentAccount].accountConfig.identity
         .didMethod;
     case 'switchMethod':
       isValidSwitchMethodRequest(request.params);
-      return await switchMethod(wallet, state, request.params.didMethod);
+      return await switchMethod(identitySnapParams, request.params.didMethod);
     case 'getSupportedProofFormats':
       return getSupportedProofFormats();
+    case 'getHederaAccountId':
+      return await getHederaAccountId(identitySnapParams);
     case 'uploadToGoogleDrive':
       return await uploadToGoogleDrive((request.params as any).uploadData);
     default:

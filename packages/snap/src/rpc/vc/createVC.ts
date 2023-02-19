@@ -1,30 +1,42 @@
-import { SnapProvider } from '@metamask/snap-types';
-import { IdentitySnapState } from '../../interfaces';
+import { divider, heading, panel, text } from '@metamask/snaps-ui';
+import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
 import { CreateVCRequestParams } from '../../types/params';
-import { snapConfirm } from '../../utils/snapUtils';
+import { snapDialog } from '../../utils/snapUtils';
 import { veramoCreateVC } from '../../utils/veramoUtils';
 import { IDataManagerSaveResult } from '../../veramo/plugins/verfiable-creds-manager';
 
 /* eslint-disable */
 export async function createVC(
-  wallet: SnapProvider,
-  state: IdentitySnapState,
-  params: CreateVCRequestParams
+  identitySnapParams: IdentitySnapParams,
+  vcRequestParams: CreateVCRequestParams
 ): Promise<IDataManagerSaveResult[]> {
-  const { vcKey = 'vcData', vcValue, credTypes = [], options } = params || {};
+  const { snap } = identitySnapParams;
+
+  const {
+    vcKey = 'vcData',
+    vcValue,
+    credTypes = [],
+    options,
+  } = vcRequestParams || {};
   const { store = 'snap' } = options || {};
 
-  const promptObj = {
-    prompt: 'Create and Save VC',
-    description: `Would you like to create and save the following VC in snap?`,
-    textAreaContent: JSON.stringify({
-      [vcKey]: vcValue,
-    }),
+  const dialogParams: SnapDialogParams = {
+    type: 'Confirmation',
+    content: panel([
+      heading('Create Verifiable Credential'),
+      text('Would you like to create and save the following VC in the snap?'),
+      divider(),
+      text(
+        JSON.stringify({
+          [vcKey]: vcValue,
+        })
+      ),
+    ]),
   };
-  if (await snapConfirm(wallet, promptObj)) {
+
+  if (await snapDialog(snap, dialogParams)) {
     return await veramoCreateVC(
-      wallet,
-      state,
+      identitySnapParams,
       vcKey,
       vcValue,
       store,
