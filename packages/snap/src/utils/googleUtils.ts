@@ -3,6 +3,27 @@ import { IdentitySnapState, UploadData } from 'src/interfaces';
 export const GOOGLE_DRIVE_VCS_FILE_NAME = 'identity-snap-vcs.json';
 const BOUNDARY = '314159265358979323846';
 
+export const verifyToken = async (accessToken: string) => {
+  try {
+    const res = await fetch(
+      `https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${accessToken}`,
+      {
+        method: 'GET',
+      },
+    );
+    const data = await res.json();
+    if (res.status !== 200) {
+      throw Error(data.error_description);
+    }
+    console.log('VerifyToken: ', { data: JSON.stringify(data) });
+
+    return true;
+  } catch (error) {
+    console.error('Failed to verify token', error);
+    throw error;
+  }
+};
+
 const searchFile = async (accessToken: string, fileName: string) => {
   try {
     const res = await fetch(

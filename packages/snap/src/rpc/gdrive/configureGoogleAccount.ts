@@ -1,15 +1,17 @@
 import { GoogleToken, IdentitySnapParams } from '../../interfaces';
+import { verifyToken } from '../../utils/googleUtils';
 import { updateSnapState } from '../../utils/stateUtils';
 
 export const configureGoogleAccount = async (
   identitySnapParams: IdentitySnapParams,
-  googleTokenParams: GoogleToken,
+  { accessToken }: GoogleToken,
 ) => {
   const { snap, state } = identitySnapParams;
   try {
+    await verifyToken(accessToken);
     state.accountState[
       state.currentAccount
-    ].accountConfig.identity.googleAccessToken = googleTokenParams.accessToken;
+    ].accountConfig.identity.googleAccessToken = accessToken;
     await updateSnapState(snap, state);
     return true;
   } catch (error) {
