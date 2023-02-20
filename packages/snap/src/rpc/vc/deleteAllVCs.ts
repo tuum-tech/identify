@@ -1,7 +1,8 @@
+import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import { IDataManagerClearResult } from 'src/veramo/plugins/verfiable-creds-manager';
-import { IdentitySnapParams } from '../../interfaces';
+import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
 import { DeleteAllVCsRequestParams } from '../../types/params';
-import { snapConfirm } from '../../utils/snapUtils';
+import { snapDialog } from '../../utils/snapUtils';
 import { veramoDeleteAllVCs } from '../../utils/veramoUtils';
 
 /* eslint-disable */
@@ -14,13 +15,19 @@ export async function deleteAllVCs(
   const { options } = vcRequestParams || {};
   const { store = 'snap' } = options || {};
 
-  const promptObj = {
-    prompt: 'Delete all VCs',
-    description: `Would you like to delete all the VCs?`,
-    textAreaContent: `Note that this action cannot be reversed and you will need to recreate all your VCs if you go through with it`,
+  const dialogParams: SnapDialogParams = {
+    type: 'Confirmation',
+    content: panel([
+      heading('Delete all Verifiable Credentials'),
+      text('Would you like to delete all the VCs?'),
+      divider(),
+      text(
+        `Note that this action cannot be reversed and you will need to recreate all your VCs if you go through with it`
+      ),
+    ]),
   };
 
-  if (await snapConfirm(snap, promptObj)) {
+  if (await snapDialog(snap, dialogParams)) {
     return await veramoDeleteAllVCs(snap, store);
   }
   throw new Error('User rejected');

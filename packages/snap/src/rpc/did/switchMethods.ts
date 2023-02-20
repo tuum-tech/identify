@@ -1,6 +1,7 @@
-import { IdentitySnapParams } from '../../interfaces';
+import { divider, heading, panel, text } from '@metamask/snaps-ui';
+import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
 import { availableMethods, isValidMethod } from '../../types/constants';
-import { snapConfirm } from '../../utils/snapUtils';
+import { snapDialog } from '../../utils/snapUtils';
 import { updateSnapState } from '../../utils/stateUtils';
 
 /* eslint-disable */
@@ -21,13 +22,17 @@ export async function switchMethod(
     );
   }
   if (method !== didMethod) {
-    const promptObj = {
-      prompt: 'Change DID method',
-      description: 'Would you like to change did method to the following?',
-      textAreaContent: didMethod,
+    const dialogParams: SnapDialogParams = {
+      type: 'Confirmation',
+      content: panel([
+        heading('Switch to a different DID method to use'),
+        text('Would you like to change did method to the following?'),
+        divider(),
+        text(`Current DID method: ${method}\nNew DID method: ${didMethod}`),
+      ]),
     };
 
-    if (await snapConfirm(snap, promptObj)) {
+    if (await snapDialog(snap, dialogParams)) {
       state.accountState[
         state.currentAccount
       ].accountConfig.identity.didMethod = didMethod;

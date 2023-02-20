@@ -1,5 +1,6 @@
-import { IdentitySnapParams } from '../../interfaces';
-import { snapConfirm, updatePopups } from '../../utils/snapUtils';
+import { heading, panel, text } from '@metamask/snaps-ui';
+import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
+import { snapDialog, updatePopups } from '../../utils/snapUtils';
 
 /* eslint-disable */
 export async function togglePopups(
@@ -8,14 +9,15 @@ export async function togglePopups(
   const { snap, state } = identitySnapParams;
   const { disablePopups } = state.snapConfig.dApp;
 
-  const promptObj = {
-    prompt: 'Toggle Popups',
-    description: 'Would you like to toggle the popups to following?',
-    textAreaContent: disablePopups
-      ? 'Current setting: True\nNew setting: False'
-      : 'Current setting: False\nNew setting: True',
+  const toggleTextToShow = disablePopups ? 'enable' : 'disable';
+  const dialogParams: SnapDialogParams = {
+    type: 'Confirmation',
+    content: panel([
+      heading('Toggle Popups'),
+      text(`Would you like to ${toggleTextToShow} the popups?`),
+    ]),
   };
-  const result = disablePopups || snapConfirm(snap, promptObj);
+  const result = await snapDialog(snap, dialogParams);
   if (result) {
     await updatePopups(snap, state);
     return true;

@@ -1,17 +1,19 @@
 import { BIP44CoinTypeNode } from '@metamask/key-tree';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
+import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import {
   DIDResolutionResult,
   IIdentifier,
   IVerifyResult,
   MinimalImportableKey,
   ProofFormat,
+  VerifiableCredential,
   VerifiablePresentation,
   W3CVerifiableCredential,
 } from '@veramo/core';
 import cloneDeep from 'lodash.clonedeep';
 import { validHederaChainID } from '../hedera/config';
-import { IdentitySnapParams } from '../interfaces';
+import { IdentitySnapParams, SnapDialogParams } from '../interfaces';
 import { KeyPair } from '../types/crypto';
 import { CreateVPRequestParams, GetVCsOptions } from '../types/params';
 import {
@@ -25,7 +27,7 @@ import { Agent, getAgent } from '../veramo/setup';
 import { getCurrentDid } from './didUtils';
 import { getKeyPair } from './hederaUtils';
 import { getAddressKeyDeriver, snapGetKeysFromAddress } from './keyPair';
-import { getCurrentNetwork, snapConfirm } from './snapUtils';
+import { getCurrentNetwork, snapDialog } from './snapUtils';
 
 /* eslint-disable */
 export async function veramoResolveDID(
@@ -124,11 +126,12 @@ export async function veramoCreateVC(
   credential.set('issuer', issuer); // the entity that issued the credential
   credential.set('credentialSubject', credentialSubject);
 
-  const verifiableCredential = await agent.createVerifiableCredential({
-    credential: JSON.parse(JSON.stringify(Object.fromEntries(credential))),
-    // digital proof that makes the credential tamper-evident
-    proofFormat: 'jwt' as ProofFormat,
-  });
+  const verifiableCredential: W3CVerifiableCredential =
+    await agent.createVerifiableCredential({
+      credential: JSON.parse(JSON.stringify(Object.fromEntries(credential))),
+      // digital proof that makes the credential tamper-evident
+      proofFormat: 'jwt' as ProofFormat,
+    });
 
   console.log(
     'Created verifiableCredential: ',
@@ -210,7 +213,7 @@ export async function veramoCreateVP(
   );
   const did = identifier.did;
 
-  const vcs: W3CVerifiableCredential[] = [];
+  const vcs: VerifiableCredential[] = [];
 
   for (const vcId of vcsMetadata) {
     const vcObj = (await agent.query({
@@ -221,21 +224,36 @@ export async function veramoCreateVP(
       options: { store: 'snap' },
     })) as IDataManagerQueryResult[];
     if (vcObj.length > 0) {
-      const vc: W3CVerifiableCredential = vcObj[0]
-        .data as W3CVerifiableCredential;
+      const vc: VerifiableCredential = vcObj[0].data as VerifiableCredential;
       vcs.push(vc);
     }
   }
 
   if (vcs.length === 0) return null;
   const config = state.snapConfig;
-  const promptObj = {
-    prompt: 'Alert',
-    description: 'Do you wish to create a VP from the following VC IDs?',
-    textAreaContent: JSON.stringify(vcsMetadata),
+
+  const panelToShow = [
+    heading('Create Verifiable Presentation'),
+    text('Do you wish to create a VP from the following VCs?'),
+    divider(),
+  ];
+  vcs.forEach((vcData, index) => {
+    const vcsToShow = {
+      credentialSubject: vcData.credentialSubject,
+      type: vcData.type,
+    };
+    panelToShow.push(divider());
+    panelToShow.push(text(`Credential #${index + 1}`));
+    panelToShow.push(divider());
+    panelToShow.push(text(JSON.stringify(vcsToShow)));
+  });
+
+  const dialogParams: SnapDialogParams = {
+    type: 'Confirmation',
+    content: panel(panelToShow),
   };
 
-  if (config.dApp.disablePopups || (await snapConfirm(snap, promptObj))) {
+  if (config.dApp.disablePopups || (await snapDialog(snap, dialogParams))) {
     const vp = await agent.createVerifiablePresentation({
       presentation: {
         holder: did, //
