@@ -59,6 +59,22 @@ export class GoogleDriveVCStore extends AbstractDataStore {
         throw new Error('Invalid id');
       }
     }
+    if (filter && filter.type === 'vcType') {
+      return Object.keys(googleVCs)
+        .map((k) => {
+          let vc = googleVCs[k] as unknown;
+          if (typeof vc === 'string') {
+            vc = decodeJWT(vc);
+          }
+          return {
+            metadata: { id: k },
+            data: vc,
+          };
+        })
+        .filter((item: any) => {
+          return item.data.type?.includes(filter.filter as string);
+        });
+    }
     if (filter === undefined || (filter && filter.type === 'none')) {
       return Object.keys(googleVCs).map((k) => {
         let vc = googleVCs[k] as unknown;
@@ -106,7 +122,6 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     let googleVCs = await getGoogleVCs(state, GOOGLE_DRIVE_VCS_FILE_NAME);
 
     if (!googleVCs) {
-      // throw new Error('Invalid vcs file');
       await createEmptyFile(state, GOOGLE_DRIVE_VCS_FILE_NAME);
       googleVCs = {};
     }

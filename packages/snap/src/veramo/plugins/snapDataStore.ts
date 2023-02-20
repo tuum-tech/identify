@@ -74,7 +74,7 @@ export class SnapKeyStore extends AbstractKeyStore {
       throw Error(`SnapKeyStore - Cannot get current account: ${account}`);
 
     const safeKeys = Object.values(
-      state.accountState[account].snapKeyStore
+      state.accountState[account].snapKeyStore,
     ).map((key) => {
       const { privateKeyHex, ...safeKey } = key;
       return safeKey;
@@ -101,13 +101,13 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
     const account = state.currentAccount;
     if (!account)
       throw Error(
-        `SnapPrivateKeyStore - Cannot get current account: ${account}`
+        `SnapPrivateKeyStore - Cannot get current account: ${account}`,
       );
 
     const key = state.accountState[account].snapPrivateKeyStore[alias];
     if (!key)
       throw Error(
-        `SnapPrivateKeyStore - not_found: PrivateKey not found for alias=${alias}`
+        `SnapPrivateKeyStore - not_found: PrivateKey not found for alias=${alias}`,
       );
     return key;
   }
@@ -117,7 +117,7 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
     const account = state.currentAccount;
     if (!account)
       throw Error(
-        `SnapPrivateKeyStore - Cannot get current account: ${account}`
+        `SnapPrivateKeyStore - Cannot get current account: ${account}`,
       );
 
     if (!state.accountState[account].snapPrivateKeyStore[alias])
@@ -133,7 +133,7 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
     const account = state.currentAccount;
     if (!account)
       throw Error(
-        `SnapPrivateKeyStore - Cannot get current account: ${account}`
+        `SnapPrivateKeyStore - Cannot get current account: ${account}`,
       );
 
     const alias = args.alias || uuidv4();
@@ -141,10 +141,10 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
       state.accountState[account].snapPrivateKeyStore[alias];
     if (existingEntry && existingEntry.privateKeyHex !== args.privateKeyHex) {
       console.error(
-        'SnapPrivateKeyStore - key_already_exists: key exists with different data, please use a different alias'
+        'SnapPrivateKeyStore - key_already_exists: key exists with different data, please use a different alias',
       );
       throw new Error(
-        'SnapPrivateKeyStore - key_already_exists: key exists with different data, please use a different alias'
+        'SnapPrivateKeyStore - key_already_exists: key exists with different data, please use a different alias',
       );
     }
     state.accountState[account].snapPrivateKeyStore[alias] = {
@@ -160,7 +160,7 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
     const account = state.currentAccount;
     if (!account)
       throw Error(
-        `SnapPrivateKeyStore - Cannot get current account: ${account}`
+        `SnapPrivateKeyStore - Cannot get current account: ${account}`,
       );
 
     return [...Object.values(state.accountState[account].snapPrivateKeyStore)];
@@ -198,7 +198,7 @@ export class SnapDIDStore extends AbstractDIDStore {
     if (did && !alias) {
       if (!identifiers[did])
         throw Error(
-          `SnapDIDStore - not_found: IIdentifier not found with did=${did}`
+          `SnapDIDStore - not_found: IIdentifier not found with did=${did}`,
         );
       return identifiers[did];
     } else if (!did && alias && provider) {
@@ -212,11 +212,11 @@ export class SnapDIDStore extends AbstractDIDStore {
       }
     } else {
       throw Error(
-        'SnapDIDStore - invalid_argument: Get requires did or (alias and provider)'
+        'SnapDIDStore - invalid_argument: Get requires did or (alias and provider)',
       );
     }
     throw Error(
-      `SnapDIDStore - not_found: IIdentifier not found with alias=${alias} provider=${provider}`
+      `SnapDIDStore - not_found: IIdentifier not found with alias=${alias} provider=${provider}`,
     );
   }
 
@@ -228,7 +228,7 @@ export class SnapDIDStore extends AbstractDIDStore {
 
     if (!state.accountState[account].identifiers[did])
       throw Error(
-        `SnapDIDStore - not_found: IIdentifier not found with did=${did}`
+        `SnapDIDStore - not_found: IIdentifier not found with did=${did}`,
       );
 
     delete state.accountState[account].identifiers[did];
@@ -273,7 +273,7 @@ export class SnapDIDStore extends AbstractDIDStore {
       result = result.filter((i) => i.provider === args.provider);
     } else if (args.provider && args.alias) {
       result = result.filter(
-        (i) => i.provider === args.provider && i.alias === args.alias
+        (i) => i.provider === args.provider && i.alias === args.alias,
       );
     }
 
@@ -338,7 +338,6 @@ export class SnapVCStore extends AbstractDataStore {
           return item.data.type?.includes(filter.filter as string);
         });
     }
-
     if (filter === undefined || (filter && filter.type === 'none')) {
       return Object.keys(state.accountState[account].vcs).map((k) => {
         let vc = state.accountState[account].vcs[k] as unknown;
