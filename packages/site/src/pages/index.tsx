@@ -65,8 +65,6 @@ const Index = () => {
   const [vc, setVc] = useState({});
   const [vcIdsToBeRemoved, setVcIdsToBeRemoved] = useState('');
   const [vp, setVp] = useState({});
-  const [fileName, setFileName] = useState('vc.txt');
-  const [content, setContent] = useState('Sample Text');
   const [loadingState, setLoadingState] = useState<string | null>(null);
 
   useEffect(() => {
@@ -94,7 +92,7 @@ const Index = () => {
   const handleConfigureGoogleAccount = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       setLoadingState('configureGoogleAccount');
-      const resp = await configureGoogleAccount(tokenResponse.access_token);
+      await configureGoogleAccount(tokenResponse.access_token);
       alert('Google Account configuration was successful');
       setLoadingState(null);
     },

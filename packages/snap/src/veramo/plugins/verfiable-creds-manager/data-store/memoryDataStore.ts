@@ -74,7 +74,7 @@ export class MemoryDataStore extends AbstractDataStore {
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await
-  public async clear(args: IFilterArgs): Promise<boolean> {
+  public async clear(_args: IFilterArgs): Promise<boolean> {
     this.data = {};
     return true;
   }

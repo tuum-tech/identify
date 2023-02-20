@@ -157,7 +157,7 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     return true;
   }
 
-  public async clear(args: IFilterArgs): Promise<boolean> {
+  public async clear(_args: IFilterArgs): Promise<boolean> {
     const state = await getSnapState(this.snap);
     const gdriveResponse = await uploadToGoogleDrive(state, {
       fileName: GOOGLE_DRIVE_VCS_FILE_NAME,

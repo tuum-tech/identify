@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import {
   GetVCsOptions,
   ProofInfo,
@@ -22,8 +23,7 @@ export const getSnaps = async (): Promise<GetSnapsResponse> => {
 /**
  * Connect a snap to MetaMask.
  *
- * @param snapId - The ID of the snap.
- * @param params - The params to pass with the snap to connect.
+ * @param snapId - The ID of the snap, params - The params to pass with the snap to connect.
  */
 export const connectSnap = async (snapId: string = defaultSnapOrigin) => {
   await window.ethereum.request({

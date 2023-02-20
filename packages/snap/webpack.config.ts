@@ -59,7 +59,7 @@ const common: Configuration = {
           },
         ],
       },
-      { test: /.json$/, type: 'json' },
+      { test: /.json$/u, type: 'json' },
     ],
   },
   plugins: [

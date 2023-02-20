@@ -399,7 +399,7 @@ export class SnapVCStore extends AbstractDataStore {
     return true;
   }
 
-  public async clear(args: IFilterArgs): Promise<boolean> {
+  public async clear(_args: IFilterArgs): Promise<boolean> {
     const state = await getSnapState(this.snap);
     const account = state.currentAccount;
     if (!account)

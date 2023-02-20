@@ -11,7 +11,7 @@ export type IDataManager = {
 } & IPluginMethodMap;
 
 /**
- *  Types
+ * Types
  */
 export type Filter = {
   type: string;
@@ -41,7 +41,7 @@ type QueryMetadata = {
 };
 
 /**
- *  Types for DataManager method arguments
+ * Types for DataManager method arguments
  */
 export type IDataManagerQueryArgs = {
   filter?: Filter;

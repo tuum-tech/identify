@@ -64,10 +64,10 @@ export class DataManager implements IAgentPlugin {
     if (options === undefined) {
       store = Object.keys(this.stores);
     } else {
-      if (options.store !== undefined) {
-        store = options.store;
-      } else {
+      if (options.store === undefined) {
         store = Object.keys(this.stores);
+      } else {
+        store = options.store;
       }
 
       if (options.returnStore !== undefined) {
@@ -147,10 +147,10 @@ export class DataManager implements IAgentPlugin {
     let store;
     if (options === undefined) {
       store = Object.keys(this.stores);
-    } else if (options.store !== undefined) {
-      store = options.store;
-    } else {
+    } else if (options.store === undefined) {
       store = Object.keys(this.stores);
+    } else {
+      store = options.store;
     }
 
     if (typeof store === 'string') {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { computeAddress } from '@ethersproject/transactions';
 import {
   IAgentContext,
@@ -22,7 +23,7 @@ export const isValidNamespace = (x: string) => isIn(SECPK1_NAMESPACES, x);
 /**
  * Options for creating a did:ethr
  *
- * @beta
+ * // @beta
  */
 export type CreateDidPkhOptions = {
   namespace: string;
@@ -39,6 +40,7 @@ export type CreateDidPkhOptions = {
  * Helper method that can computes the ethereumAddress corresponding to a Secp256k1 public key.
  *
  * @param hexPublicKey - A hex encoded public key, optionally prefixed with `0x`
+ * @returns Ethereum Address.
  */
 export function toEthereumAddress(hexPublicKey: string): string {
   const publicKey = hexPublicKey.startsWith('0x')
@@ -50,7 +52,7 @@ export function toEthereumAddress(hexPublicKey: string): string {
 /**
  * {@link @veramo/did-manager#DIDManager} identifier provider for `did:pkh` identifiers
  *
- * @beta This API may change without a BREAKING CHANGE notice.
+ * // @beta This API may change without a BREAKING CHANGE notice.
  */
 export class PkhDIDProvider extends AbstractIdentifierProvider {
   private defaultKms: string;
