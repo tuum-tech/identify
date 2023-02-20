@@ -32,7 +32,7 @@ export class MemoryDataStore extends AbstractDataStore {
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await
-  public async query(args: IFilterArgs): Promise<Array<IQueryResult>> {
+  public async query(args: IFilterArgs): Promise<IQueryResult[]> {
     const { filter } = args;
     if (filter && filter.type === 'id') {
       try {
@@ -44,11 +44,13 @@ export class MemoryDataStore extends AbstractDataStore {
             },
           ];
           return obj;
-        } else return [];
+        }
+        return [];
       } catch (e) {
         throw new Error('Invalid id');
       }
     }
+
     if (filter === undefined || (filter && filter.type === 'none')) {
       return Object.keys(this.data).map((k) => {
         return {
@@ -57,6 +59,7 @@ export class MemoryDataStore extends AbstractDataStore {
         };
       });
     }
+
     if (filter && filter.type === 'jsonpath') {
       const objects = Object.keys(this.data).map((k) => {
         return {
@@ -65,7 +68,7 @@ export class MemoryDataStore extends AbstractDataStore {
         };
       });
       const filteredObjects = jsonpath.query(objects, filter.filter as string);
-      return filteredObjects as Array<IQueryResult>;
+      return filteredObjects as IQueryResult[];
     }
     return [];
   }

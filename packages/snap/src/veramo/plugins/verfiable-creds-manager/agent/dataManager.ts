@@ -142,18 +142,17 @@ export class DataManager implements IAgentPlugin {
 
   public async clear(
     args: IDataManagerClearArgs,
-  ): Promise<Array<IDataManagerClearResult>> {
+  ): Promise<IDataManagerClearResult[]> {
     const { filter = { type: 'none', filter: {} }, options } = args;
     let store;
     if (options === undefined) {
       store = Object.keys(this.stores);
+    } else if (options.store !== undefined) {
+      store = options.store;
     } else {
-      if (options.store !== undefined) {
-        store = options.store;
-      } else {
-        store = Object.keys(this.stores);
-      }
+      store = Object.keys(this.stores);
     }
+
     if (typeof store === 'string') {
       store = [store];
     }
@@ -163,6 +162,7 @@ export class DataManager implements IAgentPlugin {
       if (!storePlugin) {
         throw new Error(`Store plugin ${storeName} not found`);
       }
+
       try {
         const result = await storePlugin.clear({ filter });
         res.push({ removed: result, store: storeName });

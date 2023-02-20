@@ -21,9 +21,10 @@ export const isValidNamespace = (x: string) => isIn(SECPK1_NAMESPACES, x);
 
 /**
  * Options for creating a did:ethr
+ *
  * @beta
  */
-export interface CreateDidPkhOptions {
+export type CreateDidPkhOptions = {
   namespace: string;
   privateKey: string;
   /**
@@ -32,16 +33,17 @@ export interface CreateDidPkhOptions {
    * If this is not specified, `1` is assumed.
    */
   chainId?: string;
-}
+};
 
 /**
  * Helper method that can computes the ethereumAddress corresponding to a Secp256k1 public key.
- * @param hexPublicKey A hex encoded public key, optionally prefixed with `0x`
+ *
+ * @param hexPublicKey - A hex encoded public key, optionally prefixed with `0x`
  */
 export function toEthereumAddress(hexPublicKey: string): string {
   const publicKey = hexPublicKey.startsWith('0x')
     ? hexPublicKey
-    : '0x' + hexPublicKey;
+    : `0x${hexPublicKey}`;
   return computeAddress(publicKey);
 }
 
@@ -52,6 +54,7 @@ export function toEthereumAddress(hexPublicKey: string): string {
  */
 export class PkhDIDProvider extends AbstractIdentifierProvider {
   private defaultKms: string;
+
   private chainId: string;
 
   constructor(options: { defaultKms: string; chainId?: string }) {
@@ -62,16 +65,16 @@ export class PkhDIDProvider extends AbstractIdentifierProvider {
 
   async createIdentifier(
     { kms, options }: { kms?: string; options?: CreateDidPkhOptions },
-    context: IContext
+    context: IContext,
   ): Promise<Omit<IIdentifier, 'provider'>> {
     const namespace = options?.namespace ? options.namespace : 'eip155';
 
     if (!isValidNamespace(namespace)) {
       console.error(
-        `Invalid namespace '${namespace}'. Valid namespaces are: ${SECPK1_NAMESPACES}`
+        `Invalid namespace '${namespace}'. Valid namespaces are: ${SECPK1_NAMESPACES}`,
       );
       throw new Error(
-        `Invalid namespace '${namespace}'. Valid namespaces are: ${SECPK1_NAMESPACES}`
+        `Invalid namespace '${namespace}'. Valid namespaces are: ${SECPK1_NAMESPACES}`,
       );
     }
 
@@ -84,16 +87,15 @@ export class PkhDIDProvider extends AbstractIdentifierProvider {
 
     if (key !== null) {
       const identifier: Omit<IIdentifier, 'provider'> = {
-        did: 'did:pkh:' + namespace + ':' + this.chainId + ':' + evmAddress,
+        did: `did:pkh:${namespace}:${this.chainId}:${evmAddress}`,
         controllerKeyId: key.kid,
         keys: [key],
         services: [],
       };
       return identifier;
-    } else {
-      console.error('Could not create identifier due to some errors');
-      throw new Error('Could not create identifier due to some errors');
     }
+    console.error('Could not create identifier due to some errors');
+    throw new Error('Could not create identifier due to some errors');
   }
 
   async updateIdentifier(
@@ -103,14 +105,14 @@ export class PkhDIDProvider extends AbstractIdentifierProvider {
       alias?: string | undefined;
       options?: any;
     },
-    context: IAgentContext<IKeyManager>
+    context: IAgentContext<IKeyManager>,
   ): Promise<IIdentifier> {
     throw new Error('PkhDIDProvider updateIdentifier not supported yet.');
   }
 
   async deleteIdentifier(
     identifier: IIdentifier,
-    context: IContext
+    context: IContext,
   ): Promise<boolean> {
     for (const { kid } of identifier.keys) {
       await context.agent.keyManagerDelete({ kid });
@@ -124,7 +126,7 @@ export class PkhDIDProvider extends AbstractIdentifierProvider {
       key,
       options,
     }: { identifier: IIdentifier; key: IKey; options?: any },
-    context: IContext
+    context: IContext,
   ): Promise<any> {
     throw Error('PkhDIDProvider addKey not supported');
   }
@@ -135,21 +137,21 @@ export class PkhDIDProvider extends AbstractIdentifierProvider {
       service,
       options,
     }: { identifier: IIdentifier; service: IService; options?: any },
-    context: IContext
+    context: IContext,
   ): Promise<any> {
     throw Error('PkhDIDProvider addService not supported');
   }
 
   async removeKey(
     args: { identifier: IIdentifier; kid: string; options?: any },
-    context: IContext
+    context: IContext,
   ): Promise<any> {
     throw Error('PkhDIDProvider removeKey not supported');
   }
 
   async removeService(
     args: { identifier: IIdentifier; id: string; options?: any },
-    context: IContext
+    context: IContext,
   ): Promise<any> {
     throw Error('PkhDIDProvider removeService not supported');
   }

@@ -1,15 +1,14 @@
 import { IPluginMethodMap } from '@veramo/core';
-export interface IDataManager extends IPluginMethodMap {
-  query(args: IDataManagerQueryArgs): Promise<Array<IDataManagerQueryResult>>;
 
-  save(args: IDataManagerSaveArgs): Promise<Array<IDataManagerSaveResult>>;
+export type IDataManager = {
+  query(args: IDataManagerQueryArgs): Promise<IDataManagerQueryResult[]>;
 
-  delete(
-    args: IDataManagerDeleteArgs
-  ): Promise<Array<IDataManagerDeleteResult>>;
+  save(args: IDataManagerSaveArgs): Promise<IDataManagerSaveResult[]>;
 
-  clear(args: IDataManagerClearArgs): Promise<Array<IDataManagerClearResult>>;
-}
+  delete(args: IDataManagerDeleteArgs): Promise<IDataManagerDeleteResult[]>;
+
+  clear(args: IDataManagerClearArgs): Promise<IDataManagerClearResult[]>;
+} & IPluginMethodMap;
 
 /**
  *  Types
@@ -42,48 +41,48 @@ type QueryMetadata = {
 };
 
 /**
- *  Interfaces for DataManager method arguments
+ *  Types for DataManager method arguments
  */
-export interface IDataManagerQueryArgs {
+export type IDataManagerQueryArgs = {
   filter?: Filter;
   options?: QueryOptions;
-}
+};
 
-export interface IDataManagerDeleteArgs {
+export type IDataManagerDeleteArgs = {
   id: string;
   options?: DeleteOptions;
-}
+};
 
-export interface IDataManagerSaveArgs {
+export type IDataManagerSaveArgs = {
   data: unknown;
   options: SaveOptions;
-}
+};
 
-export interface IDataManagerClearArgs {
+export type IDataManagerClearArgs = {
   filter?: Filter;
   options?: ClearOptions;
-}
+};
 
 /**
- * Interfaces for DataManager method return values
+ * Types for DataManager method return values
  */
-export interface IDataManagerQueryResult {
+export type IDataManagerQueryResult = {
   data: unknown;
   metadata: QueryMetadata;
-}
+};
 
-export interface IDataManagerSaveResult {
+export type IDataManagerSaveResult = {
   id: string;
   store: string;
-}
+};
 
-export interface IDataManagerDeleteResult {
+export type IDataManagerDeleteResult = {
   id: string;
   store: string;
   removed: boolean;
-}
+};
 
-export interface IDataManagerClearResult {
+export type IDataManagerClearResult = {
   store: string;
   removed: boolean;
-}
+};

@@ -11,10 +11,11 @@ import { isValidNamespace, SECPK1_NAMESPACES } from './pkh-did-provider';
 const DID_LD_JSON = 'application/did+ld+json';
 const DID_JSON = 'application/did+json';
 
+/* eslint-disable */
 function toDidDoc(did: string, blockchainAccountId: string): any {
   const { namespace } = AccountId.parse(blockchainAccountId)
     .chainId as ChainIdParams;
-  const vmId = did + '#blockchainAccountId';
+  const vmId = `${did}#blockchainAccountId`;
   const doc = {
     '@context': [
       'https://www.w3.org/ns/did/v1',
@@ -40,22 +41,23 @@ function toDidDoc(did: string, blockchainAccountId: string): any {
   };
   if (!isValidNamespace(namespace)) {
     console.error(
-      `Invalid namespace '${namespace}'. Valid namespaces are: ${SECPK1_NAMESPACES}`
+      `Invalid namespace '${namespace}'. Valid namespaces are: ${SECPK1_NAMESPACES}`,
     );
     throw new Error(
-      `Invalid namespace '${namespace}'. Valid namespaces are: ${SECPK1_NAMESPACES}`
+      `Invalid namespace '${namespace}'. Valid namespaces are: ${SECPK1_NAMESPACES}`,
     );
   }
   return doc;
 }
 
+/* eslint-disable */
 export function getResolver(): ResolverRegistry {
   return {
     pkh: async (
       did: string,
       parsed: ParsedDID,
       r: Resolvable,
-      options: DIDResolutionOptions
+      options: DIDResolutionOptions,
     ): Promise<DIDResolutionResult> => {
       const contentType = options.accept || DID_JSON;
       const response: DIDResolutionResult = {

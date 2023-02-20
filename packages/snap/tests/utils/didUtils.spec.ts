@@ -19,7 +19,7 @@ describe('Utils [did]', () => {
       const initialState = getDefaultSnapState();
 
       await expect(
-        getCurrentDid(walletMock, initialState, address)
+        getCurrentDid(walletMock, initialState, address),
       ).resolves.toBe(`did:pkh:eip155:0x4:${address}`);
 
       expect.assertions(1);
@@ -31,7 +31,7 @@ describe('Utils [did]', () => {
         'did:pkh';
 
       await expect(
-        getCurrentDid(walletMock, initialState, address)
+        getCurrentDid(walletMock, initialState, address),
       ).resolves.toBe(exampleDIDPkh);
 
       expect.assertions(1);

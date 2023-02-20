@@ -1,7 +1,7 @@
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 
 export const getMetamaskVersion = async (
-  snap: SnapsGlobalObject
+  snap: SnapsGlobalObject,
 ): Promise<string> =>
   (await snap.request({
     method: 'web3_clientVersion',
@@ -10,7 +10,7 @@ export const getMetamaskVersion = async (
 
 export const isNewerVersion = (
   current: string,
-  comparingWith: string
+  comparingWith: string,
 ): boolean => {
   if (current === comparingWith) {
     return false;

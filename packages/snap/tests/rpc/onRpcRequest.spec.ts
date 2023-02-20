@@ -1,7 +1,8 @@
 import { SnapProvider } from '@metamask/snap-types';
-import { onRpcRequest } from '../../src/index';
+import { onRpcRequest } from '../../src';
 import { exampleDIDPkh, getDefaultSnapState } from '../testUtils/constants';
 import { createMockWallet, WalletMock } from '../testUtils/wallet.mock';
+
 jest.mock('uuid');
 
 describe('onRpcRequest', () => {
@@ -24,7 +25,7 @@ describe('onRpcRequest', () => {
             method: 'getDID',
             params: {},
           },
-        })
+        }),
       ).resolves.toEqual(exampleDIDPkh);
 
       expect.assertions(1);
