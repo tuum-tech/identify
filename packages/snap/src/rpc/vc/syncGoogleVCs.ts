@@ -1,11 +1,12 @@
-import { IdentitySnapParams } from '../../interfaces';
+import { divider, heading, panel, text } from '@metamask/snaps-ui';
+import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
 import {
   createEmptyFile,
   getGoogleVCs,
   GOOGLE_DRIVE_VCS_FILE_NAME,
   uploadToGoogleDrive,
 } from '../../utils/googleUtils';
-import { snapConfirm } from '../../utils/snapUtils';
+import { snapDialog } from '../../utils/snapUtils';
 import { updateSnapState } from '../../utils/stateUtils';
 
 /* eslint-disable */
@@ -26,12 +27,19 @@ export async function syncGoogleVCs(
   const googleVCIds = Object.keys(googleVCs);
   const diffVCIds = googleVCIds.filter((id) => !snapVCIds.includes(id));
 
-  const promptObj = {
-    prompt: 'Sync VCs with Google Drive',
-    description: `Would you like to sync VCs in snap with google drive?`,
-    textAreaContent: JSON.stringify(diffVCIds),
+  const dialogParams: SnapDialogParams = {
+    type: 'Confirmation',
+    content: panel([
+      heading('Sync Verifiable Credentials with Google Drive'),
+      text(
+        'Would you like to sync VCs in snap with google drive? After this, you will have all the VCs in both the snap and your google drive account',
+      ),
+      divider(),
+      text(JSON.stringify(diffVCIds)),
+    ]),
   };
-  if (await snapConfirm(snap, promptObj)) {
+
+  if (await snapDialog(snap, dialogParams)) {
     state.accountState[state.currentAccount].vcs = {
       ...currentVCs,
       ...diffVCIds.reduce((acc, id) => ({ ...acc, [id]: googleVCs[id] }), {}),
