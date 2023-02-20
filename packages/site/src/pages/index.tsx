@@ -221,7 +221,9 @@ const Index = () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
       const options = {
-        store: ['snap', 'googleDrive'],
+        // If you want to retrieve VCs from multiple stores, you can pass an array like so:
+        // store: ['snap', 'googleDrive'],
+        store: 'snap',
         returnStore: true,
       };
       const vcs = (await getVCs(
@@ -253,7 +255,9 @@ const Index = () => {
         nickname: createVCNickname,
       };
       const options = {
-        store: ['snap', 'googleDrive'],
+        // If you want to auto save the generated VCs to multiple stores, you can pass an array like so:
+        // store: ['snap', 'googleDrive'],
+        store: 'snap',
         returnStore: true,
       };
       const credTypes = ['ProfileNamesCredential'];
@@ -291,7 +295,9 @@ const Index = () => {
       setCurrentChainId(await getCurrentNetwork());
       const id = vcIdsToBeRemoved ? vcIdsToBeRemoved.trim().split(',')[0] : '';
       const options = {
-        store: ['snap', 'googleDrive'],
+        // If you want to remove the VCs from multiple stores, you can pass an array like so:
+        // store: ['snap', 'googleDrive'],
+        store: 'snap',
       };
       console.log('vcIdsToBeRemoved: ', vcIdsToBeRemoved);
       const isRemoved = (await removeVC(
@@ -311,7 +317,9 @@ const Index = () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
       const options = {
-        store: ['snap', 'googleDrive'],
+        // If you want to remove the VCs from multiple stores, you can pass an array like so:
+        // store: ['snap', 'googleDrive'],
+        store: 'snap',
       };
       const isRemoved = (await deleteAllVCs(
         options,
