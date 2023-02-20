@@ -1,6 +1,6 @@
 // @type {import('@babel/core').ConfigFunction}
-// eslint-disable-next-line import/no-anonymous-default-export
-export default (api) => {
+/* eslint-disable */
+module.exports = (api) => {
   // Cache configuration is a required option
   api.cache(false);
 

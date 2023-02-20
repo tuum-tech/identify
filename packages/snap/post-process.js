@@ -1,10 +1,11 @@
-import { readFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
+/* eslint-disable */
+const fs = require('fs');
+const pathUtils = require('path');
 
-const bundlePath = join('dist', 'snap.js');
+const bundlePath = pathUtils.join('dist', 'snap.js');
 console.log('Bundle path', bundlePath);
 
-let bundleString = readFileSync(bundlePath, 'utf8');
+let bundleString = fs.readFileSync(bundlePath, 'utf8');
 
 // Alias `window` as `self`
 bundleString = 'var self = window;\n'.concat(bundleString);
@@ -77,4 +78,4 @@ bundleString = bundleString.replace(
   "if (verificationMethod.blockchainAccountId?.startsWith('hedera')) { return true; };let vmEthAddr = getEthereumAddress(verificationMethod);",
 );
 
-writeFileSync(bundlePath, bundleString);
+fs.writeFileSync(bundlePath, bundleString);
