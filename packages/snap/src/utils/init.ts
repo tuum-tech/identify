@@ -4,7 +4,11 @@ import { IdentitySnapState, SnapDialogParams } from '../interfaces';
 import { snapDialog } from './snapUtils';
 import { initSnapState } from './stateUtils';
 
-/* eslint-disable */
+/**
+ * Init snap state.
+ *
+ * @param snap - Snap.
+ */
 export async function init(
   snap: SnapsGlobalObject,
 ): Promise<IdentitySnapState> {

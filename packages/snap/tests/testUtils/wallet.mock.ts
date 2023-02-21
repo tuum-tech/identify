@@ -68,7 +68,11 @@ export class WalletMock implements IWalletMock {
   }
 }
 
-/* eslint-disable */
+/**
+ * Create mock wallet.
+ *
+ * @returns Wallet mock.
+ */
 export function createMockWallet(): SnapProvider & WalletMock {
   return new WalletMock() as SnapProvider & WalletMock;
 }

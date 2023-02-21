@@ -9,7 +9,11 @@ import {
 import { snapDialog } from '../../utils/snapUtils';
 import { updateSnapState } from '../../utils/stateUtils';
 
-/* eslint-disable */
+/**
+ * Function to sync Google VCs with snap.
+ *
+ * @param identitySnapParams - Identity snap params.
+ */
 export async function syncGoogleVCs(
   identitySnapParams: IdentitySnapParams,
 ): Promise<boolean> {

@@ -16,7 +16,6 @@ import {
   IQueryResult,
 } from './verfiable-creds-manager';
 
-/* eslint-disable */
 /**
  * An implementation of {@link AbstractDataStore} that holds everything in snap state.
  *
@@ -30,7 +29,7 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     this.snap = snap;
   }
 
-  async query(args: IFilterArgs): Promise<Array<IQueryResult>> {
+  async query(args: IFilterArgs): Promise<IQueryResult[]> {
     const { filter } = args;
     const state = await getSnapState(this.snap);
     const googleVCs = await getGoogleVCs(state, GOOGLE_DRIVE_VCS_FILE_NAME);
@@ -54,11 +53,13 @@ export class GoogleDriveVCStore extends AbstractDataStore {
             },
           ];
           return obj;
-        } else return [];
+        }
+        return [];
       } catch (e) {
         throw new Error('Invalid id');
       }
     }
+
     if (filter && filter.type === 'vcType') {
       return Object.keys(googleVCs)
         .map((k) => {
@@ -75,6 +76,7 @@ export class GoogleDriveVCStore extends AbstractDataStore {
           return item.data.type?.includes(filter.filter as string);
         });
     }
+
     if (filter === undefined || (filter && filter.type === 'none')) {
       return Object.keys(googleVCs).map((k) => {
         let vc = googleVCs[k] as unknown;
@@ -87,6 +89,7 @@ export class GoogleDriveVCStore extends AbstractDataStore {
         };
       });
     }
+
     if (filter && filter.type === 'JSONPath') {
       const objects = Object.keys(googleVCs).map((k) => {
         let vc = googleVCs[k] as unknown;
@@ -99,7 +102,7 @@ export class GoogleDriveVCStore extends AbstractDataStore {
         };
       });
       const filteredObjects = jsonpath.query(objects, filter.filter as string);
-      return filteredObjects as Array<IQueryResult>;
+      return filteredObjects as IQueryResult[];
     }
     return [];
   }
@@ -112,12 +115,13 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     const { data: vc, id } = args;
     const state = await getSnapState(this.snap);
     const account = state.currentAccount;
-    if (!account)
+    if (!account) {
       throw Error(
         `GoogleDriveVCStore - Cannot get current account: ${account}`,
       );
+    }
 
-    let newId = id || uuidv4();
+    const newId = id || uuidv4();
 
     let googleVCs = await getGoogleVCs(state, GOOGLE_DRIVE_VCS_FILE_NAME);
 
@@ -145,7 +149,9 @@ export class GoogleDriveVCStore extends AbstractDataStore {
       return false;
     }
 
-    if (!googleVCs[id]) throw Error(`VC ID '${id}' not found`);
+    if (!googleVCs[id]) {
+      throw Error(`VC ID '${id}' not found`);
+    }
 
     delete googleVCs[id];
     const gdriveResponse = await uploadToGoogleDrive(state, {

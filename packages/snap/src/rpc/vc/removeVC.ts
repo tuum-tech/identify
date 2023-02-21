@@ -5,10 +5,15 @@ import { RemoveVCsRequestParams } from '../../types/params';
 import { snapDialog } from '../../utils/snapUtils';
 import { veramoRemoveVC } from '../../utils/veramoUtils';
 
-/* eslint-disable */
+/**
+ * Function to remove VC.
+ *
+ * @param identitySnapParams - Identity snap params.
+ * @param vcRequestParams - VC request params.
+ */
 export async function removeVC(
   identitySnapParams: IdentitySnapParams,
-  vcRequestParams: RemoveVCsRequestParams
+  vcRequestParams: RemoveVCsRequestParams,
 ): Promise<IDataManagerDeleteResult[] | null> {
   const { snap } = identitySnapParams;
 
@@ -16,7 +21,9 @@ export async function removeVC(
   const { store = 'snap' } = options || {};
 
   const ids = typeof id === 'string' ? [id] : id;
-  if (ids.length === 0) return null;
+  if (ids.length === 0) {
+    return null;
+  }
 
   const dialogParams: SnapDialogParams = {
     type: 'Confirmation',

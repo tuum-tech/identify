@@ -8,32 +8,54 @@ import { IdentitySnapState } from '../interfaces';
 import { DEFAULTCOINTYPE } from '../types/constants';
 import { updateSnapState } from './stateUtils';
 
-/* eslint-disable */
+/**
+ * Function to get account index.
+ *
+ * @param state - IdentitySnapState.
+ * @param account - Account.
+ * @returns Account index.
+ */
 export function getAccountIndex(
   state: IdentitySnapState,
-  account: string
+  account: string,
 ): number | undefined {
-  if (state.accountState[account].index)
+  if (state.accountState[account].index) {
     return state.accountState[account].index;
+  }
   return undefined;
 }
 
+/**
+ * Function to set account index.
+ *
+ * @param snap - Snap.
+ * @param state - IdentitySnapState.
+ * @param account - Account.
+ * @param index - New account index.
+ */
 export async function setAccountIndex(
   snap: SnapsGlobalObject,
   state: IdentitySnapState,
   account: string,
-  index: number
+  index: number,
 ) {
   // eslint-disable-next-line no-param-reassign
   state.accountState[account].index = index;
   await updateSnapState(snap, state);
 }
 
+/**
+ * Function to get address key deriver.
+ *
+ * @param snap - Snap.
+ * @param coinType - Coin type.
+ * @returns BIP44CoinTypeNode.
+ */
 export async function getAddressKeyDeriver(
   snap: SnapsGlobalObject,
-  coin_type?: number
+  coinType?: number,
 ) {
-  let ct = coin_type;
+  let ct = coinType;
   if (ct === undefined) {
     ct = DEFAULTCOINTYPE;
   }
@@ -46,16 +68,25 @@ export async function getAddressKeyDeriver(
   return bip44CoinTypeNode;
 }
 
+/**
+ * Function to get address key.
+ *
+ * @param bip44CoinTypeNode - BIP44CoinTypeNode.
+ * @param addressIndex - Address index.
+ * @returns Address key.
+ */
 export async function getAddressKey(
   bip44CoinTypeNode: BIP44CoinTypeNode,
-  addressIndex = 0
+  addressIndex = 0,
 ) {
   const keyDeriver = await getBIP44AddressKeyDeriver(bip44CoinTypeNode);
   const derivedKey = await keyDeriver(addressIndex);
   const { privateKey } = derivedKey;
   const { chainCode } = derivedKey;
   const addressKey = `${privateKey as string}${chainCode.split('0x')[1]}`;
-  if (privateKey === undefined) return null;
+  if (privateKey === undefined) {
+    return null;
+  }
   return {
     privateKey,
     originalAddressKey: addressKey,
@@ -65,12 +96,16 @@ export async function getAddressKey(
 
 export const getKeysFromAddressIndex = async (
   bip44CoinTypeNode: BIP44CoinTypeNode,
-  addressIndex: number | undefined
+  addressIndex: number | undefined,
 ) => {
-  if (addressIndex === undefined) throw new Error('Err, index undefined');
+  if (addressIndex === undefined) {
+    throw new Error('Err, index undefined');
+  }
 
   const result = await getAddressKey(bip44CoinTypeNode, addressIndex);
-  if (result === null) return null;
+  if (result === null) {
+    return null;
+  }
   const { privateKey, derivationPath } = result;
   const snap = new ethers.Wallet(privateKey);
 
@@ -87,16 +122,18 @@ export const getKeysFromAddress = async (
   bip44CoinTypeNode: BIP44CoinTypeNode,
   account: string,
   maxScan = 20,
-  addressIndex?: number
+  addressIndex?: number,
 ): Promise<KeysType | null> => {
-  if (addressIndex !== undefined)
+  if (addressIndex !== undefined) {
     return getKeysFromAddressIndex(bip44CoinTypeNode, addressIndex);
+  }
 
   for (let i = 0; i < maxScan; i += 1) {
     // eslint-disable-next-line no-await-in-loop
     const keys = await getKeysFromAddressIndex(bip44CoinTypeNode, i);
-    if (keys && keys.address.toUpperCase() === account.toUpperCase())
+    if (keys && keys.address.toUpperCase() === account.toUpperCase()) {
       return keys;
+    }
   }
 
   return null;
@@ -107,7 +144,7 @@ export const snapGetKeysFromAddress = async (
   state: IdentitySnapState,
   account: string,
   snap: SnapsGlobalObject,
-  maxScan = 20
+  maxScan = 20,
 ): Promise<KeysType | null> => {
   const addressIndex = getAccountIndex(state, account);
   if (addressIndex) {
@@ -115,7 +152,7 @@ export const snapGetKeysFromAddress = async (
       bip44CoinTypeNode,
       account,
       maxScan,
-      addressIndex
+      addressIndex,
     );
   }
   const res = await getKeysFromAddress(bip44CoinTypeNode, account, maxScan);

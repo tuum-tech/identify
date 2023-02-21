@@ -2,13 +2,20 @@ import type { AccountId, Client, PublicKey } from '@hashgraph/sdk';
 import { AccountCreateTransaction, Hbar } from '@hashgraph/sdk';
 import { BigNumber } from 'bignumber.js';
 
-/* eslint-disable */
+/**
+ * Create Hedera™ crypto-currency account.
+ *
+ * @param client - Hedera Client.
+ * @param options - Create account options.
+ * @param options.publicKey - Public key.
+ * @param options.initialBalance - Initial balance.
+ */
 export async function createAccount(
   client: Client,
   options: {
     publicKey: PublicKey;
     initialBalance: BigNumber;
-  }
+  },
 ): Promise<AccountId | null> {
   const tx = new AccountCreateTransaction()
     .setInitialBalance(Hbar.fromTinybars(options.initialBalance))

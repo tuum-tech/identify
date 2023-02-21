@@ -5,10 +5,15 @@ import { snapDialog } from '../../utils/snapUtils';
 import { veramoCreateVC } from '../../utils/veramoUtils';
 import { IDataManagerSaveResult } from '../../veramo/plugins/verfiable-creds-manager';
 
-/* eslint-disable */
+/**
+ * Function to create VC.
+ *
+ * @param identitySnapParams - Identity snap params.
+ * @param vcRequestParams - VC request params.
+ */
 export async function createVC(
   identitySnapParams: IdentitySnapParams,
-  vcRequestParams: CreateVCRequestParams
+  vcRequestParams: CreateVCRequestParams,
 ): Promise<IDataManagerSaveResult[]> {
   const { snap } = identitySnapParams;
 
@@ -29,7 +34,7 @@ export async function createVC(
       text(
         JSON.stringify({
           [vcKey]: vcValue,
-        })
+        }),
       ),
     ]),
   };
@@ -40,7 +45,7 @@ export async function createVC(
       vcKey,
       vcValue,
       store,
-      credTypes
+      credTypes,
     );
   }
   throw new Error('User rejected');

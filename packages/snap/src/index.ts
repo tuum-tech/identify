@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import { IdentitySnapParams } from './interfaces';
@@ -42,7 +41,6 @@ import { getSnapStateUnchecked, initAccountState } from './utils/stateUtils';
 /**
  * Get a message from the origin. For demonstration purposes only.
  *
- * @param originString - The origin string.
  * @returns A message based on the origin.
  */
 const getMessage = (): string => `Hello, Identity Snap User!`;
@@ -63,13 +61,13 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
   }
   console.log('state:', JSON.stringify(state, null, 4));
 
-  /* 
+  /*
     We will need to call this API before trying to get the account because sometimes when connecting to hedera,
     the account may be null but to set the account, we need to call this API so it's a chicken and egg problem.
-    To avoid the error, we are calling this method in the beginning 
+    To avoid the error, we are calling this method in the beginning
     To set the account for Hedera, we need to set the private key and the accountId first
    */
-  if (request.method == 'connectHederaAccount') {
+  if (request.method === 'connectHederaAccount') {
     isValidHederaAccountParams(request.params);
     return await connectHederaAccount(
       snap,

@@ -6,10 +6,15 @@ import { GetVCsRequestParams } from '../../types/params';
 import { snapDialog } from '../../utils/snapUtils';
 import { veramoGetVCs } from '../../utils/veramoUtils';
 
-/* eslint-disable */
+/**
+ * Function to get VCs.
+ *
+ * @param identitySnapParams - Identity snap params.
+ * @param vcRequestParams - VC request params.
+ */
 export async function getVCs(
   identitySnapParams: IdentitySnapParams,
-  vcRequestParams: GetVCsRequestParams
+  vcRequestParams: GetVCsRequestParams,
 ): Promise<IDataManagerQueryResult[]> {
   const { snap, state } = identitySnapParams;
 
@@ -24,7 +29,7 @@ export async function getVCs(
     text('Are you sure you want to send VCs to the dApp?'),
     divider(),
     text(
-      `Some dApps are less secure than others and could save data from VCs against your will. Be careful where you send your private VCs! Number of VCs submitted is ${vcs.length.toString()}`
+      `Some dApps are less secure than others and could save data from VCs against your will. Be careful where you send your private VCs! Number of VCs submitted is ${vcs.length.toString()}`,
     ),
   ];
   vcs.forEach((vc, index) => {

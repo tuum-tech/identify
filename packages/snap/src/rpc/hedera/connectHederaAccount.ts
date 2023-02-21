@@ -9,7 +9,14 @@ import { initAccountState, updateSnapState } from '../../utils/stateUtils';
 import { veramoConnectHederaAccount } from '../../utils/veramoUtils';
 import { getAgent } from '../../veramo/setup';
 
-/* eslint-disable */
+/**
+ * Connect Hedera Account.
+ *
+ * @param snap - Snap.
+ * @param state - IdentitySnapState.
+ * @param metamask - Metamask provider.
+ * @param _accountId - Account id.
+ */
 export async function connectHederaAccount(
   snap: SnapsGlobalObject,
   state: IdentitySnapState,
@@ -39,14 +46,16 @@ export async function connectHederaAccount(
     if (hederaAccountInfo !== null) {
       const evmAddress = hederaAccountInfo.contractAccountId.startsWith('0x')
         ? hederaAccountInfo.contractAccountId
-        : '0x' + hederaAccountInfo.contractAccountId;
+        : `0x${hederaAccountInfo.contractAccountId}`;
 
       state.currentAccount = evmAddress;
       if (!(state.currentAccount in state.accountState)) {
         await initAccountState(snap, state, state.currentAccount);
       }
+
       state.accountState[state.currentAccount].hederaAccount.evmAddress =
         evmAddress;
+
       state.accountState[state.currentAccount].hederaAccount.accountId =
         _accountId;
       await updateSnapState(snap, state);
@@ -56,16 +65,15 @@ export async function connectHederaAccount(
         state.currentAccount,
         privateKey,
       );
-    } else {
-      console.error('Could not retrieve hedera account info');
-      return false;
     }
-  } else {
-    console.error(
-      'Invalid Chain ID. Valid chainIDs for Hedera: [0x127: mainnet, 0x128: testnet, 0x129: previewnet, 0x12a: localnet]',
-    );
-    throw new Error(
-      'Non-Hedera network was selected on Metamask while trying to configure the Hedera network. Please switch the network to Hedera Network first',
-    );
+    console.error('Could not retrieve hedera account info');
+    return false;
   }
+
+  console.error(
+    'Invalid Chain ID. Valid chainIDs for Hedera: [0x127: mainnet, 0x128: testnet, 0x129: previewnet, 0x12a: localnet]',
+  );
+  throw new Error(
+    'Non-Hedera network was selected on Metamask while trying to configure the Hedera network. Please switch the network to Hedera Network first',
+  );
 }

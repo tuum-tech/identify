@@ -48,14 +48,13 @@ export type Agent = TAgent<
     IDataStore
 >;
 
-/* eslint-disable */
 export const getAgent = async (snap: SnapsGlobalObject): Promise<Agent> => {
   const didProviders: Record<string, AbstractIdentifierProvider> = {};
   const vcStorePlugins: Record<string, AbstractDataStore> = {};
 
   didProviders['did:pkh'] = new PkhDIDProvider({ defaultKms: 'snap' });
-  vcStorePlugins['snap'] = new SnapVCStore(snap);
-  vcStorePlugins['googleDrive'] = new GoogleDriveVCStore(snap);
+  vcStorePlugins.snap = new SnapVCStore(snap);
+  vcStorePlugins.googleDrive = new GoogleDriveVCStore(snap);
 
   const agent = createAgent<
     IKeyManager &

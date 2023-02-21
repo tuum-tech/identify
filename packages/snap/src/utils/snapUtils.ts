@@ -5,19 +5,17 @@ import { IdentitySnapState, SnapDialogParams } from '../interfaces';
 import { isHederaAccountImported } from './params';
 import { updateSnapState } from './stateUtils';
 
-/* eslint-disable */
 /**
  * Function that returns address of the currently selected MetaMask account.
  *
+ * @param state - IdentitySnapState.
+ * @param metamask - Metamask provider.
  * @private
- *
- * @returns {Promise<string>} address - MetaMask address
- *
- *
- **/
+ * @returns MetaMask address.
+ */
 export async function getCurrentAccount(
   state: IdentitySnapState,
-  metamask: MetaMaskInpageProvider
+  metamask: MetaMaskInpageProvider,
 ): Promise<string | null> {
   try {
     const chainId = await getCurrentNetwork(metamask);
@@ -29,32 +27,36 @@ export async function getCurrentAccount(
             state.accountState[state.currentAccount].hederaAccount.evmAddress
           }, AccountId: ${
             state.accountState[state.currentAccount].hederaAccount.accountId
-          }`
+          }`,
         );
         return state.accountState[state.currentAccount].hederaAccount
           .evmAddress;
-      } else {
-        console.error(
-          'Hedera Network was selected but Hedera Account has not yet been configured. Please configure it first by calling "configureHederaAccount" API'
-        );
-        return null;
       }
-    } else {
-      // Handle everything else
-      const accounts = (await metamask.request({
-        method: 'eth_requestAccounts',
-      })) as Array<string>;
-      console.log(`MetaMask accounts: EVM Address: ${accounts}`);
-      return accounts[0];
+
+      console.error(
+        'Hedera Network was selected but Hedera Account has not yet been configured. Please configure it first by calling "configureHederaAccount" API',
+      );
+      return null;
     }
+    // Handle everything else
+    const accounts = (await metamask.request({
+      method: 'eth_requestAccounts',
+    })) as string[];
+    console.log(`MetaMask accounts: EVM Address: ${accounts}`);
+    return accounts[0];
   } catch (e) {
     console.error(`Error while trying to get the account: ${e}`);
     return null;
   }
 }
 
+/**
+ * Get current network.
+ *
+ * @param metamask - Metamask provider.
+ */
 export async function getCurrentNetwork(
-  metamask: MetaMaskInpageProvider
+  metamask: MetaMaskInpageProvider,
 ): Promise<string> {
   return (await metamask.request({
     method: 'eth_chainId',
@@ -64,23 +66,28 @@ export async function getCurrentNetwork(
 /**
  * Function that toggles the disablePopups flag in the config.
  *
+ * @param snap - Snap.
+ * @param state - IdentitySnapState.
  */
 export async function updatePopups(
   snap: SnapsGlobalObject,
-  state: IdentitySnapState
+  state: IdentitySnapState,
 ) {
   state.snapConfig.dApp.disablePopups = !state.snapConfig.dApp.disablePopups;
   await updateSnapState(snap, state);
 }
 
 /**
- * Function that lets you add a friendly dApp
+ * Function that lets you add a friendly dApp.
  *
+ * @param snap - Snap.
+ * @param state - IdentitySnapState.
+ * @param dapp - Dapp.
  */
 export async function addFriendlyDapp(
   snap: SnapsGlobalObject,
   state: IdentitySnapState,
-  dapp: string
+  dapp: string,
 ) {
   state.snapConfig.dApp.friendlyDapps.push(dapp);
   await updateSnapState(snap, state);
@@ -89,11 +96,14 @@ export async function addFriendlyDapp(
 /**
  * Function that removes a friendly dApp.
  *
+ * @param snap - Snap.
+ * @param state - IdentitySnapState.
+ * @param dapp - Dapp.
  */
 export async function removeFriendlyDapp(
   snap: SnapsGlobalObject,
   state: IdentitySnapState,
-  dapp: string
+  dapp: string,
 ) {
   // FIXME: TEST IF YOU CAN REFERENCE FRIENDLY DAPS
   // let friendlyDapps = state.snapConfig.dApp.friendlyDapps;
@@ -104,10 +114,10 @@ export async function removeFriendlyDapp(
 }
 
 /**
- *  UNUSEDFUNCTION
- *  Generate the public key for the current account using personal_sign.
+ * UNUSEDFUNCTION
+ * Generate the public key for the current account using personal_sign.
  *
- * @returns {Promise<string>} - returns public key for current account
+ * @returns {Promise<string>} returns public key for current account
  */
 /* export async function getPublicKey(
   wallet: SnapProvider,
@@ -135,12 +145,18 @@ export async function removeFriendlyDapp(
   return ethers.utils.recoverPublicKey(msgHashBytes, signedMsg);
 } */
 
+/**
+ * Function that opens snap dialog.
+ *
+ * @param snap - Snap.
+ * @param params - Snap dialog params.
+ */
 export async function snapDialog(
   snap: SnapsGlobalObject,
-  params: SnapDialogParams
+  params: SnapDialogParams,
 ): Promise<string | boolean | null> {
   return (await snap.request({
     method: 'snap_dialog',
-    params: params,
+    params,
   })) as boolean;
 }

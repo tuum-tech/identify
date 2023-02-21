@@ -2,10 +2,15 @@ import { W3CVerifiableCredential } from '@veramo/core';
 import { IdentitySnapParams } from '../../interfaces';
 import { veramoVerifyVC } from '../../utils/veramoUtils';
 
-/* eslint-disable */
+/**
+ * Function to verify VC.
+ *
+ * @param identitySnapParams - Identity snap params.
+ * @param vc - Verifiable Credential.
+ */
 export async function verifyVC(
   identitySnapParams: IdentitySnapParams,
-  vc: W3CVerifiableCredential
+  vc: W3CVerifiableCredential,
 ): Promise<boolean | null> {
   const { snap } = identitySnapParams;
 
@@ -13,7 +18,7 @@ export async function verifyVC(
   if (result.verified === false) {
     console.log(
       'VC Verification Error: ',
-      JSON.stringify(result.error, null, 4)
+      JSON.stringify(result.error, null, 4),
     );
   }
   return result.verified;

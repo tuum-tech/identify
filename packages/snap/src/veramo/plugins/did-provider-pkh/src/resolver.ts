@@ -11,7 +11,13 @@ import { isValidNamespace, SECPK1_NAMESPACES } from './pkh-did-provider';
 const DID_LD_JSON = 'application/did+ld+json';
 const DID_JSON = 'application/did+json';
 
-/* eslint-disable */
+/**
+ * Function to get DID document.
+ *
+ * @param did - DID.
+ * @param blockchainAccountId - Blockchain Account id.
+ * @returns DID document.
+ */
 function toDidDoc(did: string, blockchainAccountId: string): any {
   const { namespace } = AccountId.parse(blockchainAccountId)
     .chainId as ChainIdParams;
@@ -50,13 +56,17 @@ function toDidDoc(did: string, blockchainAccountId: string): any {
   return doc;
 }
 
-/* eslint-disable */
+/**
+ * Function to get resolver.
+ *
+ * @returns Resolver.
+ */
 export function getResolver(): ResolverRegistry {
   return {
     pkh: async (
       did: string,
       parsed: ParsedDID,
-      r: Resolvable,
+      _r: Resolvable,
       options: DIDResolutionOptions,
     ): Promise<DIDResolutionResult> => {
       const contentType = options.accept || DID_JSON;
