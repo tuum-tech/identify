@@ -53,9 +53,6 @@ const Index = () => {
   const [currentChainId, setCurrentChainId] = useState('');
   const [hederaAccountConnected, setHederaAccountConnected] = useState(false);
 
-  const [hederaPrivateKey, setHederaPrivateKey] = useState(
-    '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c',
-  );
   const [hederaAccountId, setHederaAccountId] = useState('0.0.15215');
 
   const [createVCName, setCreateVCName] = useState('Kiran Pachhai');
@@ -116,10 +113,7 @@ const Index = () => {
   const handleConfigureHederaAccountClick = async () => {
     setLoadingState('connectHederaAccount');
     try {
-      const configured = await connectHederaAccount(
-        hederaPrivateKey,
-        hederaAccountId,
-      );
+      const configured = await connectHederaAccount(hederaAccountId);
       console.log('configured: ', configured);
       if (configured) {
         setHederaAccountConnected(true);
@@ -442,15 +436,6 @@ const Index = () => {
                 'Connect to Hedera Account. NOTE that you will need to reconnect to Hedera Account if you switch the network on Metamask at any point in time as that will cause your metamask state to point to your non-hedera account on metamask',
               form: (
                 <form>
-                  <label>
-                    Enter your Hedera Private Key
-                    <input
-                      type="text"
-                      value={hederaPrivateKey}
-                      onChange={(e) => setHederaPrivateKey(e.target.value)}
-                    />
-                  </label>
-                  <br />
                   <label>
                     Enter your Hedera Account ID
                     <input

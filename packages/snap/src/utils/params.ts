@@ -12,19 +12,15 @@ import {
 
 /* eslint-disable */
 type HederaAccountParams = {
-  privateKey: string;
   accountId: string;
 };
 
 export function isValidHederaAccountParams(
-  params: unknown
+  params: unknown,
 ): asserts params is HederaAccountParams {
   if (
     params !== null &&
     typeof params === 'object' &&
-    'privateKey' in params &&
-    (params as HederaAccountParams).privateKey != null &&
-    typeof (params as HederaAccountParams).privateKey === 'string' &&
     'accountId' in params &&
     (params as HederaAccountParams).accountId != null &&
     typeof (params as HederaAccountParams).accountId === 'string'
@@ -52,7 +48,7 @@ type SwitchMethodRequestParams = {
 };
 
 export function isValidSwitchMethodRequest(
-  params: unknown
+  params: unknown,
 ): asserts params is SwitchMethodRequestParams {
   if (
     params != null &&
@@ -70,7 +66,7 @@ export function isValidSwitchMethodRequest(
 type ResolveDIDRequestParams = { did?: string };
 
 export function isValidResolveDIDRequest(
-  params: unknown
+  params: unknown,
 ): asserts params is ResolveDIDRequestParams {
   if (params != null && typeof params === 'object') return;
 
@@ -78,7 +74,7 @@ export function isValidResolveDIDRequest(
 }
 
 export function isValidGetVCsRequest(
-  params: unknown
+  params: unknown,
 ): asserts params is GetVCsRequestParams {
   if (params === null) return;
   const parameter = params as GetVCsRequestParams;
@@ -142,7 +138,7 @@ export function isValidGetVCsRequest(
 }
 
 export function isValidSaveVCRequest(
-  params: unknown
+  params: unknown,
 ): asserts params is SaveVCRequestParams {
   const parameter = params as SaveVCRequestParams;
   if (
@@ -178,7 +174,7 @@ export function isValidSaveVCRequest(
 }
 
 export function isValidCreateVCRequest(
-  params: unknown
+  params: unknown,
 ): asserts params is CreateVCRequestParams {
   const parameter = params as CreateVCRequestParams;
   if (
@@ -217,7 +213,7 @@ export function isValidCreateVCRequest(
 type VerifyVCRequestParams = { verifiableCredential: W3CVerifiableCredential };
 
 export function isValidVerifyVCRequest(
-  params: unknown
+  params: unknown,
 ): asserts params is VerifyVCRequestParams {
   if (
     params !== null &&
@@ -231,7 +227,7 @@ export function isValidVerifyVCRequest(
 }
 
 export function isValidRemoveVCRequest(
-  params: unknown
+  params: unknown,
 ): asserts params is RemoveVCsRequestParams {
   if (params === null) return;
   const parameter = params as RemoveVCsRequestParams;
@@ -273,7 +269,7 @@ export function isValidRemoveVCRequest(
 }
 
 export function isValidDeleteAllVCsRequest(
-  params: unknown
+  params: unknown,
 ): asserts params is DeleteAllVCsRequestParams {
   if (params === null) return;
   const parameter = params as DeleteAllVCsRequestParams;
@@ -307,7 +303,7 @@ export function isValidDeleteAllVCsRequest(
 }
 
 export function isValidCreateVPRequest(
-  params: unknown
+  params: unknown,
 ): asserts params is CreateVPRequestParams {
   const parameter = params as CreateVPRequestParams;
   if (
@@ -366,7 +362,7 @@ export function isValidCreateVPRequest(
 type VerifyVPRequestParams = { verifiablePresentation: VerifiablePresentation };
 
 export function isValidVerifyVPRequest(
-  params: unknown
+  params: unknown,
 ): asserts params is VerifyVPRequestParams {
   if (
     params !== null &&
@@ -380,7 +376,7 @@ export function isValidVerifyVPRequest(
 }
 
 export function isValidConfigueGoogleRequest(
-  params: unknown
+  params: unknown,
 ): asserts params is GoogleToken {
   if (params !== null && typeof params === 'object' && 'accessToken' in params)
     return;

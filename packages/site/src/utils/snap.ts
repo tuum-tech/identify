@@ -64,16 +64,12 @@ export const getCurrentNetwork = async (): Promise<string> => {
  * Invoke "connectHederaAccount" method from the snap
  */
 
-export const connectHederaAccount = async (
-  privateKey: string,
-  accountId: string,
-) => {
+export const connectHederaAccount = async (accountId: string) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
       method: 'connectHederaAccount',
       params: {
-        privateKey,
         accountId,
       },
     },

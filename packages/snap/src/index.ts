@@ -75,7 +75,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
       snap,
       state,
       ethereum,
-      request.params.privateKey,
       request.params.accountId,
     );
   }

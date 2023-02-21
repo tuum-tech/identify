@@ -65,7 +65,7 @@ export interface HederaAccount {
 export type SnapDialogParams = {
   type: string;
   content: Panel;
-  promptPlaceholder?: string;
+  placeholder?: string;
 };
 
 export type UploadData = {
