@@ -39,13 +39,6 @@ import { getCurrentAccount } from './utils/snapUtils';
 import { getSnapStateUnchecked, initAccountState } from './utils/stateUtils';
 
 /**
- * Get a message from the origin. For demonstration purposes only.
- *
- * @returns A message based on the origin.
- */
-const getMessage = (): string => `Hello, Identity Snap User!`;
-
-/**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
  *
  * @param args - The request handler args as object.

@@ -24,6 +24,7 @@ export async function syncGoogleVCs(
 
   if (!googleVCs) {
     await createEmptyFile(state, GOOGLE_DRIVE_VCS_FILE_NAME);
+    // eslint-disable-next-line require-atomic-updates
     googleVCs = {};
   }
 
