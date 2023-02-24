@@ -1,4 +1,7 @@
-import { UploadData } from 'src/interfaces';
+type UploadData = {
+  fileName: string;
+  content: string;
+};
 
 export const GOOGLE_DRIVE_VCS_FILE_NAME = 'identity-snap-vcs.json';
 const BOUNDARY = '314159265358979323846';
