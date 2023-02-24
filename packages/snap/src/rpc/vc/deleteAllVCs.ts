@@ -33,7 +33,7 @@ export async function deleteAllVCs(
   };
 
   if (await snapDialog(snap, dialogParams)) {
-    return await veramoDeleteAllVCs(snap, store);
+    return await veramoDeleteAllVCs(identitySnapParams, store);
   }
   throw new Error('User rejected');
 }

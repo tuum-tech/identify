@@ -36,7 +36,7 @@ export async function removeVC(
   };
 
   if (await snapDialog(snap, dialogParams)) {
-    return await veramoRemoveVC(snap, ids, store);
+    return await veramoRemoveVC(identitySnapParams, ids, store);
   }
   throw new Error('User rejected');
 }

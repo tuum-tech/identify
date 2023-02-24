@@ -8,16 +8,16 @@ import { IDataManagerSaveResult } from '../../veramo/plugins/verfiable-creds-man
 /**
  * Function to save VC.
  *
- * @param params - Identity snap params.
+ * @param identitySnapParams - Identity snap params.
  * @param options0 - Save VC request params.
  * @param options0.verifiableCredential - Verifiable Credential.
  * @param options0.options - Save VC options.
  */
 export async function saveVC(
-  params: IdentitySnapParams,
+  identitySnapParams: IdentitySnapParams,
   { verifiableCredential, options }: SaveVCRequestParams,
 ): Promise<IDataManagerSaveResult[]> {
-  const { snap } = params;
+  const { snap } = identitySnapParams;
 
   const { store = 'snap' } = options || {};
 
@@ -36,7 +36,7 @@ export async function saveVC(
   };
 
   if (await snapDialog(snap, dialogParams)) {
-    return await veramoSaveVC(snap, verifiableCredential, store);
+    return await veramoSaveVC(identitySnapParams, verifiableCredential, store);
   }
   throw new Error('User rejected');
 }

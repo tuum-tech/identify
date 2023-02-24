@@ -62,20 +62,24 @@ export async function veramoResolveDID(
 /**
  * Veramo Get VCs.
  *
- * @param snap - Snap.
+ * @param identitySnapParams - Identity snap params.
  * @param options - Get VCs options.
  * @param filter - Filter parameters.
  * @returns VCs.
  */
 export async function veramoGetVCs(
-  snap: SnapsGlobalObject,
+  identitySnapParams: IdentitySnapParams,
   options: GetVCsOptions,
   filter?: Filter,
 ): Promise<IDataManagerQueryResult[]> {
+  const { snap, state } = identitySnapParams;
   const agent = await getAgent(snap);
   const result = (await agent.query({
     filter,
     options,
+    accessToken:
+      state.accountState[state.currentAccount].accountConfig.identity
+        .googleAccessToken,
   })) as IDataManagerQueryResult[];
   return result;
 }
@@ -83,20 +87,24 @@ export async function veramoGetVCs(
 /**
  * Veramo Save VC.
  *
- * @param snap - Snap.
+ * @param identitySnapParams - Identity snap params.
  * @param verifiableCredential - Verifiable Credential.
  * @param store - Store to save.
  * @returns Save result.
  */
 export async function veramoSaveVC(
-  snap: SnapsGlobalObject,
+  identitySnapParams: IdentitySnapParams,
   verifiableCredential: W3CVerifiableCredential,
   store: string | string[],
 ): Promise<IDataManagerSaveResult[]> {
+  const { snap, state } = identitySnapParams;
   const agent = await getAgent(snap);
   const result = await agent.save({
     data: verifiableCredential,
     options: { store },
+    accessToken:
+      state.accountState[state.currentAccount].accountConfig.identity
+        .googleAccessToken,
   });
   return result;
 }
@@ -172,6 +180,9 @@ export async function veramoCreateVC(
   const result = await agent.save({
     data: verifiableCredential,
     options: { store },
+    accessToken:
+      state.accountState[state.currentAccount].accountConfig.identity
+        .googleAccessToken,
   });
   return result;
 }
@@ -195,16 +206,17 @@ export async function veramoVerifyVC(
 /**
  * Veramo remove vc.
  *
- * @param snap - Snap.
+ * @param identitySnapParams - Identity snap params.
  * @param ids - Ids to remove.
  * @param store - Store to remove from.
  * @returns Delete result.
  */
 export async function veramoRemoveVC(
-  snap: SnapsGlobalObject,
+  identitySnapParams: IdentitySnapParams,
   ids: string[],
   store: string | string[],
 ): Promise<IDataManagerDeleteResult[]> {
+  const { snap, state } = identitySnapParams;
   const agent = await getAgent(snap);
   let options: any;
   if (store) {
@@ -216,6 +228,9 @@ export async function veramoRemoveVC(
       return await agent.delete({
         id,
         options,
+        accessToken:
+          state.accountState[state.currentAccount].accountConfig.identity
+            .googleAccessToken,
       });
     }),
   ).then((data: IDataManagerDeleteResult[][]) => {
@@ -226,14 +241,15 @@ export async function veramoRemoveVC(
 /**
  * Veramo Delete all VCs.
  *
- * @param snap - Snap.
+ * @param identitySnapParams - Identity snap params.
  * @param store - Store to remove from.
  * @returns Clear result.
  */
 export async function veramoDeleteAllVCs(
-  snap: SnapsGlobalObject,
+  identitySnapParams: IdentitySnapParams,
   store: string | string[],
 ): Promise<IDataManagerClearResult[]> {
+  const { snap, state } = identitySnapParams;
   const agent = await getAgent(snap);
   let options: any;
   if (store) {
@@ -242,6 +258,9 @@ export async function veramoDeleteAllVCs(
 
   return await agent.clear({
     options,
+    accessToken:
+      state.accountState[state.currentAccount].accountConfig.identity
+        .googleAccessToken,
   });
 }
 

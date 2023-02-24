@@ -21,7 +21,11 @@ export async function getVCs(
   const { filter, options } = vcRequestParams || {};
   const { store = 'snap', returnStore = true } = options || {};
 
-  const vcs = await veramoGetVCs(snap, { store, returnStore }, filter);
+  const vcs = await veramoGetVCs(
+    identitySnapParams,
+    { store, returnStore },
+    filter,
+  );
 
   console.log('VCs: ', JSON.stringify(vcs, null, 4));
   const panelToShow = [
