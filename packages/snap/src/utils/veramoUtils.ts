@@ -131,6 +131,7 @@ export async function veramoCreateVC(
   const { did } = identifier;
 
   const issuanceDate = new Date();
+  // Set the expiration date to be 1 year from the date it's issued
   const expirationDate = cloneDeep(issuanceDate);
   expirationDate.setFullYear(
     issuanceDate.getFullYear() + 1,
@@ -305,16 +306,16 @@ export async function veramoCreateVP(
     divider(),
   ];
   vcs.forEach((vcData, index) => {
-    const vcsToShow = {
-      credentialSubject: vcData.credentialSubject,
-      type: vcData.type,
-    };
+    delete vcData.credentialSubject.id;
+    delete vcData.credentialSubject.hederaAccountId;
     panelToShow.push(divider());
     panelToShow.push(text(`Credential #${index + 1}`));
     panelToShow.push(divider());
-    panelToShow.push(text(JSON.stringify(vcsToShow)));
+    panelToShow.push(text('SUBJECT:'));
+    panelToShow.push(text(JSON.stringify(vcData.credentialSubject)));
+    panelToShow.push(text('TYPE:'));
+    panelToShow.push(text(JSON.stringify(vcData.type)));
   });
-
   const dialogParams: SnapDialogParams = {
     type: 'Confirmation',
     content: panel(panelToShow),

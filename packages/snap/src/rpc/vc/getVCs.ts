@@ -34,15 +34,16 @@ export async function getVCs(
   ];
   vcs.forEach((vc, index) => {
     const vcData = vc.data as VerifiableCredential;
-    const vcsToShow = {
-      credentialSubject: vcData.credentialSubject,
-      type: vcData.type,
-      metadata: vc.metadata,
-    };
+    delete vcData.credentialSubject.id;
+    delete vcData.credentialSubject.hederaAccountId;
     panelToShow.push(divider());
     panelToShow.push(text(`Credential #${index + 1}`));
     panelToShow.push(divider());
-    panelToShow.push(text(JSON.stringify(vcsToShow)));
+    panelToShow.push(text('ID: '));
+    panelToShow.push(text('SUBJECT:'));
+    panelToShow.push(text(JSON.stringify(vcData.credentialSubject)));
+    panelToShow.push(text('TYPE:'));
+    panelToShow.push(text(JSON.stringify(vcData.type)));
   });
   const dialogParams: SnapDialogParams = {
     type: 'Confirmation',
