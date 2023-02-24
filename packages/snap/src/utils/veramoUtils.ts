@@ -1,6 +1,5 @@
 import { BIP44CoinTypeNode } from '@metamask/key-tree';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
-import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import {
   DIDResolutionResult,
   IIdentifier,
@@ -14,6 +13,7 @@ import {
 import cloneDeep from 'lodash.clonedeep';
 import { validHederaChainID } from '../hedera/config';
 import { IdentitySnapParams, SnapDialogParams } from '../interfaces';
+import { generateVCPanel } from '../rpc/snap/dialogUtils';
 import { KeyPair } from '../types/crypto';
 import { CreateVPRequestParams, GetVCsOptions } from '../types/params';
 import {
@@ -280,6 +280,7 @@ export async function veramoCreateVP(
   const { did } = identifier;
 
   const vcs: VerifiableCredential[] = [];
+  const vcsWithMetadata: IDataManagerQueryResult[] = [];
 
   for (const vcId of vcsMetadata) {
     const vcObj = (await agent.query({
@@ -292,6 +293,7 @@ export async function veramoCreateVP(
     if (vcObj.length > 0) {
       const vc: VerifiableCredential = vcObj[0].data as VerifiableCredential;
       vcs.push(vc);
+      vcsWithMetadata.push({ data: vc, metadata: { id: vcId } });
     }
   }
 
@@ -300,27 +302,19 @@ export async function veramoCreateVP(
   }
   const config = state.snapConfig;
 
-  const panelToShow = [
-    heading('Create Verifiable Presentation'),
-    text('Do you wish to create a VP from the following VCs?'),
-    divider(),
-  ];
-  vcs.forEach((vcData, index) => {
-    delete vcData.credentialSubject.id;
-    delete vcData.credentialSubject.hederaAccountId;
-    panelToShow.push(divider());
-    panelToShow.push(text(`Credential #${index + 1}`));
-    panelToShow.push(divider());
-    panelToShow.push(text('SUBJECT:'));
-    panelToShow.push(text(JSON.stringify(vcData.credentialSubject)));
-    panelToShow.push(text('TYPE:'));
-    panelToShow.push(text(JSON.stringify(vcData.type)));
-  });
+  const header = 'Create Verifiable Presentation';
+  const prompt = 'Do you wish to create a VP from the following VCs?';
+  const description =
+    'A Verifiable Presentation is a secure way for someone to present information about themselves or their identity to someone else while ensuring that the information is accureate and trustworthy';
   const dialogParams: SnapDialogParams = {
     type: 'Confirmation',
-    content: panel(panelToShow),
+    content: await generateVCPanel(
+      header,
+      prompt,
+      description,
+      vcsWithMetadata,
+    ),
   };
-
   if (config.dApp.disablePopups || (await snapDialog(snap, dialogParams))) {
     const vp = await agent.createVerifiablePresentation({
       presentation: {
