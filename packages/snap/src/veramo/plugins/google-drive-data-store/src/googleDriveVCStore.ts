@@ -3,18 +3,19 @@ import { W3CVerifiableCredential } from '@veramo/core';
 import jsonpath from 'jsonpath';
 import { v4 as uuidv4 } from 'uuid';
 import {
+  AbstractDataStore,
+  IConfigureArgs,
+  IFilterArgs,
+  IQueryResult,
+} from '../../verfiable-creds-manager';
+import {
   createEmptyFile,
   getGoogleVCs,
   GOOGLE_DRIVE_VCS_FILE_NAME,
   uploadToGoogleDrive,
-} from '../../utils/googleUtils';
-import { decodeJWT } from '../../utils/jwt';
-import { getSnapState } from '../../utils/stateUtils';
-import {
-  AbstractDataStore,
-  IFilterArgs,
-  IQueryResult,
-} from './verfiable-creds-manager';
+  verifyToken,
+} from './googleUtils';
+import { decodeJWT } from './jwt';
 
 /**
  * An implementation of {@link AbstractDataStore} that holds everything in snap state.
@@ -24,15 +25,20 @@ import {
 export class GoogleDriveVCStore extends AbstractDataStore {
   snap: SnapsGlobalObject;
 
+  accessToken: string;
+
   constructor(snap: SnapsGlobalObject) {
     super();
     this.snap = snap;
+    this.accessToken = '';
   }
 
   async query(args: IFilterArgs): Promise<IQueryResult[]> {
     const { filter } = args;
-    const state = await getSnapState(this.snap);
-    const googleVCs = await getGoogleVCs(state, GOOGLE_DRIVE_VCS_FILE_NAME);
+    const googleVCs = await getGoogleVCs(
+      this.accessToken,
+      GOOGLE_DRIVE_VCS_FILE_NAME,
+    );
 
     if (!googleVCs) {
       console.log('Invalid vcs file');
@@ -113,25 +119,21 @@ export class GoogleDriveVCStore extends AbstractDataStore {
   }): Promise<string> {
     // TODO check if VC is correct type
     const { data: vc, id } = args;
-    const state = await getSnapState(this.snap);
-    const account = state.currentAccount;
-    if (!account) {
-      throw Error(
-        `GoogleDriveVCStore - Cannot get current account: ${account}`,
-      );
-    }
 
     const newId = id || uuidv4();
 
-    let googleVCs = await getGoogleVCs(state, GOOGLE_DRIVE_VCS_FILE_NAME);
+    let googleVCs = await getGoogleVCs(
+      this.accessToken,
+      GOOGLE_DRIVE_VCS_FILE_NAME,
+    );
 
     if (!googleVCs) {
-      await createEmptyFile(state, GOOGLE_DRIVE_VCS_FILE_NAME);
+      await createEmptyFile(this.accessToken, GOOGLE_DRIVE_VCS_FILE_NAME);
       googleVCs = {};
     }
 
     const newVCs = { ...googleVCs, [newId]: vc };
-    const gdriveResponse = await uploadToGoogleDrive(state, {
+    const gdriveResponse = await uploadToGoogleDrive(this.accessToken, {
       fileName: GOOGLE_DRIVE_VCS_FILE_NAME,
       content: JSON.stringify(newVCs),
     });
@@ -141,8 +143,10 @@ export class GoogleDriveVCStore extends AbstractDataStore {
   }
 
   async delete({ id }: { id: string }): Promise<boolean> {
-    const state = await getSnapState(this.snap);
-    const googleVCs = await getGoogleVCs(state, GOOGLE_DRIVE_VCS_FILE_NAME);
+    const googleVCs = await getGoogleVCs(
+      this.accessToken,
+      GOOGLE_DRIVE_VCS_FILE_NAME,
+    );
 
     if (!googleVCs) {
       console.log('Invalid vcs file');
@@ -154,7 +158,7 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     }
 
     delete googleVCs[id];
-    const gdriveResponse = await uploadToGoogleDrive(state, {
+    const gdriveResponse = await uploadToGoogleDrive(this.accessToken, {
       fileName: GOOGLE_DRIVE_VCS_FILE_NAME,
       content: JSON.stringify(googleVCs),
     });
@@ -164,13 +168,24 @@ export class GoogleDriveVCStore extends AbstractDataStore {
   }
 
   public async clear(_args: IFilterArgs): Promise<boolean> {
-    const state = await getSnapState(this.snap);
-    const gdriveResponse = await uploadToGoogleDrive(state, {
+    const gdriveResponse = await uploadToGoogleDrive(this.accessToken, {
       fileName: GOOGLE_DRIVE_VCS_FILE_NAME,
       content: JSON.stringify({}),
     });
     console.log({ gdriveResponse });
 
     return true;
+  }
+
+  public async configure({ accessToken }: IConfigureArgs): Promise<boolean> {
+    try {
+      await verifyToken(accessToken);
+      this.accessToken = accessToken;
+
+      return true;
+    } catch (error) {
+      console.error('Could not configure google account', error);
+      throw error;
+    }
   }
 }

@@ -30,7 +30,7 @@ export class DataManager implements IAgentPlugin {
   public async save(
     args: IDataManagerSaveArgs,
   ): Promise<IDataManagerSaveResult[]> {
-    const { data, options } = args;
+    const { data, options, accessToken } = args;
     let { store } = options;
     if (typeof store === 'string') {
       store = [store];
@@ -46,6 +46,9 @@ export class DataManager implements IAgentPlugin {
       }
 
       try {
+        if (accessToken && storePlugin.configure) {
+          await storePlugin.configure({ accessToken });
+        }
         const result = await storePlugin.save({ data, options, id });
         res.push({ id: result, store: storeName });
       } catch (e) {
@@ -58,7 +61,11 @@ export class DataManager implements IAgentPlugin {
   public async query(
     args: IDataManagerQueryArgs,
   ): Promise<IDataManagerQueryResult[]> {
-    const { filter = { type: 'none', filter: {} }, options } = args;
+    const {
+      filter = { type: 'none', filter: {} },
+      options,
+      accessToken,
+    } = args;
     let store;
     let returnStore = true;
     if (options === undefined) {
@@ -87,6 +94,9 @@ export class DataManager implements IAgentPlugin {
       }
 
       try {
+        if (accessToken && storePlugin.configure) {
+          await storePlugin.configure({ accessToken });
+        }
         const result = await storePlugin.query({ filter });
         const mappedResult = result.map((r) => {
           if (returnStore) {
@@ -108,7 +118,7 @@ export class DataManager implements IAgentPlugin {
   public async delete(
     args: IDataManagerDeleteArgs,
   ): Promise<IDataManagerDeleteResult[]> {
-    const { id, options } = args;
+    const { id, options, accessToken } = args;
     let store;
     if (options === undefined) {
       store = Object.keys(this.stores);
@@ -131,6 +141,9 @@ export class DataManager implements IAgentPlugin {
       }
 
       try {
+        if (accessToken && storePlugin.configure) {
+          await storePlugin.configure({ accessToken });
+        }
         const result = await storePlugin.delete({ id });
         res.push({ id, removed: result, store: storeName });
       } catch (e) {
@@ -143,7 +156,11 @@ export class DataManager implements IAgentPlugin {
   public async clear(
     args: IDataManagerClearArgs,
   ): Promise<IDataManagerClearResult[]> {
-    const { filter = { type: 'none', filter: {} }, options } = args;
+    const {
+      filter = { type: 'none', filter: {} },
+      options,
+      accessToken,
+    } = args;
     let store;
     if (options === undefined) {
       store = Object.keys(this.stores);
@@ -164,6 +181,9 @@ export class DataManager implements IAgentPlugin {
       }
 
       try {
+        if (accessToken && storePlugin.configure) {
+          await storePlugin.configure({ accessToken });
+        }
         const result = await storePlugin.clear({ filter });
         res.push({ removed: result, store: storeName });
       } catch (e) {

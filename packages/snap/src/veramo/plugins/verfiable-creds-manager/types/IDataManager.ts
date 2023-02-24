@@ -46,21 +46,25 @@ type QueryMetadata = {
 export type IDataManagerQueryArgs = {
   filter?: Filter;
   options?: QueryOptions;
+  accessToken?: string;
 };
 
 export type IDataManagerDeleteArgs = {
   id: string;
   options?: DeleteOptions;
+  accessToken?: string;
 };
 
 export type IDataManagerSaveArgs = {
   data: unknown;
   options: SaveOptions;
+  accessToken?: string;
 };
 
 export type IDataManagerClearArgs = {
   filter?: Filter;
   options?: ClearOptions;
+  accessToken?: string;
 };
 
 /**

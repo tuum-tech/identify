@@ -14,6 +14,8 @@ import {
 export class MemoryDataStore extends AbstractDataStore {
   private data: Record<string, unknown> = {};
 
+  configure: undefined;
+
   // eslint-disable-next-line @typescript-eslint/require-await
   public async save(args: ISaveArgs): Promise<string> {
     const id = v4();

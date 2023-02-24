@@ -308,6 +308,8 @@ export class SnapDIDStore extends AbstractDIDStore {
 export class SnapVCStore extends AbstractDataStore {
   snap: SnapsGlobalObject;
 
+  configure: undefined;
+
   constructor(snap: SnapsGlobalObject) {
     super();
     this.snap = snap;

@@ -13,6 +13,7 @@ import { CredentialIssuerEIP712 } from '@veramo/credential-eip712';
   LdDefaultContexts,
   VeramoEcdsaSecp256k1RecoverySignature2020,
 } from '@veramo/credential-ld'; */
+import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { CredentialPlugin, W3cMessageHandler } from '@veramo/credential-w3c';
 import { JwtMessageHandler } from '@veramo/did-jwt';
 import { AbstractIdentifierProvider, DIDManager } from '@veramo/did-manager';
@@ -22,7 +23,6 @@ import { KeyManagementSystem } from '@veramo/kms-local';
 import { MessageHandler } from '@veramo/message-handler';
 import { SdrMessageHandler } from '@veramo/selective-disclosure';
 import { Resolver } from 'did-resolver';
-import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { PkhDIDProvider } from './plugins/did-provider-pkh/src/pkh-did-provider';
 import { getResolver as getDidPkhResolver } from './plugins/did-provider-pkh/src/resolver';
 import {
@@ -31,7 +31,7 @@ import {
   IDataManager,
 } from './plugins/verfiable-creds-manager';
 
-import { GoogleDriveVCStore } from './plugins/googleDriveDataStore';
+import { GoogleDriveVCStore } from './plugins/google-drive-data-store';
 import {
   SnapDIDStore,
   SnapKeyStore,

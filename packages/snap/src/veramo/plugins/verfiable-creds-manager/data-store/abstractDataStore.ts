@@ -16,6 +16,10 @@ export type IFilterArgs = {
   };
 };
 
+export type IConfigureArgs = {
+  accessToken: string;
+};
+
 export type IQueryResult = {
   data: unknown;
   metadata: {
@@ -31,4 +35,6 @@ export abstract class AbstractDataStore {
   abstract query(args: IFilterArgs): Promise<IQueryResult[]>;
 
   abstract clear(args: IFilterArgs): Promise<boolean>;
+
+  abstract configure?(args: IConfigureArgs): Promise<boolean>;
 }
