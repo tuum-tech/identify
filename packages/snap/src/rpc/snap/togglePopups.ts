@@ -1,6 +1,6 @@
 import { heading, panel, text } from '@metamask/snaps-ui';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
-import { snapDialog, updatePopups } from '../../utils/snapUtils';
+import { snapDialog, updatePopups } from './utils';
 
 /**
  * Function to toggle popups.

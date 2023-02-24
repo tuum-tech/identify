@@ -9,8 +9,8 @@ import {
 } from '@veramo/key-manager';
 import jsonpath from 'jsonpath';
 import { v4 as uuidv4 } from 'uuid';
+import { getSnapState, updateSnapState } from '../../rpc/snap/state';
 import { decodeJWT } from '../../utils/jwt';
-import { getSnapState, updateSnapState } from '../../utils/stateUtils';
 import {
   AbstractDataStore,
   IFilterArgs,
@@ -30,7 +30,7 @@ export class SnapKeyStore extends AbstractKeyStore {
     this.snap = snap;
   }
 
-  async get({ kid }: { kid: string }): Promise<IKey> {
+  async getKey({ kid }: { kid: string }): Promise<IKey> {
     const state = await getSnapState(this.snap);
     const account = state.currentAccount;
     if (!account) {
@@ -44,7 +44,7 @@ export class SnapKeyStore extends AbstractKeyStore {
     return key;
   }
 
-  async delete({ kid }: { kid: string }) {
+  async deleteKey({ kid }: { kid: string }) {
     const state = await getSnapState(this.snap);
     const account = state.currentAccount;
     if (!account) {
@@ -60,7 +60,7 @@ export class SnapKeyStore extends AbstractKeyStore {
     return true;
   }
 
-  async import(args: IKey) {
+  async importKey(args: IKey) {
     const state = await getSnapState(this.snap);
     const account = state.currentAccount;
     if (!account) {
@@ -72,7 +72,7 @@ export class SnapKeyStore extends AbstractKeyStore {
     return true;
   }
 
-  async list(): Promise<Exclude<IKey, 'privateKeyHex'>[]> {
+  async listKeys(): Promise<Exclude<IKey, 'privateKeyHex'>[]> {
     const state = await getSnapState(this.snap);
     const account = state.currentAccount;
     if (!account) {
@@ -102,7 +102,7 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
     this.snap = snap;
   }
 
-  async get({ alias }: { alias: string }): Promise<ManagedPrivateKey> {
+  async getKey({ alias }: { alias: string }): Promise<ManagedPrivateKey> {
     const state = await getSnapState(this.snap);
     const account = state.currentAccount;
     if (!account) {
@@ -120,7 +120,7 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
     return key;
   }
 
-  async delete({ alias }: { alias: string }) {
+  async deleteKey({ alias }: { alias: string }) {
     const state = await getSnapState(this.snap);
     const account = state.currentAccount;
     if (!account) {
@@ -138,7 +138,7 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
     return true;
   }
 
-  async import(args: ImportablePrivateKey) {
+  async importKey(args: ImportablePrivateKey) {
     const state = await getSnapState(this.snap);
     const account = state.currentAccount;
     if (!account) {
@@ -167,7 +167,7 @@ export class SnapPrivateKeyStore extends AbstractPrivateKeyStore {
     return state.accountState[account].snapPrivateKeyStore[alias];
   }
 
-  async list(): Promise<ManagedPrivateKey[]> {
+  async listKeys(): Promise<ManagedPrivateKey[]> {
     const state = await getSnapState(this.snap);
     const account = state.currentAccount;
     if (!account) {
@@ -193,7 +193,7 @@ export class SnapDIDStore extends AbstractDIDStore {
     this.snap = snap;
   }
 
-  async get({
+  async getDID({
     did,
     alias,
     provider,
@@ -235,7 +235,7 @@ export class SnapDIDStore extends AbstractDIDStore {
     );
   }
 
-  async delete({ did }: { did: string }) {
+  async deleteDID({ did }: { did: string }) {
     const state = await getSnapState(this.snap);
     const account = state.currentAccount;
     if (!account) {
@@ -253,7 +253,7 @@ export class SnapDIDStore extends AbstractDIDStore {
     return true;
   }
 
-  async import(args: IIdentifier) {
+  async importDID(args: IIdentifier) {
     const state = await getSnapState(this.snap);
     const account = state.currentAccount;
     if (!account) {
@@ -271,7 +271,7 @@ export class SnapDIDStore extends AbstractDIDStore {
     return true;
   }
 
-  async list(args: {
+  async listDIDs(args: {
     alias?: string;
     provider?: string;
   }): Promise<IIdentifier[]> {
@@ -315,7 +315,7 @@ export class SnapVCStore extends AbstractDataStore {
     this.snap = snap;
   }
 
-  async query(args: IFilterArgs): Promise<IQueryResult[]> {
+  async queryVC(args: IFilterArgs): Promise<IQueryResult[]> {
     const { filter } = args;
     const state = await getSnapState(this.snap);
     const account = state.currentAccount;
@@ -393,7 +393,7 @@ export class SnapVCStore extends AbstractDataStore {
     return [];
   }
 
-  async save(args: {
+  async saveVC(args: {
     data: W3CVerifiableCredential;
     id: string;
   }): Promise<string> {
@@ -412,7 +412,7 @@ export class SnapVCStore extends AbstractDataStore {
     return newId;
   }
 
-  async delete({ id }: { id: string }): Promise<boolean> {
+  async deleteVC({ id }: { id: string }): Promise<boolean> {
     const state = await getSnapState(this.snap);
     const account = state.currentAccount;
     if (!account) {
@@ -428,7 +428,7 @@ export class SnapVCStore extends AbstractDataStore {
     return true;
   }
 
-  public async clear(_args: IFilterArgs): Promise<boolean> {
+  public async clearVCs(_args: IFilterArgs): Promise<boolean> {
     const state = await getSnapState(this.snap);
     const account = state.currentAccount;
     if (!account) {

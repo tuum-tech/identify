@@ -15,10 +15,10 @@ import {
 
 export class DataManager implements IAgentPlugin {
   readonly methods: IDataManager = {
-    save: this.save.bind(this),
-    query: this.query.bind(this),
-    delete: this.delete.bind(this),
-    clear: this.clear.bind(this),
+    saveVC: this.saveVC.bind(this),
+    queryVC: this.queryVC.bind(this),
+    deleteVC: this.deleteVC.bind(this),
+    clearVCs: this.clearVCs.bind(this),
   };
 
   private stores: Record<string, AbstractDataStore>;
@@ -27,7 +27,7 @@ export class DataManager implements IAgentPlugin {
     this.stores = options.store;
   }
 
-  public async save(
+  public async saveVC(
     args: IDataManagerSaveArgs,
   ): Promise<IDataManagerSaveResult[]> {
     const { data, options, accessToken } = args;
@@ -58,7 +58,7 @@ export class DataManager implements IAgentPlugin {
     return res;
   }
 
-  public async query(
+  public async queryVC(
     args: IDataManagerQueryArgs,
   ): Promise<IDataManagerQueryResult[]> {
     const {
@@ -115,7 +115,7 @@ export class DataManager implements IAgentPlugin {
     return res;
   }
 
-  public async delete(
+  public async deleteVC(
     args: IDataManagerDeleteArgs,
   ): Promise<IDataManagerDeleteResult[]> {
     const { id, options, accessToken } = args;
@@ -153,7 +153,7 @@ export class DataManager implements IAgentPlugin {
     return res;
   }
 
-  public async clear(
+  public async clearVCs(
     args: IDataManagerClearArgs,
   ): Promise<IDataManagerClearResult[]> {
     const {

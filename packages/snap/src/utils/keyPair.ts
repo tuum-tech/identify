@@ -5,8 +5,8 @@ import {
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { ethers } from 'ethers';
 import { IdentitySnapState } from '../interfaces';
+import { updateSnapState } from '../rpc/snap/state';
 import { DEFAULTCOINTYPE } from '../types/constants';
-import { updateSnapState } from './stateUtils';
 
 /**
  * Function to get account index.

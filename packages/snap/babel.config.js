@@ -14,6 +14,7 @@ module.exports = (api) => {
     ['@babel/plugin-transform-flow-strip-types'],
     ['@babel/plugin-proposal-class-properties', { loose: true }],
     ['@babel/plugin-proposal-private-methods', { loose: true }],
+    ['@babel/plugin-syntax-import-assertions'],
   ];
 
   return { presets, plugins };

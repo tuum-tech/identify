@@ -17,14 +17,13 @@ import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { CredentialPlugin, W3cMessageHandler } from '@veramo/credential-w3c';
 import { JwtMessageHandler } from '@veramo/did-jwt';
 import { AbstractIdentifierProvider, DIDManager } from '@veramo/did-manager';
+import { getDidPkhResolver, PkhDIDProvider } from '@veramo/did-provider-pkh';
 import { DIDResolverPlugin } from '@veramo/did-resolver';
 import { KeyManager } from '@veramo/key-manager';
 import { KeyManagementSystem } from '@veramo/kms-local';
 import { MessageHandler } from '@veramo/message-handler';
 import { SdrMessageHandler } from '@veramo/selective-disclosure';
 import { Resolver } from 'did-resolver';
-import { PkhDIDProvider } from './plugins/did-provider-pkh/src/pkh-did-provider';
-import { getResolver as getDidPkhResolver } from './plugins/did-provider-pkh/src/resolver';
 import {
   AbstractDataStore,
   DataManager,

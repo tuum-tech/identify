@@ -28,13 +28,13 @@ export type IQueryResult = {
 };
 
 export abstract class AbstractDataStore {
-  abstract save(args: ISaveArgs): Promise<string>;
+  abstract saveVC(args: ISaveArgs): Promise<string>;
 
-  abstract delete(args: IDeleteArgs): Promise<boolean>;
+  abstract deleteVC(args: IDeleteArgs): Promise<boolean>;
 
-  abstract query(args: IFilterArgs): Promise<IQueryResult[]>;
+  abstract queryVC(args: IFilterArgs): Promise<IQueryResult[]>;
 
-  abstract clear(args: IFilterArgs): Promise<boolean>;
+  abstract clearVCs(args: IFilterArgs): Promise<boolean>;
 
   abstract configure?(args: IConfigureArgs): Promise<boolean>;
 }

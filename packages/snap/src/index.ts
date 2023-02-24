@@ -8,7 +8,9 @@ import { switchMethod } from './rpc/did/switchMethods';
 import { configureGoogleAccount } from './rpc/gdrive/configureGoogleAccount';
 import { connectHederaAccount } from './rpc/hedera/connectHederaAccount';
 import { getHederaAccountId } from './rpc/hedera/getHederaAccountId';
+import { getSnapStateUnchecked, initAccountState } from './rpc/snap/state';
 import { togglePopups } from './rpc/snap/togglePopups';
+import { getCurrentAccount } from './rpc/snap/utils';
 import { createVC } from './rpc/vc/createVC';
 import { createVP } from './rpc/vc/createVP';
 import { deleteAllVCs } from './rpc/vc/deleteAllVCs';
@@ -35,8 +37,6 @@ import {
   isValidVerifyVCRequest,
   isValidVerifyVPRequest,
 } from './utils/params';
-import { getCurrentAccount } from './utils/snapUtils';
-import { getSnapStateUnchecked, initAccountState } from './utils/stateUtils';
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.

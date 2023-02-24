@@ -33,7 +33,7 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     this.accessToken = '';
   }
 
-  async query(args: IFilterArgs): Promise<IQueryResult[]> {
+  async queryVC(args: IFilterArgs): Promise<IQueryResult[]> {
     const { filter } = args;
     const googleVCs = await getGoogleVCs(
       this.accessToken,
@@ -113,7 +113,7 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     return [];
   }
 
-  async save(args: {
+  async saveVC(args: {
     data: W3CVerifiableCredential;
     id: string;
   }): Promise<string> {
@@ -142,7 +142,7 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     return newId;
   }
 
-  async delete({ id }: { id: string }): Promise<boolean> {
+  async deleteVC({ id }: { id: string }): Promise<boolean> {
     const googleVCs = await getGoogleVCs(
       this.accessToken,
       GOOGLE_DRIVE_VCS_FILE_NAME,
@@ -167,7 +167,7 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     return true;
   }
 
-  public async clear(_args: IFilterArgs): Promise<boolean> {
+  public async clearVCs(_args: IFilterArgs): Promise<boolean> {
     const gdriveResponse = await uploadToGoogleDrive(this.accessToken, {
       fileName: GOOGLE_DRIVE_VCS_FILE_NAME,
       content: JSON.stringify({}),

@@ -7,7 +7,7 @@ import {
   removeFriendlyDapp,
   snapConfirm,
   togglePopups,
-} from '../../src/utils/snapUtils';
+} from '../../src/rpc/snap/utils';
 import {
   address,
   getDefaultSnapState,

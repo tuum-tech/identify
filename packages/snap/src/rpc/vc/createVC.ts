@@ -1,9 +1,9 @@
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
 import { CreateVCRequestParams } from '../../types/params';
-import { snapDialog } from '../../utils/snapUtils';
 import { veramoCreateVC } from '../../utils/veramoUtils';
 import { IDataManagerSaveResult } from '../../veramo/plugins/verfiable-creds-manager';
+import { snapDialog } from '../snap/utils';
 
 /**
  * Function to create VC.

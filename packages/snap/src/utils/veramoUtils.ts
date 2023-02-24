@@ -1,6 +1,5 @@
 import { BIP44CoinTypeNode } from '@metamask/key-tree';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
-import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import {
   DIDResolutionResult,
   IIdentifier,
@@ -14,6 +13,8 @@ import {
 import cloneDeep from 'lodash.clonedeep';
 import { validHederaChainID } from '../hedera/config';
 import { IdentitySnapParams, SnapDialogParams } from '../interfaces';
+import { generateVCPanel } from '../rpc/snap/dialogUtils';
+import { getCurrentNetwork, snapDialog } from '../rpc/snap/utils';
 import { KeyPair } from '../types/crypto';
 import { CreateVPRequestParams, GetVCsOptions } from '../types/params';
 import {
@@ -27,7 +28,6 @@ import { Agent, getAgent } from '../veramo/setup';
 import { getCurrentDid } from './didUtils';
 import { getKeyPair } from './hederaUtils';
 import { getAddressKeyDeriver, snapGetKeysFromAddress } from './keyPair';
-import { getCurrentNetwork, snapDialog } from './snapUtils';
 
 /**
  * Veramo Resolves DID.
@@ -74,7 +74,7 @@ export async function veramoGetVCs(
 ): Promise<IDataManagerQueryResult[]> {
   const { snap, state } = identitySnapParams;
   const agent = await getAgent(snap);
-  const result = (await agent.query({
+  const result = (await agent.queryVC({
     filter,
     options,
     accessToken:
@@ -99,7 +99,7 @@ export async function veramoSaveVC(
 ): Promise<IDataManagerSaveResult[]> {
   const { snap, state } = identitySnapParams;
   const agent = await getAgent(snap);
-  const result = await agent.save({
+  const result = await agent.saveVC({
     data: verifiableCredential,
     options: { store },
     accessToken:
@@ -139,6 +139,7 @@ export async function veramoCreateVC(
   const { did } = identifier;
 
   const issuanceDate = new Date();
+  // Set the expiration date to be 1 year from the date it's issued
   const expirationDate = cloneDeep(issuanceDate);
   expirationDate.setFullYear(
     issuanceDate.getFullYear() + 1,
@@ -177,7 +178,7 @@ export async function veramoCreateVC(
     'Created verifiableCredential: ',
     JSON.stringify(verifiableCredential, null, 4),
   );
-  const result = await agent.save({
+  const result = await agent.saveVC({
     data: verifiableCredential,
     options: { store },
     accessToken:
@@ -225,7 +226,7 @@ export async function veramoRemoveVC(
 
   return Promise.all(
     ids.map(async (id) => {
-      return await agent.delete({
+      return await agent.deleteVC({
         id,
         options,
         accessToken:
@@ -256,7 +257,7 @@ export async function veramoDeleteAllVCs(
     options = { store };
   }
 
-  return await agent.clear({
+  return await agent.clearVCs({
     options,
     accessToken:
       state.accountState[state.currentAccount].accountConfig.identity
@@ -298,9 +299,10 @@ export async function veramoCreateVP(
   const { did } = identifier;
 
   const vcs: VerifiableCredential[] = [];
+  const vcsWithMetadata: IDataManagerQueryResult[] = [];
 
   for (const vcId of vcsMetadata) {
-    const vcObj = (await agent.query({
+    const vcObj = (await agent.queryVC({
       filter: {
         type: 'id',
         filter: vcId,
@@ -310,6 +312,7 @@ export async function veramoCreateVP(
     if (vcObj.length > 0) {
       const vc: VerifiableCredential = vcObj[0].data as VerifiableCredential;
       vcs.push(vc);
+      vcsWithMetadata.push({ data: vc, metadata: { id: vcId } });
     }
   }
 
@@ -318,27 +321,19 @@ export async function veramoCreateVP(
   }
   const config = state.snapConfig;
 
-  const panelToShow = [
-    heading('Create Verifiable Presentation'),
-    text('Do you wish to create a VP from the following VCs?'),
-    divider(),
-  ];
-  vcs.forEach((vcData, index) => {
-    const vcsToShow = {
-      credentialSubject: vcData.credentialSubject,
-      type: vcData.type,
-    };
-    panelToShow.push(divider());
-    panelToShow.push(text(`Credential #${index + 1}`));
-    panelToShow.push(divider());
-    panelToShow.push(text(JSON.stringify(vcsToShow)));
-  });
-
+  const header = 'Create Verifiable Presentation';
+  const prompt = 'Do you wish to create a VP from the following VCs?';
+  const description =
+    'A Verifiable Presentation is a secure way for someone to present information about themselves or their identity to someone else while ensuring that the information is accureate and trustworthy';
   const dialogParams: SnapDialogParams = {
     type: 'Confirmation',
-    content: panel(panelToShow),
+    content: await generateVCPanel(
+      header,
+      prompt,
+      description,
+      vcsWithMetadata,
+    ),
   };
-
   if (config.dApp.disablePopups || (await snapDialog(snap, dialogParams))) {
     const vp = await agent.createVerifiablePresentation({
       presentation: {

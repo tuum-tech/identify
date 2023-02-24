@@ -953,30 +953,6 @@ const Index = () => {
           ''
         )}
         {/* =============================================================================== */}
-        {validHederaChainID(currentChainId) && hederaAccountConnected ? (
-          <Card
-            content={{
-              title: 'getHederaAccountId',
-              description: 'Retrieve Hedera Account Id',
-              button: (
-                <SendHelloButton
-                  buttonText="Get Account Id"
-                  onClick={handleGetHederaAccountIdClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        ) : (
-          ''
-        )}
-        {/* =============================================================================== */}
         {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
         (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
           <Card
