@@ -49,7 +49,7 @@ export class DataManager implements IAgentPlugin {
         if (accessToken && storePlugin.configure) {
           await storePlugin.configure({ accessToken });
         }
-        const result = await storePlugin.save({ data, options, id });
+        const result = await storePlugin.saveVC({ data, options, id });
         res.push({ id: result, store: storeName });
       } catch (e) {
         console.log(e);
@@ -97,7 +97,7 @@ export class DataManager implements IAgentPlugin {
         if (accessToken && storePlugin.configure) {
           await storePlugin.configure({ accessToken });
         }
-        const result = await storePlugin.query({ filter });
+        const result = await storePlugin.queryVC({ filter });
         const mappedResult = result.map((r) => {
           if (returnStore) {
             return {
@@ -144,7 +144,7 @@ export class DataManager implements IAgentPlugin {
         if (accessToken && storePlugin.configure) {
           await storePlugin.configure({ accessToken });
         }
-        const result = await storePlugin.delete({ id });
+        const result = await storePlugin.deleteVC({ id });
         res.push({ id, removed: result, store: storeName });
       } catch (e) {
         console.log(e);
@@ -184,7 +184,7 @@ export class DataManager implements IAgentPlugin {
         if (accessToken && storePlugin.configure) {
           await storePlugin.configure({ accessToken });
         }
-        const result = await storePlugin.clear({ filter });
+        const result = await storePlugin.clearVCs({ filter });
         res.push({ removed: result, store: storeName });
       } catch (e) {
         console.log(e);
