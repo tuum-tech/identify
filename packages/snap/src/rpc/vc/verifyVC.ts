@@ -16,6 +16,7 @@ export async function verifyVC(
 
   const result = await veramoVerifyVC(snap, vc);
   if (result.verified === false) {
+    console.log('result: ', JSON.stringify(result, null, 4));
     console.log(
       'VC Verification Error: ',
       JSON.stringify(result.error, null, 4),

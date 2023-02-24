@@ -1,6 +1,6 @@
 import { GoogleToken, IdentitySnapParams } from '../../interfaces';
 import { verifyToken } from '../../utils/googleUtils';
-import { updateSnapState } from '../../utils/stateUtils';
+import { updateSnapState } from '../snap/state';
 
 export const configureGoogleAccount = async (
   identitySnapParams: IdentitySnapParams,

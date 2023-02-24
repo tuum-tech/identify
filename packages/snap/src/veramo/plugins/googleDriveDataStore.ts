@@ -2,6 +2,7 @@ import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { W3CVerifiableCredential } from '@veramo/core';
 import jsonpath from 'jsonpath';
 import { v4 as uuidv4 } from 'uuid';
+import { getSnapState } from '../../rpc/snap/state';
 import {
   createEmptyFile,
   getGoogleVCs,
@@ -9,7 +10,6 @@ import {
   uploadToGoogleDrive,
 } from '../../utils/googleUtils';
 import { decodeJWT } from '../../utils/jwt';
-import { getSnapState } from '../../utils/stateUtils';
 import {
   AbstractDataStore,
   IFilterArgs,
@@ -29,7 +29,7 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     this.snap = snap;
   }
 
-  async query(args: IFilterArgs): Promise<IQueryResult[]> {
+  async queryVC(args: IFilterArgs): Promise<IQueryResult[]> {
     const { filter } = args;
     const state = await getSnapState(this.snap);
     const googleVCs = await getGoogleVCs(state, GOOGLE_DRIVE_VCS_FILE_NAME);
@@ -107,7 +107,7 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     return [];
   }
 
-  async save(args: {
+  async saveVC(args: {
     data: W3CVerifiableCredential;
     id: string;
   }): Promise<string> {
@@ -140,7 +140,7 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     return newId;
   }
 
-  async delete({ id }: { id: string }): Promise<boolean> {
+  async deleteVC({ id }: { id: string }): Promise<boolean> {
     const state = await getSnapState(this.snap);
     const googleVCs = await getGoogleVCs(state, GOOGLE_DRIVE_VCS_FILE_NAME);
 
@@ -163,7 +163,7 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     return true;
   }
 
-  public async clear(_args: IFilterArgs): Promise<boolean> {
+  public async clearVCs(_args: IFilterArgs): Promise<boolean> {
     const state = await getSnapState(this.snap);
     const gdriveResponse = await uploadToGoogleDrive(state, {
       fileName: GOOGLE_DRIVE_VCS_FILE_NAME,

@@ -1631,6 +1631,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@digitalcredentials/ed25519-verification-key-2020@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "@digitalcredentials/ed25519-verification-key-2020@npm:4.0.0"
+  dependencies:
+    "@digitalcredentials/keypair": ^1.0.5
+    "@noble/ed25519": ^1.7.1
+    base-x: ^4.0.0
+  checksum: 8f68496d67b94144d44b56e22299d19a09aa66c255c39a99a912fbe89a2e0a6622244e7aa0600b7bdb97670b3b6c18703a83be8baf0d87044c272f6061ea56ec
+  languageName: node
+  linkType: hard
+
 "@digitalcredentials/http-client@npm:^1.0.0":
   version: 1.2.2
   resolution: "@digitalcredentials/http-client@npm:1.2.2"
@@ -1663,6 +1674,13 @@ __metadata:
     canonicalize: ^1.0.1
     lru-cache: ^6.0.0
   checksum: d91796915fe266ddc412ee88d4acdab11d685146e7b0a091904f938a01dcf046d6df8be84176799c0b47594c6d4632c8a19d427ecff6e4b76cf2d168b33d5940
+  languageName: node
+  linkType: hard
+
+"@digitalcredentials/keypair@npm:^1.0.5":
+  version: 1.0.5
+  resolution: "@digitalcredentials/keypair@npm:1.0.5"
+  checksum: fb4502125f2a6be436e93e4493b63f178b024e634fd67cbe7d15d827a833ca23731c633bc9620f19be314d3aa3ffc4014505f2b7e2bbd2f6bf1b7b63865592da
   languageName: node
   linkType: hard
 
@@ -3415,6 +3433,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@noble/ed25519@npm:^1.7.1":
+  version: 1.7.3
+  resolution: "@noble/ed25519@npm:1.7.3"
+  checksum: 45169927d51de513e47bbeebff3a603433c4ac7579e1b8c5034c380a0afedbe85e6959be3d69584a7a5ed6828d638f8f28879003b9bb2fb5f22d8aa2d88fd5fe
+  languageName: node
+  linkType: hard
+
 "@noble/hashes@npm:1.1.2":
   version: 1.1.2
   resolution: "@noble/hashes@npm:1.1.2"
@@ -4305,7 +4330,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stablelib/ed25519@npm:^1.0.1, @stablelib/ed25519@npm:^1.0.2":
+"@stablelib/ed25519@npm:^1.0.1, @stablelib/ed25519@npm:^1.0.2, @stablelib/ed25519@npm:^1.0.3":
   version: 1.0.3
   resolution: "@stablelib/ed25519@npm:1.0.3"
   dependencies:
@@ -4339,7 +4364,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stablelib/nacl@npm:^1.0.2":
+"@stablelib/nacl@npm:^1.0.4":
   version: 1.0.4
   resolution: "@stablelib/nacl@npm:1.0.4"
   dependencies:
@@ -4713,10 +4738,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@transmute/credentials-context@npm:^0.7.0-unstable.67, @transmute/credentials-context@npm:^0.7.0-unstable.79":
+"@transmute/credentials-context@npm:^0.7.0-unstable.79":
   version: 0.7.0-unstable.79
   resolution: "@transmute/credentials-context@npm:0.7.0-unstable.79"
   checksum: 1d94522fbbbfd8e574e41dd12526e1351da84610cc9ceb00e02698f9e99a3337ffef97ce31d5be54c7b478bad3f2d4935e1a7f1a369041080b9af7591fe6fe37
+  languageName: node
+  linkType: hard
+
+"@transmute/credentials-context@npm:^0.7.0-unstable.80":
+  version: 0.7.0-unstable.80
+  resolution: "@transmute/credentials-context@npm:0.7.0-unstable.80"
+  checksum: bb45c4e12c99ae3e1285076fb6715468a27950bdea7ad99a50ae718984aafc34b70556509934db60fc2c0e4d8afd96779acf6797f586802b65831057ace6b3ce
   languageName: node
   linkType: hard
 
@@ -4731,33 +4763,33 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@transmute/ed25519-key-pair@npm:^0.7.0-unstable.79":
-  version: 0.7.0-unstable.79
-  resolution: "@transmute/ed25519-key-pair@npm:0.7.0-unstable.79"
+"@transmute/ed25519-key-pair@npm:^0.7.0-unstable.80":
+  version: 0.7.0-unstable.80
+  resolution: "@transmute/ed25519-key-pair@npm:0.7.0-unstable.80"
   dependencies:
     "@stablelib/ed25519": ^1.0.1
-    "@transmute/ld-key-pair": ^0.7.0-unstable.79
-    "@transmute/x25519-key-pair": ^0.7.0-unstable.79
-  checksum: af1e876a389e484c62604595d8e460a6a136daa9c2b94470154b8164c19a34940c31e42b553319facb5b0551ecbec4f17d4bcad8cb436012bcb5b4be469c5904
+    "@transmute/ld-key-pair": ^0.7.0-unstable.80
+    "@transmute/x25519-key-pair": ^0.7.0-unstable.80
+  checksum: dd0b59e34a9038d3958d3f86eebf76217588254a0b966c8fcd5d29d0faea88aad29ecfbe82bc11414173dedd41f642ed5549e825ffbb05f3422fe6d1c344a82d
   languageName: node
   linkType: hard
 
-"@transmute/ed25519-signature-2018@npm:^0.7.0-unstable.67":
-  version: 0.7.0-unstable.79
-  resolution: "@transmute/ed25519-signature-2018@npm:0.7.0-unstable.79"
+"@transmute/ed25519-signature-2018@npm:^0.7.0-unstable.79":
+  version: 0.7.0-unstable.80
+  resolution: "@transmute/ed25519-signature-2018@npm:0.7.0-unstable.80"
   dependencies:
-    "@transmute/credentials-context": ^0.7.0-unstable.79
+    "@transmute/credentials-context": ^0.7.0-unstable.80
     "@transmute/ed25519-key-pair": 0.7.0-unstable.2
-    "@transmute/jose-ld": ^0.7.0-unstable.79
-    "@transmute/security-context": ^0.7.0-unstable.79
-    jsonld: ^5.2.0
-  checksum: 529ef052d22673e9578ed30cd8453e330064c3c4ee457df1bcd10c6fa5e1b6b2ea7cc4a4df7125f2647ea90b4007e697539844bc4f6d6d1641a7ec542f0958cc
+    "@transmute/jose-ld": ^0.7.0-unstable.80
+    "@transmute/jsonld": 0.0.4
+    "@transmute/security-context": ^0.7.0-unstable.80
+  checksum: e0faa4e64546a1c2243fa0d7b98ba5490025032780cd2672acdae5ecdc91a0942811ced05322c52d20f684889a255bd1d6ae933434793180c943ad953893f365
   languageName: node
   linkType: hard
 
-"@transmute/jose-ld@npm:^0.7.0-unstable.79":
-  version: 0.7.0-unstable.79
-  resolution: "@transmute/jose-ld@npm:0.7.0-unstable.79"
+"@transmute/jose-ld@npm:^0.7.0-unstable.80":
+  version: 0.7.0-unstable.80
+  resolution: "@transmute/jose-ld@npm:0.7.0-unstable.80"
   dependencies:
     "@peculiar/webcrypto": ^1.1.6
     "@stablelib/aes-kw": ^1.0.0
@@ -4765,21 +4797,31 @@ __metadata:
     base64url: ^3.0.1
     jose: ^4.3.8
     web-streams-polyfill: ^3.0.3
-  checksum: 77e9b707f07b419ed1a19224dfb22f5bb43291ec6ad9f4de5d3981098c0cd346fb81fc1400676d25aab3d84196a34a6d60d561739c6af9027d84bb7d48097184
+  checksum: 871475f5b8db4fcc80f61447af3b00d3a67530e9b41b3ff46bf903cfd25b4e577702fa1ee84687fd7f5c2a28875b225b81e5ac699d91e220687bc92c93fe155b
   languageName: node
   linkType: hard
 
-"@transmute/json-web-signature@npm:^0.7.0-unstable.67":
-  version: 0.7.0-unstable.79
-  resolution: "@transmute/json-web-signature@npm:0.7.0-unstable.79"
+"@transmute/json-web-signature@npm:^0.7.0-unstable.79":
+  version: 0.7.0-unstable.80
+  resolution: "@transmute/json-web-signature@npm:0.7.0-unstable.80"
   dependencies:
-    "@transmute/ed25519-key-pair": ^0.7.0-unstable.79
-    "@transmute/jose-ld": ^0.7.0-unstable.79
-    "@transmute/secp256k1-key-pair": ^0.7.0-unstable.79
-    "@transmute/security-context": ^0.7.0-unstable.79
-    "@transmute/web-crypto-key-pair": ^0.7.0-unstable.79
-    jsonld: ^5.2.0
-  checksum: ec75593921f126c8ce66e0989b550489f27e9a5e2082bc6292441f29d72cf3bf1f152b06c15fdb5c725872b7f48307178f7b5a835a6a135a62407da02d78ad5d
+    "@transmute/ed25519-key-pair": ^0.7.0-unstable.80
+    "@transmute/jose-ld": ^0.7.0-unstable.80
+    "@transmute/jsonld": 0.0.4
+    "@transmute/secp256k1-key-pair": ^0.7.0-unstable.80
+    "@transmute/security-context": ^0.7.0-unstable.80
+    "@transmute/web-crypto-key-pair": ^0.7.0-unstable.80
+  checksum: 83321e612b2767e22aaf6a3805cf2018cd269a860ef2faccc9b4dd8aec617cb7caa7ed6005339e83b6f73dae7aa3235fdc62eedd7ea37d3a9bfad7fff893cb8d
+  languageName: node
+  linkType: hard
+
+"@transmute/jsonld@npm:0.0.4":
+  version: 0.0.4
+  resolution: "@transmute/jsonld@npm:0.0.4"
+  dependencies:
+    json-pointer: ^0.6.2
+    jsonld: 5.2.0
+  checksum: def93ba66abeb8f296bbd64ff0720186dcc53022d42a44d2626d0ef6b999ef4d743f47b7287822b5382040a8ad66b6356350828d270a54e61340269bfa57e7e6
   languageName: node
   linkType: hard
 
@@ -4790,42 +4832,59 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@transmute/secp256k1-key-pair@npm:^0.7.0-unstable.79":
-  version: 0.7.0-unstable.79
-  resolution: "@transmute/secp256k1-key-pair@npm:0.7.0-unstable.79"
+"@transmute/ld-key-pair@npm:^0.7.0-unstable.80":
+  version: 0.7.0-unstable.80
+  resolution: "@transmute/ld-key-pair@npm:0.7.0-unstable.80"
+  checksum: 04adbfcef6a37e8d06ed27c99bdd1039d761d5ad94b185bae3f62c1b36e10d17f79503495f59f2d545723a64aa30e1686ac1b6bf97d1a894abc655019ffbbaa3
+  languageName: node
+  linkType: hard
+
+"@transmute/secp256k1-key-pair@npm:^0.7.0-unstable.80":
+  version: 0.7.0-unstable.80
+  resolution: "@transmute/secp256k1-key-pair@npm:0.7.0-unstable.80"
   dependencies:
     "@bitauth/libauth": ^1.18.1
-    "@transmute/ld-key-pair": ^0.7.0-unstable.79
+    "@transmute/ld-key-pair": ^0.7.0-unstable.80
     secp256k1: ^4.0.2
-  checksum: 711d97106797a323c670b358613600ee8fadcc17f5a93f7fcf0360f52c0341db6275482d4843787ac07b0d2ca9ef6e5a58a04705521170ef9436a4985d55a305
+  checksum: fb7f82baf2b90b96677c4ff1d1ebf7d2135b958e7dc73f8c752acc126aa10b6ed7c4030812b70a714878cadccefc47e261d738d9c5318ce600a113401b0d975a
   languageName: node
   linkType: hard
 
-"@transmute/security-context@npm:^0.7.0-unstable.79":
-  version: 0.7.0-unstable.79
-  resolution: "@transmute/security-context@npm:0.7.0-unstable.79"
-  checksum: 2fbe904282383a444692d62d5f6f4f75e70478357e54e88bd6a78192caef4d47e62c0b4943232b0ef6d8747b3a9be2fc28c2908658cb5be7d7915d8eb4d93cbd
+"@transmute/security-context@npm:^0.7.0-unstable.80":
+  version: 0.7.0-unstable.80
+  resolution: "@transmute/security-context@npm:0.7.0-unstable.80"
+  checksum: c7902d433da8bb3380fe3b3344d400a77caf396a6cea29a00f11d26e934f50f34d238e9adbe7638ece2c968869d0f64d611aab5cf82ebc50c0f400c40949501a
   languageName: node
   linkType: hard
 
-"@transmute/web-crypto-key-pair@npm:^0.7.0-unstable.79":
-  version: 0.7.0-unstable.79
-  resolution: "@transmute/web-crypto-key-pair@npm:0.7.0-unstable.79"
+"@transmute/web-crypto-key-pair@npm:^0.7.0-unstable.80":
+  version: 0.7.0-unstable.80
+  resolution: "@transmute/web-crypto-key-pair@npm:0.7.0-unstable.80"
   dependencies:
     "@peculiar/webcrypto": ^1.1.6
-    "@transmute/ld-key-pair": ^0.7.0-unstable.79
+    "@transmute/ld-key-pair": ^0.7.0-unstable.80
     big-integer: ^1.6.48
-  checksum: 7b690a08d0c40c8093e88cf04bae724302b890a21e1268d53f8f057e8ea500b4e8d96a84f5c0acf86ae7a2982962f5e01f67b3bddbc087c605c831b01b1aec28
+  checksum: a3e0acce3b58ce959f08492712225c132c9a1f4b684b85d738beb095a526ab9248979add91e81b47d5e27229a4921e2faabefc251a3fd049336ac1370b03a1fc
   languageName: node
   linkType: hard
 
-"@transmute/x25519-key-pair@npm:^0.7.0-unstable.2, @transmute/x25519-key-pair@npm:^0.7.0-unstable.79":
+"@transmute/x25519-key-pair@npm:^0.7.0-unstable.2":
   version: 0.7.0-unstable.79
   resolution: "@transmute/x25519-key-pair@npm:0.7.0-unstable.79"
   dependencies:
     "@stablelib/x25519": ^1.0.0
     "@transmute/ld-key-pair": ^0.7.0-unstable.79
   checksum: 918738e5bfe7942be048a3e7a943a835232b9d600a29aa4279715ad18dd91a605dbec7570b60bcc58944fd797bfb43cb188c2b3277c02c7cdd3d95c2303e4e88
+  languageName: node
+  linkType: hard
+
+"@transmute/x25519-key-pair@npm:^0.7.0-unstable.80":
+  version: 0.7.0-unstable.80
+  resolution: "@transmute/x25519-key-pair@npm:0.7.0-unstable.80"
+  dependencies:
+    "@stablelib/x25519": ^1.0.0
+    "@transmute/ld-key-pair": ^0.7.0-unstable.80
+  checksum: d5985d7970637220d91ee6238ab5fdf7ef42ace66b798be91e31f041e9feed5c401ff76db33ed38a98f9c91539619c90d23fa47c67e1b61a3b95dcec648ea0e6
   languageName: node
   linkType: hard
 
@@ -4998,18 +5057,18 @@ __metadata:
     "@types/uuid": ^9.0.0
     "@typescript-eslint/eslint-plugin": ^5.33.0
     "@typescript-eslint/parser": ^5.33.0
-    "@veramo/core": next
-    "@veramo/credential-eip712": next
-    "@veramo/credential-ld": next
-    "@veramo/credential-w3c": next
-    "@veramo/did-jwt": next
-    "@veramo/did-manager": next
-    "@veramo/did-provider-pkh": next
-    "@veramo/did-resolver": next
-    "@veramo/key-manager": next
-    "@veramo/kms-local": next
-    "@veramo/message-handler": next
-    "@veramo/selective-disclosure": next
+    "@veramo/core": 5.0.1-next.12
+    "@veramo/credential-eip712": 5.0.1-next.12
+    "@veramo/credential-ld": 5.0.1-next.12
+    "@veramo/credential-w3c": 5.0.1-next.12
+    "@veramo/did-jwt": 5.0.1-next.12
+    "@veramo/did-manager": 5.0.1-next.12
+    "@veramo/did-provider-pkh": 5.0.1-next.12
+    "@veramo/did-resolver": 5.0.1-next.12
+    "@veramo/key-manager": 5.0.1-next.12
+    "@veramo/kms-local": 5.0.1-next.12
+    "@veramo/message-handler": 5.0.1-next.12
+    "@veramo/selective-disclosure": 5.0.1-next.12
     babel-loader: ^9.1.0
     bignumber.js: ^9.1.0
     caip: ^1.1.0
@@ -5876,15 +5935,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@veramo/core-types@npm:^5.0.1-next.12+44bb3650":
-  version: 5.0.1-next.12
-  resolution: "@veramo/core-types@npm:5.0.1-next.12"
+"@veramo/core-types@npm:^5.0.1-next.12+44bb3650, @veramo/core-types@npm:^5.0.1-next.14+19cccc1f":
+  version: 5.0.1-next.14
+  resolution: "@veramo/core-types@npm:5.0.1-next.14"
   dependencies:
     credential-status: ^2.0.5
     debug: ^4.3.3
     did-jwt-vc: ^3.1.0
     did-resolver: ^4.0.1
-  checksum: 6b622cdb8a534001e29e76cf552290605959106750f28f344f87feb6f7d04832a473f26bd0fdd58a447823957c540b2f14988b308e30a829a43e697673af4517
+  checksum: 0e657607c76464a5434e414374dea7aaf90e331ab9c8280bf2f03d6578e7078563e70b563ab8e6fd2c0ff08429aefb17c9ddb5c2e766c37303d33079586d4ab8
+  languageName: node
+  linkType: hard
+
+"@veramo/core@npm:5.0.1-next.12":
+  version: 5.0.1-next.12
+  resolution: "@veramo/core@npm:5.0.1-next.12"
+  dependencies:
+    "@veramo/core-types": ^5.0.1-next.12+44bb3650
+    debug: ^4.3.4
+    events: ^3.2.0
+    z-schema: ^5.0.5
+  checksum: e6c68bc649e61d85dff306109c98f26f70ab622fb1451c8ec44b92575e3e55b160be2daedc01232daf4d4b5473ae66ed27a8cf78dc1f9cf04e8f4a47c485a6ed
   languageName: node
   linkType: hard
 
@@ -5902,67 +5973,76 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@veramo/core@npm:^4.2.1-next.7+a4209f5f, @veramo/core@npm:next":
-  version: 4.2.1-next.7
-  resolution: "@veramo/core@npm:4.2.1-next.7"
-  dependencies:
-    credential-status: ^2.0.5
-    debug: ^4.3.3
-    did-jwt-vc: ^3.1.0
-    did-resolver: ^4.0.1
-    events: ^3.2.0
-    z-schema: ^5.0.2
-  checksum: 6353cd9f513fa71c4878a9c5610929c2a132f583b2f92cb4e2856dec012919acf91f69247242c11ef9536a5d8c7c5b88cb404f5db52f31d42c1e0ac37ce35f38
-  languageName: node
-  linkType: hard
-
-"@veramo/credential-eip712@npm:next":
-  version: 4.2.1-next.7
-  resolution: "@veramo/credential-eip712@npm:4.2.1-next.7"
+"@veramo/credential-eip712@npm:5.0.1-next.12":
+  version: 5.0.1-next.12
+  resolution: "@veramo/credential-eip712@npm:5.0.1-next.12"
   dependencies:
     "@metamask/eth-sig-util": ^5.0.0
-    "@veramo/core": ^4.2.1-next.7+a4209f5f
-    "@veramo/utils": ^4.2.1-next.7+a4209f5f
+    "@veramo/core-types": ^5.0.1-next.12+44bb3650
+    "@veramo/utils": ^5.0.1-next.12+44bb3650
     debug: ^4.3.3
     eip-712-types-generation: ^0.1.6
-  checksum: 90f7a08235240b312700934f6e3480c99c0933b63c82e5b6e4ef47948d4f634d7f87b4871f6704aa4b91d22a3863d9c4913b4c977d285c83757cf0afe2982445
+  checksum: c6f7bb3e66cd4965c67d34eb355d92550268a4d5d0ab602e0caa728711625c5996929deece52dccb19623090939dda24d11b26f21d267da39d683f5dac1fc14e
   languageName: node
   linkType: hard
 
-"@veramo/credential-ld@npm:^4.2.1-next.7+a4209f5f, @veramo/credential-ld@npm:next":
-  version: 4.2.1-next.7
-  resolution: "@veramo/credential-ld@npm:4.2.1-next.7"
+"@veramo/credential-ld@npm:5.0.1-next.12":
+  version: 5.0.1-next.12
+  resolution: "@veramo/credential-ld@npm:5.0.1-next.12"
   dependencies:
     "@digitalcredentials/ed25519-signature-2020": ^3.0.2
+    "@digitalcredentials/ed25519-verification-key-2020": ^4.0.0
     "@digitalcredentials/jsonld": ^5.2.1
     "@digitalcredentials/jsonld-signatures": ^9.3.1
     "@digitalcredentials/vc": ^5.0.0
-    "@transmute/credentials-context": ^0.7.0-unstable.67
-    "@transmute/ed25519-signature-2018": ^0.7.0-unstable.67
-    "@transmute/json-web-signature": ^0.7.0-unstable.67
+    "@transmute/credentials-context": ^0.7.0-unstable.79
+    "@transmute/ed25519-signature-2018": ^0.7.0-unstable.79
+    "@transmute/json-web-signature": ^0.7.0-unstable.79
     "@veramo-community/lds-ecdsa-secp256k1-recovery2020": "github:uport-project/EcdsaSecp256k1RecoverySignature2020"
-    "@veramo/core": ^4.2.1-next.7+a4209f5f
-    "@veramo/did-resolver": ^4.2.1-next.7+a4209f5f
-    "@veramo/utils": ^4.2.1-next.7+a4209f5f
+    "@veramo/core-types": ^5.0.1-next.12+44bb3650
+    "@veramo/utils": ^5.0.1-next.12+44bb3650
+    cross-fetch: ^3.1.5
     debug: ^4.3.3
     did-resolver: ^4.0.1
     uint8arrays: ^3.0.0
-  checksum: cebf9fa7e808209534326481841bd46d72b4670c66d463cdbc6f614c951d19db37090bc318c81610d8b3ca93595350972bf7678a91181114e4e7d818f12ab1b7
+  checksum: baa863ce955f60cbb40e8ca9dd3c570ca3e58bdf1cd3e86597861d86e226b43507173b709ea416653dfa41cc48ff38dabb03d505462702112f3665aed517b2b9
   languageName: node
   linkType: hard
 
-"@veramo/credential-w3c@npm:^4.2.1-next.7+a4209f5f, @veramo/credential-w3c@npm:next":
-  version: 4.2.1-next.7
-  resolution: "@veramo/credential-w3c@npm:4.2.1-next.7"
+"@veramo/credential-ld@npm:^5.0.1-next.12+44bb3650":
+  version: 5.0.1-next.14
+  resolution: "@veramo/credential-ld@npm:5.0.1-next.14"
   dependencies:
-    "@veramo/core": ^4.2.1-next.7+a4209f5f
-    "@veramo/credential-ld": ^4.2.1-next.7+a4209f5f
-    "@veramo/did-jwt": ^4.2.1-next.7+a4209f5f
-    "@veramo/did-resolver": ^4.2.1-next.7+a4209f5f
-    "@veramo/message-handler": ^4.2.1-next.7+a4209f5f
-    "@veramo/utils": ^4.2.1-next.7+a4209f5f
+    "@digitalcredentials/ed25519-signature-2020": ^3.0.2
+    "@digitalcredentials/ed25519-verification-key-2020": ^4.0.0
+    "@digitalcredentials/jsonld": ^5.2.1
+    "@digitalcredentials/jsonld-signatures": ^9.3.1
+    "@digitalcredentials/vc": ^5.0.0
+    "@transmute/credentials-context": ^0.7.0-unstable.79
+    "@transmute/ed25519-signature-2018": ^0.7.0-unstable.79
+    "@transmute/json-web-signature": ^0.7.0-unstable.79
+    "@veramo-community/lds-ecdsa-secp256k1-recovery2020": "github:uport-project/EcdsaSecp256k1RecoverySignature2020"
+    "@veramo/core-types": ^5.0.1-next.14+19cccc1f
+    "@veramo/utils": ^5.0.1-next.14+19cccc1f
+    cross-fetch: ^3.1.5
+    debug: ^4.3.3
+    did-resolver: ^4.0.1
+    uint8arrays: ^3.0.0
+  checksum: 825a8b61ce3efce227116d4800a766d51f91310f3e7fa98fe31c75fa6cb8ad374ed5f05eb6779a70e08fc1f7c2fb74e4658aa1c6812e0e9c32fa1122a18aa957
+  languageName: node
+  linkType: hard
+
+"@veramo/credential-w3c@npm:5.0.1-next.12":
+  version: 5.0.1-next.12
+  resolution: "@veramo/credential-w3c@npm:5.0.1-next.12"
+  dependencies:
+    "@veramo/core-types": ^5.0.1-next.12+44bb3650
+    "@veramo/credential-ld": ^5.0.1-next.12+44bb3650
+    "@veramo/message-handler": ^5.0.1-next.12+44bb3650
+    "@veramo/utils": ^5.0.1-next.12+44bb3650
     canonicalize: ^1.0.8
     debug: ^4.3.3
+    did-jwt: ^6.11.0
     did-jwt-vc: ^3.1.0
     did-resolver: ^4.0.1
     uint8arrays: ^3.0.0
@@ -5970,44 +6050,34 @@ __metadata:
   dependenciesMeta:
     "@veramo/credential-ld":
       optional: true
-  checksum: 76b11136614778401bce2c206adf431a0a0957da393691e21970f3d5b3a531d43384314b13b85fb073d6c6b4fee9d6966231e6687d9e0f9570986861f2dce86e
+  checksum: 7c14a9e73cece759aeaabd164cf2d2e9df2b7cf0620d372eb192b32f615b933a24175cc75ac41b2c2634fc73dae7cd6b47fcbc737d774bc24d8686c20406f933
   languageName: node
   linkType: hard
 
-"@veramo/did-discovery@npm:^4.2.1-next.7+a4209f5f":
-  version: 4.2.1-next.7
-  resolution: "@veramo/did-discovery@npm:4.2.1-next.7"
+"@veramo/did-discovery@npm:^5.0.1-next.12+44bb3650, @veramo/did-discovery@npm:^5.0.1-next.14+19cccc1f":
+  version: 5.0.1-next.14
+  resolution: "@veramo/did-discovery@npm:5.0.1-next.14"
   dependencies:
-    "@veramo/core": ^4.2.1-next.7+a4209f5f
+    "@veramo/core-types": ^5.0.1-next.14+19cccc1f
     debug: ^4.3.3
-  checksum: 1bf992980208b844ecf37405eafbcd19dddf71477da463fb842aab89e54bcd02384aa99e5ea09d20821d22afc0aae3c6556731e0488aa8cf884b7e769b6b40c5
+  checksum: 56b42028d160a60891a816d801c92dbfa914efdf21ddf417aad1d0d6c9915e1c90387ba64caee39287328c91ae5ec6c595f982555a049ac367c69edb8e79be24
   languageName: node
   linkType: hard
 
-"@veramo/did-discovery@npm:^5.0.1-next.12+44bb3650":
+"@veramo/did-jwt@npm:5.0.1-next.12":
   version: 5.0.1-next.12
-  resolution: "@veramo/did-discovery@npm:5.0.1-next.12"
+  resolution: "@veramo/did-jwt@npm:5.0.1-next.12"
   dependencies:
     "@veramo/core-types": ^5.0.1-next.12+44bb3650
-    debug: ^4.3.3
-  checksum: 1d689be000271a0d8ea1e23470becc4e8e276d276def519ce4f19adc0709ad079e8bbc68b2898a3e256463d639f3ea5bd9961563ab8d0c34f99c99b491ebd8ad
-  languageName: node
-  linkType: hard
-
-"@veramo/did-jwt@npm:^4.2.1-next.7+a4209f5f, @veramo/did-jwt@npm:next":
-  version: 4.2.1-next.7
-  resolution: "@veramo/did-jwt@npm:4.2.1-next.7"
-  dependencies:
-    "@veramo/core": ^4.2.1-next.7+a4209f5f
-    "@veramo/message-handler": ^4.2.1-next.7+a4209f5f
+    "@veramo/message-handler": ^5.0.1-next.12+44bb3650
     debug: ^4.3.3
     did-jwt: ^6.9.0
     did-resolver: ^4.0.1
-  checksum: f3d62eef2d60af466b753134dce28b913a1a2577e7d0e345451bde732ce4ce491618c11290b36a90343102ef995175079c3b96c26e58b32c386ce247df5aaa64
+  checksum: e3d3fe37e623ad5bfcc9f863ed7e7104eed913847cd83de30dfbe33922ba8df3a8b5b06fddbf769acc737f401c524983ec4fef30412e70f4acace496baa79321
   languageName: node
   linkType: hard
 
-"@veramo/did-manager@npm:^5.0.1-next.12+44bb3650":
+"@veramo/did-manager@npm:5.0.1-next.12":
   version: 5.0.1-next.12
   resolution: "@veramo/did-manager@npm:5.0.1-next.12"
   dependencies:
@@ -6017,17 +6087,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@veramo/did-manager@npm:next":
-  version: 4.2.1-next.7
-  resolution: "@veramo/did-manager@npm:4.2.1-next.7"
+"@veramo/did-manager@npm:^5.0.1-next.12+44bb3650":
+  version: 5.0.1-next.14
+  resolution: "@veramo/did-manager@npm:5.0.1-next.14"
   dependencies:
-    "@veramo/core": ^4.2.1-next.7+a4209f5f
-    "@veramo/did-discovery": ^4.2.1-next.7+a4209f5f
-  checksum: 0a29dd8a7586da726d39460c132a472b2f290aa43cefedbb7b40c2d0b43c25fdd1b3ae8fe17a32c2b9b10935a94bbf72bd3b71de2bc40e4a784f95c196a0f63f
+    "@veramo/core-types": ^5.0.1-next.14+19cccc1f
+    "@veramo/did-discovery": ^5.0.1-next.14+19cccc1f
+  checksum: 3ffa1c9ba9a8fef983e0052be8b673ab62f65ccc06ff5420e9381e2e08a108b971cee87861665dbfe7bccee9a10f3833bd7a9314be3062837c68b05d10f8efa4
   languageName: node
   linkType: hard
 
-"@veramo/did-provider-pkh@npm:next":
+"@veramo/did-provider-pkh@npm:5.0.1-next.12":
   version: 5.0.1-next.12
   resolution: "@veramo/did-provider-pkh@npm:5.0.1-next.12"
   dependencies:
@@ -6044,38 +6114,56 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@veramo/did-resolver@npm:^4.2.1-next.7+a4209f5f, @veramo/did-resolver@npm:next":
-  version: 4.2.1-next.7
-  resolution: "@veramo/did-resolver@npm:4.2.1-next.7"
+"@veramo/did-resolver@npm:5.0.1-next.12":
+  version: 5.0.1-next.12
+  resolution: "@veramo/did-resolver@npm:5.0.1-next.12"
   dependencies:
-    "@veramo/core": ^4.2.1-next.7+a4209f5f
-    "@veramo/utils": ^4.2.1-next.7+a4209f5f
+    "@veramo/core-types": ^5.0.1-next.12+44bb3650
+    "@veramo/utils": ^5.0.1-next.12+44bb3650
     cross-fetch: ^3.1.4
     debug: ^4.3.3
     did-resolver: ^4.0.1
-  checksum: 175cd9dc9ada277643018f16ff46b33feb194da17297fd659f7642a5fa1fffb7ac924c3d579eb4e52bfc6e607a016e9505834288c8b8afbdd60f15d4f9e30f4b
+  checksum: da3167167e1c9eb8e39debe88bbe1db793f5852e6e01d79a9266059b4d772c3fd50d4c9c5512e2f719dab213e62d06440beb65dd62462da1255d39b2eb6acbaf
   languageName: node
   linkType: hard
 
-"@veramo/key-manager@npm:^4.2.1-next.7+a4209f5f, @veramo/key-manager@npm:next":
-  version: 4.2.1-next.7
-  resolution: "@veramo/key-manager@npm:4.2.1-next.7"
+"@veramo/key-manager@npm:5.0.1-next.12":
+  version: 5.0.1-next.12
+  resolution: "@veramo/key-manager@npm:5.0.1-next.12"
   dependencies:
     "@ethersproject/bytes": ^5.7.0
     "@ethersproject/strings": ^5.7.0
     "@ethersproject/transactions": ^5.7.0
-    "@stablelib/ed25519": ^1.0.2
-    "@veramo/core": ^4.2.1-next.7+a4209f5f
+    "@stablelib/ed25519": ^1.0.3
+    "@veramo/core-types": ^5.0.1-next.12+44bb3650
+    debug: ^4.3.4
     did-jwt: ^6.9.0
     uint8arrays: ^3.0.0
     uuid: ^9.0.0
-  checksum: d3e91b275f118918d3d92640e31c1f7091ab59551dca21be841c17e24138cd7200f156c51674d27d328d09d891e30e82fb806246de816f50a4514d5c67b70744
+  checksum: 6429c906ac8d84d59c4b0b23af14c7a438a8d545a391a8bb10f6cf753cc9422c63d84d7697922dc5b74189261f8cb902b6ed803ff82166f149f179e91b62f834
   languageName: node
   linkType: hard
 
-"@veramo/kms-local@npm:next":
-  version: 4.2.1-next.7
-  resolution: "@veramo/kms-local@npm:4.2.1-next.7"
+"@veramo/key-manager@npm:^5.0.1-next.12+44bb3650":
+  version: 5.0.1-next.14
+  resolution: "@veramo/key-manager@npm:5.0.1-next.14"
+  dependencies:
+    "@ethersproject/bytes": ^5.7.0
+    "@ethersproject/strings": ^5.7.0
+    "@ethersproject/transactions": ^5.7.0
+    "@stablelib/ed25519": ^1.0.3
+    "@veramo/core-types": ^5.0.1-next.14+19cccc1f
+    debug: ^4.3.4
+    did-jwt: ^6.9.0
+    uint8arrays: ^3.0.0
+    uuid: ^9.0.0
+  checksum: f12671b52637c6ee0294856c9e5d52ebbee99ac1366bc396a793524b8f998579f0ed7b1ac145363d2dbadbec194a0f43393dcb1e5018f0f5fe2af2d55a0aaf2f
+  languageName: node
+  linkType: hard
+
+"@veramo/kms-local@npm:5.0.1-next.12":
+  version: 5.0.1-next.12
+  resolution: "@veramo/kms-local@npm:5.0.1-next.12"
   dependencies:
     "@ethersproject/abstract-provider": ^5.7.0
     "@ethersproject/bytes": ^5.7.0
@@ -6084,60 +6172,74 @@ __metadata:
     "@ethersproject/strings": ^5.7.0
     "@ethersproject/transactions": ^5.7.0
     "@ethersproject/wallet": ^5.7.0
-    "@stablelib/ed25519": ^1.0.2
-    "@stablelib/nacl": ^1.0.2
-    "@veramo/core": ^4.2.1-next.7+a4209f5f
-    "@veramo/key-manager": ^4.2.1-next.7+a4209f5f
+    "@stablelib/ed25519": ^1.0.3
+    "@stablelib/nacl": ^1.0.4
+    "@stablelib/random": ^1.0.2
+    "@stablelib/x25519": ^1.0.3
+    "@veramo/core-types": ^5.0.1-next.12+44bb3650
+    "@veramo/key-manager": ^5.0.1-next.12+44bb3650
     base-58: ^0.0.1
     debug: ^4.3.3
     did-jwt: ^6.9.0
     elliptic: ^6.5.4
     uint8arrays: ^3.0.0
-  checksum: f1d4b57158e5ae19f8a0ba1def37062a47a141ae98ad431059294964205fe4a2128d1e6d4c3be2b0310961eb9eddeb018e88c8589c0a07928c077135d57d3843
+  checksum: df7c92381d7138ad844cd40f51da5e7b3a28a1b06d9c845308b306be4450fc7e877a35c08750ca8bd59846098f49badcbcd804c891194c6833dcedf118a70803
   languageName: node
   linkType: hard
 
-"@veramo/message-handler@npm:^4.2.1-next.7+a4209f5f, @veramo/message-handler@npm:next":
-  version: 4.2.1-next.7
-  resolution: "@veramo/message-handler@npm:4.2.1-next.7"
+"@veramo/message-handler@npm:5.0.1-next.12":
+  version: 5.0.1-next.12
+  resolution: "@veramo/message-handler@npm:5.0.1-next.12"
   dependencies:
-    "@veramo/core": ^4.2.1-next.7+a4209f5f
-  checksum: 4e3966226aa75bd66832a6ff2f15f3cc1d449a20ba40f5b2b91b3af4c2b103aca8caad3a4552ca054e2db8b68c74a9fc5faa0e4ccdca4ee18ac5aab7124efd23
+    "@veramo/core-types": ^5.0.1-next.12+44bb3650
+    debug: ^4.3.4
+  checksum: 4ba4f85cbc89fc7f3f585bcbec882759e6f78c7df2bc7d9c60f3086b57581456d38b5a88e01c6e1c7df557171ec3aa4d7e4c6a841f3d70e8b20742aa164321f4
   languageName: node
   linkType: hard
 
-"@veramo/selective-disclosure@npm:next":
-  version: 4.2.1-next.7
-  resolution: "@veramo/selective-disclosure@npm:4.2.1-next.7"
+"@veramo/message-handler@npm:^5.0.1-next.12+44bb3650":
+  version: 5.0.1-next.14
+  resolution: "@veramo/message-handler@npm:5.0.1-next.14"
   dependencies:
-    "@veramo/core": ^4.2.1-next.7+a4209f5f
-    "@veramo/credential-w3c": ^4.2.1-next.7+a4209f5f
-    "@veramo/did-jwt": ^4.2.1-next.7+a4209f5f
-    "@veramo/message-handler": ^4.2.1-next.7+a4209f5f
+    "@veramo/core-types": ^5.0.1-next.14+19cccc1f
+    debug: ^4.3.4
+  checksum: aa3a97c9f85ec5f6085c0f51b0ce34c8cc1ceb031e912b53fe27462b41f552dc392c1839a2fd455b8d2b2e553d4cc20eae9b6e0f00b80603cb13be24f793932e
+  languageName: node
+  linkType: hard
+
+"@veramo/selective-disclosure@npm:5.0.1-next.12":
+  version: 5.0.1-next.12
+  resolution: "@veramo/selective-disclosure@npm:5.0.1-next.12"
+  dependencies:
+    "@veramo/core-types": ^5.0.1-next.12+44bb3650
+    "@veramo/message-handler": ^5.0.1-next.12+44bb3650
+    "@veramo/utils": ^5.0.1-next.12+44bb3650
     debug: ^4.3.3
     did-jwt: ^6.9.0
     uuid: ^9.0.0
-  checksum: 53a5f646986969c0435e79d1b87bbf41cc54a086c4baf85e4902ca6674fbcb85300039160caf6d64655f25fb7040e63bb6304bab2b9ba32dea51f10dacfb03ed
+  checksum: 2067b0f59e6edf47790cfb47122e2ebd15aa58f130a080cfff14e9ec7a729d78012f9200e1eb9a5137f41bf373891c0833e99facebb7fcd2bde9e6e275d8a3d8
   languageName: node
   linkType: hard
 
-"@veramo/utils@npm:^4.2.1-next.7+a4209f5f":
-  version: 4.2.1-next.7
-  resolution: "@veramo/utils@npm:4.2.1-next.7"
+"@veramo/utils@npm:^5.0.1-next.12+44bb3650, @veramo/utils@npm:^5.0.1-next.14+19cccc1f":
+  version: 5.0.1-next.14
+  resolution: "@veramo/utils@npm:5.0.1-next.14"
   dependencies:
+    "@ethersproject/signing-key": ^5.7.0
     "@ethersproject/transactions": ^5.7.0
-    "@stablelib/ed25519": ^1.0.2
-    "@veramo/core": ^4.2.1-next.7+a4209f5f
+    "@stablelib/ed25519": ^1.0.3
+    "@veramo/core-types": ^5.0.1-next.14+19cccc1f
     blakejs: ^1.1.1
-    cross-fetch: ^3.1.4
+    credential-status: ^2.0.5
+    cross-fetch: ^3.1.5
     debug: ^4.3.3
     did-jwt: ^6.9.0
     did-jwt-vc: ^3.1.0
     did-resolver: ^4.0.1
     elliptic: ^6.5.4
-    multiformats: 9.9.0
+    multiformats: ^9.9.0
     uint8arrays: ^3.0.0
-  checksum: 2bcf55c524aa508272f43ec4c60c73871c72db3701dd4e83edbe1d73ac935086f5df9de861daf606d508f5a087d2f89f4ef46b29a7c5ddc0ce796258e2fd5c10
+  checksum: fc182c0f5b79feb202f530ee950d84520bb7365da88787e69c1bdacbd5eb782bd295fa4c2a9ccd7d74932c702f7b5b2a81a9cdeb81e9b32808ea3968a505bd9b
   languageName: node
   linkType: hard
 
@@ -7403,6 +7505,13 @@ __metadata:
   dependencies:
     safe-buffer: ^5.0.1
   checksum: 957101d6fd09e1903e846fd8f69fd7e5e3e50254383e61ab667c725866bec54e5ece5ba49ce385128ae48f9ec93a26567d1d5ebb91f4d56ef4a9cc0d5a5481e8
+  languageName: node
+  linkType: hard
+
+"base-x@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "base-x@npm:4.0.0"
+  checksum: b25db9e07eb1998472a20557c7f00c797dc0595f79df95155ab74274e7fa98b9f2659b3ee547ac8773666b7f69540656793aeb97ad2b1ceccdb6fa5faaf69ac0
   languageName: node
   linkType: hard
 
@@ -9597,6 +9706,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"did-jwt@npm:^6.11.0":
+  version: 6.11.1
+  resolution: "did-jwt@npm:6.11.1"
+  dependencies:
+    "@stablelib/ed25519": ^1.0.2
+    "@stablelib/random": ^1.0.1
+    "@stablelib/sha256": ^1.0.1
+    "@stablelib/x25519": ^1.0.2
+    "@stablelib/xchacha20poly1305": ^1.0.1
+    bech32: ^2.0.0
+    canonicalize: ^1.0.8
+    did-resolver: ^4.0.0
+    elliptic: ^6.5.4
+    js-sha3: ^0.8.0
+    multiformats: ^9.6.5
+    uint8arrays: ^3.0.0
+  checksum: 35be4ff16c699d5aaf6302f6ecf1459da86da868c2c3c2b018d8b20e355beac8809e03de919a500c8868ebd537ff880913f39e6e75d412c6b49b9443978b5cb7
+  languageName: node
+  linkType: hard
+
 "did-jwt@npm:^6.3.0, did-jwt@npm:^6.6.0, did-jwt@npm:^6.9.0":
   version: 6.11.0
   resolution: "did-jwt@npm:6.11.0"
@@ -11410,6 +11539,13 @@ __metadata:
   dependencies:
     is-callable: ^1.1.3
   checksum: 6c48ff2bc63362319c65e2edca4a8e1e3483a2fabc72fbe7feaf8c73db94fc7861bd53bc02c8a66a0c1dd709da6b04eec42e0abdd6b40ce47305ae92a25e5d28
+  languageName: node
+  linkType: hard
+
+"foreach@npm:^2.0.4":
+  version: 2.0.6
+  resolution: "foreach@npm:2.0.6"
+  checksum: f7b68494545ee41cbd0b0425ebf5386c265dc38ef2a9b0d5cd91a1b82172e939b4cf9387f8e0ebf6db4e368fc79ed323f2198424d5c774515ac3ed9b08901c0e
   languageName: node
   linkType: hard
 
@@ -14403,6 +14539,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"json-pointer@npm:^0.6.2":
+  version: 0.6.2
+  resolution: "json-pointer@npm:0.6.2"
+  dependencies:
+    foreach: ^2.0.4
+  checksum: 668143014b16d7f90e6f0e6c2d756b00b799424f58d750794a79a24cbce595855b224f7861986aaff719579558fbab81fb83c7371f5e24aded9dc33b3838de30
+  languageName: node
+  linkType: hard
+
 "json-rpc-engine@npm:^6.1.0":
   version: 6.1.0
   resolution: "json-rpc-engine@npm:6.1.0"
@@ -14508,7 +14653,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jsonld@npm:^5.2.0":
+"jsonld@npm:5.2.0":
   version: 5.2.0
   resolution: "jsonld@npm:5.2.0"
   dependencies:
@@ -15648,7 +15793,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"multiformats@npm:9.9.0, multiformats@npm:^9.4.2, multiformats@npm:^9.6.5":
+"multiformats@npm:^9.4.2, multiformats@npm:^9.6.5, multiformats@npm:^9.9.0":
   version: 9.9.0
   resolution: "multiformats@npm:9.9.0"
   checksum: d3e8c1be400c09a014f557ea02251a2710dbc9fca5aa32cc702ff29f636c5471e17979f30bdcb0a9cbb556f162a8591dc2e1219c24fc21394a56115b820bb84e
@@ -21070,7 +21215,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"z-schema@npm:^5.0.2":
+"z-schema@npm:^5.0.2, z-schema@npm:^5.0.5":
   version: 5.0.5
   resolution: "z-schema@npm:5.0.5"
   dependencies:

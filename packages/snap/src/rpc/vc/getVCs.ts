@@ -1,9 +1,9 @@
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
 import { GetVCsRequestParams } from '../../types/params';
-import { snapDialog } from '../../utils/snapUtils';
 import { veramoGetVCs } from '../../utils/veramoUtils';
 import { IDataManagerQueryResult } from '../../veramo/plugins/verfiable-creds-manager';
 import { generateVCPanel } from '../snap/dialogUtils';
+import { snapDialog } from '../snap/utils';
 
 /**
  * Function to get VCs.

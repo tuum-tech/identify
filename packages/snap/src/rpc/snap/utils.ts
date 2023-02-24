@@ -1,9 +1,9 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
-import { validHederaChainID } from '../hedera/config';
-import { IdentitySnapState, SnapDialogParams } from '../interfaces';
-import { isHederaAccountImported } from './params';
-import { updateSnapState } from './stateUtils';
+import { validHederaChainID } from '../../hedera/config';
+import { IdentitySnapState, SnapDialogParams } from '../../interfaces';
+import { isHederaAccountImported } from '../../utils/params';
+import { updateSnapState } from './state';
 
 /**
  * Function that returns address of the currently selected MetaMask account.

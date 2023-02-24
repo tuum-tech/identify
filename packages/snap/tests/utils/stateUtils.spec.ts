@@ -1,11 +1,11 @@
 import { SnapProvider } from '@metamask/snap-types';
-import { getInitialSnapState } from '../../src/utils/config';
 import {
   getSnapStateUnchecked,
   initAccountState,
   initSnapState,
   updateSnapState,
-} from '../../src/utils/stateUtils';
+} from '../../src/rpc/snap/state';
+import { getInitialSnapState } from '../../src/utils/config';
 import {
   address,
   getDefaultSnapState,

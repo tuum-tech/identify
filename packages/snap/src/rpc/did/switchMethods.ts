@@ -1,8 +1,8 @@
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
 import { availableMethods, isValidMethod } from '../../types/constants';
-import { snapDialog } from '../../utils/snapUtils';
-import { updateSnapState } from '../../utils/stateUtils';
+import { updateSnapState } from '../snap/state';
+import { snapDialog } from '../snap/utils';
 
 /**
  * Function to switch method.

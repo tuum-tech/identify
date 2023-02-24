@@ -6,8 +6,8 @@ import {
   GOOGLE_DRIVE_VCS_FILE_NAME,
   uploadToGoogleDrive,
 } from '../../utils/googleUtils';
-import { snapDialog } from '../../utils/snapUtils';
-import { updateSnapState } from '../../utils/stateUtils';
+import { updateSnapState } from '../snap/state';
+import { snapDialog } from '../snap/utils';
 
 /**
  * Function to sync Google VCs with snap.

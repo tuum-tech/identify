@@ -14,6 +14,7 @@ import cloneDeep from 'lodash.clonedeep';
 import { validHederaChainID } from '../hedera/config';
 import { IdentitySnapParams, SnapDialogParams } from '../interfaces';
 import { generateVCPanel } from '../rpc/snap/dialogUtils';
+import { getCurrentNetwork, snapDialog } from '../rpc/snap/utils';
 import { KeyPair } from '../types/crypto';
 import { CreateVPRequestParams, GetVCsOptions } from '../types/params';
 import {
@@ -27,7 +28,6 @@ import { Agent, getAgent } from '../veramo/setup';
 import { getCurrentDid } from './didUtils';
 import { getKeyPair } from './hederaUtils';
 import { getAddressKeyDeriver, snapGetKeysFromAddress } from './keyPair';
-import { getCurrentNetwork, snapDialog } from './snapUtils';
 
 /**
  * Veramo Resolves DID.
@@ -73,7 +73,7 @@ export async function veramoGetVCs(
   filter?: Filter,
 ): Promise<IDataManagerQueryResult[]> {
   const agent = await getAgent(snap);
-  const result = (await agent.query({
+  const result = (await agent.queryVC({
     filter,
     options,
   })) as IDataManagerQueryResult[];
@@ -94,7 +94,7 @@ export async function veramoSaveVC(
   store: string | string[],
 ): Promise<IDataManagerSaveResult[]> {
   const agent = await getAgent(snap);
-  const result = await agent.save({
+  const result = await agent.saveVC({
     data: verifiableCredential,
     options: { store },
   });
@@ -170,7 +170,7 @@ export async function veramoCreateVC(
     'Created verifiableCredential: ',
     JSON.stringify(verifiableCredential, null, 4),
   );
-  const result = await agent.save({
+  const result = await agent.saveVC({
     data: verifiableCredential,
     options: { store },
   });
@@ -214,7 +214,7 @@ export async function veramoRemoveVC(
 
   return Promise.all(
     ids.map(async (id) => {
-      return await agent.delete({
+      return await agent.deleteVC({
         id,
         options,
       });
@@ -241,7 +241,7 @@ export async function veramoDeleteAllVCs(
     options = { store };
   }
 
-  return await agent.clear({
+  return await agent.clearVCs({
     options,
   });
 }
@@ -283,7 +283,7 @@ export async function veramoCreateVP(
   const vcsWithMetadata: IDataManagerQueryResult[] = [];
 
   for (const vcId of vcsMetadata) {
-    const vcObj = (await agent.query({
+    const vcObj = (await agent.queryVC({
       filter: {
         type: 'id',
         filter: vcId,

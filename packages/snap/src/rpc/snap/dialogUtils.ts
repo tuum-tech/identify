@@ -5,10 +5,10 @@ import { IDataManagerQueryResult } from 'src/veramo/plugins/verfiable-creds-mana
 /**
  * Function to toggle popups.
  *
- * @param header - Identity snap params.
- * @param prompt - Identity snap params.
- * @param description - Identity snap params.
- * @param vcs - Identity snap params.
+ * @param header - Header text of the metamask dialog box(eg. 'Retrieve Verifiable Credentials').
+ * @param prompt - Prompt text of the metamask dialog box(eg. 'Are you sure you want to send VCs to the dApp?').
+ * @param description - Description text of the metamask dialog box(eg. 'Some dApps are less secure than others and could save data from VCs against your will. Be careful where you send your private VCs! Number of VCs submitted is 2').
+ * @param vcs - The Verifiable Credentials to show on the metamask dialog box.
  */
 export async function generateVCPanel(
   header: string,

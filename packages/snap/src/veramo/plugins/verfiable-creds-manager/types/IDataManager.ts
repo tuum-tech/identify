@@ -1,13 +1,13 @@
 import { IPluginMethodMap } from '@veramo/core';
 
 export type IDataManager = {
-  query(args: IDataManagerQueryArgs): Promise<IDataManagerQueryResult[]>;
+  queryVC(args: IDataManagerQueryArgs): Promise<IDataManagerQueryResult[]>;
 
-  save(args: IDataManagerSaveArgs): Promise<IDataManagerSaveResult[]>;
+  saveVC(args: IDataManagerSaveArgs): Promise<IDataManagerSaveResult[]>;
 
-  delete(args: IDataManagerDeleteArgs): Promise<IDataManagerDeleteResult[]>;
+  deleteVC(args: IDataManagerDeleteArgs): Promise<IDataManagerDeleteResult[]>;
 
-  clear(args: IDataManagerClearArgs): Promise<IDataManagerClearResult[]>;
+  clearVCs(args: IDataManagerClearArgs): Promise<IDataManagerClearResult[]>;
 } & IPluginMethodMap;
 
 /**

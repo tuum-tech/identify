@@ -1,9 +1,9 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { validHederaChainID } from '../../hedera/config';
 import { IdentitySnapState } from '../../interfaces';
+import { getCurrentNetwork } from '../../rpc/snap/utils';
 import { convertChainIdFromHex } from '../../utils/network';
 import { isHederaAccountImported } from '../../utils/params';
-import { getCurrentNetwork } from '../../utils/snapUtils';
 
 /**
  * Function to get did pkh identifier.

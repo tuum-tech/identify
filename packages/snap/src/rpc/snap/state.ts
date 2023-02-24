@@ -1,6 +1,6 @@
 import { SnapsGlobalObject } from '@metamask/snaps-types';
-import { IdentitySnapState } from '../interfaces';
-import { getEmptyAccountState, getInitialSnapState } from './config';
+import { IdentitySnapState } from '../../interfaces';
+import { getEmptyAccountState, getInitialSnapState } from '../../utils/config';
 
 /**
  * Function for updating IdentitySnapState object in the MetaMask state.
