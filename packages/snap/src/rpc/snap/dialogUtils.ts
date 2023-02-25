@@ -1,5 +1,6 @@
 import { divider, heading, panel, Panel, text } from '@metamask/snaps-ui';
 import { VerifiableCredential } from '@veramo/core';
+import cloneDeep from 'lodash.clonedeep';
 import { IDataManagerQueryResult } from 'src/veramo/plugins/verfiable-creds-manager';
 
 /**
@@ -16,13 +17,14 @@ export async function generateVCPanel(
   description: string,
   vcs: IDataManagerQueryResult[],
 ): Promise<Panel> {
+  const vcsToUse = cloneDeep(vcs);
   const panelToShow = [
     heading(header),
     text(prompt),
     divider(),
     text(description),
   ];
-  vcs.forEach((vc, index) => {
+  vcsToUse.forEach((vc, index) => {
     const vcData = vc.data as VerifiableCredential;
     delete vcData.credentialSubject.id;
     delete vcData.credentialSubject.hederaAccountId;
@@ -31,6 +33,8 @@ export async function generateVCPanel(
     panelToShow.push(divider());
     panelToShow.push(text('ID: '));
     panelToShow.push(text(vc.metadata.id));
+    panelToShow.push(text('STORAGE: '));
+    panelToShow.push(text(vc.metadata.store as string));
     panelToShow.push(text('TYPE:'));
     panelToShow.push(text(JSON.stringify(vcData.type)));
     panelToShow.push(text('SUBJECT:'));

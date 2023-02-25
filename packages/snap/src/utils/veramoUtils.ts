@@ -312,7 +312,7 @@ export async function veramoCreateVP(
     if (vcObj.length > 0) {
       const vc: VerifiableCredential = vcObj[0].data as VerifiableCredential;
       vcs.push(vc);
-      vcsWithMetadata.push({ data: vc, metadata: { id: vcId } });
+      vcsWithMetadata.push({ data: vc, metadata: { id: vcId, store: 'snap' } });
     }
   }
 
