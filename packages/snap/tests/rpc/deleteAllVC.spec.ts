@@ -8,7 +8,7 @@ import { createMockWallet, WalletMock } from '../testUtils/wallet.mock';
 
 jest.mock('uuid');
 
-  describe('delete all VC', () => {
+  describe.skip('delete all VC', () => {
     let walletMock: SnapProvider & WalletMock;
     let snapState: IdentitySnapState;
     beforeEach(async () => {

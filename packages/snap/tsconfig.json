@@ -8,8 +8,8 @@
     "sourceMap": true
   },
   "files": [
-    "../../node_modules/@metamask/snap-types/global.d.ts",
+    "./global.d.ts",
     "./json-typings.d.ts"
   ],
-  "include": ["src/**/*", "tests/**/*"]
+  "include": ["src/**/*", "tests/**/*", "global.d.ts"]
 }

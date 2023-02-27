@@ -23,13 +23,7 @@ export async function connectHederaAccount(
   metamask: MetaMaskInpageProvider,
   _accountId: string,
 ): Promise<boolean> {
-
-  let walletToUse = _wallet === undefined ? wallet: _wallet; 
-
-
-  const chainId = await getCurrentNetwork(walletToUse);
-
-
+  const chainId = await getCurrentNetwork(metamask);
   if (validHederaChainID(chainId)) {
     const dialogParamsForPrivateKey: SnapDialogParams = {
       type: 'Prompt',
@@ -49,8 +43,6 @@ export async function connectHederaAccount(
       _accountId,
       getHederaNetwork(chainId),
     );
-        console.log("------------------2");
-
     if (hederaAccountInfo !== null) {
       const evmAddress = hederaAccountInfo.contractAccountId.startsWith('0x')
         ? hederaAccountInfo.contractAccountId

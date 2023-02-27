@@ -19,13 +19,8 @@ describe.skip('Utils [did]', () => {
       const initialState = getDefaultSnapState();
 
       await expect(
-<<<<<<< HEAD
-        getCurrentDid(walletMock, initialState)
-      ).resolves.toBe(`did:pkh:eip155:4:${address}`);
-=======
-        getCurrentDid(walletMock, initialState, address),
+        getCurrentDid(walletMock, initialState),
       ).resolves.toBe(`did:pkh:eip155:0x4:${address}`);
->>>>>>> main
 
       expect.assertions(1);
     });
@@ -36,11 +31,7 @@ describe.skip('Utils [did]', () => {
         'did:pkh';
 
       await expect(
-<<<<<<< HEAD
-        getCurrentDid(walletMock, initialState)
-=======
-        getCurrentDid(walletMock, initialState, address),
->>>>>>> main
+        getCurrentDid(walletMock, initialState),
       ).resolves.toBe(exampleDIDPkh);
 
       expect.assertions(1);

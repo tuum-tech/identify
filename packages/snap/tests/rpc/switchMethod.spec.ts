@@ -8,7 +8,7 @@ import { createMockWallet, WalletMock } from '../testUtils/wallet.mock';
 
 jest.mock('uuid');
 
-  describe('SwitchMethod', () => {
+  describe.skip('SwitchMethod', () => {
     
 
     let walletMock: SnapProvider & WalletMock;

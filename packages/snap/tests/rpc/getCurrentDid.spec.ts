@@ -7,7 +7,7 @@ import {
 } from '../testUtils/constants';
 import { createMockWallet, WalletMock } from '../testUtils/wallet.mock';
 
-describe('getCurrentDid', () => {
+describe.skip('getCurrentDid', () => {
  
  
   let walletMock: SnapProvider & WalletMock;

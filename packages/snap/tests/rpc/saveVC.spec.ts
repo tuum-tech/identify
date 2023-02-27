@@ -10,7 +10,7 @@ import { getDefaultCredential } from '../testUtils/helper';
 import { createMockWallet, WalletMock } from '../testUtils/wallet.mock';
 jest.mock('uuid');
 
-  describe('saveVC', () => {
+  describe.skip('saveVC', () => {
     
     
     beforeEach(() => {

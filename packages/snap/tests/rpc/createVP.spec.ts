@@ -1,61 +1,66 @@
 /* eslint-disable */
 
-import { SnapProvider } from '@metamask/snap-types';
-import { IdentitySnapState } from '../../src/interfaces';
+import { MetaMaskInpageProvider } from '@metamask/providers';
+import { SnapsGlobalObject } from '@metamask/snaps-types';
+import { IdentitySnapParams, IdentitySnapState } from '../../src/interfaces';
 import { connectHederaAccount } from '../../src/rpc/hedera/connectHederaAccount';
 import { createVC } from '../../src/rpc/vc/createVC';
 import { createVP } from '../../src/rpc/vc/createVP';
-import { SaveVCRequestParams } from '../../src/types/params';
 import { getDefaultSnapState } from '../testUtils/constants';
-import { createMockWallet, WalletMock } from '../testUtils/wallet.mock';
+import { createMockSnap, SnapMock } from '../testUtils/snap.mock';
 jest.mock('uuid');
 
   describe('createVP', () => {
     
-     let walletMock: SnapProvider & WalletMock;
-         let snapState: IdentitySnapState; 
-
+    let identitySnapParams: IdentitySnapParams;
+    let snapState: IdentitySnapState; 
+    let snapMock: SnapsGlobalObject & SnapMock;
+    let metamask: MetaMaskInpageProvider;
+    
     beforeEach(async() => {
       snapState = getDefaultSnapState();
-      walletMock = createMockWallet();
-      walletMock.rpcMocks.eth_chainId.mockReturnValue('0x128');
-
+      snapMock = createMockSnap();
+      metamask = snapMock as unknown as MetaMaskInpageProvider;
+      identitySnapParams = {
+        metamask: metamask,
+        snap: snapMock,
+        state: snapState
+      };
+     
       let privateKey = '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c';
-      let connected = await connectHederaAccount(snapState, privateKey, '0.0.15215', walletMock);
-    });
+      (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValueOnce(privateKey);
+      (identitySnapParams.snap as SnapMock).rpcMocks.eth_chainId.mockReturnValue('0x128');
 
+      let connected = await connectHederaAccount(snapMock, snapState, metamask, '0.0.15215');
+    });
     it('should succeed creating VP from 1 VC', async () => {
 
            
       // Setup snap confirm return
-      walletMock.rpcMocks.snap_confirm.mockReturnValue(true);
+       (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(true);
       
-      let createCredentialResult = await createVC(walletMock, snapState, { vcValue: {'name':'Diego'}, credTypes: ["Login"]});
-      let params: SaveVCRequestParams = {
-        verifiableCredential: createCredentialResult[0].id
-      }
+      let createCredentialResult = await createVC(identitySnapParams, { vcValue: {'name':'Diego'}, credTypes: ["Login"]});
 
+      console.log("ccr " + JSON.stringify(createCredentialResult));
+     
       // Act and assert
-      await expect(createVP(walletMock, snapState, {vcs: [createCredentialResult[0].id as string]})).resolves.not.toBeUndefined();
+      await expect(createVP(identitySnapParams, {vcs: [createCredentialResult[0].id as string]})).resolves.not.toBeUndefined();
 
       expect.assertions(1);
     });
 
-      it('should throw error when user rejects confirm', async () => {
+    it('should throw error when user rejects confirm', async () => {
 
            
       // Setup snap confirm return
-      walletMock.rpcMocks.snap_confirm.mockReturnValue(true);
+      (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(true);
       
-      let createCredentialResult = await createVC(walletMock, snapState, { vcValue: {'name':'Diego'}, credTypes: ["Login"]});
-      let params: SaveVCRequestParams = {
-        verifiableCredential: createCredentialResult[0].id
-      }
+      let createCredentialResult = await createVC(identitySnapParams, { vcValue: {'name':'Diego'}, credTypes: ["Login"]});
 
-      walletMock.rpcMocks.snap_confirm.mockReturnValue(false);
+      (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(true);
 
       // Act and assert
-      await expect(createVP(walletMock, snapState, {vcs: [createCredentialResult[0].id as string]})).rejects.toThrow();
+      await expect(createVP(identitySnapParams, {vcs: [createCredentialResult[0].id as string]})).rejects.toThrow();
 
 
 

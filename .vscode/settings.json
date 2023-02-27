@@ -4,7 +4,7 @@
   "editor.wordWrap": "on",
   "files.autoSave": "onFocusChange",
   "editor.formatOnPaste": true,
-  "editor.formatOnSave": true,
+  "editor.formatOnSave": false,
   "editor.formatOnType": false,
   "editor.formatOnSaveMode": "file",
   "emmet.includeLanguages": {

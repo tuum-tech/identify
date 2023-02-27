@@ -75,3 +75,66 @@ export type UploadData = {
 export type GoogleToken = {
   accessToken: string;
 };
+
+
+export type SSISnapState = {
+  /**
+   * Account specific storage
+   */
+  accountState: Record<string, SSIAccountState>;
+
+  /**
+   * Configuration for SSISnap
+   */
+  snapConfig: SSISnapConfig;
+};
+
+/**
+ * SSI Snap State for a MetaMask address
+ */
+export type SSIAccountState = {
+  /**
+   * Store for {@link SnapPrivateKeyStore}
+   */
+  snapPrivateKeyStore: Record<string, ManagedPrivateKey>;
+  /**
+   * Store for {@link SnapKeyStore}
+   */
+  snapKeyStore: Record<string, IKey>;
+  /**
+   * Store for {@link SnapDIDStore}
+   */
+  identifiers: Record<string, IIdentifier>;
+  /**
+   * Store for {@link SnapVCStore}
+   */
+  vcs: Record<string, W3CVerifiableCredential>;
+
+  publicKey: string;
+  index?: number;
+  accountConfig: SSIAccountConfig;
+};
+
+export type SSISnapConfig = {
+  snap: {
+    acceptedTerms: boolean;
+  };
+  dApp: {
+    disablePopups: boolean;
+    friendlyDapps: string[];
+  };
+};
+
+export type SSIAccountConfig = {
+  ssi: {
+    didMethod: AvailableMethods;
+    vcStore: Record<AvailableVCStores, boolean>;
+  };
+};
+export const availableVCStores = ['snap', 'ceramic'] as const;
+export type AvailableVCStores = (typeof availableVCStores)[number];
+
+
+
+export const availableMethods = ['did:ethr', 'did:pkh'] as const;
+export type AvailableMethods = (typeof availableMethods)[number];

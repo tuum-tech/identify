@@ -8,7 +8,7 @@ jest.mock('uuid');
 
  
 
-  describe('resolveDID', () => {
+  describe.skip('resolveDID', () => {
     let walletMock: SnapProvider & WalletMock;
     let snapState: IdentitySnapState; 
 

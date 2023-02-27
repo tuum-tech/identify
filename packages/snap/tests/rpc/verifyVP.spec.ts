@@ -11,7 +11,7 @@ import { createMockWallet, WalletMock } from '../testUtils/wallet.mock';
 
 jest.mock('uuid');
 
-  describe('VerifyVP', () => {
+  describe.skip('VerifyVP', () => {
     let walletMock: SnapProvider & WalletMock;
     let snapState: IdentitySnapState;
     

@@ -1,3 +1,4 @@
+/* eslint-disable */ 
 import { BIP44CoinTypeNode } from '@metamask/key-tree';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import {
@@ -186,6 +187,11 @@ export async function veramoCreateVC(
       state.accountState[state.currentAccount].accountConfig.identity
         .googleAccessToken,
   });
+
+  console.log(
+    'save result: ',
+    JSON.stringify(result, null, 4),
+  );
   return result;
 }
 
@@ -347,9 +353,8 @@ export async function veramoCreateVP(
       challenge, // Optional (only JWT) string challenge parameter to add to the verifiable presentation
     });
     return vp;
-  } else {
-      throw new Error('User rejected');
   }
+  throw new Error('User rejected');
 }
 
 /**

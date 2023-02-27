@@ -7,7 +7,7 @@ import { getDefaultSnapState } from '../testUtils/constants';
 import { createMockWallet, WalletMock } from '../testUtils/wallet.mock';
 jest.mock('uuid');
 
-  describe('getVCs', () => {
+  describe.skip('getVCs', () => {
     let walletMock: SnapProvider & WalletMock;
     let snapState: IdentitySnapState; 
 

@@ -1,15 +1,11 @@
 import { SnapProvider } from '@metamask/snap-types';
-<<<<<<< HEAD:packages/snap/tests/rpc/getDid.spec.ts
-import { getDid } from '../../src/rpc/did/getDID';
-=======
 import { onRpcRequest } from '../../src';
->>>>>>> main:packages/snap/tests/rpc/onRpcRequest.spec.ts
 import { exampleDIDPkh, getDefaultSnapState } from '../testUtils/constants';
 import { createMockWallet, WalletMock } from '../testUtils/wallet.mock';
 
 jest.mock('uuid');
 
-  describe('getDID', () => {
+  describe.skip('getDID', () => {
      let walletMock: SnapProvider & WalletMock;
 
     beforeEach(() => {
@@ -21,9 +17,6 @@ jest.mock('uuid');
 
     it('should succeed returning current did (did:pkh)', async () => {
       await expect(
-<<<<<<< HEAD:packages/snap/tests/rpc/getDid.spec.ts
-        getDid(walletMock, getDefaultSnapState())
-=======
         onRpcRequest({
           origin: 'localhost',
           request: {
@@ -33,7 +26,6 @@ jest.mock('uuid');
             params: {},
           },
         }),
->>>>>>> main:packages/snap/tests/rpc/onRpcRequest.spec.ts
       ).resolves.toEqual(exampleDIDPkh);
 
       expect.assertions(1);

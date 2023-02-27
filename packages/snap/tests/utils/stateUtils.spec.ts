@@ -3,14 +3,9 @@ import {
   getSnapStateUnchecked,
   initAccountState,
   initSnapState,
-<<<<<<< HEAD
-  updateSnapState
-} from '../../src/utils/stateUtils';
-=======
   updateSnapState,
 } from '../../src/rpc/snap/state';
 import { getInitialSnapState } from '../../src/utils/config';
->>>>>>> main
 import {
   address,
   getDefaultSnapState
