@@ -45,6 +45,7 @@ export const CardContainer = styled.div`
   width: 100%;
   height: 100%;
   margin-top: 1.5rem;
+  gap: 16px;
 `;
 
 export const Notice = styled.div`

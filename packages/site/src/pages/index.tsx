@@ -14,6 +14,7 @@ import {
   InstallFlaskButton,
   ReconnectButton,
   SendHelloButton,
+  TextInput,
 } from '../components';
 import {
   CardContainer,
@@ -378,12 +379,12 @@ const Index = () => {
       <Subtitle>
         Get started by editing <code>src/index.ts</code>
       </Subtitle>
+      {state.error && (
+        <ErrorMessage>
+          <b>An error happened:</b> {state.error.message}
+        </ErrorMessage>
+      )}
       <CardContainer>
-        {state.error && (
-          <ErrorMessage>
-            <b>An error happened:</b> {state.error.message}
-          </ErrorMessage>
-        )}
         {!state.isFlask && (
           <Card
             content={{
@@ -601,10 +602,11 @@ const Index = () => {
                 <form>
                   <label>
                     Enter your VC Id
-                    <input
-                      type="text"
+                    <TextInput
+                      rows={2}
                       value={vcId ? vcId.trim().split(',')[0] : ''}
                       onChange={(e) => setVcId(e.target.value)}
+                      fullWidth
                     />
                   </label>
                 </form>
@@ -665,6 +667,7 @@ const Index = () => {
                     Enter your name
                     <input
                       type="text"
+                      style={{ width: '100%' }}
                       value={createVCName}
                       onChange={(e) => setCreateVCName(e.target.value)}
                     />
@@ -674,6 +677,7 @@ const Index = () => {
                     Enter your nickname
                     <input
                       type="text"
+                      style={{ width: '100%' }}
                       value={createVCNickname}
                       onChange={(e) => setCreateVCNickname(e.target.value)}
                     />
@@ -709,10 +713,11 @@ const Index = () => {
                 <form>
                   <label>
                     Enter your Verifiable Credential
-                    <input
-                      type="text"
+                    <TextInput
+                      rows={3}
                       value={JSON.stringify(vc)}
                       onChange={(e) => setVc(e.target.value)}
+                      fullWidth
                     />
                   </label>
                 </form>
@@ -746,14 +751,15 @@ const Index = () => {
                 <form>
                   <label>
                     Enter your VC IDs to be removed separated by a comma
-                    <input
-                      type="text"
+                    <TextInput
+                      rows={2}
                       value={
                         vcIdsToBeRemoved
                           ? vcIdsToBeRemoved.trim().split(',')[0]
                           : ''
                       }
                       onChange={(e) => setVcIdsToBeRemoved(e.target.value)}
+                      fullWidth
                     />
                   </label>
                 </form>
@@ -812,10 +818,11 @@ const Index = () => {
                 <form>
                   <label>
                     Enter the Verifiable Credential ID
-                    <input
-                      type="text"
+                    <TextInput
+                      rows={2}
                       value={vcId}
                       onChange={(e) => setVcId(e.target.value)}
+                      fullWidth
                     />
                   </label>
                 </form>
@@ -849,10 +856,11 @@ const Index = () => {
                 <form>
                   <label>
                     Enter your Verifiable Presentation
-                    <input
-                      type="text"
+                    <TextInput
+                      rows={2}
                       value={JSON.stringify(vp)}
                       onChange={(e) => setVp(e.target.value)}
+                      fullWidth
                     />
                   </label>
                 </form>
