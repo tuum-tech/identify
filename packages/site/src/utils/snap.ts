@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import {
   GetVCsOptions,
   ProofInfo,
@@ -22,8 +23,7 @@ export const getSnaps = async (): Promise<GetSnapsResponse> => {
 /**
  * Connect a snap to MetaMask.
  *
- * @param snapId - The ID of the snap.
- * @param params - The params to pass with the snap to connect.
+ * @param snapId - The ID of the snap, params - The params to pass with the snap to connect.
  */
 export const connectSnap = async (snapId: string = defaultSnapOrigin) => {
   await window.ethereum.request({
@@ -46,7 +46,7 @@ export const getSnap = async (version?: string): Promise<Snap | undefined> => {
 
     return Object.values(snaps).find(
       (snap) =>
-        snap.id === defaultSnapOrigin && (!version || snap.version === version)
+        snap.id === defaultSnapOrigin && (!version || snap.version === version),
     );
   } catch (e) {
     console.log('Failed to obtain installed snap', e);
@@ -64,16 +64,12 @@ export const getCurrentNetwork = async (): Promise<string> => {
  * Invoke "connectHederaAccount" method from the snap
  */
 
-export const connectHederaAccount = async (
-  privateKey: string,
-  accountId: string
-) => {
+export const connectHederaAccount = async (accountId: string) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
       method: 'connectHederaAccount',
       params: {
-        privateKey,
         accountId,
       },
     },
@@ -156,7 +152,7 @@ export const resolveDID = async (did?: string) => {
 
 export const getVCs = async (
   filter: Filter | undefined,
-  options: GetVCsOptions
+  options: GetVCsOptions,
 ) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
@@ -194,7 +190,7 @@ export const createVC = async (
   vcKey: string,
   vcValue: object,
   options: GetVCsOptions,
-  credTypes?: string[]
+  credTypes?: string[],
 ) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
@@ -211,25 +207,31 @@ export const createVC = async (
 };
 
 /**
- * Invoke the "uploadToGoogleDrive" method from the snap.
+ * Invoke the "configureGoogleAccount" method from the snap.
  */
 
-export const uploadToGoogleDrive = async (
-  fileName: string,
-  content: string,
-  accessToken: string
-) => {
+export const configureGoogleAccount = async (accessToken: string) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
-      method: 'uploadToGoogleDrive',
+      method: 'configureGoogleAccount',
       params: {
-        uploadData: {
-          fileName,
-          content,
-          accessToken,
-        },
+        accessToken,
       },
+    },
+  });
+};
+
+/**
+ * Invoke the "syncGoogleVCs" method from the snap.
+ */
+
+export const syncGoogleVCs = async () => {
+  return await window.ethereum.request({
+    method: `wallet_snap_${defaultSnapOrigin}`,
+    params: {
+      method: 'syncGoogleVCs',
+      params: {},
     },
   });
 };
@@ -254,7 +256,7 @@ export const verifyVC = async (vc: VerifiableCredential | {}) => {
 
 export const removeVC = async (
   id: string | string[],
-  options: RemoveVCOptions
+  options: RemoveVCOptions,
 ) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,

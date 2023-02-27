@@ -1,7 +1,7 @@
+import { resolve } from 'path';
 import SnapsWebpackPlugin from '@metamask/snaps-webpack-plugin';
 import ESLintPlugin from 'eslint-webpack-plugin';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
-import { resolve } from 'path';
 import { Configuration, ProvidePlugin } from 'webpack';
 import { merge } from 'webpack-merge';
 import WebpackBarPlugin from 'webpackbar';
@@ -59,7 +59,7 @@ const common: Configuration = {
           },
         ],
       },
-      { test: /.json$/, type: 'json' },
+      { test: /.json$/u, type: 'json' },
     ],
   },
   plugins: [

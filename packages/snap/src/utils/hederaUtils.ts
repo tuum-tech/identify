@@ -1,7 +1,11 @@
 import { PrivateKey } from '@hashgraph/sdk';
 import { KeyPair } from '../types/crypto';
 
-/* eslint-disable */
+/**
+ * Function to get key pair.
+ *
+ * @param privateKey - Private key.
+ */
 export async function getKeyPair(privateKey: string): Promise<KeyPair> {
   return {
     privateKey,

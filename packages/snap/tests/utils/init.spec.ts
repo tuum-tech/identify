@@ -17,7 +17,7 @@ describe.skip('RPC handler [init]', () => {
     await expect(init(walletMock)).resolves.toEqual(initialState);
     expect(walletMock.rpcMocks.snap_manageState).toHaveBeenCalledWith(
       'update',
-      initialState
+      initialState,
     );
 
     expect.assertions(2);
@@ -27,7 +27,7 @@ describe.skip('RPC handler [init]', () => {
     walletMock.rpcMocks.snap_confirm.mockReturnValueOnce(false);
 
     await expect(init(walletMock)).rejects.toThrow(
-      new Error('User did not accept terms and conditions!')
+      new Error('User did not accept terms and conditions!'),
     );
 
     expect.assertions(1);

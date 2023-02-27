@@ -1,4 +1,5 @@
 import { ComponentProps } from 'react';
+import Spinner from 'react-bootstrap/Spinner';
 import styled from 'styled-components';
 import { ReactComponent as FlaskFox } from '../assets/flask_fox.svg';
 import { MetamaskState } from '../hooks';
@@ -94,8 +95,15 @@ export const ReconnectButton = (props: ComponentProps<typeof Button>) => {
   );
 };
 
-export const SendHelloButton = (props: ComponentProps<typeof Button>) => {
-  return <Button {...props}>{props.buttonText}</Button>;
+type ButtonProps = ComponentProps<typeof Button> & { loading?: boolean };
+
+export const SendHelloButton = ({ loading, ...props }: ButtonProps) => {
+  return (
+    <Button {...props}>
+      {loading && <Spinner animation="border" style={{ marginRight: 8 }} />}
+      {props.buttonText}
+    </Button>
+  );
 };
 
 export const HeaderButtons = ({

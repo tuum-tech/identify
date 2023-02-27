@@ -2,7 +2,6 @@ import type { PrivateKey, PublicKey } from '@hashgraph/sdk';
 
 import { WalletHedera } from './abstract';
 
-/* eslint-disable */
 export class PrivateKeySoftwareWallet extends WalletHedera {
   private _privateKey: PrivateKey;
 
@@ -16,7 +15,7 @@ export class PrivateKeySoftwareWallet extends WalletHedera {
     (transactionBody: Uint8Array) => Promise<Uint8Array>
   > {
     return Promise.resolve((transactionBody) =>
-      Promise.resolve(this._privateKey.sign(transactionBody))
+      Promise.resolve(this._privateKey.sign(transactionBody)),
     );
   }
 

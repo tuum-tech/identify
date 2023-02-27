@@ -1,4 +1,5 @@
-/** @type {import('@babel/core').ConfigFunction} */
+// @type {import('@babel/core').ConfigFunction}
+/* eslint-disable */
 module.exports = (api) => {
   // Cache configuration is a required option
   api.cache(false);
@@ -13,6 +14,7 @@ module.exports = (api) => {
     ['@babel/plugin-transform-flow-strip-types'],
     ['@babel/plugin-proposal-class-properties', { loose: true }],
     ['@babel/plugin-proposal-private-methods', { loose: true }],
+    ['@babel/plugin-syntax-import-assertions'],
   ];
 
   return { presets, plugins };

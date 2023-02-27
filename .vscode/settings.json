@@ -49,5 +49,6 @@
   "editor.codeActionsOnSave": {
     "source.organizeImports": true
   },
-  "editor.fontWeight": "normal"
+  "editor.fontWeight": "normal",
+  "editor.indentSize": "tabSize"
 }

@@ -1,6 +1,10 @@
 import { validProofFormats } from '../../types/constants';
 
-/* eslint-disable */
+/**
+ * Function to get supported proof formats.
+ *
+ * @returns Proof formats.
+ */
 export function getSupportedProofFormats(): string[] {
   return validProofFormats.map((key) => key);
 }

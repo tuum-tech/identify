@@ -3,22 +3,25 @@ import { getDidPkhIdentifier } from '../did/pkh/pkhDidUtils';
 import { IdentitySnapState } from '../interfaces';
 import { availableMethods, isValidMethod } from '../types/constants';
 
-/* eslint-disable */
+/**
+ * Function to get current Did.
+ *
+ * @param state - IdentitySnapState.
+ * @param metamask - Metamask provider.
+ */
 export async function getCurrentDid(
   state: IdentitySnapState,
-  metamask: MetaMaskInpageProvider
+  metamask: MetaMaskInpageProvider,
 ): Promise<string> {
-  let did: string = '';
-  console.log("account State" + JSON.stringify(state.accountState));
-  console.log("current account" + JSON.stringify(state.currentAccount));
+  let did = '';
   const method =
     state.accountState[state.currentAccount].accountConfig.identity.didMethod;
   if (!isValidMethod(method)) {
     console.error(
-      `did method '${method}' not supported. Supported methods are: ${availableMethods}`
+      `did method '${method}' not supported. Supported methods are: ${availableMethods}`,
     );
     throw new Error(
-      `did method '${method}' not supported. Supported methods are: ${availableMethods}`
+      `did method '${method}' not supported. Supported methods are: ${availableMethods}`,
     );
   }
 

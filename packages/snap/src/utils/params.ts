@@ -1,5 +1,5 @@
 import { VerifiablePresentation, W3CVerifiableCredential } from '@veramo/core';
-import { IdentitySnapState } from '../interfaces';
+import { GoogleToken, IdentitySnapState } from '../interfaces';
 import { isValidProofFormat, isValidVCStore } from '../types/constants';
 import {
   CreateVCRequestParams,
@@ -10,31 +10,38 @@ import {
   SaveVCRequestParams,
 } from '../types/params';
 
-/* eslint-disable */
 type HederaAccountParams = {
-  privateKey: string;
   accountId: string;
 };
 
+/**
+ * Check validation of Hedera account.
+ *
+ * @param params - Request params.
+ */
 export function isValidHederaAccountParams(
-  params: unknown
+  params: unknown,
 ): asserts params is HederaAccountParams {
   if (
     params !== null &&
     typeof params === 'object' &&
-    'privateKey' in params &&
-    (params as HederaAccountParams).privateKey != null &&
-    typeof (params as HederaAccountParams).privateKey === 'string' &&
     'accountId' in params &&
-    (params as HederaAccountParams).accountId != null &&
+    (params as HederaAccountParams).accountId !== null &&
     typeof (params as HederaAccountParams).accountId === 'string'
-  )
+  ) {
     return;
+  }
 
   console.error('Invalid Hedera Params passed');
   throw new Error('Invalid Hedera Params passed');
 }
 
+/**
+ * Check if Hedera account was imported.
+ *
+ * @param state - IdentitySnapState.
+ * @returns Result.
+ */
 export function isHederaAccountImported(state: IdentitySnapState): boolean {
   if (
     state.accountState[state.currentAccount].hederaAccount.evmAddress ===
@@ -42,26 +49,31 @@ export function isHederaAccountImported(state: IdentitySnapState): boolean {
     state.accountState[state.currentAccount].hederaAccount.accountId !== ''
   ) {
     return true;
-  } else {
-    return false;
   }
+  return false;
 }
 
 type SwitchMethodRequestParams = {
   didMethod: string;
 };
 
+/**
+ * Check Validation of Switch Method request.
+ *
+ * @param params - Request params.
+ */
 export function isValidSwitchMethodRequest(
-  params: unknown
+  params: unknown,
 ): asserts params is SwitchMethodRequestParams {
   if (
-    params != null &&
+    params !== null &&
     typeof params === 'object' &&
     'didMethod' in params &&
-    (params as SwitchMethodRequestParams).didMethod != null &&
+    (params as SwitchMethodRequestParams).didMethod !== null &&
     typeof (params as SwitchMethodRequestParams).didMethod === 'string'
-  )
+  ) {
     return;
+  }
 
   console.error('Invalid switchMethod request');
   throw new Error('Invalid switchMethod request');
@@ -69,18 +81,32 @@ export function isValidSwitchMethodRequest(
 
 type ResolveDIDRequestParams = { did?: string };
 
+/**
+ * Check Validation of Resolve DID request.
+ *
+ * @param params - Request params.
+ */
 export function isValidResolveDIDRequest(
-  params: unknown
+  params: unknown,
 ): asserts params is ResolveDIDRequestParams {
-  if (params != null && typeof params === 'object') return;
+  if (params !== null && typeof params === 'object') {
+    return;
+  }
 
   throw new Error('Invalid ResolveDID request');
 }
 
+/**
+ * Check Validation of Get VCs request.
+ *
+ * @param params - Request params.
+ */
 export function isValidGetVCsRequest(
-  params: unknown
+  params: unknown,
 ): asserts params is GetVCsRequestParams {
-  if (params === null) return;
+  if (params === null) {
+    return;
+  }
   const parameter = params as GetVCsRequestParams;
 
   // Check if filter is valid
@@ -98,6 +124,7 @@ export function isValidGetVCsRequest(
     ) {
       throw new Error('Filter type is missing or not a string!');
     }
+
     if (!('filter' in parameter.filter && parameter.filter?.filter !== null)) {
       throw new Error('Filter is missing!');
     }
@@ -119,13 +146,15 @@ export function isValidGetVCsRequest(
         parameter.options?.store.length > 0
       ) {
         (parameter.options?.store as [string]).forEach((store) => {
-          if (!isValidVCStore(store))
+          if (!isValidVCStore(store)) {
             throw new Error('Store is not supported!');
+          }
         });
       } else {
         throw new Error('Store is invalid format');
       }
     }
+
     if ('returnStore' in parameter.options) {
       if (
         !(
@@ -138,11 +167,15 @@ export function isValidGetVCsRequest(
       }
     }
   }
-  return;
 }
 
+/**
+ * Check Validation of Save VC request.
+ *
+ * @param params - Request params.
+ */
 export function isValidSaveVCRequest(
-  params: unknown
+  params: unknown,
 ): asserts params is SaveVCRequestParams {
   const parameter = params as SaveVCRequestParams;
   if (
@@ -166,10 +199,13 @@ export function isValidSaveVCRequest(
           parameter.options?.store.length > 0
         ) {
           (parameter.options?.store as [string]).forEach((store) => {
-            if (!isValidVCStore(store))
+            if (!isValidVCStore(store)) {
               throw new Error('Store is not supported!');
+            }
           });
-        } else throw new Error('Store is invalid format');
+        } else {
+          throw new Error('Store is invalid format');
+        }
       }
     }
     return;
@@ -177,8 +213,13 @@ export function isValidSaveVCRequest(
   throw new Error('Invalid SaveVC request');
 }
 
+/**
+ * Check Validation of Create VC request.
+ *
+ * @param params - Request params.
+ */
 export function isValidCreateVCRequest(
-  params: unknown
+  params: unknown,
 ): asserts params is CreateVCRequestParams {
   const parameter = params as CreateVCRequestParams;
   if (
@@ -203,10 +244,13 @@ export function isValidCreateVCRequest(
           parameter.options?.store.length > 0
         ) {
           (parameter.options?.store as [string]).forEach((store) => {
-            if (!isValidVCStore(store))
+            if (!isValidVCStore(store)) {
               throw new Error('Store is not supported!');
+            }
           });
-        } else throw new Error('Store is invalid format');
+        } else {
+          throw new Error('Store is invalid format');
+        }
       }
     }
     return;
@@ -216,24 +260,37 @@ export function isValidCreateVCRequest(
 
 type VerifyVCRequestParams = { verifiableCredential: W3CVerifiableCredential };
 
+/**
+ * Check Validation of Verify VC request.
+ *
+ * @param params - Request params.
+ */
 export function isValidVerifyVCRequest(
-  params: unknown
+  params: unknown,
 ): asserts params is VerifyVCRequestParams {
   if (
     params !== null &&
     typeof params === 'object' &&
     'verifiableCredential' in params
-  )
+  ) {
     return;
+  }
 
   console.error('Invalid VerifyVC request');
   throw new Error('Invalid VerifyVC request');
 }
 
+/**
+ * Check Validation of Remove VC request.
+ *
+ * @param params - Request params.
+ */
 export function isValidRemoveVCRequest(
-  params: unknown
+  params: unknown,
 ): asserts params is RemoveVCsRequestParams {
-  if (params === null) return;
+  if (params === null) {
+    return;
+  }
   const parameter = params as RemoveVCsRequestParams;
 
   // Check if id exists
@@ -259,8 +316,9 @@ export function isValidRemoveVCRequest(
           parameter.options?.store.length > 0
         ) {
           (parameter.options?.store as [string]).forEach((store) => {
-            if (!isValidVCStore(store))
+            if (!isValidVCStore(store)) {
               throw new Error('Store is not supported!');
+            }
           });
         } else {
           throw new Error('Store is invalid format');
@@ -272,10 +330,17 @@ export function isValidRemoveVCRequest(
   throw new Error('Invalid RemoveVCRequest');
 }
 
+/**
+ * Check Validation of Delete all VCs request.
+ *
+ * @param params - Request params.
+ */
 export function isValidDeleteAllVCsRequest(
-  params: unknown
+  params: unknown,
 ): asserts params is DeleteAllVCsRequestParams {
-  if (params === null) return;
+  if (params === null) {
+    return;
+  }
   const parameter = params as DeleteAllVCsRequestParams;
 
   // Check if options is valid
@@ -294,8 +359,9 @@ export function isValidDeleteAllVCsRequest(
         parameter.options?.store.length > 0
       ) {
         (parameter.options?.store as [string]).forEach((store) => {
-          if (!isValidVCStore(store))
+          if (!isValidVCStore(store)) {
             throw new Error('Store is not supported!');
+          }
         });
       } else {
         throw new Error('Store is invalid format');
@@ -306,12 +372,17 @@ export function isValidDeleteAllVCsRequest(
   throw new Error('Invalid isValidDeleteAllVCsRequest');
 }
 
+/**
+ * Check Validation of Create VP request.
+ *
+ * @param params - Request params.
+ */
 export function isValidCreateVPRequest(
-  params: unknown
+  params: unknown,
 ): asserts params is CreateVPRequestParams {
   const parameter = params as CreateVPRequestParams;
   if (
-    parameter != null &&
+    parameter !== null &&
     typeof parameter === 'object' &&
     'vcs' in parameter &&
     parameter.vcs !== null &&
@@ -332,6 +403,7 @@ export function isValidCreateVPRequest(
       ) {
         throw new Error('Proof format not supported');
       }
+
       // Check if type is a string
       if (
         'type' in parameter.proofInfo &&
@@ -340,6 +412,7 @@ export function isValidCreateVPRequest(
       ) {
         throw new Error('Type is not a string');
       }
+
       // Check if domain is a string
       if (
         'domain' in parameter.proofInfo &&
@@ -348,6 +421,7 @@ export function isValidCreateVPRequest(
       ) {
         throw new Error('Domain is not a string');
       }
+
       // Check if challenge is a string
       if (
         'challenge' in parameter.proofInfo &&
@@ -365,16 +439,42 @@ export function isValidCreateVPRequest(
 
 type VerifyVPRequestParams = { verifiablePresentation: VerifiablePresentation };
 
+/**
+ * Check Validation of Verify VP request.
+ *
+ * @param params - Request params.
+ */
 export function isValidVerifyVPRequest(
-  params: unknown
+  params: unknown,
 ): asserts params is VerifyVPRequestParams {
   if (
     params !== null &&
     typeof params === 'object' &&
     'verifiablePresentation' in params
-  )
+  ) {
     return;
+  }
 
   console.error('Invalid VerifyVP request');
   throw new Error('Invalid VerifyVP request');
+}
+
+/**
+ * Check Validation of Configure google request.
+ *
+ * @param params - Request params.
+ */
+export function isValidConfigueGoogleRequest(
+  params: unknown,
+): asserts params is GoogleToken {
+  if (
+    params !== null &&
+    typeof params === 'object' &&
+    'accessToken' in params
+  ) {
+    return;
+  }
+
+  console.error('Invalid Configure Google request');
+  throw new Error('Invalid Configure Google request');
 }

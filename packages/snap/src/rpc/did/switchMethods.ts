@@ -1,13 +1,18 @@
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
 import { availableMethods, isValidMethod } from '../../types/constants';
-import { snapDialog } from '../../utils/snapUtils';
-import { updateSnapState } from '../../utils/stateUtils';
+import { updateSnapState } from '../snap/state';
+import { snapDialog } from '../snap/utils';
 
-/* eslint-disable */
+/**
+ * Function to switch method.
+ *
+ * @param identitySnapParams - Identity snap params.
+ * @param didMethod - DID method.
+ */
 export async function switchMethod(
   identitySnapParams: IdentitySnapParams,
-  didMethod: string
+  didMethod: string,
 ): Promise<boolean> {
   const { snap, state } = identitySnapParams;
 
@@ -15,12 +20,13 @@ export async function switchMethod(
     state.accountState[state.currentAccount].accountConfig.identity.didMethod;
   if (!isValidMethod(didMethod)) {
     console.error(
-      `did method '${didMethod}' not supported. Supported methods are: ${availableMethods}`
+      `did method '${didMethod}' not supported. Supported methods are: ${availableMethods}`,
     );
     throw new Error(
-      `did method ${didMethod}'not supported. Supported methods are: ${availableMethods}`
+      `did method ${didMethod}'not supported. Supported methods are: ${availableMethods}`,
     );
   }
+
   if (method !== didMethod) {
     const dialogParams: SnapDialogParams = {
       type: 'Confirmation',

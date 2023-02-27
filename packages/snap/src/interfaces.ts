@@ -4,7 +4,6 @@ import { Panel } from '@metamask/snaps-ui';
 import { IIdentifier, IKey, W3CVerifiableCredential } from '@veramo/core';
 import { ManagedPrivateKey } from '@veramo/key-manager';
 
-/* eslint-disable */
 export type IdentitySnapState = {
   currentAccount: string;
 
@@ -19,20 +18,20 @@ export type IdentitySnapState = {
   snapConfig: IdentitySnapConfig;
 };
 
-export interface IdentitySnapConfig {
+export type IdentitySnapConfig = {
   snap: {
     acceptedTerms: boolean;
   };
   dApp: {
     disablePopups: boolean;
-    friendlyDapps: Array<string>;
+    friendlyDapps: string[];
   };
-}
+};
 
 /**
  * Identity Snap State for a MetaMask address
  */
-export interface IdentityAccountState {
+export type IdentityAccountState = {
   snapKeyStore: Record<string, IKey>;
   snapPrivateKeyStore: Record<string, ManagedPrivateKey>;
   identifiers: Record<string, IIdentifier>;
@@ -41,28 +40,38 @@ export interface IdentityAccountState {
   index?: number;
   accountConfig: IdentityAccountConfig;
   hederaAccount: HederaAccount;
-}
+};
 
-export interface IdentityAccountConfig {
+export type IdentityAccountConfig = {
   identity: {
     didMethod: string;
     vcStore: string;
+    googleAccessToken: string;
   };
-}
+};
 
-export interface IdentitySnapParams {
+export type IdentitySnapParams = {
   snap: SnapsGlobalObject;
   state: IdentitySnapState;
   metamask: MetaMaskInpageProvider;
-}
+};
 
-export interface HederaAccount {
+export type HederaAccount = {
   accountId: string;
   evmAddress: string;
-}
+};
 
 export type SnapDialogParams = {
   type: string;
   content: Panel;
-  promptPlaceholder?: string;
+  placeholder?: string;
+};
+
+export type UploadData = {
+  fileName: string;
+  content: string;
+};
+
+export type GoogleToken = {
+  accessToken: string;
 };

@@ -1631,6 +1631,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@digitalcredentials/ed25519-verification-key-2020@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "@digitalcredentials/ed25519-verification-key-2020@npm:4.0.0"
+  dependencies:
+    "@digitalcredentials/keypair": ^1.0.5
+    "@noble/ed25519": ^1.7.1
+    base-x: ^4.0.0
+  checksum: 8f68496d67b94144d44b56e22299d19a09aa66c255c39a99a912fbe89a2e0a6622244e7aa0600b7bdb97670b3b6c18703a83be8baf0d87044c272f6061ea56ec
+  languageName: node
+  linkType: hard
+
 "@digitalcredentials/http-client@npm:^1.0.0":
   version: 1.2.2
   resolution: "@digitalcredentials/http-client@npm:1.2.2"
@@ -1663,6 +1674,13 @@ __metadata:
     canonicalize: ^1.0.1
     lru-cache: ^6.0.0
   checksum: d91796915fe266ddc412ee88d4acdab11d685146e7b0a091904f938a01dcf046d6df8be84176799c0b47594c6d4632c8a19d427ecff6e4b76cf2d168b33d5940
+  languageName: node
+  linkType: hard
+
+"@digitalcredentials/keypair@npm:^1.0.5":
+  version: 1.0.5
+  resolution: "@digitalcredentials/keypair@npm:1.0.5"
+  checksum: fb4502125f2a6be436e93e4493b63f178b024e634fd67cbe7d15d827a833ca23731c633bc9620f19be314d3aa3ffc4014505f2b7e2bbd2f6bf1b7b63865592da
   languageName: node
   linkType: hard
 
@@ -3415,6 +3433,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@noble/ed25519@npm:^1.7.1":
+  version: 1.7.3
+  resolution: "@noble/ed25519@npm:1.7.3"
+  checksum: 45169927d51de513e47bbeebff3a603433c4ac7579e1b8c5034c380a0afedbe85e6959be3d69584a7a5ed6828d638f8f28879003b9bb2fb5f22d8aa2d88fd5fe
+  languageName: node
+  linkType: hard
+
 "@noble/hashes@npm:1.1.2":
   version: 1.1.2
   resolution: "@noble/hashes@npm:1.1.2"
@@ -4069,6 +4094,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-oauth/google@npm:^0.7.0":
+  version: 0.7.0
+  resolution: "@react-oauth/google@npm:0.7.0"
+  peerDependencies:
+    react: ">=16.8.0"
+    react-dom: ">=16.8.0"
+  checksum: 04168015034eed21e88c253cd6f3621b91dbef1fb31d32d0f516be475c91d26ea9a4acb046270fb3bc5840bcd7fd55fa395fd0898e96ecd2041ed707339d9960
+  languageName: node
+  linkType: hard
+
 "@restart/hooks@npm:^0.4.6, @restart/hooks@npm:^0.4.7":
   version: 0.4.8
   resolution: "@restart/hooks@npm:0.4.8"
@@ -4295,7 +4330,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stablelib/ed25519@npm:^1.0.1, @stablelib/ed25519@npm:^1.0.2":
+"@stablelib/ed25519@npm:^1.0.1, @stablelib/ed25519@npm:^1.0.2, @stablelib/ed25519@npm:^1.0.3":
   version: 1.0.3
   resolution: "@stablelib/ed25519@npm:1.0.3"
   dependencies:
@@ -4329,7 +4364,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stablelib/nacl@npm:^1.0.2":
+"@stablelib/nacl@npm:^1.0.4":
   version: 1.0.4
   resolution: "@stablelib/nacl@npm:1.0.4"
   dependencies:
@@ -4703,10 +4738,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@transmute/credentials-context@npm:^0.7.0-unstable.67, @transmute/credentials-context@npm:^0.7.0-unstable.79":
+"@transmute/credentials-context@npm:^0.7.0-unstable.79":
   version: 0.7.0-unstable.79
   resolution: "@transmute/credentials-context@npm:0.7.0-unstable.79"
   checksum: 1d94522fbbbfd8e574e41dd12526e1351da84610cc9ceb00e02698f9e99a3337ffef97ce31d5be54c7b478bad3f2d4935e1a7f1a369041080b9af7591fe6fe37
+  languageName: node
+  linkType: hard
+
+"@transmute/credentials-context@npm:^0.7.0-unstable.80":
+  version: 0.7.0-unstable.80
+  resolution: "@transmute/credentials-context@npm:0.7.0-unstable.80"
+  checksum: bb45c4e12c99ae3e1285076fb6715468a27950bdea7ad99a50ae718984aafc34b70556509934db60fc2c0e4d8afd96779acf6797f586802b65831057ace6b3ce
   languageName: node
   linkType: hard
 
@@ -4721,33 +4763,33 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@transmute/ed25519-key-pair@npm:^0.7.0-unstable.79":
-  version: 0.7.0-unstable.79
-  resolution: "@transmute/ed25519-key-pair@npm:0.7.0-unstable.79"
+"@transmute/ed25519-key-pair@npm:^0.7.0-unstable.80":
+  version: 0.7.0-unstable.80
+  resolution: "@transmute/ed25519-key-pair@npm:0.7.0-unstable.80"
   dependencies:
     "@stablelib/ed25519": ^1.0.1
-    "@transmute/ld-key-pair": ^0.7.0-unstable.79
-    "@transmute/x25519-key-pair": ^0.7.0-unstable.79
-  checksum: af1e876a389e484c62604595d8e460a6a136daa9c2b94470154b8164c19a34940c31e42b553319facb5b0551ecbec4f17d4bcad8cb436012bcb5b4be469c5904
+    "@transmute/ld-key-pair": ^0.7.0-unstable.80
+    "@transmute/x25519-key-pair": ^0.7.0-unstable.80
+  checksum: dd0b59e34a9038d3958d3f86eebf76217588254a0b966c8fcd5d29d0faea88aad29ecfbe82bc11414173dedd41f642ed5549e825ffbb05f3422fe6d1c344a82d
   languageName: node
   linkType: hard
 
-"@transmute/ed25519-signature-2018@npm:^0.7.0-unstable.67":
-  version: 0.7.0-unstable.79
-  resolution: "@transmute/ed25519-signature-2018@npm:0.7.0-unstable.79"
+"@transmute/ed25519-signature-2018@npm:^0.7.0-unstable.79":
+  version: 0.7.0-unstable.80
+  resolution: "@transmute/ed25519-signature-2018@npm:0.7.0-unstable.80"
   dependencies:
-    "@transmute/credentials-context": ^0.7.0-unstable.79
+    "@transmute/credentials-context": ^0.7.0-unstable.80
     "@transmute/ed25519-key-pair": 0.7.0-unstable.2
-    "@transmute/jose-ld": ^0.7.0-unstable.79
-    "@transmute/security-context": ^0.7.0-unstable.79
-    jsonld: ^5.2.0
-  checksum: 529ef052d22673e9578ed30cd8453e330064c3c4ee457df1bcd10c6fa5e1b6b2ea7cc4a4df7125f2647ea90b4007e697539844bc4f6d6d1641a7ec542f0958cc
+    "@transmute/jose-ld": ^0.7.0-unstable.80
+    "@transmute/jsonld": 0.0.4
+    "@transmute/security-context": ^0.7.0-unstable.80
+  checksum: e0faa4e64546a1c2243fa0d7b98ba5490025032780cd2672acdae5ecdc91a0942811ced05322c52d20f684889a255bd1d6ae933434793180c943ad953893f365
   languageName: node
   linkType: hard
 
-"@transmute/jose-ld@npm:^0.7.0-unstable.79":
-  version: 0.7.0-unstable.79
-  resolution: "@transmute/jose-ld@npm:0.7.0-unstable.79"
+"@transmute/jose-ld@npm:^0.7.0-unstable.80":
+  version: 0.7.0-unstable.80
+  resolution: "@transmute/jose-ld@npm:0.7.0-unstable.80"
   dependencies:
     "@peculiar/webcrypto": ^1.1.6
     "@stablelib/aes-kw": ^1.0.0
@@ -4755,21 +4797,31 @@ __metadata:
     base64url: ^3.0.1
     jose: ^4.3.8
     web-streams-polyfill: ^3.0.3
-  checksum: 77e9b707f07b419ed1a19224dfb22f5bb43291ec6ad9f4de5d3981098c0cd346fb81fc1400676d25aab3d84196a34a6d60d561739c6af9027d84bb7d48097184
+  checksum: 871475f5b8db4fcc80f61447af3b00d3a67530e9b41b3ff46bf903cfd25b4e577702fa1ee84687fd7f5c2a28875b225b81e5ac699d91e220687bc92c93fe155b
   languageName: node
   linkType: hard
 
-"@transmute/json-web-signature@npm:^0.7.0-unstable.67":
-  version: 0.7.0-unstable.79
-  resolution: "@transmute/json-web-signature@npm:0.7.0-unstable.79"
+"@transmute/json-web-signature@npm:^0.7.0-unstable.79":
+  version: 0.7.0-unstable.80
+  resolution: "@transmute/json-web-signature@npm:0.7.0-unstable.80"
   dependencies:
-    "@transmute/ed25519-key-pair": ^0.7.0-unstable.79
-    "@transmute/jose-ld": ^0.7.0-unstable.79
-    "@transmute/secp256k1-key-pair": ^0.7.0-unstable.79
-    "@transmute/security-context": ^0.7.0-unstable.79
-    "@transmute/web-crypto-key-pair": ^0.7.0-unstable.79
-    jsonld: ^5.2.0
-  checksum: ec75593921f126c8ce66e0989b550489f27e9a5e2082bc6292441f29d72cf3bf1f152b06c15fdb5c725872b7f48307178f7b5a835a6a135a62407da02d78ad5d
+    "@transmute/ed25519-key-pair": ^0.7.0-unstable.80
+    "@transmute/jose-ld": ^0.7.0-unstable.80
+    "@transmute/jsonld": 0.0.4
+    "@transmute/secp256k1-key-pair": ^0.7.0-unstable.80
+    "@transmute/security-context": ^0.7.0-unstable.80
+    "@transmute/web-crypto-key-pair": ^0.7.0-unstable.80
+  checksum: 83321e612b2767e22aaf6a3805cf2018cd269a860ef2faccc9b4dd8aec617cb7caa7ed6005339e83b6f73dae7aa3235fdc62eedd7ea37d3a9bfad7fff893cb8d
+  languageName: node
+  linkType: hard
+
+"@transmute/jsonld@npm:0.0.4":
+  version: 0.0.4
+  resolution: "@transmute/jsonld@npm:0.0.4"
+  dependencies:
+    json-pointer: ^0.6.2
+    jsonld: 5.2.0
+  checksum: def93ba66abeb8f296bbd64ff0720186dcc53022d42a44d2626d0ef6b999ef4d743f47b7287822b5382040a8ad66b6356350828d270a54e61340269bfa57e7e6
   languageName: node
   linkType: hard
 
@@ -4780,42 +4832,59 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@transmute/secp256k1-key-pair@npm:^0.7.0-unstable.79":
-  version: 0.7.0-unstable.79
-  resolution: "@transmute/secp256k1-key-pair@npm:0.7.0-unstable.79"
+"@transmute/ld-key-pair@npm:^0.7.0-unstable.80":
+  version: 0.7.0-unstable.80
+  resolution: "@transmute/ld-key-pair@npm:0.7.0-unstable.80"
+  checksum: 04adbfcef6a37e8d06ed27c99bdd1039d761d5ad94b185bae3f62c1b36e10d17f79503495f59f2d545723a64aa30e1686ac1b6bf97d1a894abc655019ffbbaa3
+  languageName: node
+  linkType: hard
+
+"@transmute/secp256k1-key-pair@npm:^0.7.0-unstable.80":
+  version: 0.7.0-unstable.80
+  resolution: "@transmute/secp256k1-key-pair@npm:0.7.0-unstable.80"
   dependencies:
     "@bitauth/libauth": ^1.18.1
-    "@transmute/ld-key-pair": ^0.7.0-unstable.79
+    "@transmute/ld-key-pair": ^0.7.0-unstable.80
     secp256k1: ^4.0.2
-  checksum: 711d97106797a323c670b358613600ee8fadcc17f5a93f7fcf0360f52c0341db6275482d4843787ac07b0d2ca9ef6e5a58a04705521170ef9436a4985d55a305
+  checksum: fb7f82baf2b90b96677c4ff1d1ebf7d2135b958e7dc73f8c752acc126aa10b6ed7c4030812b70a714878cadccefc47e261d738d9c5318ce600a113401b0d975a
   languageName: node
   linkType: hard
 
-"@transmute/security-context@npm:^0.7.0-unstable.79":
-  version: 0.7.0-unstable.79
-  resolution: "@transmute/security-context@npm:0.7.0-unstable.79"
-  checksum: 2fbe904282383a444692d62d5f6f4f75e70478357e54e88bd6a78192caef4d47e62c0b4943232b0ef6d8747b3a9be2fc28c2908658cb5be7d7915d8eb4d93cbd
+"@transmute/security-context@npm:^0.7.0-unstable.80":
+  version: 0.7.0-unstable.80
+  resolution: "@transmute/security-context@npm:0.7.0-unstable.80"
+  checksum: c7902d433da8bb3380fe3b3344d400a77caf396a6cea29a00f11d26e934f50f34d238e9adbe7638ece2c968869d0f64d611aab5cf82ebc50c0f400c40949501a
   languageName: node
   linkType: hard
 
-"@transmute/web-crypto-key-pair@npm:^0.7.0-unstable.79":
-  version: 0.7.0-unstable.79
-  resolution: "@transmute/web-crypto-key-pair@npm:0.7.0-unstable.79"
+"@transmute/web-crypto-key-pair@npm:^0.7.0-unstable.80":
+  version: 0.7.0-unstable.80
+  resolution: "@transmute/web-crypto-key-pair@npm:0.7.0-unstable.80"
   dependencies:
     "@peculiar/webcrypto": ^1.1.6
-    "@transmute/ld-key-pair": ^0.7.0-unstable.79
+    "@transmute/ld-key-pair": ^0.7.0-unstable.80
     big-integer: ^1.6.48
-  checksum: 7b690a08d0c40c8093e88cf04bae724302b890a21e1268d53f8f057e8ea500b4e8d96a84f5c0acf86ae7a2982962f5e01f67b3bddbc087c605c831b01b1aec28
+  checksum: a3e0acce3b58ce959f08492712225c132c9a1f4b684b85d738beb095a526ab9248979add91e81b47d5e27229a4921e2faabefc251a3fd049336ac1370b03a1fc
   languageName: node
   linkType: hard
 
-"@transmute/x25519-key-pair@npm:^0.7.0-unstable.2, @transmute/x25519-key-pair@npm:^0.7.0-unstable.79":
+"@transmute/x25519-key-pair@npm:^0.7.0-unstable.2":
   version: 0.7.0-unstable.79
   resolution: "@transmute/x25519-key-pair@npm:0.7.0-unstable.79"
   dependencies:
     "@stablelib/x25519": ^1.0.0
     "@transmute/ld-key-pair": ^0.7.0-unstable.79
   checksum: 918738e5bfe7942be048a3e7a943a835232b9d600a29aa4279715ad18dd91a605dbec7570b60bcc58944fd797bfb43cb188c2b3277c02c7cdd3d95c2303e4e88
+  languageName: node
+  linkType: hard
+
+"@transmute/x25519-key-pair@npm:^0.7.0-unstable.80":
+  version: 0.7.0-unstable.80
+  resolution: "@transmute/x25519-key-pair@npm:0.7.0-unstable.80"
+  dependencies:
+    "@stablelib/x25519": ^1.0.0
+    "@transmute/ld-key-pair": ^0.7.0-unstable.80
+  checksum: d5985d7970637220d91ee6238ab5fdf7ef42ace66b798be91e31f041e9feed5c401ff76db33ed38a98f9c91539619c90d23fa47c67e1b61a3b95dcec648ea0e6
   languageName: node
   linkType: hard
 
@@ -4892,6 +4961,7 @@ __metadata:
     "@metamask/eslint-config-nodejs": ^10.0.0
     "@metamask/eslint-config-typescript": ^10.0.0
     "@metamask/providers": ^9.0.0
+    "@react-oauth/google": ^0.7.0
     "@svgr/webpack": ^6.4.0
     "@testing-library/dom": ^8.17.1
     "@testing-library/jest-dom": ^5.16.4
@@ -4915,12 +4985,10 @@ __metadata:
     eslint-plugin-jsdoc: ^39.2.9
     eslint-plugin-node: ^11.1.0
     eslint-plugin-prettier: ^4.2.1
-    gapi-script: ^1.2.0
     gatsby: ^4.24.4
     gatsby-plugin-manifest: ^4.24.0
     gatsby-plugin-styled-components: ^5.24.0
     gatsby-plugin-svgr: ^3.0.0-beta.0
-    googleapis: ^110.0.0
     prettier: ^2.2.1
     prettier-plugin-packagejson: ^2.2.18
     react: ^18.2.0
@@ -4964,6 +5032,7 @@ __metadata:
     "@babel/plugin-proposal-class-properties": ^7.18.6
     "@babel/plugin-proposal-decorators": ^7.20.7
     "@babel/plugin-proposal-private-methods": ^7.18.6
+    "@babel/plugin-syntax-import-assertions": ^7.20.0
     "@babel/plugin-transform-flow-strip-types": ^7.19.0
     "@babel/preset-env": ^7.20.2
     "@babel/preset-typescript": ^7.18.6
@@ -4988,17 +5057,18 @@ __metadata:
     "@types/uuid": ^9.0.0
     "@typescript-eslint/eslint-plugin": ^5.33.0
     "@typescript-eslint/parser": ^5.33.0
-    "@veramo/core": next
-    "@veramo/credential-eip712": next
-    "@veramo/credential-ld": next
-    "@veramo/credential-w3c": next
-    "@veramo/did-jwt": next
-    "@veramo/did-manager": next
-    "@veramo/did-resolver": next
-    "@veramo/key-manager": next
-    "@veramo/kms-local": next
-    "@veramo/message-handler": next
-    "@veramo/selective-disclosure": next
+    "@veramo/core": 5.0.1-next.12
+    "@veramo/credential-eip712": 5.0.1-next.12
+    "@veramo/credential-ld": 5.0.1-next.12
+    "@veramo/credential-w3c": 5.0.1-next.12
+    "@veramo/did-jwt": 5.0.1-next.12
+    "@veramo/did-manager": 5.0.1-next.12
+    "@veramo/did-provider-pkh": 5.0.1-next.12
+    "@veramo/did-resolver": 5.0.1-next.12
+    "@veramo/key-manager": 5.0.1-next.12
+    "@veramo/kms-local": 5.0.1-next.12
+    "@veramo/message-handler": 5.0.1-next.12
+    "@veramo/selective-disclosure": 5.0.1-next.12
     babel-loader: ^9.1.0
     bignumber.js: ^9.1.0
     caip: ^1.1.0
@@ -5865,6 +5935,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@veramo/core-types@npm:^5.0.1-next.12+44bb3650, @veramo/core-types@npm:^5.0.1-next.14+19cccc1f":
+  version: 5.0.1-next.14
+  resolution: "@veramo/core-types@npm:5.0.1-next.14"
+  dependencies:
+    credential-status: ^2.0.5
+    debug: ^4.3.3
+    did-jwt-vc: ^3.1.0
+    did-resolver: ^4.0.1
+  checksum: 0e657607c76464a5434e414374dea7aaf90e331ab9c8280bf2f03d6578e7078563e70b563ab8e6fd2c0ff08429aefb17c9ddb5c2e766c37303d33079586d4ab8
+  languageName: node
+  linkType: hard
+
+"@veramo/core@npm:5.0.1-next.12":
+  version: 5.0.1-next.12
+  resolution: "@veramo/core@npm:5.0.1-next.12"
+  dependencies:
+    "@veramo/core-types": ^5.0.1-next.12+44bb3650
+    debug: ^4.3.4
+    events: ^3.2.0
+    z-schema: ^5.0.5
+  checksum: e6c68bc649e61d85dff306109c98f26f70ab622fb1451c8ec44b92575e3e55b160be2daedc01232daf4d4b5473ae66ed27a8cf78dc1f9cf04e8f4a47c485a6ed
+  languageName: node
+  linkType: hard
+
 "@veramo/core@npm:^4.1.1":
   version: 4.2.0
   resolution: "@veramo/core@npm:4.2.0"
@@ -5879,67 +5973,76 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@veramo/core@npm:^4.2.1-next.7+a4209f5f, @veramo/core@npm:next":
-  version: 4.2.1-next.7
-  resolution: "@veramo/core@npm:4.2.1-next.7"
-  dependencies:
-    credential-status: ^2.0.5
-    debug: ^4.3.3
-    did-jwt-vc: ^3.1.0
-    did-resolver: ^4.0.1
-    events: ^3.2.0
-    z-schema: ^5.0.2
-  checksum: 6353cd9f513fa71c4878a9c5610929c2a132f583b2f92cb4e2856dec012919acf91f69247242c11ef9536a5d8c7c5b88cb404f5db52f31d42c1e0ac37ce35f38
-  languageName: node
-  linkType: hard
-
-"@veramo/credential-eip712@npm:next":
-  version: 4.2.1-next.7
-  resolution: "@veramo/credential-eip712@npm:4.2.1-next.7"
+"@veramo/credential-eip712@npm:5.0.1-next.12":
+  version: 5.0.1-next.12
+  resolution: "@veramo/credential-eip712@npm:5.0.1-next.12"
   dependencies:
     "@metamask/eth-sig-util": ^5.0.0
-    "@veramo/core": ^4.2.1-next.7+a4209f5f
-    "@veramo/utils": ^4.2.1-next.7+a4209f5f
+    "@veramo/core-types": ^5.0.1-next.12+44bb3650
+    "@veramo/utils": ^5.0.1-next.12+44bb3650
     debug: ^4.3.3
     eip-712-types-generation: ^0.1.6
-  checksum: 90f7a08235240b312700934f6e3480c99c0933b63c82e5b6e4ef47948d4f634d7f87b4871f6704aa4b91d22a3863d9c4913b4c977d285c83757cf0afe2982445
+  checksum: c6f7bb3e66cd4965c67d34eb355d92550268a4d5d0ab602e0caa728711625c5996929deece52dccb19623090939dda24d11b26f21d267da39d683f5dac1fc14e
   languageName: node
   linkType: hard
 
-"@veramo/credential-ld@npm:^4.2.1-next.7+a4209f5f, @veramo/credential-ld@npm:next":
-  version: 4.2.1-next.7
-  resolution: "@veramo/credential-ld@npm:4.2.1-next.7"
+"@veramo/credential-ld@npm:5.0.1-next.12":
+  version: 5.0.1-next.12
+  resolution: "@veramo/credential-ld@npm:5.0.1-next.12"
   dependencies:
     "@digitalcredentials/ed25519-signature-2020": ^3.0.2
+    "@digitalcredentials/ed25519-verification-key-2020": ^4.0.0
     "@digitalcredentials/jsonld": ^5.2.1
     "@digitalcredentials/jsonld-signatures": ^9.3.1
     "@digitalcredentials/vc": ^5.0.0
-    "@transmute/credentials-context": ^0.7.0-unstable.67
-    "@transmute/ed25519-signature-2018": ^0.7.0-unstable.67
-    "@transmute/json-web-signature": ^0.7.0-unstable.67
+    "@transmute/credentials-context": ^0.7.0-unstable.79
+    "@transmute/ed25519-signature-2018": ^0.7.0-unstable.79
+    "@transmute/json-web-signature": ^0.7.0-unstable.79
     "@veramo-community/lds-ecdsa-secp256k1-recovery2020": "github:uport-project/EcdsaSecp256k1RecoverySignature2020"
-    "@veramo/core": ^4.2.1-next.7+a4209f5f
-    "@veramo/did-resolver": ^4.2.1-next.7+a4209f5f
-    "@veramo/utils": ^4.2.1-next.7+a4209f5f
+    "@veramo/core-types": ^5.0.1-next.12+44bb3650
+    "@veramo/utils": ^5.0.1-next.12+44bb3650
+    cross-fetch: ^3.1.5
     debug: ^4.3.3
     did-resolver: ^4.0.1
     uint8arrays: ^3.0.0
-  checksum: cebf9fa7e808209534326481841bd46d72b4670c66d463cdbc6f614c951d19db37090bc318c81610d8b3ca93595350972bf7678a91181114e4e7d818f12ab1b7
+  checksum: baa863ce955f60cbb40e8ca9dd3c570ca3e58bdf1cd3e86597861d86e226b43507173b709ea416653dfa41cc48ff38dabb03d505462702112f3665aed517b2b9
   languageName: node
   linkType: hard
 
-"@veramo/credential-w3c@npm:^4.2.1-next.7+a4209f5f, @veramo/credential-w3c@npm:next":
-  version: 4.2.1-next.7
-  resolution: "@veramo/credential-w3c@npm:4.2.1-next.7"
+"@veramo/credential-ld@npm:^5.0.1-next.12+44bb3650":
+  version: 5.0.1-next.14
+  resolution: "@veramo/credential-ld@npm:5.0.1-next.14"
   dependencies:
-    "@veramo/core": ^4.2.1-next.7+a4209f5f
-    "@veramo/credential-ld": ^4.2.1-next.7+a4209f5f
-    "@veramo/did-jwt": ^4.2.1-next.7+a4209f5f
-    "@veramo/did-resolver": ^4.2.1-next.7+a4209f5f
-    "@veramo/message-handler": ^4.2.1-next.7+a4209f5f
-    "@veramo/utils": ^4.2.1-next.7+a4209f5f
+    "@digitalcredentials/ed25519-signature-2020": ^3.0.2
+    "@digitalcredentials/ed25519-verification-key-2020": ^4.0.0
+    "@digitalcredentials/jsonld": ^5.2.1
+    "@digitalcredentials/jsonld-signatures": ^9.3.1
+    "@digitalcredentials/vc": ^5.0.0
+    "@transmute/credentials-context": ^0.7.0-unstable.79
+    "@transmute/ed25519-signature-2018": ^0.7.0-unstable.79
+    "@transmute/json-web-signature": ^0.7.0-unstable.79
+    "@veramo-community/lds-ecdsa-secp256k1-recovery2020": "github:uport-project/EcdsaSecp256k1RecoverySignature2020"
+    "@veramo/core-types": ^5.0.1-next.14+19cccc1f
+    "@veramo/utils": ^5.0.1-next.14+19cccc1f
+    cross-fetch: ^3.1.5
+    debug: ^4.3.3
+    did-resolver: ^4.0.1
+    uint8arrays: ^3.0.0
+  checksum: 825a8b61ce3efce227116d4800a766d51f91310f3e7fa98fe31c75fa6cb8ad374ed5f05eb6779a70e08fc1f7c2fb74e4658aa1c6812e0e9c32fa1122a18aa957
+  languageName: node
+  linkType: hard
+
+"@veramo/credential-w3c@npm:5.0.1-next.12":
+  version: 5.0.1-next.12
+  resolution: "@veramo/credential-w3c@npm:5.0.1-next.12"
+  dependencies:
+    "@veramo/core-types": ^5.0.1-next.12+44bb3650
+    "@veramo/credential-ld": ^5.0.1-next.12+44bb3650
+    "@veramo/message-handler": ^5.0.1-next.12+44bb3650
+    "@veramo/utils": ^5.0.1-next.12+44bb3650
     canonicalize: ^1.0.8
     debug: ^4.3.3
+    did-jwt: ^6.11.0
     did-jwt-vc: ^3.1.0
     did-resolver: ^4.0.1
     uint8arrays: ^3.0.0
@@ -5947,75 +6050,120 @@ __metadata:
   dependenciesMeta:
     "@veramo/credential-ld":
       optional: true
-  checksum: 76b11136614778401bce2c206adf431a0a0957da393691e21970f3d5b3a531d43384314b13b85fb073d6c6b4fee9d6966231e6687d9e0f9570986861f2dce86e
+  checksum: 7c14a9e73cece759aeaabd164cf2d2e9df2b7cf0620d372eb192b32f615b933a24175cc75ac41b2c2634fc73dae7cd6b47fcbc737d774bc24d8686c20406f933
   languageName: node
   linkType: hard
 
-"@veramo/did-discovery@npm:^4.2.1-next.7+a4209f5f":
-  version: 4.2.1-next.7
-  resolution: "@veramo/did-discovery@npm:4.2.1-next.7"
+"@veramo/did-discovery@npm:^5.0.1-next.12+44bb3650, @veramo/did-discovery@npm:^5.0.1-next.14+19cccc1f":
+  version: 5.0.1-next.14
+  resolution: "@veramo/did-discovery@npm:5.0.1-next.14"
   dependencies:
-    "@veramo/core": ^4.2.1-next.7+a4209f5f
+    "@veramo/core-types": ^5.0.1-next.14+19cccc1f
     debug: ^4.3.3
-  checksum: 1bf992980208b844ecf37405eafbcd19dddf71477da463fb842aab89e54bcd02384aa99e5ea09d20821d22afc0aae3c6556731e0488aa8cf884b7e769b6b40c5
+  checksum: 56b42028d160a60891a816d801c92dbfa914efdf21ddf417aad1d0d6c9915e1c90387ba64caee39287328c91ae5ec6c595f982555a049ac367c69edb8e79be24
   languageName: node
   linkType: hard
 
-"@veramo/did-jwt@npm:^4.2.1-next.7+a4209f5f, @veramo/did-jwt@npm:next":
-  version: 4.2.1-next.7
-  resolution: "@veramo/did-jwt@npm:4.2.1-next.7"
+"@veramo/did-jwt@npm:5.0.1-next.12":
+  version: 5.0.1-next.12
+  resolution: "@veramo/did-jwt@npm:5.0.1-next.12"
   dependencies:
-    "@veramo/core": ^4.2.1-next.7+a4209f5f
-    "@veramo/message-handler": ^4.2.1-next.7+a4209f5f
+    "@veramo/core-types": ^5.0.1-next.12+44bb3650
+    "@veramo/message-handler": ^5.0.1-next.12+44bb3650
     debug: ^4.3.3
     did-jwt: ^6.9.0
     did-resolver: ^4.0.1
-  checksum: f3d62eef2d60af466b753134dce28b913a1a2577e7d0e345451bde732ce4ce491618c11290b36a90343102ef995175079c3b96c26e58b32c386ce247df5aaa64
+  checksum: e3d3fe37e623ad5bfcc9f863ed7e7104eed913847cd83de30dfbe33922ba8df3a8b5b06fddbf769acc737f401c524983ec4fef30412e70f4acace496baa79321
   languageName: node
   linkType: hard
 
-"@veramo/did-manager@npm:next":
-  version: 4.2.1-next.7
-  resolution: "@veramo/did-manager@npm:4.2.1-next.7"
+"@veramo/did-manager@npm:5.0.1-next.12":
+  version: 5.0.1-next.12
+  resolution: "@veramo/did-manager@npm:5.0.1-next.12"
   dependencies:
-    "@veramo/core": ^4.2.1-next.7+a4209f5f
-    "@veramo/did-discovery": ^4.2.1-next.7+a4209f5f
-  checksum: 0a29dd8a7586da726d39460c132a472b2f290aa43cefedbb7b40c2d0b43c25fdd1b3ae8fe17a32c2b9b10935a94bbf72bd3b71de2bc40e4a784f95c196a0f63f
+    "@veramo/core-types": ^5.0.1-next.12+44bb3650
+    "@veramo/did-discovery": ^5.0.1-next.12+44bb3650
+  checksum: 8571d6ebdafedc0e036bbe6b0ec9dcb4f0b147151942ccbdc3d0290305d199188858b963796a8e0ce3af257d4a9149ccf1dd95aa5f80c2d4e7a4effee4bdabb9
   languageName: node
   linkType: hard
 
-"@veramo/did-resolver@npm:^4.2.1-next.7+a4209f5f, @veramo/did-resolver@npm:next":
-  version: 4.2.1-next.7
-  resolution: "@veramo/did-resolver@npm:4.2.1-next.7"
+"@veramo/did-manager@npm:^5.0.1-next.12+44bb3650":
+  version: 5.0.1-next.14
+  resolution: "@veramo/did-manager@npm:5.0.1-next.14"
   dependencies:
-    "@veramo/core": ^4.2.1-next.7+a4209f5f
-    "@veramo/utils": ^4.2.1-next.7+a4209f5f
+    "@veramo/core-types": ^5.0.1-next.14+19cccc1f
+    "@veramo/did-discovery": ^5.0.1-next.14+19cccc1f
+  checksum: 3ffa1c9ba9a8fef983e0052be8b673ab62f65ccc06ff5420e9381e2e08a108b971cee87861665dbfe7bccee9a10f3833bd7a9314be3062837c68b05d10f8efa4
+  languageName: node
+  linkType: hard
+
+"@veramo/did-provider-pkh@npm:5.0.1-next.12":
+  version: 5.0.1-next.12
+  resolution: "@veramo/did-provider-pkh@npm:5.0.1-next.12"
+  dependencies:
+    "@ethersproject/abstract-provider": ^5.7.0
+    "@ethersproject/bignumber": ^5.7.0
+    "@ethersproject/signing-key": ^5.7.0
+    "@ethersproject/transactions": ^5.7.0
+    "@veramo/core-types": ^5.0.1-next.12+44bb3650
+    "@veramo/did-manager": ^5.0.1-next.12+44bb3650
+    caip: ^1.1.0
+    debug: ^4.3.3
+    did-resolver: ^4.0.1
+  checksum: eb708e85147329847f51692433e535ef36e50efbfe00d7637d8cc81e8f59229c6c38fb4f7d275943db155a758b53bae7890cc08719e49692fe896e173d6f7edb
+  languageName: node
+  linkType: hard
+
+"@veramo/did-resolver@npm:5.0.1-next.12":
+  version: 5.0.1-next.12
+  resolution: "@veramo/did-resolver@npm:5.0.1-next.12"
+  dependencies:
+    "@veramo/core-types": ^5.0.1-next.12+44bb3650
+    "@veramo/utils": ^5.0.1-next.12+44bb3650
     cross-fetch: ^3.1.4
     debug: ^4.3.3
     did-resolver: ^4.0.1
-  checksum: 175cd9dc9ada277643018f16ff46b33feb194da17297fd659f7642a5fa1fffb7ac924c3d579eb4e52bfc6e607a016e9505834288c8b8afbdd60f15d4f9e30f4b
+  checksum: da3167167e1c9eb8e39debe88bbe1db793f5852e6e01d79a9266059b4d772c3fd50d4c9c5512e2f719dab213e62d06440beb65dd62462da1255d39b2eb6acbaf
   languageName: node
   linkType: hard
 
-"@veramo/key-manager@npm:^4.2.1-next.7+a4209f5f, @veramo/key-manager@npm:next":
-  version: 4.2.1-next.7
-  resolution: "@veramo/key-manager@npm:4.2.1-next.7"
+"@veramo/key-manager@npm:5.0.1-next.12":
+  version: 5.0.1-next.12
+  resolution: "@veramo/key-manager@npm:5.0.1-next.12"
   dependencies:
     "@ethersproject/bytes": ^5.7.0
     "@ethersproject/strings": ^5.7.0
     "@ethersproject/transactions": ^5.7.0
-    "@stablelib/ed25519": ^1.0.2
-    "@veramo/core": ^4.2.1-next.7+a4209f5f
+    "@stablelib/ed25519": ^1.0.3
+    "@veramo/core-types": ^5.0.1-next.12+44bb3650
+    debug: ^4.3.4
     did-jwt: ^6.9.0
     uint8arrays: ^3.0.0
     uuid: ^9.0.0
-  checksum: d3e91b275f118918d3d92640e31c1f7091ab59551dca21be841c17e24138cd7200f156c51674d27d328d09d891e30e82fb806246de816f50a4514d5c67b70744
+  checksum: 6429c906ac8d84d59c4b0b23af14c7a438a8d545a391a8bb10f6cf753cc9422c63d84d7697922dc5b74189261f8cb902b6ed803ff82166f149f179e91b62f834
   languageName: node
   linkType: hard
 
-"@veramo/kms-local@npm:next":
-  version: 4.2.1-next.7
-  resolution: "@veramo/kms-local@npm:4.2.1-next.7"
+"@veramo/key-manager@npm:^5.0.1-next.12+44bb3650":
+  version: 5.0.1-next.14
+  resolution: "@veramo/key-manager@npm:5.0.1-next.14"
+  dependencies:
+    "@ethersproject/bytes": ^5.7.0
+    "@ethersproject/strings": ^5.7.0
+    "@ethersproject/transactions": ^5.7.0
+    "@stablelib/ed25519": ^1.0.3
+    "@veramo/core-types": ^5.0.1-next.14+19cccc1f
+    debug: ^4.3.4
+    did-jwt: ^6.9.0
+    uint8arrays: ^3.0.0
+    uuid: ^9.0.0
+  checksum: f12671b52637c6ee0294856c9e5d52ebbee99ac1366bc396a793524b8f998579f0ed7b1ac145363d2dbadbec194a0f43393dcb1e5018f0f5fe2af2d55a0aaf2f
+  languageName: node
+  linkType: hard
+
+"@veramo/kms-local@npm:5.0.1-next.12":
+  version: 5.0.1-next.12
+  resolution: "@veramo/kms-local@npm:5.0.1-next.12"
   dependencies:
     "@ethersproject/abstract-provider": ^5.7.0
     "@ethersproject/bytes": ^5.7.0
@@ -6024,60 +6172,74 @@ __metadata:
     "@ethersproject/strings": ^5.7.0
     "@ethersproject/transactions": ^5.7.0
     "@ethersproject/wallet": ^5.7.0
-    "@stablelib/ed25519": ^1.0.2
-    "@stablelib/nacl": ^1.0.2
-    "@veramo/core": ^4.2.1-next.7+a4209f5f
-    "@veramo/key-manager": ^4.2.1-next.7+a4209f5f
+    "@stablelib/ed25519": ^1.0.3
+    "@stablelib/nacl": ^1.0.4
+    "@stablelib/random": ^1.0.2
+    "@stablelib/x25519": ^1.0.3
+    "@veramo/core-types": ^5.0.1-next.12+44bb3650
+    "@veramo/key-manager": ^5.0.1-next.12+44bb3650
     base-58: ^0.0.1
     debug: ^4.3.3
     did-jwt: ^6.9.0
     elliptic: ^6.5.4
     uint8arrays: ^3.0.0
-  checksum: f1d4b57158e5ae19f8a0ba1def37062a47a141ae98ad431059294964205fe4a2128d1e6d4c3be2b0310961eb9eddeb018e88c8589c0a07928c077135d57d3843
+  checksum: df7c92381d7138ad844cd40f51da5e7b3a28a1b06d9c845308b306be4450fc7e877a35c08750ca8bd59846098f49badcbcd804c891194c6833dcedf118a70803
   languageName: node
   linkType: hard
 
-"@veramo/message-handler@npm:^4.2.1-next.7+a4209f5f, @veramo/message-handler@npm:next":
-  version: 4.2.1-next.7
-  resolution: "@veramo/message-handler@npm:4.2.1-next.7"
+"@veramo/message-handler@npm:5.0.1-next.12":
+  version: 5.0.1-next.12
+  resolution: "@veramo/message-handler@npm:5.0.1-next.12"
   dependencies:
-    "@veramo/core": ^4.2.1-next.7+a4209f5f
-  checksum: 4e3966226aa75bd66832a6ff2f15f3cc1d449a20ba40f5b2b91b3af4c2b103aca8caad3a4552ca054e2db8b68c74a9fc5faa0e4ccdca4ee18ac5aab7124efd23
+    "@veramo/core-types": ^5.0.1-next.12+44bb3650
+    debug: ^4.3.4
+  checksum: 4ba4f85cbc89fc7f3f585bcbec882759e6f78c7df2bc7d9c60f3086b57581456d38b5a88e01c6e1c7df557171ec3aa4d7e4c6a841f3d70e8b20742aa164321f4
   languageName: node
   linkType: hard
 
-"@veramo/selective-disclosure@npm:next":
-  version: 4.2.1-next.7
-  resolution: "@veramo/selective-disclosure@npm:4.2.1-next.7"
+"@veramo/message-handler@npm:^5.0.1-next.12+44bb3650":
+  version: 5.0.1-next.14
+  resolution: "@veramo/message-handler@npm:5.0.1-next.14"
   dependencies:
-    "@veramo/core": ^4.2.1-next.7+a4209f5f
-    "@veramo/credential-w3c": ^4.2.1-next.7+a4209f5f
-    "@veramo/did-jwt": ^4.2.1-next.7+a4209f5f
-    "@veramo/message-handler": ^4.2.1-next.7+a4209f5f
+    "@veramo/core-types": ^5.0.1-next.14+19cccc1f
+    debug: ^4.3.4
+  checksum: aa3a97c9f85ec5f6085c0f51b0ce34c8cc1ceb031e912b53fe27462b41f552dc392c1839a2fd455b8d2b2e553d4cc20eae9b6e0f00b80603cb13be24f793932e
+  languageName: node
+  linkType: hard
+
+"@veramo/selective-disclosure@npm:5.0.1-next.12":
+  version: 5.0.1-next.12
+  resolution: "@veramo/selective-disclosure@npm:5.0.1-next.12"
+  dependencies:
+    "@veramo/core-types": ^5.0.1-next.12+44bb3650
+    "@veramo/message-handler": ^5.0.1-next.12+44bb3650
+    "@veramo/utils": ^5.0.1-next.12+44bb3650
     debug: ^4.3.3
     did-jwt: ^6.9.0
     uuid: ^9.0.0
-  checksum: 53a5f646986969c0435e79d1b87bbf41cc54a086c4baf85e4902ca6674fbcb85300039160caf6d64655f25fb7040e63bb6304bab2b9ba32dea51f10dacfb03ed
+  checksum: 2067b0f59e6edf47790cfb47122e2ebd15aa58f130a080cfff14e9ec7a729d78012f9200e1eb9a5137f41bf373891c0833e99facebb7fcd2bde9e6e275d8a3d8
   languageName: node
   linkType: hard
 
-"@veramo/utils@npm:^4.2.1-next.7+a4209f5f":
-  version: 4.2.1-next.7
-  resolution: "@veramo/utils@npm:4.2.1-next.7"
+"@veramo/utils@npm:^5.0.1-next.12+44bb3650, @veramo/utils@npm:^5.0.1-next.14+19cccc1f":
+  version: 5.0.1-next.14
+  resolution: "@veramo/utils@npm:5.0.1-next.14"
   dependencies:
+    "@ethersproject/signing-key": ^5.7.0
     "@ethersproject/transactions": ^5.7.0
-    "@stablelib/ed25519": ^1.0.2
-    "@veramo/core": ^4.2.1-next.7+a4209f5f
+    "@stablelib/ed25519": ^1.0.3
+    "@veramo/core-types": ^5.0.1-next.14+19cccc1f
     blakejs: ^1.1.1
-    cross-fetch: ^3.1.4
+    credential-status: ^2.0.5
+    cross-fetch: ^3.1.5
     debug: ^4.3.3
     did-jwt: ^6.9.0
     did-jwt-vc: ^3.1.0
     did-resolver: ^4.0.1
     elliptic: ^6.5.4
-    multiformats: 9.9.0
+    multiformats: ^9.9.0
     uint8arrays: ^3.0.0
-  checksum: 2bcf55c524aa508272f43ec4c60c73871c72db3701dd4e83edbe1d73ac935086f5df9de861daf606d508f5a087d2f89f4ef46b29a7c5ddc0ce796258e2fd5c10
+  checksum: fc182c0f5b79feb202f530ee950d84520bb7365da88787e69c1bdacbd5eb782bd295fa4c2a9ccd7d74932c702f7b5b2a81a9cdeb81e9b32808ea3968a505bd9b
   languageName: node
   linkType: hard
 
@@ -6776,7 +6938,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"arrify@npm:^2.0.0, arrify@npm:^2.0.1":
+"arrify@npm:^2.0.1":
   version: 2.0.1
   resolution: "arrify@npm:2.0.1"
   checksum: 067c4c1afd182806a82e4c1cb8acee16ab8b5284fbca1ce29408e6e91281c36bb5b612f6ddfbd40a0f7a7e0c75bf2696eb94c027f6e328d6e9c52465c98e4209
@@ -7346,6 +7508,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"base-x@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "base-x@npm:4.0.0"
+  checksum: b25db9e07eb1998472a20557c7f00c797dc0595f79df95155ab74274e7fa98b9f2659b3ee547ac8773666b7f69540656793aeb97ad2b1ceccdb6fa5faaf69ac0
+  languageName: node
+  linkType: hard
+
 "base64-arraybuffer@npm:0.1.4":
   version: 0.1.4
   resolution: "base64-arraybuffer@npm:0.1.4"
@@ -7429,7 +7598,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bignumber.js@npm:^9.0.0, bignumber.js@npm:^9.1.0":
+"bignumber.js@npm:^9.1.0":
   version: 9.1.1
   resolution: "bignumber.js@npm:9.1.1"
   checksum: ad243b7e2f9120b112d670bb3d674128f0bd2ca1745b0a6c9df0433bd2c0252c43e6315d944c2ac07b4c639e7496b425e46842773cf89c6a2dcd4f31e5c4b11e
@@ -7773,13 +7942,6 @@ __metadata:
   dependencies:
     node-int64: ^0.4.0
   checksum: 9ba4dc58ce86300c862bffc3ae91f00b2a03b01ee07f3564beeeaf82aa243b8b03ba53f123b0b842c190d4399b94697970c8e7cf7b1ea44b61aa28c3526a4449
-  languageName: node
-  linkType: hard
-
-"buffer-equal-constant-time@npm:1.0.1":
-  version: 1.0.1
-  resolution: "buffer-equal-constant-time@npm:1.0.1"
-  checksum: 80bb945f5d782a56f374b292770901065bad21420e34936ecbe949e57724b4a13874f735850dd1cc61f078773c4fb5493a41391e7bda40d1fa388d6bd80daaab
   languageName: node
   linkType: hard
 
@@ -9544,6 +9706,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"did-jwt@npm:^6.11.0":
+  version: 6.11.1
+  resolution: "did-jwt@npm:6.11.1"
+  dependencies:
+    "@stablelib/ed25519": ^1.0.2
+    "@stablelib/random": ^1.0.1
+    "@stablelib/sha256": ^1.0.1
+    "@stablelib/x25519": ^1.0.2
+    "@stablelib/xchacha20poly1305": ^1.0.1
+    bech32: ^2.0.0
+    canonicalize: ^1.0.8
+    did-resolver: ^4.0.0
+    elliptic: ^6.5.4
+    js-sha3: ^0.8.0
+    multiformats: ^9.6.5
+    uint8arrays: ^3.0.0
+  checksum: 35be4ff16c699d5aaf6302f6ecf1459da86da868c2c3c2b018d8b20e355beac8809e03de919a500c8868ebd537ff880913f39e6e75d412c6b49b9443978b5cb7
+  languageName: node
+  linkType: hard
+
 "did-jwt@npm:^6.3.0, did-jwt@npm:^6.6.0, did-jwt@npm:^6.9.0":
   version: 6.11.0
   resolution: "did-jwt@npm:6.11.0"
@@ -9778,15 +9960,6 @@ __metadata:
     jsbn: ~0.1.0
     safer-buffer: ^2.1.0
   checksum: 22fef4b6203e5f31d425f5b711eb389e4c6c2723402e389af394f8411b76a488fa414d309d866e2b577ce3e8462d344205545c88a8143cc21752a5172818888a
-  languageName: node
-  linkType: hard
-
-"ecdsa-sig-formatter@npm:1.0.11, ecdsa-sig-formatter@npm:^1.0.11":
-  version: 1.0.11
-  resolution: "ecdsa-sig-formatter@npm:1.0.11"
-  dependencies:
-    safe-buffer: ^5.0.1
-  checksum: 207f9ab1c2669b8e65540bce29506134613dd5f122cccf1e6a560f4d63f2732d427d938f8481df175505aad94583bcb32c688737bb39a6df0625f903d6d93c03
   languageName: node
   linkType: hard
 
@@ -11027,7 +11200,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"extend@npm:^3.0.2, extend@npm:~3.0.2":
+"extend@npm:~3.0.2":
   version: 3.0.2
   resolution: "extend@npm:3.0.2"
   checksum: a50a8309ca65ea5d426382ff09f33586527882cf532931cb08ca786ea3146c0553310bda688710ff61d7668eba9f96b923fe1420cdf56a2c3eaf30fcab87b515
@@ -11123,7 +11296,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-text-encoding@npm:^1.0.0, fast-text-encoding@npm:^1.0.3":
+"fast-text-encoding@npm:^1.0.3":
   version: 1.0.6
   resolution: "fast-text-encoding@npm:1.0.6"
   checksum: 9d58f694314b3283e785bf61954902536da228607ad246905e30256f9ab8331f780ac987e7222c9f5eafd04168d07e12b8054c85cedb76a2c05af0e82387a903
@@ -11369,6 +11542,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"foreach@npm:^2.0.4":
+  version: 2.0.6
+  resolution: "foreach@npm:2.0.6"
+  checksum: f7b68494545ee41cbd0b0425ebf5386c265dc38ef2a9b0d5cd91a1b82172e939b4cf9387f8e0ebf6db4e368fc79ed323f2198424d5c774515ac3ed9b08901c0e
+  languageName: node
+  linkType: hard
+
 "forever-agent@npm:~0.6.1":
   version: 0.6.1
   resolution: "forever-agent@npm:0.6.1"
@@ -11597,13 +11777,6 @@ __metadata:
   version: 1.2.3
   resolution: "functions-have-names@npm:1.2.3"
   checksum: c3f1f5ba20f4e962efb71344ce0a40722163e85bee2101ce25f88214e78182d2d2476aa85ef37950c579eb6cf6ee811c17b3101bb84004bb75655f3e33f3fdb5
-  languageName: node
-  linkType: hard
-
-"gapi-script@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "gapi-script@npm:1.2.0"
-  checksum: f61140855e9a4369de15badb2f4568fdd037d949561de5fd86eca379b89423301bc6062748aba6bd1be68a5329f6239ca9c4b6b5fe454ad6046b6b918979d1ba
   languageName: node
   linkType: hard
 
@@ -12132,28 +12305,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"gaxios@npm:^5.0.0, gaxios@npm:^5.0.1":
-  version: 5.0.2
-  resolution: "gaxios@npm:5.0.2"
-  dependencies:
-    extend: ^3.0.2
-    https-proxy-agent: ^5.0.0
-    is-stream: ^2.0.0
-    node-fetch: ^2.6.7
-  checksum: 117036131cc0d0a268d2d99fffe6a6cc6a4e88dd5b77ce23d3f0b4aff1291b8af169dae20e88799adc986cf3ae507acfaeb70f6ceca8c5d6b8c28e3dde5c992a
-  languageName: node
-  linkType: hard
-
-"gcp-metadata@npm:^5.0.0":
-  version: 5.2.0
-  resolution: "gcp-metadata@npm:5.2.0"
-  dependencies:
-    gaxios: ^5.0.0
-    json-bigint: ^1.0.0
-  checksum: 4e7ed589c814bb79cbf052b0eda1d5e219fbee030f4772eca27ec1e6e1faa85ba0ef3b17ea5c3fd51a54fc5429c924b4edbb260ac147701f211fb9807b893544
-  languageName: node
-  linkType: hard
-
 "gensync@npm:^1.0.0-beta.2":
   version: 1.0.0-beta.2
   resolution: "gensync@npm:1.0.0-beta.2"
@@ -12415,58 +12566,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"google-auth-library@npm:^8.0.2":
-  version: 8.7.0
-  resolution: "google-auth-library@npm:8.7.0"
-  dependencies:
-    arrify: ^2.0.0
-    base64-js: ^1.3.0
-    ecdsa-sig-formatter: ^1.0.11
-    fast-text-encoding: ^1.0.0
-    gaxios: ^5.0.0
-    gcp-metadata: ^5.0.0
-    gtoken: ^6.1.0
-    jws: ^4.0.0
-    lru-cache: ^6.0.0
-  checksum: 978d1c5f763aceddbc0218cd76fa578c8ba54a0653cefffaf61847bb8d246ebf26e7fcd276d8885b8a3354c17eef0a11cfae9e60e4df62c01cae4378d4eb78e4
-  languageName: node
-  linkType: hard
-
-"google-p12-pem@npm:^4.0.0":
-  version: 4.0.1
-  resolution: "google-p12-pem@npm:4.0.1"
-  dependencies:
-    node-forge: ^1.3.1
-  bin:
-    gp12-pem: build/src/bin/gp12-pem.js
-  checksum: 59a5026331ea67455672e83770da29f09d979f02e06cb2227ea5916f8cca437887c2d3869f2602a686dc84437886ae9d2ac010780803cbe8e5f161c2d02d8efd
-  languageName: node
-  linkType: hard
-
-"googleapis-common@npm:^6.0.0":
-  version: 6.0.4
-  resolution: "googleapis-common@npm:6.0.4"
-  dependencies:
-    extend: ^3.0.2
-    gaxios: ^5.0.1
-    google-auth-library: ^8.0.2
-    qs: ^6.7.0
-    url-template: ^2.0.8
-    uuid: ^9.0.0
-  checksum: 718db6b533bdbfaef8f50df8ad9c7cf5a145a346dde16601e7380c5a845920c0801fa84b915e82998f9c4fc1ca77022b585fa5e94c3a40ec35600def7b9d94fe
-  languageName: node
-  linkType: hard
-
-"googleapis@npm:^110.0.0":
-  version: 110.0.0
-  resolution: "googleapis@npm:110.0.0"
-  dependencies:
-    google-auth-library: ^8.0.2
-    googleapis-common: ^6.0.0
-  checksum: 4cfa66d007ecca350e9df240a476792654385e878c76d3ca755a5df3898c97cd3256134b788c4765513bca393062f9e033f746245eba45ae189769918d1ccd98
-  languageName: node
-  linkType: hard
-
 "gopd@npm:^1.0.1":
   version: 1.0.1
   resolution: "gopd@npm:1.0.1"
@@ -12581,17 +12680,6 @@ __metadata:
   version: 15.8.0
   resolution: "graphql@npm:15.8.0"
   checksum: 423325271db8858428641b9aca01699283d1fe5b40ef6d4ac622569ecca927019fce8196208b91dd1d8eb8114f00263fe661d241d0eb40c10e5bfd650f86ec5e
-  languageName: node
-  linkType: hard
-
-"gtoken@npm:^6.1.0":
-  version: 6.1.2
-  resolution: "gtoken@npm:6.1.2"
-  dependencies:
-    gaxios: ^5.0.1
-    google-p12-pem: ^4.0.0
-    jws: ^4.0.0
-  checksum: cf3210afe2ccee8feaa06f0c7eb942e217244a8563a1d0a71aa3095eea545015896741c1d48654d8de35b7b07579f93e25e5dfe817f06b7e753646b67f7a4ecf
   languageName: node
   linkType: hard
 
@@ -14416,15 +14504,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"json-bigint@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "json-bigint@npm:1.0.0"
-  dependencies:
-    bignumber.js: ^9.0.0
-  checksum: c67bb93ccb3c291e60eb4b62931403e378906aab113ec1c2a8dd0f9a7f065ad6fd9713d627b732abefae2e244ac9ce1721c7a3142b2979532f12b258634ce6f6
-  languageName: node
-  linkType: hard
-
 "json-buffer@npm:3.0.0":
   version: 3.0.0
   resolution: "json-buffer@npm:3.0.0"
@@ -14457,6 +14536,15 @@ __metadata:
   version: 2.3.1
   resolution: "json-parse-even-better-errors@npm:2.3.1"
   checksum: 798ed4cf3354a2d9ccd78e86d2169515a0097a5c133337807cdf7f1fc32e1391d207ccfc276518cc1d7d8d4db93288b8a50ba4293d212ad1336e52a8ec0a941f
+  languageName: node
+  linkType: hard
+
+"json-pointer@npm:^0.6.2":
+  version: 0.6.2
+  resolution: "json-pointer@npm:0.6.2"
+  dependencies:
+    foreach: ^2.0.4
+  checksum: 668143014b16d7f90e6f0e6c2d756b00b799424f58d750794a79a24cbce595855b224f7861986aaff719579558fbab81fb83c7371f5e24aded9dc33b3838de30
   languageName: node
   linkType: hard
 
@@ -14565,7 +14653,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jsonld@npm:^5.2.0":
+"jsonld@npm:5.2.0":
   version: 5.2.0
   resolution: "jsonld@npm:5.2.0"
   dependencies:
@@ -14614,27 +14702,6 @@ __metadata:
     array-includes: ^3.1.5
     object.assign: ^4.1.3
   checksum: a2ed78cac49a0f0c4be8b1eafe3c5257a1411341d8e7f1ac740debae003de04e5f6372bfcfbd9d082e954ffd99aac85bcda85b7c6bc11609992483f4cdc0f745
-  languageName: node
-  linkType: hard
-
-"jwa@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "jwa@npm:2.0.0"
-  dependencies:
-    buffer-equal-constant-time: 1.0.1
-    ecdsa-sig-formatter: 1.0.11
-    safe-buffer: ^5.0.1
-  checksum: 8f00b71ad5fe94cb55006d0d19202f8f56889109caada2f7eeb63ca81755769ce87f4f48101967f398462e3b8ae4faebfbd5a0269cb755dead5d63c77ba4d2f1
-  languageName: node
-  linkType: hard
-
-"jws@npm:^4.0.0":
-  version: 4.0.0
-  resolution: "jws@npm:4.0.0"
-  dependencies:
-    jwa: ^2.0.0
-    safe-buffer: ^5.0.1
-  checksum: d68d07aa6d1b8cb35c363a9bd2b48f15064d342a5d9dc18a250dbbce8dc06bd7e4792516c50baa16b8d14f61167c19e851fd7f66b59ecc68b7f6a013759765f7
   languageName: node
   linkType: hard
 
@@ -15726,7 +15793,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"multiformats@npm:9.9.0, multiformats@npm:^9.4.2, multiformats@npm:^9.6.5":
+"multiformats@npm:^9.4.2, multiformats@npm:^9.6.5, multiformats@npm:^9.9.0":
   version: 9.9.0
   resolution: "multiformats@npm:9.9.0"
   checksum: d3e8c1be400c09a014f557ea02251a2710dbc9fca5aa32cc702ff29f636c5471e17979f30bdcb0a9cbb556f162a8591dc2e1219c24fc21394a56115b820bb84e
@@ -15895,13 +15962,6 @@ __metadata:
     encoding:
       optional: true
   checksum: 91f57be68e29f9b1382750693619e199733a6936998e6d618f1aa779853ad8fc4a2facf170db7957bf1d2510bad33449edf74b5802713d81b63de5986fa3be00
-  languageName: node
-  linkType: hard
-
-"node-forge@npm:^1.3.1":
-  version: 1.3.1
-  resolution: "node-forge@npm:1.3.1"
-  checksum: 08fb072d3d670599c89a1704b3e9c649ff1b998256737f0e06fbd1a5bf41cae4457ccaee32d95052d80bbafd9ffe01284e078c8071f0267dc9744e51c5ed42a9
   languageName: node
   linkType: hard
 
@@ -17554,7 +17614,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"qs@npm:6.11.0, qs@npm:^6.7.0":
+"qs@npm:6.11.0":
   version: 6.11.0
   resolution: "qs@npm:6.11.0"
   dependencies:
@@ -20342,13 +20402,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"url-template@npm:^2.0.8":
-  version: 2.0.8
-  resolution: "url-template@npm:2.0.8"
-  checksum: 4183fccd74e3591e4154134d4443dccecba9c455c15c7df774f1f1e3fa340fd9bffb903b5beec347196d15ce49c34edf6dec0634a95d170ad6e78c0467d6e13e
-  languageName: node
-  linkType: hard
-
 "url@npm:~0.11.0":
   version: 0.11.0
   resolution: "url@npm:0.11.0"
@@ -21162,7 +21215,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"z-schema@npm:^5.0.2":
+"z-schema@npm:^5.0.2, z-schema@npm:^5.0.5":
   version: 5.0.5
   resolution: "z-schema@npm:5.0.5"
   dependencies:

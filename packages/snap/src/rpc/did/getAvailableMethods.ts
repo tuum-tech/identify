@@ -1,6 +1,10 @@
 import { availableMethods } from '../../types/constants';
 
-/* eslint-disable */
+/**
+ * Function to get available methods.
+ *
+ * @returns Available methods.
+ */
 export function getAvailableMethods(): string[] {
   return availableMethods.map((key) => key);
 }

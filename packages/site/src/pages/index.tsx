@@ -1,3 +1,4 @@
+import { useGoogleLogin } from '@react-oauth/google';
 import { ProofInfo } from '@tuum-tech/identity-snap/src/types/params';
 import {
   IDataManagerClearResult,
@@ -24,6 +25,7 @@ import {
 } from '../config/styles';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
 import {
+  configureGoogleAccount,
   connectHederaAccount,
   connectSnap,
   createVC,
@@ -39,12 +41,11 @@ import {
   resolveDID,
   sendHello,
   shouldDisplayReconnectButton,
+  syncGoogleVCs,
   togglePopups,
-  uploadToGoogleDrive,
   verifyVC,
   verifyVP,
 } from '../utils';
-import { getAccessToken } from '../utils/google';
 import { validHederaChainID } from '../utils/hedera';
 
 const Index = () => {
@@ -52,9 +53,6 @@ const Index = () => {
   const [currentChainId, setCurrentChainId] = useState('');
   const [hederaAccountConnected, setHederaAccountConnected] = useState(false);
 
-  const [hederaPrivateKey, setHederaPrivateKey] = useState(
-    '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c'
-  );
   const [hederaAccountId, setHederaAccountId] = useState('0.0.15215');
 
   const [createVCName, setCreateVCName] = useState('Kiran Pachhai');
@@ -64,8 +62,7 @@ const Index = () => {
   const [vc, setVc] = useState({});
   const [vcIdsToBeRemoved, setVcIdsToBeRemoved] = useState('');
   const [vp, setVp] = useState({});
-  const [fileName, setFileName] = useState('vc.txt');
-  const [content, setContent] = useState('Sample Text');
+  const [loadingState, setLoadingState] = useState<string | null>(null);
 
   useEffect(() => {
     if (!validHederaChainID(currentChainId)) {
@@ -89,26 +86,34 @@ const Index = () => {
     }
   };
 
-  const handleUploadToGoogleDrive = async () => {
+  const handleConfigureGoogleAccount = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setLoadingState('configureGoogleAccount');
+      await configureGoogleAccount(tokenResponse.access_token);
+      alert('Google Account configuration was successful');
+      setLoadingState(null);
+    },
+    onError: (error) => {
+      console.log('Login Failed', error);
+    },
+  });
+
+  const handleSyncGoogleVCs = async () => {
+    setLoadingState('syncGoogleVCs');
     try {
-      const accessToken = await getAccessToken();
-      if (!accessToken) {
-        return;
-      }
-      const saved = await uploadToGoogleDrive(fileName, content, accessToken);
-      console.log('uploaded the VC: ', saved);
+      const resp = await syncGoogleVCs();
+      console.log('Synced with google drive: ', resp);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
+    setLoadingState(null);
   };
 
   const handleConfigureHederaAccountClick = async () => {
+    setLoadingState('connectHederaAccount');
     try {
-      const configured = await connectHederaAccount(
-        hederaPrivateKey,
-        hederaAccountId
-      );
+      const configured = await connectHederaAccount(hederaAccountId);
       console.log('configured: ', configured);
       if (configured) {
         setHederaAccountConnected(true);
@@ -120,6 +125,7 @@ const Index = () => {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
+    setLoadingState(null);
   };
 
   const handleSendHelloClick = async () => {
@@ -207,12 +213,14 @@ const Index = () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
       const options = {
+        // If you want to retrieve VCs from multiple stores, you can pass an array like so:
+        // store: ['snap', 'googleDrive'],
         store: 'snap',
         returnStore: true,
       };
       const vcs = (await getVCs(
         undefined,
-        options
+        options,
       )) as IDataManagerQueryResult[];
       console.log(`Your VCs are: ${JSON.stringify(vcs, null, 4)}`);
       if (vcs.length > 0) {
@@ -239,6 +247,8 @@ const Index = () => {
         nickname: createVCNickname,
       };
       const options = {
+        // If you want to auto save the generated VCs to multiple stores, you can pass an array like so:
+        // store: ['snap', 'googleDrive'],
         store: 'snap',
         returnStore: true,
       };
@@ -246,7 +256,7 @@ const Index = () => {
       const saved = await createVC(vcKey, vcValue, options, credTypes);
       const savedJson = JSON.parse(JSON.stringify(saved));
       if (savedJson.length > 0) {
-        let vcIdsToAdd: any = [];
+        const vcIdsToAdd: any = [];
         savedJson.forEach((data: any) => {
           vcIdsToAdd.push(data.id);
         });
@@ -275,16 +285,16 @@ const Index = () => {
   const handleRemoveVCClick = async () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
-      const vcId = vcIdsToBeRemoved
-        ? vcIdsToBeRemoved.trim().split(',')[0]
-        : '';
+      const id = vcIdsToBeRemoved ? vcIdsToBeRemoved.trim().split(',')[0] : '';
       const options = {
+        // If you want to remove the VCs from multiple stores, you can pass an array like so:
+        // store: ['snap', 'googleDrive'],
         store: 'snap',
       };
       console.log('vcIdsToBeRemoved: ', vcIdsToBeRemoved);
       const isRemoved = (await removeVC(
-        vcId,
-        options
+        id,
+        options,
       )) as IDataManagerDeleteResult[];
       console.log(`Remove VC Result: ${JSON.stringify(isRemoved, null, 4)}`);
       setVcId('');
@@ -299,10 +309,12 @@ const Index = () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
       const options = {
+        // If you want to remove the VCs from multiple stores, you can pass an array like so:
+        // store: ['snap', 'googleDrive'],
         store: 'snap',
       };
       const isRemoved = (await deleteAllVCs(
-        options
+        options,
       )) as IDataManagerClearResult[];
       console.log(`Remove VC Result: ${JSON.stringify(isRemoved, null, 4)}`);
       setVcId('');
@@ -323,7 +335,7 @@ const Index = () => {
       console.log('vcId: ', vcId);
       const vp = (await createVP(
         vcId.trim().split(','),
-        proofInfo
+        proofInfo,
       )) as VerifiablePresentation;
       setVp(vp);
       console.log(`Your VP is: ${JSON.stringify(vp, null, 4)}`);
@@ -425,15 +437,6 @@ const Index = () => {
               form: (
                 <form>
                   <label>
-                    Enter your Hedera Private Key
-                    <input
-                      type="text"
-                      value={hederaPrivateKey}
-                      onChange={(e) => setHederaPrivateKey(e.target.value)}
-                    />
-                  </label>
-                  <br />
-                  <label>
                     Enter your Hedera Account ID
                     <input
                       type="text"
@@ -448,6 +451,7 @@ const Index = () => {
                   buttonText="Connect to Hedera Account"
                   onClick={handleConfigureHederaAccountClick}
                   disabled={!state.installedSnap}
+                  loading={loadingState === 'connectHederaAccount'}
                 />
               ),
             }}
@@ -900,25 +904,41 @@ const Index = () => {
         (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
           <Card
             content={{
-              title: 'todo',
-              description: 'TODO',
-              /* form: (
-              <form>
-                <label>
-                  Enter your Verifiable Presentation
-                  <input
-                    type="text"
-                    value={JSON.stringify(vp)}
-                    onChange={(e) => setVp(e.target.value)}
-                  />
-                </label>
-              </form>
-            ), */
+              title: 'configureGoogleAccount',
+              description: 'Configure Google Account',
+              form: null,
               button: (
                 <SendHelloButton
-                  buttonText="todo"
-                  onClick={handleVerifyVPClick}
+                  buttonText="Configure Google Account"
+                  onClick={handleConfigureGoogleAccount}
                   disabled={!state.installedSnap}
+                  loading={loadingState === 'configureGoogleAccount'}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        ) : (
+          ''
+        )}
+        {/* =============================================================================== */}
+        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
+        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+          <Card
+            content={{
+              title: 'syncGoogleVCs',
+              description: 'Sync VCs with google drive',
+              button: (
+                <SendHelloButton
+                  buttonText="Sync Google VCs"
+                  onClick={handleSyncGoogleVCs}
+                  disabled={!state.installedSnap}
+                  loading={loadingState === 'syncGoogleVCs'}
                 />
               ),
             }}

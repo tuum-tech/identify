@@ -1,8 +1,12 @@
 import { IdentitySnapParams } from '../../interfaces';
 
-/* eslint-disable */
+/**
+ * Function to get Hedera account id.
+ *
+ * @param identitySnapParams - Identity snap params.
+ */
 export async function getHederaAccountId(
-  identitySnapParams: IdentitySnapParams
+  identitySnapParams: IdentitySnapParams,
 ): Promise<string> {
   const { state } = identitySnapParams;
 
