@@ -24,7 +24,8 @@ import {
   Span,
   Subtitle,
 } from '../config/styles';
-import { MetamaskActions, MetaMaskContext } from '../hooks';
+import { MetamaskActions, MetaMaskContext } from '../contexts/MetamaskContext';
+import { VcContext } from '../contexts/VcContext';
 import {
   configureGoogleAccount,
   connectHederaAccount,
@@ -47,6 +48,7 @@ import {
 import { validHederaChainID } from '../utils/hedera';
 import GetCurrentDIDMethod from './cards/GetCurrentDIDMethod';
 import GetDID from './cards/GetDID';
+import GetSpecificVC from './cards/GetSpecificVC';
 import ResolveDID from './cards/ResolveDID';
 
 const Index = () => {
@@ -59,8 +61,7 @@ const Index = () => {
   const [createVCName, setCreateVCName] = useState('Kiran Pachhai');
   const [createVCNickname, setCreateVCNickname] = useState('KP Woods');
 
-  const [vcId, setVcId] = useState('');
-  const [vc, setVc] = useState({});
+  const { vcId, setVcId, vc, setVc } = useContext(VcContext);
   const [vcIdsToBeRemoved, setVcIdsToBeRemoved] = useState('');
   const [vp, setVp] = useState({});
   const [loadingState, setLoadingState] = useState<string | null>(null);
@@ -143,31 +144,6 @@ const Index = () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
       await togglePopups();
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
-  const handleGetSpecificVCClick = async () => {
-    try {
-      setCurrentChainId(await getCurrentNetwork());
-      const filter = {
-        type: 'id',
-        filter: vcId ? vcId.trim().split(',')[0] : undefined,
-      };
-      const options = {
-        store: 'snap',
-        returnStore: true,
-      };
-      const vcs = (await getVCs(filter, options)) as IDataManagerQueryResult[];
-      console.log(`Your VC is: ${JSON.stringify(vcs, null, 4)}`);
-      if (vcs.length > 0) {
-        const keys = vcs.map((vc: { metadata: any }) => vc.metadata.id);
-        if (keys.length > 0) {
-          setVc(vcs[keys.length - 1].data as IDataManagerQueryResult);
-        }
-      }
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -500,43 +476,11 @@ const Index = () => {
           hederaAccountConnected={hederaAccountConnected}
         />
         {/* =============================================================================== */}
-        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
-        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
-          <Card
-            content={{
-              title: 'getSpecificVC',
-              description: 'Get specific VC of the user',
-              form: (
-                <form>
-                  <label>
-                    Enter your VC Id
-                    <TextInput
-                      rows={2}
-                      value={vcId ? vcId.trim().split(',')[0] : ''}
-                      onChange={(e) => setVcId(e.target.value)}
-                      fullWidth
-                    />
-                  </label>
-                </form>
-              ),
-              button: (
-                <SendHelloButton
-                  buttonText="Retrieve VC"
-                  onClick={handleGetSpecificVCClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        ) : (
-          ''
-        )}
+        <GetSpecificVC
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+          hederaAccountConnected={hederaAccountConnected}
+        />
         {/* =============================================================================== */}
         {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
         (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
