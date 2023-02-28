@@ -1,52 +1,60 @@
-import { SnapProvider } from '@metamask/snap-types';
-import { IdentitySnapState } from 'src/interfaces';
+import { MetaMaskInpageProvider } from '@metamask/providers';
+import { SnapsGlobalObject } from '@metamask/snaps-types';
+import { IdentitySnapParams, IdentitySnapState } from 'src/interfaces';
 import { connectHederaAccount } from '../../src/rpc/hedera/connectHederaAccount';
 import { createVC } from '../../src/rpc/vc/createVC';
 import { getVCs } from '../../src/rpc/vc/getVCs';
 import { getDefaultSnapState } from '../testUtils/constants';
-import { createMockWallet, WalletMock } from '../testUtils/wallet.mock';
+import { createMockSnap, SnapMock } from '../testUtils/snap.mock';
 jest.mock('uuid');
 
-  describe.skip('getVCs', () => {
-    let walletMock: SnapProvider & WalletMock;
+  describe('getVCs', () => {
+     let identitySnapParams: IdentitySnapParams;
     let snapState: IdentitySnapState; 
+    let snapMock: SnapsGlobalObject & SnapMock;
+    type NewType = MetaMaskInpageProvider;
 
-
+    let metamask: NewType;
+    
     beforeEach(async() => {
       snapState = getDefaultSnapState();
-      walletMock = createMockWallet();
-      walletMock.rpcMocks.eth_chainId.mockReturnValue('0x128');
-            
-      // Setup snap confirm return
-      walletMock.rpcMocks.snap_confirm.mockReturnValue(true);
-      
-
+      snapMock = createMockSnap();
+      metamask = snapMock as unknown as MetaMaskInpageProvider;
+      identitySnapParams = {
+        metamask: metamask,
+        snap: snapMock,
+        state: snapState
+      };
+     
       let privateKey = '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c';
-      let connected = await connectHederaAccount(snapState, privateKey, '0.0.15215', walletMock);
+      (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(privateKey);
+      (identitySnapParams.snap as SnapMock).rpcMocks.eth_chainId.mockReturnValue('0x128');
+
+      let connected = await connectHederaAccount(snapMock, snapState, metamask, '0.0.15215');
     });
 
   
 
-    it.skip('should succeed returning VCS', async () => {
+    it('should succeed returning VCS without filter', async () => {
 
-      walletMock.rpcMocks.snap_confirm.mockReturnValue(true);
+      (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(true);
 
-      await createVC(walletMock, snapState, { vcValue: {'prop':10} });
+      await createVC(identitySnapParams, { vcValue: {'prop':10} });
 
-     // console.log("state: " + JSON.stringify(snapState));
-      let vcsReturned  = await getVCs(walletMock, snapState, {});
+      let vcsReturned  = await getVCs(identitySnapParams, {});
       expect(vcsReturned.length).toEqual(1);
 
       expect.assertions(1);
     });
   
 
-     it.skip('should filter Login Type VCs', async () => {
+     it('should filter Login Type VCs', async () => {
 
-      await createVC(walletMock, snapState, { vcValue: {'prop':10}, credTypes: ['Login'] });
-      await createVC(walletMock, snapState, { vcValue: {'prop':20} });
+      (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(true);
+      await createVC(identitySnapParams, { vcValue: {'prop':10}, credTypes: ['Login'] });
+      await createVC(identitySnapParams, { vcValue: {'prop':20} });
 
-      let vcsReturned  = await getVCs(walletMock, snapState, {options: {}, filter: {type: 'vcType', filter:'Login'}});
+      let vcsReturned  = await getVCs(identitySnapParams, {options: {}, filter: {type: 'vcType', filter:'Login'}});
       expect(vcsReturned.length).toEqual(1);
 
       expect.assertions(1);
@@ -54,12 +62,13 @@ jest.mock('uuid');
 
 
     it('should filter VCs by id', async () => {
-
-      await createVC(walletMock, snapState, { vcValue: {'prop':10} });
-      let vcs = await getVCs(walletMock, snapState, {});
+      
+      (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(true);
+      await createVC(identitySnapParams, { vcValue: {'prop':10} });
+      let vcs = await getVCs(identitySnapParams, {});
       let vcId = vcs[0].metadata.id;
 
-      let vcsReturned  = await getVCs(walletMock, snapState, {filter: {type: 'id', filter:vcId}});
+      let vcsReturned  = await getVCs(identitySnapParams, {filter: {type: 'id', filter:vcId}});
       expect(vcsReturned.length).toEqual(1);
 
       expect.assertions(1);
@@ -68,13 +77,12 @@ jest.mock('uuid');
 
      it('should return empty if user rejects confirm', async () => {
 
-      walletMock.rpcMocks.snap_confirm.mockReturnValue(true);
+      (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(true);
+      await createVC(identitySnapParams, { vcValue: {'prop':10} });
 
-      await createVC(walletMock, snapState, { vcValue: {'prop':10} });
+      (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(false);
 
-      walletMock.rpcMocks.snap_confirm.mockReturnValue(false);
-
-      await expect(getVCs(walletMock, snapState, {})).resolves.toStrictEqual([]);
+      await expect(getVCs(identitySnapParams, {})).rejects.toThrowError();
 
       expect.assertions(1);
     });
