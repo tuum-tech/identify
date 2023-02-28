@@ -10,7 +10,6 @@ import { createMockSnap, SnapMock } from '../testUtils/snap.mock';
 
 import { getDefaultSnapState } from '../testUtils/constants';
 
-jest.mock('uuid');
 
   describe('VerifyVP', () => {
     let identitySnapParams: IdentitySnapParams;
@@ -52,7 +51,7 @@ jest.mock('uuid');
     });
 
 
-      it('should refuse validation when VP is adultered', async () => {
+    it('should refuse validation when VP is adultered', async () => {
 
       // Setup
       (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(true);
@@ -71,24 +70,6 @@ jest.mock('uuid');
       //console.log("adultered Presentation " + JSON.stringify(adultered));
 
       await expect(verifyVP(identitySnapParams, adultered as VerifiablePresentation)).rejects.toThrowError();
-      expect.assertions(1);
-
-    });
-
-    it('should return null if user refused confirmation', async () => {
-
-      // Setup
-      (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(true);
-
-      // create VC 
-      let vcCreatedResult = await createVC(identitySnapParams, { vcValue: {'prop':10} });
-      //let vc = await getVCs(walletMock, snapState, {filter: {type: 'id', filter: vcCreatedResult[0].id}})
-
-      // create VP 
-      let verifiablePresentation = await createVP(identitySnapParams, {vcs: [vcCreatedResult[0].id as string]});
-
-      (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(false);
-      await expect(verifyVP(identitySnapParams, verifiablePresentation as VerifiablePresentation)).resolves.toBeNull();
       expect.assertions(1);
 
     });

@@ -9,7 +9,6 @@ import { verifyVC } from '../../src/rpc/vc/verifyVC';
 import { getDefaultSnapState } from '../testUtils/constants';
 import { createMockSnap, SnapMock } from '../testUtils/snap.mock';
 
-jest.mock('uuid');
 
   describe('VerifyVC', () => {
     let identitySnapParams: IdentitySnapParams;

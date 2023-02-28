@@ -2,7 +2,6 @@
 
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
-import { uuid } from 'uuidv4';
 import { IdentitySnapParams, IdentitySnapState } from '../../src/interfaces';
 import { connectHederaAccount } from '../../src/rpc/hedera/connectHederaAccount';
 import { saveVC } from '../../src/rpc/vc/saveVC';
@@ -11,7 +10,6 @@ import { getAgent } from '../../src/veramo/setup';
 import { getDefaultSnapState } from '../testUtils/constants';
 import { getDefaultCredential } from '../testUtils/helper';
 import { createMockSnap, SnapMock } from '../testUtils/snap.mock';
-jest.mock('uuid');
 
   describe('saveVC', () => {
     
@@ -57,12 +55,9 @@ jest.mock('uuid');
       };
 
       let result = await saveVC(identitySnapParams, params);
-      console.log("uuid result "+ uuid());
-
-
       expect(result.length).toBe(1);
 
-      expect.assertions(2);
+      expect.assertions(1);
     });
   
 });

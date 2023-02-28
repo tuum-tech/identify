@@ -8,7 +8,6 @@ import { createVC } from '../../src/rpc/vc/createVC';
 import { createVP } from '../../src/rpc/vc/createVP';
 import { getDefaultSnapState } from '../testUtils/constants';
 import { createMockSnap, SnapMock } from '../testUtils/snap.mock';
-jest.mock('uuid');
 
   describe('createVP', () => {
     

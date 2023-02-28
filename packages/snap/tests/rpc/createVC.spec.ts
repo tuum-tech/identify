@@ -6,7 +6,6 @@ import { createVC } from '../../src/rpc/vc/createVC';
 import { getDefaultSnapState } from '../testUtils/constants';
 import { createMockSnap, SnapMock } from '../testUtils/snap.mock';
 
-jest.mock('uuid');
 
   describe('createVC', () => {
     let identitySnapParams: IdentitySnapParams;
@@ -40,13 +39,15 @@ jest.mock('uuid');
       expect(vcCreatedResult[0].id).not.toBeUndefined(); 
       
 
-      expect.assertions(1);
+      expect.assertions(2);
     });
 
     it('should throw exception if user refused confirmation', async () => {
 
       (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(false);
       await expect(createVC(identitySnapParams, { vcValue: {'prop':10} })).rejects.toThrowError();
+      expect.assertions(1);
+
     });
   
 });

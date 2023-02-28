@@ -5,11 +5,9 @@ import { connectHederaAccount } from '../../src/rpc/hedera/connectHederaAccount'
 import { createVC } from '../../src/rpc/vc/createVC';
 import { getVCs } from '../../src/rpc/vc/getVCs';
 import { removeVC } from '../../src/rpc/vc/removeVC';
+import { getDefaultSnapState } from '../testUtils/constants';
 import { createMockSnap, SnapMock } from '../testUtils/snap.mock';
 
-import { getDefaultSnapState } from '../testUtils/constants';
-
-jest.mock('uuid');
 
   describe('RemoveVC', () => {
    let identitySnapParams: IdentitySnapParams;

@@ -1,11 +1,8 @@
 import { getAvailableMethods } from '../../src/rpc/did/getAvailableMethods';
 
 
-jest.mock('uuid');
 
   describe('GetAvailableMethods', () => {
-    
-
     it('should return all available methods', async () => {
 
       // get  

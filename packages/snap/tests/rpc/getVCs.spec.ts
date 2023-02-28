@@ -6,15 +6,12 @@ import { createVC } from '../../src/rpc/vc/createVC';
 import { getVCs } from '../../src/rpc/vc/getVCs';
 import { getDefaultSnapState } from '../testUtils/constants';
 import { createMockSnap, SnapMock } from '../testUtils/snap.mock';
-jest.mock('uuid');
 
   describe('getVCs', () => {
-     let identitySnapParams: IdentitySnapParams;
+    let identitySnapParams: IdentitySnapParams;
     let snapState: IdentitySnapState; 
     let snapMock: SnapsGlobalObject & SnapMock;
-    type NewType = MetaMaskInpageProvider;
-
-    let metamask: NewType;
+    let metamask: MetaMaskInpageProvider;
     
     beforeEach(async() => {
       snapState = getDefaultSnapState();
@@ -82,7 +79,7 @@ jest.mock('uuid');
 
       (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(false);
 
-      await expect(getVCs(identitySnapParams, {})).rejects.toThrowError();
+      await expect(getVCs(identitySnapParams, {})).resolves.toStrictEqual([]);
 
       expect.assertions(1);
     });

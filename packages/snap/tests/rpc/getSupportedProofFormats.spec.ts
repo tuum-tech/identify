@@ -1,11 +1,9 @@
 import { getSupportedProofFormats } from '../../src/rpc/vc/getSupportedProofFormats';
 
 
-jest.mock('uuid');
 
   describe('GetSupportedProofFormats', () => {
     
-
     it('should return all supported proof formats', async () => {
 
       // get  
@@ -18,7 +16,5 @@ jest.mock('uuid');
       expect.assertions(4);
     
     });
-
-
 
 });

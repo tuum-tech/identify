@@ -1,34 +1,44 @@
-import { SnapProvider } from '@metamask/snap-types';
-import { onRpcRequest } from '../../src';
-import { exampleDIDPkh, getDefaultSnapState } from '../testUtils/constants';
-import { createMockWallet, WalletMock } from '../testUtils/wallet.mock';
+import { MetaMaskInpageProvider } from '@metamask/providers';
+import { SnapsGlobalObject } from '@metamask/snaps-types';
+import { IdentitySnapParams, IdentitySnapState } from '../../src/interfaces';
+import { getDid } from '../../src/rpc/did/getDID';
+import { connectHederaAccount } from '../../src/rpc/hedera/connectHederaAccount';
+import { getDefaultSnapState, hedera_address } from '../testUtils/constants';
+import { createMockSnap, SnapMock } from '../testUtils/snap.mock';
 
-jest.mock('uuid');
 
-  describe.skip('getDID', () => {
-     let walletMock: SnapProvider & WalletMock;
+  describe('getDID', () => {
+      let identitySnapParams: IdentitySnapParams;
+    let snapState: IdentitySnapState; 
+    let snapMock: SnapsGlobalObject & SnapMock;
+    let metamask: MetaMaskInpageProvider;
+    
+    beforeEach(async() => {
+      snapState = getDefaultSnapState();
+      snapMock = createMockSnap();
+      metamask = snapMock as unknown as MetaMaskInpageProvider;
+      identitySnapParams = {
+        metamask: metamask,
+        snap: snapMock,
+        state: snapState
+      };
+     
+      let privateKey = '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c';
+      (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(privateKey);
+      (identitySnapParams.snap as SnapMock).rpcMocks.eth_chainId.mockReturnValue('0x128');
 
-    beforeEach(() => {
-      walletMock = createMockWallet();
-      walletMock.rpcMocks.snap_manageState('update', getDefaultSnapState());
-      //walletMock.rpcMocks.snap_confirm()
-      //global.wallet = walletMock;
+      let connected = await connectHederaAccount(snapMock, snapState, metamask, '0.0.15215');
     });
 
-    it('should succeed returning current did (did:pkh)', async () => {
+
+  it('should return did:pkh', async () => {
+     
       await expect(
-        onRpcRequest({
-          origin: 'localhost',
-          request: {
-            id: 'test-id',
-            jsonrpc: '2.0',
-            method: 'getDID',
-            params: {},
-          },
-        }),
-      ).resolves.toEqual(exampleDIDPkh);
+        getDid(identitySnapParams)
+      ).resolves.toBe(`did:pkh:eip155:296:${hedera_address}`);
 
       expect.assertions(1);
     });
+
   
 });

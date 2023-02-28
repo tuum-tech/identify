@@ -45,7 +45,6 @@ export const getDefaultSnapState = (): IdentitySnapState => {
 export const getSnapStateWithIdentifiers = (): IdentitySnapState => {
   let snapStateWithIdentifiers = getDefaultSnapState();
   return snapStateWithIdentifiers;
-  //snapStateWithIdentifiers.accountState[snapStateWithIdentifiers.currentAccount].identifiers[]
 };
 
 export const snapConfirmParams: SnapConfirmParams = {

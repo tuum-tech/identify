@@ -9,7 +9,6 @@ import {
 } from '@veramo/key-manager';
 import jsonpath from 'jsonpath';
 import { v4 as uuidv4 } from 'uuid';
-import { uuid } from 'uuidv4';
 import { getSnapState, updateSnapState } from '../../rpc/snap/state';
 import { decodeJWT } from '../../utils/jwt';
 import {
@@ -414,15 +413,15 @@ export class SnapVCStore extends AbstractDataStore {
     }
 
     const newId = id || uuidv4();
-    const newUuid = id || uuid();
+    //const newUuid = id || uuid();
     console.log("newID" + newId);
-    console.log("newUuID" + newUuid);
+   // console.log("newUuID" + newUuid);
 
-    state.accountState[account].vcs[newUuid] = vc;
+    state.accountState[account].vcs[newId] = vc;
     await updateSnapState(this.snap, state);
 
 
-    return newUuid;
+    return newId;
   }
 
   async deleteVC({ id }: { id: string }): Promise<boolean> {

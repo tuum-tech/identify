@@ -138,3 +138,4 @@ export type AvailableVCStores = (typeof availableVCStores)[number];
 
 export const availableMethods = ['did:ethr', 'did:pkh'] as const;
 export type AvailableMethods = (typeof availableMethods)[number];
+

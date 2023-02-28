@@ -5,9 +5,6 @@ import { resolveDID } from '../../src/rpc/did/resolveDID';
 import { connectHederaAccount } from '../../src/rpc/hedera/connectHederaAccount';
 import { exampleDIDPkh, getDefaultSnapState } from '../testUtils/constants';
 import { createMockSnap, SnapMock } from '../testUtils/snap.mock';
-jest.mock('uuid');
-
- 
 
   describe('resolveDID', () => {
     let identitySnapParams: IdentitySnapParams;
