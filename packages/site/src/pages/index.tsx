@@ -3,7 +3,6 @@ import { ProofInfo } from '@tuum-tech/identity-snap/src/types/params';
 import {
   IDataManagerClearResult,
   IDataManagerDeleteResult,
-  IDataManagerQueryResult,
 } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
 import { VerifiablePresentation } from '@veramo/core';
 import { useContext, useEffect, useState } from 'react';
@@ -36,7 +35,6 @@ import {
   getCurrentNetwork,
   getHederaAccountId,
   getSnap,
-  getVCs,
   removeVC,
   sendHello,
   shouldDisplayReconnectButton,
@@ -46,6 +44,7 @@ import {
   verifyVP,
 } from '../utils';
 import { validHederaChainID } from '../utils/hedera';
+import GetAllVCs from './cards/GetAllVCs';
 import GetCurrentDIDMethod from './cards/GetCurrentDIDMethod';
 import GetDID from './cards/GetDID';
 import GetSpecificVC from './cards/GetSpecificVC';
@@ -61,8 +60,8 @@ const Index = () => {
   const [createVCName, setCreateVCName] = useState('Kiran Pachhai');
   const [createVCNickname, setCreateVCNickname] = useState('KP Woods');
 
-  const { vcId, setVcId, vc, setVc } = useContext(VcContext);
-  const [vcIdsToBeRemoved, setVcIdsToBeRemoved] = useState('');
+  const { vcId, setVcId, vc, setVc, vcIdsToBeRemoved, setVcIdsToBeRemoved } =
+    useContext(VcContext);
   const [vp, setVp] = useState({});
   const [loadingState, setLoadingState] = useState<string | null>(null);
 
@@ -144,35 +143,6 @@ const Index = () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
       await togglePopups();
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
-  const handleGetVCsClick = async () => {
-    try {
-      setCurrentChainId(await getCurrentNetwork());
-      const options = {
-        // If you want to retrieve VCs from multiple stores, you can pass an array like so:
-        // store: ['snap', 'googleDrive'],
-        store: 'snap',
-        returnStore: true,
-      };
-      const vcs = (await getVCs(
-        undefined,
-        options,
-      )) as IDataManagerQueryResult[];
-      console.log(`Your VCs are: ${JSON.stringify(vcs, null, 4)}`);
-      if (vcs.length > 0) {
-        const keys = vcs.map((vc: { metadata: any }) => vc.metadata.id);
-        if (keys.length > 0) {
-          setVcId(keys.toString());
-          setVcIdsToBeRemoved(keys.toString());
-          setVc(vcs[keys.length - 1].data as IDataManagerQueryResult);
-          alert(`Your VC IDs are: ${keys.toString()}`);
-        }
-      }
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -482,30 +452,12 @@ const Index = () => {
           hederaAccountConnected={hederaAccountConnected}
         />
         {/* =============================================================================== */}
-        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
-        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
-          <Card
-            content={{
-              title: 'getAllVCs',
-              description: 'Get all the VCs of the user',
-              button: (
-                <SendHelloButton
-                  buttonText="Retrieve all VCs"
-                  onClick={handleGetVCsClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        ) : (
-          ''
-        )}
+        <GetAllVCs
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+          hederaAccountConnected={hederaAccountConnected}
+        />
+
         {/* =============================================================================== */}
         {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
         (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (

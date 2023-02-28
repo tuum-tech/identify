@@ -9,14 +9,28 @@ const VcContext = createContext({
   setVc: (vc: any) => {
     console.log('Not initialized', vc);
   },
+  vcIdsToBeRemoved: '',
+  setVcIdsToBeRemoved: (ids: any) => {
+    console.log('Not initialized', ids);
+  },
 });
 
 const VcContextProvider = ({ children }: PropsWithChildren<any>) => {
   const [vcId, setVcId] = useState('');
   const [vc, setVc] = useState({});
+  const [vcIdsToBeRemoved, setVcIdsToBeRemoved] = useState('');
 
   return (
-    <VcContext.Provider value={{ vcId, setVcId, vc, setVc }}>
+    <VcContext.Provider
+      value={{
+        vcId,
+        setVcId,
+        vc,
+        setVc,
+        vcIdsToBeRemoved,
+        setVcIdsToBeRemoved,
+      }}
+    >
       {children}
     </VcContext.Provider>
   );
