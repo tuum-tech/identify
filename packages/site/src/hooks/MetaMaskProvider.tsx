@@ -1,41 +1,12 @@
+import { ReactNode, Reducer, useEffect, useReducer } from 'react';
 import {
-  createContext,
-  Dispatch,
-  ReactNode,
-  Reducer,
-  useEffect,
-  useReducer,
-} from 'react';
-import { Snap } from '../types';
-import { getSnap, isFlask } from '../utils';
-
-export type MetamaskState = {
-  isFlask: boolean;
-  installedSnap?: Snap;
-  error?: Error;
-};
-
-const initialState: MetamaskState = {
-  isFlask: false,
-  error: undefined,
-};
-
-type MetamaskDispatch = { type: MetamaskActions; payload: any };
-
-export const MetaMaskContext = createContext<
-  [MetamaskState, Dispatch<MetamaskDispatch>]
->([
   initialState,
-  () => {
-    /* no op */
-  },
-]);
-
-export enum MetamaskActions {
-  SetInstalled = 'SetInstalled',
-  SetFlaskDetected = 'SetFlaskDetected',
-  SetError = 'SetError',
-}
+  MetamaskActions,
+  MetaMaskContext,
+  MetamaskDispatch,
+  MetamaskState,
+} from '../contexts/MetamaskContext';
+import { getSnap, isFlask } from '../utils';
 
 const reducer: Reducer<MetamaskState, MetamaskDispatch> = (state, action) => {
   switch (action.type) {

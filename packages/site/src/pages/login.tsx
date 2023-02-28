@@ -8,7 +8,7 @@ import {
   getDID,
   getSnap,
   getVCs,
-  saveVC
+  saveVC,
 } from './../utils/snap';
 
 import { ProofInfo } from '@tuum-tech/identity-snap/src/types/params';
@@ -20,7 +20,7 @@ import {
   ConnectButton,
   InstallFlaskButton,
   ReconnectButton,
-  SendHelloButton
+  SendHelloButton,
 } from '../components';
 import {
   CardContainer,
@@ -28,9 +28,9 @@ import {
   ErrorMessage,
   Heading,
   Span,
-  Subtitle
+  Subtitle,
 } from '../config/styles';
-import { MetamaskActions, MetaMaskContext } from '../hooks';
+import { MetamaskActions, MetaMaskContext } from '../contexts/MetamaskContext';
 import { shouldDisplayReconnectButton } from '../utils';
 import { validHederaChainID } from '../utils/hedera';
 
@@ -38,7 +38,7 @@ function LoginPage() {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [hederaAccountConnected, setHederaAccountConnected] = useState(false);
   const [hederaPrivateKey, setHederaPrivateKey] = useState(
-    '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c'
+    '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c',
   );
   const [hederaAccountId, setHederaAccountId] = useState('0.0.15215');
 
@@ -100,9 +100,8 @@ function LoginPage() {
         });
 
         setVC(JSON.stringify(ret.data));
-        if (ret.status === 200){
-          
-          alert("Register user successful");        
+        if (ret.status === 200) {
+          alert('Register user successful');
         }
       }
     })();
@@ -134,7 +133,7 @@ function LoginPage() {
     try {
       const configured = await connectHederaAccount(
         hederaPrivateKey,
-        hederaAccountId
+        hederaAccountId,
       );
       console.log('configured: ', configured);
       if (configured) {
@@ -159,7 +158,7 @@ function LoginPage() {
     // Send a POST request
     if (vc !== '') {
       let parsedVC: VerifiableCredential = JSON.parse(
-        vc
+        vc,
       ) as VerifiableCredential;
       await saveVC(parsedVC);
     }
@@ -171,7 +170,7 @@ function LoginPage() {
       const proofInfo: ProofInfo = {
         proofFormat: 'jwt',
         type: 'ProfileNamesPresentation',
-        challenge: challenge
+        challenge,
       };
       console.log('vcId: ', vcId);
       const vp = (await createVP([vcId], proofInfo)) as VerifiablePresentation;
@@ -180,34 +179,29 @@ function LoginPage() {
       setShowVcsModal(false);
     } catch (e) {
       console.error(e);
-      //dispatch({ type: MetamaskActions.SetError, payload: e });
+      // dispatch({ type: MetamaskActions.SetError, payload: e });
     }
   };
-
 
   const handleChallenge = async () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
-      let identifier = await getDID() as string;
+      let identifier = (await getDID()) as string;
       const backend_url = process.env.GATSBY_BACKEND_URL;
       const ret = await axios({
         method: 'post',
         url: `${backend_url}api/v1/credential/challenge`,
         data: {
-          did: identifier
+          did: identifier,
         },
       });
 
-      if (ret.status === 200){
-        
+      if (ret.status === 200) {
         setChallenge(ret.data.challenge);
-        alert("challenge " + ret.data.challenge);        
+        alert('challenge ' + ret.data.challenge);
       }
-    } catch(e){
-      
-    }
-
-  }
+    } catch (e) {}
+  };
 
   const handleSignIn = async () => {
     try {
@@ -219,9 +213,9 @@ function LoginPage() {
       const vcs = (await getVCs(
         {
           type: 'vcType',
-          filter: 'SiteLoginCredential'
+          filter: 'SiteLoginCredential',
         },
-        options
+        options,
       )) as IDataManagerQueryResult[];
 
       console.log(`Your VCs are: ${JSON.stringify(vcs, null, 4)}`);
@@ -233,7 +227,7 @@ function LoginPage() {
       }
     } catch (e) {
       console.error(e);
-      //dispatch({ type: MetamaskActions.SetError, payload: e });
+      // dispatch({ type: MetamaskActions.SetError, payload: e });
     }
   };
 
@@ -255,7 +249,7 @@ function LoginPage() {
             <div key={cred.metadata.id}>
               <span
                 onClick={() => handleVCClicked(cred.metadata.id)}
-              >{`Login : ${cred.data.credentialSubject.loginName} Issuance: ${cred.data.issuanceDate}` }</span>
+              >{`Login : ${cred.data.credentialSubject.loginName} Issuance: ${cred.data.issuanceDate}`}</span>
             </div>
           ))}
         </Modal.Body>

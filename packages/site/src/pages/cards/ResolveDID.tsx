@@ -1,7 +1,10 @@
 /* eslint-disable no-alert */
 import { FC, useContext } from 'react';
 import { Card, SendHelloButton } from '../../components';
-import { MetamaskActions, MetaMaskContext } from '../../hooks/MetamaskContext';
+import {
+  MetamaskActions,
+  MetaMaskContext,
+} from '../../contexts/MetamaskContext';
 import {
   getCurrentNetwork,
   resolveDID,
