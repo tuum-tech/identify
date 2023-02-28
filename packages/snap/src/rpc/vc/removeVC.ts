@@ -1,9 +1,9 @@
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import { IDataManagerDeleteResult } from 'src/veramo/plugins/verfiable-creds-manager';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
+import { snapDialog } from '../../snap/dialog';
 import { RemoveVCsRequestParams } from '../../types/params';
 import { veramoRemoveVC } from '../../utils/veramoUtils';
-import { snapDialog } from '../snap/utils';
 
 /**
  * Function to remove VC.

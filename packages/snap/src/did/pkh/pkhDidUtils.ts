@@ -1,7 +1,7 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { validHederaChainID } from '../../hedera/config';
 import { IdentitySnapState } from '../../interfaces';
-import { getCurrentNetwork } from '../../rpc/snap/utils';
+import { getCurrentNetwork } from '../../snap/network';
 import { convertChainIdFromHex } from '../../utils/network';
 import { isHederaAccountImported } from '../../utils/params';
 

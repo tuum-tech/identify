@@ -1,8 +1,8 @@
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { heading, panel, text } from '@metamask/snaps-ui';
 import { IdentitySnapState, SnapDialogParams } from '../interfaces';
-import { initSnapState } from '../rpc/snap/state';
-import { snapDialog } from '../rpc/snap/utils';
+import { initSnapState } from '../snap/state';
+import { snapDialog } from '../snap/dialog';
 
 /**
  * Init snap state.

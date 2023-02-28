@@ -2,13 +2,10 @@ import {
   getSnapStateUnchecked,
   initAccountState,
   initSnapState,
-  updateSnapState
-} from '../../src/rpc/snap/state';
+  updateSnapState,
+} from '../../src/snap/state';
 import { getInitialSnapState } from '../../src/utils/config';
-import {
-  address,
-  getDefaultSnapState
-} from '../testUtils/constants';
+import { address, getDefaultSnapState } from '../testUtils/constants';
 import { createMockWallet, WalletMock } from '../testUtils/wallet.mock';
 
 describe.skip('Utils [state]', () => {

@@ -4,10 +4,11 @@ import { heading, panel, text } from '@metamask/snaps-ui';
 import { toHederaAccountInfo } from '../../hedera';
 import { getHederaNetwork, validHederaChainID } from '../../hedera/config';
 import { IdentitySnapState, SnapDialogParams } from '../../interfaces';
+import { snapDialog } from '../../snap/dialog';
+import { getCurrentNetwork } from '../../snap/network';
+import { initAccountState, updateSnapState } from '../../snap/state';
 import { veramoConnectHederaAccount } from '../../utils/veramoUtils';
 import { getAgent } from '../../veramo/setup';
-import { initAccountState, updateSnapState } from '../snap/state';
-import { getCurrentNetwork, snapDialog } from '../snap/utils';
 
 /**
  * Connect Hedera Account.

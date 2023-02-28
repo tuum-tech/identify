@@ -1,6 +1,6 @@
 import { GoogleToken, IdentitySnapParams } from '../../interfaces';
 import { verifyToken } from '../../veramo/plugins/google-drive-data-store';
-import { updateSnapState } from '../snap/state';
+import { updateSnapState } from '../../snap/state';
 
 export const configureGoogleAccount = async (
   identitySnapParams: IdentitySnapParams,

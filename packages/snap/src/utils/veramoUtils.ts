@@ -13,8 +13,8 @@ import {
 import cloneDeep from 'lodash.clonedeep';
 import { validHederaChainID } from '../hedera/config';
 import { IdentitySnapParams, SnapDialogParams } from '../interfaces';
-import { generateVCPanel } from '../rpc/snap/dialogUtils';
-import { getCurrentNetwork, snapDialog } from '../rpc/snap/utils';
+import { generateVCPanel, snapDialog } from '../snap/dialog';
+import { getCurrentNetwork } from '../snap/network';
 import { KeyPair } from '../types/crypto';
 import { CreateVPRequestParams, GetVCsOptions } from '../types/params';
 import {

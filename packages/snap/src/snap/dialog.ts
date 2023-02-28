@@ -1,7 +1,40 @@
+import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { divider, heading, panel, Panel, text } from '@metamask/snaps-ui';
 import { VerifiableCredential } from '@veramo/core';
 import cloneDeep from 'lodash.clonedeep';
-import { IDataManagerQueryResult } from 'src/veramo/plugins/verfiable-creds-manager';
+import { IdentitySnapState, SnapDialogParams } from 'src/interfaces';
+import { IDataManagerQueryResult } from '../veramo/plugins/verfiable-creds-manager';
+import { updateSnapState } from './state';
+
+/**
+ * Function that toggles the disablePopups flag in the config.
+ *
+ * @param snap - Snap.
+ * @param state - IdentitySnapState.
+ */
+export async function updatePopups(
+  snap: SnapsGlobalObject,
+  state: IdentitySnapState,
+) {
+  state.snapConfig.dApp.disablePopups = !state.snapConfig.dApp.disablePopups;
+  await updateSnapState(snap, state);
+}
+
+/**
+ * Function that opens snap dialog.
+ *
+ * @param snap - Snap.
+ * @param params - Snap dialog params.
+ */
+export async function snapDialog(
+  snap: SnapsGlobalObject,
+  params: SnapDialogParams,
+): Promise<string | boolean | null> {
+  return (await snap.request({
+    method: 'snap_dialog',
+    params,
+  })) as boolean;
+}
 
 /**
  * Function to toggle popups.
