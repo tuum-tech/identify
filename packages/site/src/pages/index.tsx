@@ -1,9 +1,6 @@
 import { useGoogleLogin } from '@react-oauth/google';
 import { ProofInfo } from '@tuum-tech/identity-snap/src/types/params';
-import {
-  IDataManagerClearResult,
-  IDataManagerDeleteResult,
-} from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
+import { IDataManagerClearResult } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
 import { VerifiablePresentation } from '@veramo/core';
 import { useContext, useEffect, useState } from 'react';
 
@@ -34,7 +31,6 @@ import {
   getCurrentNetwork,
   getHederaAccountId,
   getSnap,
-  removeVC,
   sendHello,
   shouldDisplayReconnectButton,
   syncGoogleVCs,
@@ -47,6 +43,7 @@ import GetAllVCs from './cards/GetAllVCs';
 import GetCurrentDIDMethod from './cards/GetCurrentDIDMethod';
 import GetDID from './cards/GetDID';
 import GetSpecificVC from './cards/GetSpecificVC';
+import RemoveVC from './cards/RemoveVC';
 import ResolveDID from './cards/ResolveDID';
 import VerifyVC from './cards/VerifyVC';
 
@@ -140,29 +137,6 @@ const Index = () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
       await togglePopups();
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
-  const handleRemoveVCClick = async () => {
-    try {
-      setCurrentChainId(await getCurrentNetwork());
-      const id = vcIdsToBeRemoved ? vcIdsToBeRemoved.trim().split(',')[0] : '';
-      const options = {
-        // If you want to remove the VCs from multiple stores, you can pass an array like so:
-        // store: ['snap', 'googleDrive'],
-        store: 'snap',
-      };
-      console.log('vcIdsToBeRemoved: ', vcIdsToBeRemoved);
-      const isRemoved = (await removeVC(
-        id,
-        options,
-      )) as IDataManagerDeleteResult[];
-      console.log(`Remove VC Result: ${JSON.stringify(isRemoved, null, 4)}`);
-      setVcId('');
-      setVcIdsToBeRemoved('');
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -423,49 +397,12 @@ const Index = () => {
           setCurrentChainId={setCurrentChainId}
           hederaAccountConnected={hederaAccountConnected}
         />
-
         {/* =============================================================================== */}
-        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
-        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
-          <Card
-            content={{
-              title: 'removeVC',
-              description: 'Remove one or more VCs from the snap',
-              form: (
-                <form>
-                  <label>
-                    Enter your VC IDs to be removed separated by a comma
-                    <TextInput
-                      rows={2}
-                      value={
-                        vcIdsToBeRemoved
-                          ? vcIdsToBeRemoved.trim().split(',')[0]
-                          : ''
-                      }
-                      onChange={(e) => setVcIdsToBeRemoved(e.target.value)}
-                      fullWidth
-                    />
-                  </label>
-                </form>
-              ),
-              button: (
-                <SendHelloButton
-                  buttonText="Delete VC"
-                  onClick={handleRemoveVCClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        ) : (
-          ''
-        )}
+        <RemoveVC
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+          hederaAccountConnected={hederaAccountConnected}
+        />
         {/* =============================================================================== */}
         {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
         (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
