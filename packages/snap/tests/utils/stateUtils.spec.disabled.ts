@@ -1,3 +1,4 @@
+import { SnapsGlobalObject } from '@metamask/snaps-types';
 import {
   getSnapStateUnchecked,
   initAccountState,
@@ -9,7 +10,7 @@ import { address, getDefaultSnapState } from '../testUtils/constants';
 import { createMockWallet, WalletMock } from '../testUtils/wallet.mock';
 
 describe.skip('Utils [state]', () => {
-  let walletMock: SnapProvider & WalletMock;
+  let walletMock: SnapsGlobalObject & WalletMock;
 
   beforeEach(() => {
     walletMock = createMockWallet();
@@ -86,7 +87,7 @@ describe.skip('Utils [state]', () => {
     it('should succeed initializing empty account state', async () => {
       const initialState = getInitialSnapState();
       const defaultState = getDefaultSnapState();
-      //defaultState.accountState[address].publicKey = publicKey;
+      //  defaultState.accountState[address].publicKey = publicKey;
 
       await expect(
         initAccountState(walletMock, initialState, address),

@@ -21,8 +21,6 @@
 //     walletMock = createMockWallet();
 //   });
 
-
-
 //   describe.skip('getCurrentNetwork', () => {
 //     it('should succeed for mainnet (0x1)', async () => {
 //       walletMock.rpcMocks.eth_chainId.mockResolvedValue('0x1');

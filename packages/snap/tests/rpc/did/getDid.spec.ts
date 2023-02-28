@@ -3,7 +3,7 @@ import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { IdentitySnapParams, IdentitySnapState } from '../../../src/interfaces';
 import { getDid } from '../../../src/rpc/did/getDID';
 import { connectHederaAccount } from '../../../src/rpc/hedera/connectHederaAccount';
-import { getDefaultSnapState, hedera_address } from '../../testUtils/constants';
+import { getDefaultSnapState, hederaAddress } from '../../testUtils/constants';
 import { createMockSnap, SnapMock } from '../../testUtils/snap.mock';
 
 describe('getDID', () => {
@@ -17,31 +17,27 @@ describe('getDID', () => {
     snapMock = createMockSnap();
     metamask = snapMock as unknown as MetaMaskInpageProvider;
     identitySnapParams = {
-      metamask: metamask,
+      metamask,
       snap: snapMock,
       state: snapState,
     };
 
-    let privateKey =
+    const privateKey =
       '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c';
     (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
       privateKey,
     );
+
     (identitySnapParams.snap as SnapMock).rpcMocks.eth_chainId.mockReturnValue(
       '0x128',
     );
 
-    let connected = await connectHederaAccount(
-      snapMock,
-      snapState,
-      metamask,
-      '0.0.15215',
-    );
+    await connectHederaAccount(snapMock, snapState, metamask, '0.0.15215');
   });
 
   it('should return did:pkh', async () => {
     await expect(getDid(identitySnapParams)).resolves.toBe(
-      `did:pkh:eip155:296:${hedera_address}`,
+      `did:pkh:eip155:296:${hederaAddress}`,
     );
 
     expect.assertions(1);
