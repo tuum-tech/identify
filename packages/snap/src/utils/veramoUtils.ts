@@ -1,4 +1,4 @@
-/* eslint-disable */ 
+/* eslint-disable */
 import { BIP44CoinTypeNode } from '@metamask/key-tree';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import {
@@ -9,7 +9,7 @@ import {
   ProofFormat,
   VerifiableCredential,
   VerifiablePresentation,
-  W3CVerifiableCredential
+  W3CVerifiableCredential,
 } from '@veramo/core';
 import cloneDeep from 'lodash.clonedeep';
 import { validHederaChainID } from '../hedera/config';
@@ -23,7 +23,7 @@ import {
   IDataManagerClearResult,
   IDataManagerDeleteResult,
   IDataManagerQueryResult,
-  IDataManagerSaveResult
+  IDataManagerSaveResult,
 } from '../veramo/plugins/verfiable-creds-manager';
 import { Agent, getAgent } from '../veramo/setup';
 import { getCurrentDid } from './didUtils';
@@ -46,7 +46,6 @@ export async function veramoResolveDID(
 
   // Get agent
   const agent = await getAgent(snap);
-
 
   // GET DID if not exists
   if (!did) {
@@ -188,10 +187,7 @@ export async function veramoCreateVC(
         .googleAccessToken,
   });
 
-  console.log(
-    'save result: ',
-    JSON.stringify(result, null, 4),
-  );
+  console.log('Savede verifiableCredential: ', JSON.stringify(result, null, 4));
   return result;
 }
 
@@ -308,7 +304,6 @@ export async function veramoCreateVP(
   const vcs: VerifiableCredential[] = [];
   const vcsWithMetadata: IDataManagerQueryResult[] = [];
 
-
   for (const vcId of vcsMetadata) {
     const vcObj = (await agent.queryVC({
       filter: {
@@ -317,10 +312,6 @@ export async function veramoCreateVP(
       },
       options: { store: 'snap' },
     })) as IDataManagerQueryResult[];
-
-    
-      console.log("vcs: " + JSON.stringify(vcObj));
-
 
     if (vcObj.length > 0) {
       const vc: VerifiableCredential = vcObj[0].data as VerifiableCredential;
