@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { BIP44CoinTypeNode } from '@metamask/key-tree';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import {
@@ -187,7 +186,7 @@ export async function veramoCreateVC(
         .googleAccessToken,
   });
 
-  console.log('Savede verifiableCredential: ', JSON.stringify(result, null, 4));
+  console.log('Saved verifiableCredential: ', JSON.stringify(result, null, 4));
   return result;
 }
 
@@ -319,6 +318,7 @@ export async function veramoCreateVP(
       vcsWithMetadata.push({ data: vc, metadata: { id: vcId, store: 'snap' } });
     }
   }
+
   if (vcs.length === 0) {
     return null;
   }
