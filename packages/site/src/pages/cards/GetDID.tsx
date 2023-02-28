@@ -3,8 +3,8 @@ import { FC, useContext } from 'react';
 import { Card, SendHelloButton } from '../../components';
 import { MetamaskActions, MetaMaskContext } from '../../hooks/MetamaskContext';
 import {
-  getCurrentDIDMethod,
   getCurrentNetwork,
+  getDID,
   shouldDisplayReconnectButton,
 } from '../../utils';
 import { validHederaChainID } from '../../utils/hedera';
@@ -15,19 +15,19 @@ type Props = {
   hederaAccountConnected: boolean;
 };
 
-const GetCurrentDIDMethod: FC<Props> = ({
+const GetDID: FC<Props> = ({
   currentChainId,
   setCurrentChainId,
   hederaAccountConnected,
 }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
 
-  const handleGetCurrentDIDMethodClick = async () => {
+  const handleGetDIDClick = async () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
-      const currentDIDMethod = await getCurrentDIDMethod();
-      console.log(`Your current DID method is: ${currentDIDMethod}`);
-      alert(`Your current DID method is: ${currentDIDMethod}`);
+      const did = await getDID();
+      console.log(`Your DID is: ${did}`);
+      alert(`Your DID is: ${did}`);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -38,12 +38,12 @@ const GetCurrentDIDMethod: FC<Props> = ({
     (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
     <Card
       content={{
-        title: 'getCurrentDIDMethod',
-        description: 'Get the current DID method to use',
+        title: 'getDID',
+        description: 'Get the current DID of the user',
         button: (
           <SendHelloButton
-            buttonText="Get DID method"
-            onClick={handleGetCurrentDIDMethodClick}
+            buttonText="Get DID"
+            onClick={handleGetDIDClick}
             disabled={!state.installedSnap}
           />
         ),
@@ -58,4 +58,4 @@ const GetCurrentDIDMethod: FC<Props> = ({
   ) : null;
 };
 
-export default GetCurrentDIDMethod;
+export default GetDID;

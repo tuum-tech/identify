@@ -33,7 +33,6 @@ import {
   createVP,
   deleteAllVCs,
   getCurrentNetwork,
-  getDID,
   getHederaAccountId,
   getSnap,
   getVCs,
@@ -48,6 +47,7 @@ import {
 } from '../utils';
 import { validHederaChainID } from '../utils/hedera';
 import GetCurrentDIDMethod from './cards/GetCurrentDIDMethod';
+import GetDID from './cards/GetDID';
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
@@ -143,18 +143,6 @@ const Index = () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
       await togglePopups();
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
-  const handleGetDIDClick = async () => {
-    try {
-      setCurrentChainId(await getCurrentNetwork());
-      const did = await getDID();
-      console.log(`Your DID is: ${did}`);
-      alert(`Your DID is: ${did}`);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -511,30 +499,12 @@ const Index = () => {
           hederaAccountConnected={hederaAccountConnected}
         />
         {/* =============================================================================== */}
-        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
-        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
-          <Card
-            content={{
-              title: 'getDID',
-              description: 'Get the current DID of the user',
-              button: (
-                <SendHelloButton
-                  buttonText="Get DID"
-                  onClick={handleGetDIDClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        ) : (
-          ''
-        )}
+        <GetDID
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+          hederaAccountConnected={hederaAccountConnected}
+        />
+
         {/* =============================================================================== */}
         {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
         (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
