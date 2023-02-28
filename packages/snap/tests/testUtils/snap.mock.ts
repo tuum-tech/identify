@@ -4,7 +4,7 @@ import { SnapsGlobalObject } from '@metamask/snaps-types';
 
 import { providers, Wallet } from 'ethers';
 //import { BIP44CoinTypeNode } from '@metamask/key-tree';
-import { SSISnapState } from '../../src/interfaces';
+import { IdentitySnapState } from '../../src/interfaces';
 import { address, privateKey } from './constants';
 
 interface ISnapMock {
@@ -17,11 +17,11 @@ interface SnapManageState {
 }
 
 export class SnapMock implements ISnapMock {
-  private snapState: SSISnapState | null = null;
+  private snapState: IdentitySnapState | null = null;
 
   private snap: Wallet = new Wallet(privateKey);
 
-  private snapManageState(params: SnapManageState): SSISnapState | null {
+  private snapManageState(params: SnapManageState): IdentitySnapState | null {
     if (!params) {
       return null;
     }
@@ -29,7 +29,7 @@ export class SnapMock implements ISnapMock {
       return this.snapState;
     }
     if (params.operation === 'update') {
-      this.snapState = params.newState as SSISnapState;
+      this.snapState = params.newState as IdentitySnapState;
     } else if (params.operation === 'clear') {
       this.snapState = null;
     }
@@ -77,7 +77,7 @@ export class SnapMock implements ISnapMock {
     snap_manageState: jest
       .fn()
       .mockImplementation((params: unknown) =>
-        this.snapManageState(params as SnapManageState)
+        this.snapManageState(params as SnapManageState),
       ),
     personal_sign: jest.fn().mockImplementation(async (data: unknown) => {
       return this.snapPersonalSign(data as string[]);

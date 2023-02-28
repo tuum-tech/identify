@@ -1,6 +1,6 @@
 import { RequestArguments } from '@metamask/providers/dist/BaseProvider';
 import { Maybe } from '@metamask/providers/dist/utils';
-import { SnapProvider } from '@metamask/snap-types';
+import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { Wallet } from 'ethers';
 import { IdentitySnapState } from '../../src/interfaces';
 import { address, privateKey, signedMsg } from './constants';
@@ -73,6 +73,6 @@ export class WalletMock implements IWalletMock {
  *
  * @returns Wallet mock.
  */
-export function createMockWallet(): SnapProvider & WalletMock {
-  return new WalletMock() as SnapProvider & WalletMock;
+export function createMockWallet(): SnapsGlobalObject & WalletMock {
+  return new WalletMock() as SnapsGlobalObject & WalletMock;
 }
