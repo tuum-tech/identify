@@ -3,7 +3,7 @@ import { getSupportedProofFormats } from '../../src/rpc/vc/getSupportedProofForm
 
 jest.mock('uuid');
 
-  describe.skip('GetSupportedProofFormats', () => {
+  describe('GetSupportedProofFormats', () => {
     
 
     it('should return all supported proof formats', async () => {

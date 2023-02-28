@@ -1,32 +1,47 @@
 /* eslint-disable */
 
-import { SnapProvider } from '@metamask/snap-types';
-import { IdentitySnapState } from '../../src/interfaces';
+import { MetaMaskInpageProvider } from '@metamask/providers';
+import { SnapsGlobalObject } from '@metamask/snaps-types';
+import { uuid } from 'uuidv4';
+import { IdentitySnapParams, IdentitySnapState } from '../../src/interfaces';
+import { connectHederaAccount } from '../../src/rpc/hedera/connectHederaAccount';
 import { saveVC } from '../../src/rpc/vc/saveVC';
 import { SaveVCRequestParams } from '../../src/types/params';
 import { getAgent } from '../../src/veramo/setup';
 import { getDefaultSnapState } from '../testUtils/constants';
 import { getDefaultCredential } from '../testUtils/helper';
-import { createMockWallet, WalletMock } from '../testUtils/wallet.mock';
+import { createMockSnap, SnapMock } from '../testUtils/snap.mock';
 jest.mock('uuid');
 
-  describe.skip('saveVC', () => {
+  describe('saveVC', () => {
     
+    let identitySnapParams: IdentitySnapParams;
+    let snapState: IdentitySnapState; 
+    let snapMock: SnapsGlobalObject & SnapMock;
+    let metamask: MetaMaskInpageProvider;
     
-    beforeEach(() => {
-      
+    beforeEach(async() => {
+      snapState = getDefaultSnapState();
+      snapMock = createMockSnap();
+      metamask = snapMock as unknown as MetaMaskInpageProvider;
+      identitySnapParams = {
+        metamask: metamask,
+        snap: snapMock,
+        state: snapState
+      };
+     
+      let privateKey = '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c';
+      (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(privateKey);
+      (identitySnapParams.snap as SnapMock).rpcMocks.eth_chainId.mockReturnValue('0x128');
+
+      let connected = await connectHederaAccount(snapMock, snapState, metamask, '0.0.15215');
     });
 
     it('should succeed saving passing VC', async () => {
 
-    let walletMock: SnapProvider & WalletMock;
-      walletMock = createMockWallet();
-      walletMock.rpcMocks.snap_manageState('update', getDefaultSnapState());
-
-      let snapState: IdentitySnapState = getDefaultSnapState();
-      let agent = await getAgent(walletMock, snapState);
+      let agent = await getAgent(snapMock);
       
-      walletMock.rpcMocks.snap_confirm.mockReturnValue(true);
+      (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(true);
 
  
       let identifier = await agent.didManagerCreate({ kms: 'snap', provider: "did:pkh", options: { chainId: "1" } });
@@ -36,14 +51,18 @@ jest.mock('uuid');
       let credential = await getDefaultCredential(agent, identifier.did);
       let params: SaveVCRequestParams = {
         verifiableCredential: credential,
-        
+        options: {
+          
+        }
       };
 
-      let result = await saveVC(walletMock, snapState, params)
+      let result = await saveVC(identitySnapParams, params);
+      console.log("uuid result "+ uuid());
+
 
       expect(result.length).toBe(1);
 
-      expect.assertions(1);
+      expect.assertions(2);
     });
   
 });

@@ -9,6 +9,7 @@ export const privateKey =
 
 export const hedera_privateKey = '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c';
 export const hedera_accountId = '0.0.15215';
+export const hedera_address = '0x7d871f006d97498ea338268a956af94ab2e65cdd';
 
 export const address = '0xb6665128eE91D84590f70c3268765384A9CAfBCd';
 export const publicKey =

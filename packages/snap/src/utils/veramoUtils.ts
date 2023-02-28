@@ -308,6 +308,7 @@ export async function veramoCreateVP(
   const vcs: VerifiableCredential[] = [];
   const vcsWithMetadata: IDataManagerQueryResult[] = [];
 
+
   for (const vcId of vcsMetadata) {
     const vcObj = (await agent.queryVC({
       filter: {
@@ -316,13 +317,17 @@ export async function veramoCreateVP(
       },
       options: { store: 'snap' },
     })) as IDataManagerQueryResult[];
+
+    
+      console.log("vcs: " + JSON.stringify(vcObj));
+
+
     if (vcObj.length > 0) {
       const vc: VerifiableCredential = vcObj[0].data as VerifiableCredential;
       vcs.push(vc);
       vcsWithMetadata.push({ data: vc, metadata: { id: vcId, store: 'snap' } });
     }
   }
-
   if (vcs.length === 0) {
     return null;
   }

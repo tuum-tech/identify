@@ -41,8 +41,6 @@ jest.mock('uuid');
       
       let createCredentialResult = await createVC(identitySnapParams, { vcValue: {'name':'Diego'}, credTypes: ["Login"]});
 
-      console.log("ccr " + JSON.stringify(createCredentialResult));
-     
       // Act and assert
       await expect(createVP(identitySnapParams, {vcs: [createCredentialResult[0].id as string]})).resolves.not.toBeUndefined();
 
@@ -57,7 +55,7 @@ jest.mock('uuid');
       
       let createCredentialResult = await createVC(identitySnapParams, { vcValue: {'name':'Diego'}, credTypes: ["Login"]});
 
-      (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(true);
+      (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(false);
 
       // Act and assert
       await expect(createVP(identitySnapParams, {vcs: [createCredentialResult[0].id as string]})).rejects.toThrow();

@@ -5,16 +5,17 @@ import {
   AbstractKeyStore,
   AbstractPrivateKeyStore,
   ImportablePrivateKey,
-  ManagedPrivateKey,
+  ManagedPrivateKey
 } from '@veramo/key-manager';
 import jsonpath from 'jsonpath';
 import { v4 as uuidv4 } from 'uuid';
+import { uuid } from 'uuidv4';
 import { getSnapState, updateSnapState } from '../../rpc/snap/state';
 import { decodeJWT } from '../../utils/jwt';
 import {
   AbstractDataStore,
   IFilterArgs,
-  IQueryResult,
+  IQueryResult
 } from './verfiable-creds-manager';
 
 /**
@@ -325,10 +326,16 @@ export class SnapVCStore extends AbstractDataStore {
 
     if (filter && filter.type === 'id') {
       try {
+
+         console.log("State1: " + JSON.stringify(state.accountState[account]));
+        //console.log("State: " + state.accountState[account].vcs[filter.filter as string]);
         if (state.accountState[account].vcs[filter.filter as string]) {
           let vc = state.accountState[account].vcs[
             filter.filter as string
           ] as unknown;
+
+          console.log("Vc found:" + JSON.stringify(vc));
+
           if (typeof vc === 'string') {
             vc = decodeJWT(vc);
           }
@@ -407,9 +414,15 @@ export class SnapVCStore extends AbstractDataStore {
     }
 
     const newId = id || uuidv4();
-    state.accountState[account].vcs[newId] = vc;
+    const newUuid = id || uuid();
+    console.log("newID" + newId);
+    console.log("newUuID" + newUuid);
+
+    state.accountState[account].vcs[newUuid] = vc;
     await updateSnapState(this.snap, state);
-    return newId;
+
+
+    return newUuid;
   }
 
   async deleteVC({ id }: { id: string }): Promise<boolean> {

@@ -37,6 +37,7 @@ jest.mock('uuid');
       let vcCreatedResult = await createVC(identitySnapParams, { vcValue: {'prop':10} });
       console.log(JSON.stringify(vcCreatedResult));
       expect(vcCreatedResult.length).toBe(1); 
+      expect(vcCreatedResult[0].id).not.toBeUndefined(); 
       
 
       expect.assertions(1);

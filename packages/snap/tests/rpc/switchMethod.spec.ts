@@ -1,26 +1,35 @@
-import { SnapProvider } from '@metamask/snap-types';
-import { IdentitySnapState } from 'src/interfaces';
+import { MetaMaskInpageProvider } from '@metamask/providers';
+import { SnapsGlobalObject } from '@metamask/snaps-types';
+import { IdentitySnapParams, IdentitySnapState } from 'src/interfaces';
 import { switchMethod } from '../../src/rpc/did/switchMethods';
 import { connectHederaAccount } from '../../src/rpc/hedera/connectHederaAccount';
 import { getDefaultSnapState } from '../testUtils/constants';
-import { createMockWallet, WalletMock } from '../testUtils/wallet.mock';
+import { createMockSnap, SnapMock } from '../testUtils/snap.mock';
 
 
 jest.mock('uuid');
 
-  describe.skip('SwitchMethod', () => {
-    
-
-    let walletMock: SnapProvider & WalletMock;
+  describe('SwitchMethod', () => {
+       let identitySnapParams: IdentitySnapParams;
     let snapState: IdentitySnapState; 
-
+    let snapMock: SnapsGlobalObject & SnapMock;
+    let metamask: MetaMaskInpageProvider;
+    
     beforeEach(async() => {
       snapState = getDefaultSnapState();
-      walletMock = createMockWallet();
-      walletMock.rpcMocks.eth_chainId.mockReturnValue('0x128');
-
+      snapMock = createMockSnap();
+      metamask = snapMock as unknown as MetaMaskInpageProvider;
+      identitySnapParams = {
+        metamask: metamask,
+        snap: snapMock,
+        state: snapState
+      };
+     
       let privateKey = '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c';
-      let connected = await connectHederaAccount(snapState, privateKey, '0.0.15215', walletMock);
+      (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(privateKey);
+      (identitySnapParams.snap as SnapMock).rpcMocks.eth_chainId.mockReturnValue('0x128');
+
+      let connected = await connectHederaAccount(snapMock, snapState, metamask, '0.0.15215');
     });
     
 
@@ -29,9 +38,9 @@ jest.mock('uuid');
 
       // setup
       snapState.accountState[snapState.currentAccount].accountConfig.identity.didMethod = "did:key";
-      walletMock.rpcMocks.snap_confirm.mockReturnValue(true);
+      (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(true);
 
-      let switchMethodResult = await switchMethod(walletMock, snapState, "did:pkh");
+      let switchMethodResult = await switchMethod(identitySnapParams, "did:pkh");
       expect(switchMethodResult).toBeTruthy();
       expect(snapState.accountState[snapState.currentAccount].accountConfig.identity.didMethod).toBe("did:pkh");
 
@@ -41,9 +50,10 @@ jest.mock('uuid');
     it('should throw error when switch to invalid method', async () => {
 
       // setup
-      walletMock.rpcMocks.snap_confirm.mockReturnValue(true);
+      (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(true);
 
-      await expect(switchMethod(walletMock, snapState, "did:inv")).rejects.toThrowError();
+
+      await expect(switchMethod(identitySnapParams, "did:inv")).rejects.toThrowError();
 
       expect.assertions(1);
     });
@@ -53,9 +63,9 @@ jest.mock('uuid');
       snapState.accountState[snapState.currentAccount].accountConfig.identity.didMethod = "did:key";
 
       // setup
-      walletMock.rpcMocks.snap_confirm.mockReturnValue(false);
+      (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(false);
 
-      let switchMethodPromise = switchMethod(walletMock, snapState, "did:pkh");
+      let switchMethodPromise = switchMethod(identitySnapParams, "did:pkh");
 
       await expect(switchMethodPromise).resolves.toBeFalsy();
       expect(snapState.accountState[snapState.currentAccount].accountConfig.identity.didMethod).toBe("did:key");

@@ -1,4 +1,3 @@
-import { SnapProvider } from '@metamask/snap-types';
 import { IdentitySnapState } from 'src/interfaces';
 import { resolveDID } from '../../src/rpc/did/resolveDID';
 import { connectHederaAccount } from '../../src/rpc/hedera/connectHederaAccount';
