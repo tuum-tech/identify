@@ -1,57 +1,67 @@
-import { SnapProvider } from '@metamask/snap-types';
+import { MetaMaskInpageProvider } from '@metamask/providers';
+import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { VerifiablePresentation } from '@veramo/core';
-import { IdentitySnapState } from '../../src/interfaces';
+import { IdentitySnapParams, IdentitySnapState } from '../../src/interfaces';
 import { connectHederaAccount } from '../../src/rpc/hedera/connectHederaAccount';
 import { createVC } from '../../src/rpc/vc/createVC';
 import { createVP } from '../../src/rpc/vc/createVP';
 import { verifyVP } from '../../src/rpc/vc/verifyVP';
+import { createMockSnap, SnapMock } from '../testUtils/snap.mock';
 
 import { getDefaultSnapState } from '../testUtils/constants';
-import { createMockWallet, WalletMock } from '../testUtils/wallet.mock';
 
 jest.mock('uuid');
 
-  describe.skip('VerifyVP', () => {
-    let walletMock: SnapProvider & WalletMock;
-    let snapState: IdentitySnapState;
+  describe('VerifyVP', () => {
+    let identitySnapParams: IdentitySnapParams;
+    let snapState: IdentitySnapState; 
+    let snapMock: SnapsGlobalObject & SnapMock;
+    let metamask: MetaMaskInpageProvider;
     
-    beforeEach( async() => {
+    beforeEach(async() => {
       snapState = getDefaultSnapState();
-      walletMock = createMockWallet();
-      walletMock.rpcMocks.eth_chainId.mockReturnValue('0x128');
-
+      snapMock = createMockSnap();
+      metamask = snapMock as unknown as MetaMaskInpageProvider;
+      identitySnapParams = {
+        metamask: metamask,
+        snap: snapMock,
+        state: snapState
+      };
+     
       let privateKey = '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c';
-      let connected = await connectHederaAccount(snapState, privateKey, '0.0.15215', walletMock);
+      (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(privateKey);
+      (identitySnapParams.snap as SnapMock).rpcMocks.eth_chainId.mockReturnValue('0x128');
+
+      let connected = await connectHederaAccount(snapMock, snapState, metamask, '0.0.15215');
     });
 
     it('should verify valid VP', async () => {
 
       // Setup
-      walletMock.rpcMocks.snap_confirm.mockReturnValue(true);
+      (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(true);
+
 
       // create VC 
-      let vcCreatedResult = await createVC(walletMock, snapState, { vcValue: {'prop':10} });
-      //let vc = await getVCs(walletMock, snapState, {filter: {type: 'id', filter: vcCreatedResult[0].id}})
+      let vcCreatedResult = await createVC(identitySnapParams, { vcValue: {'prop':10} });
 
       // create VP 
-      let verifiablePresentation = await createVP(walletMock, snapState, {vcs: [vcCreatedResult[0].id as string]});
+      let verifiablePresentation = await createVP(identitySnapParams, {vcs: [vcCreatedResult[0].id as string]});
 
-      await expect(verifyVP(walletMock, snapState, verifiablePresentation as VerifiablePresentation)).resolves.toBe(true); 
+      await expect(verifyVP(identitySnapParams, verifiablePresentation as VerifiablePresentation)).resolves.toBe(true); 
       expect.assertions(1);
     });
 
 
       it('should refuse validation when VP is adultered', async () => {
 
-         // Setup
-      walletMock.rpcMocks.snap_confirm.mockReturnValue(true);
+      // Setup
+      (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(true);
 
       // create VC 
-      let vcCreatedResult = await createVC(walletMock, snapState, { vcValue: {'prop':10} });
-      //let vc = await getVCs(walletMock, snapState, {filter: {type: 'id', filter: vcCreatedResult[0].id}})
+      let vcCreatedResult = await createVC(identitySnapParams, { vcValue: {'prop':10} });
 
       // create VP 
-      let verifiablePresentation = await createVP(walletMock, snapState, {vcs: [vcCreatedResult[0].id as string]});
+      let verifiablePresentation = await createVP(identitySnapParams, {vcs: [vcCreatedResult[0].id as string]});
 
 
       let adultered = JSON.parse(JSON.stringify(verifiablePresentation));
@@ -60,25 +70,25 @@ jest.mock('uuid');
 
       //console.log("adultered Presentation " + JSON.stringify(adultered));
 
-      await expect(verifyVP(walletMock, snapState, adultered as VerifiablePresentation)).rejects.toThrowError();
+      await expect(verifyVP(identitySnapParams, adultered as VerifiablePresentation)).rejects.toThrowError();
       expect.assertions(1);
 
     });
 
-    it.skip('should throw exception if user refused confirmation', async () => {
+    it('should return null if user refused confirmation', async () => {
 
-         // Setup
-      walletMock.rpcMocks.snap_confirm.mockReturnValue(true);
+      // Setup
+      (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(true);
 
       // create VC 
-      let vcCreatedResult = await createVC(walletMock, snapState, { vcValue: {'prop':10} });
+      let vcCreatedResult = await createVC(identitySnapParams, { vcValue: {'prop':10} });
       //let vc = await getVCs(walletMock, snapState, {filter: {type: 'id', filter: vcCreatedResult[0].id}})
 
       // create VP 
-      let verifiablePresentation = await createVP(walletMock, snapState, {vcs: [vcCreatedResult[0].id as string]});
+      let verifiablePresentation = await createVP(identitySnapParams, {vcs: [vcCreatedResult[0].id as string]});
 
-      walletMock.rpcMocks.snap_confirm.mockReturnValue(false);
-      await expect(verifyVP(walletMock, snapState, verifiablePresentation as VerifiablePresentation)).rejects.toThrowError();
+      (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(false);
+      await expect(verifyVP(identitySnapParams, verifiablePresentation as VerifiablePresentation)).resolves.toBeNull();
       expect.assertions(1);
 
     });
