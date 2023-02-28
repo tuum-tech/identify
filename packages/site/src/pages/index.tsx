@@ -39,7 +39,6 @@ import {
   shouldDisplayReconnectButton,
   syncGoogleVCs,
   togglePopups,
-  verifyVC,
   verifyVP,
 } from '../utils';
 import { validHederaChainID } from '../utils/hedera';
@@ -49,6 +48,7 @@ import GetCurrentDIDMethod from './cards/GetCurrentDIDMethod';
 import GetDID from './cards/GetDID';
 import GetSpecificVC from './cards/GetSpecificVC';
 import ResolveDID from './cards/ResolveDID';
+import VerifyVC from './cards/VerifyVC';
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
@@ -140,18 +140,6 @@ const Index = () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
       await togglePopups();
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
-  const handleVerifyVCClick = async () => {
-    try {
-      setCurrentChainId(await getCurrentNetwork());
-      const verified = await verifyVC(vc);
-      console.log('VC Verified: ', verified);
-      alert(`VC Verified: ${verified}`);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -430,43 +418,12 @@ const Index = () => {
           hederaAccountConnected={hederaAccountConnected}
         />
         {/* =============================================================================== */}
-        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
-        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
-          <Card
-            content={{
-              title: 'verifyVC',
-              description: 'Verify a VC JWT, LDS format or EIP712',
-              form: (
-                <form>
-                  <label>
-                    Enter your Verifiable Credential
-                    <TextInput
-                      rows={3}
-                      value={JSON.stringify(vc)}
-                      onChange={(e) => setVc(e.target.value)}
-                      fullWidth
-                    />
-                  </label>
-                </form>
-              ),
-              button: (
-                <SendHelloButton
-                  buttonText="Verify VC"
-                  onClick={handleVerifyVCClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        ) : (
-          ''
-        )}
+        <VerifyVC
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+          hederaAccountConnected={hederaAccountConnected}
+        />
+
         {/* =============================================================================== */}
         {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
         (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
