@@ -32,7 +32,6 @@ import {
   createVC,
   createVP,
   deleteAllVCs,
-  getCurrentDIDMethod,
   getCurrentNetwork,
   getDID,
   getHederaAccountId,
@@ -48,6 +47,7 @@ import {
   verifyVP,
 } from '../utils';
 import { validHederaChainID } from '../utils/hedera';
+import GetCurrentDIDMethod from './cards/GetCurrentDIDMethod';
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
@@ -143,18 +143,6 @@ const Index = () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
       await togglePopups();
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
-  const handleGetCurrentDIDMethodClick = async () => {
-    try {
-      setCurrentChainId(await getCurrentNetwork());
-      const currentDIDMethod = await getCurrentDIDMethod();
-      console.log(`Your current DID method is: ${currentDIDMethod}`);
-      alert(`Your current DID method is: ${currentDIDMethod}`);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -517,30 +505,11 @@ const Index = () => {
           ''
         )}
         {/* =============================================================================== */}
-        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
-        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
-          <Card
-            content={{
-              title: 'getCurrentDIDMethod',
-              description: 'Get the current DID method to use',
-              button: (
-                <SendHelloButton
-                  buttonText="Get DID method"
-                  onClick={handleGetCurrentDIDMethodClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        ) : (
-          ''
-        )}
+        <GetCurrentDIDMethod
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+          hederaAccountConnected={hederaAccountConnected}
+        />
         {/* =============================================================================== */}
         {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
         (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
