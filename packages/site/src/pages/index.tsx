@@ -37,7 +37,6 @@ import {
   getSnap,
   getVCs,
   removeVC,
-  resolveDID,
   sendHello,
   shouldDisplayReconnectButton,
   syncGoogleVCs,
@@ -48,6 +47,7 @@ import {
 import { validHederaChainID } from '../utils/hedera';
 import GetCurrentDIDMethod from './cards/GetCurrentDIDMethod';
 import GetDID from './cards/GetDID';
+import ResolveDID from './cards/ResolveDID';
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
@@ -143,18 +143,6 @@ const Index = () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
       await togglePopups();
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
-  const handleResolveDIDClick = async () => {
-    try {
-      setCurrentChainId(await getCurrentNetwork());
-      const doc = await resolveDID();
-      console.log(`Your DID document is is: ${JSON.stringify(doc, null, 4)}`);
-      alert(`Your DID document is: ${JSON.stringify(doc, null, 4)}`);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -506,30 +494,11 @@ const Index = () => {
         />
 
         {/* =============================================================================== */}
-        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
-        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
-          <Card
-            content={{
-              title: 'resolveDID',
-              description: 'Resolve the DID and return a DID document',
-              button: (
-                <SendHelloButton
-                  buttonText="Resolve DID"
-                  onClick={handleResolveDIDClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        ) : (
-          ''
-        )}
+        <ResolveDID
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+          hederaAccountConnected={hederaAccountConnected}
+        />
         {/* =============================================================================== */}
         {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
         (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
