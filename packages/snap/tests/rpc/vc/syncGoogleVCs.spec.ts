@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { IdentitySnapParams, IdentitySnapState } from '../../../src/interfaces';

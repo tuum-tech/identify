@@ -1,20 +1,21 @@
+/* eslint-disable */
+
 import { RequestArguments } from '@metamask/providers/dist/BaseProvider';
 import { Maybe } from '@metamask/providers/dist/utils';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 
 import { providers, Wallet } from 'ethers';
-//import { BIP44CoinTypeNode } from '@metamask/key-tree';
 import { IdentitySnapState } from '../../src/interfaces';
 import { address, privateKey } from './constants';
 
-interface ISnapMock {
+type ISnapMock = {
   request<T>(args: RequestArguments): Promise<Maybe<T>>;
   resetHistory(): void;
-}
-interface SnapManageState {
+};
+type SnapManageState = {
   operation: 'get' | 'update' | 'clear';
   newState: unknown;
-}
+};
 
 export class SnapMock implements ISnapMock {
   private snapState: IdentitySnapState | null = null;
@@ -25,9 +26,11 @@ export class SnapMock implements ISnapMock {
     if (!params) {
       return null;
     }
+
     if (params.operation === 'get') {
       return this.snapState;
     }
+
     if (params.operation === 'update') {
       this.snapState = params.newState as IdentitySnapState;
     } else if (params.operation === 'clear') {
@@ -114,6 +117,11 @@ export class SnapMock implements ISnapMock {
   }
 }
 
+/**
+ * Creates and returns a Mock Snap
+ *
+ * @returns {SnapsGlobalObject & SnapMock} SnapMock
+ */
 export function createMockSnap(): SnapsGlobalObject & SnapMock {
   return new SnapMock() as SnapsGlobalObject & SnapMock;
 }

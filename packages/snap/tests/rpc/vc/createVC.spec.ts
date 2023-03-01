@@ -3,7 +3,10 @@ import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { IdentitySnapParams, IdentitySnapState } from '../../../src/interfaces';
 import { connectHederaAccount } from '../../../src/rpc/hedera/connectHederaAccount';
 import { createVC } from '../../../src/rpc/vc/createVC';
-import { getDefaultSnapState } from '../../testUtils/constants';
+import {
+  getDefaultSnapState,
+  hederaPrivateKey,
+} from '../../testUtils/constants';
 import { createMockSnap, SnapMock } from '../../testUtils/snap.mock';
 
 describe('createVC', () => {
@@ -17,30 +20,24 @@ describe('createVC', () => {
     snapMock = createMockSnap();
     metamask = snapMock as unknown as MetaMaskInpageProvider;
     identitySnapParams = {
-      metamask: metamask,
+      metamask,
       snap: snapMock,
       state: snapState,
     };
 
-    let privateKey =
-      '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c';
     (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
-      privateKey,
+      hederaPrivateKey,
     );
+
     (identitySnapParams.snap as SnapMock).rpcMocks.eth_chainId.mockReturnValue(
       '0x128',
     );
 
-    let connected = await connectHederaAccount(
-      snapMock,
-      snapState,
-      metamask,
-      '0.0.15215',
-    );
+    await connectHederaAccount(snapMock, snapState, metamask, '0.0.15215');
   });
 
   it('should create VC', async () => {
-    let vcCreatedResult = await createVC(identitySnapParams, {
+    const vcCreatedResult = await createVC(identitySnapParams, {
       vcValue: { prop: 10 },
     });
     console.log(JSON.stringify(vcCreatedResult));
@@ -54,6 +51,7 @@ describe('createVC', () => {
     (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
       false,
     );
+
     await expect(
       createVC(identitySnapParams, { vcValue: { prop: 10 } }),
     ).rejects.toThrowError();

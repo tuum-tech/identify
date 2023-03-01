@@ -4,7 +4,10 @@ import { IdentitySnapParams, IdentitySnapState } from 'src/interfaces';
 import { connectHederaAccount } from '../../../src/rpc/hedera/connectHederaAccount';
 import { createVC } from '../../../src/rpc/vc/createVC';
 import { getVCs } from '../../../src/rpc/vc/getVCs';
-import { getDefaultSnapState } from '../../testUtils/constants';
+import {
+  getDefaultSnapState,
+  hederaPrivateKey,
+} from '../../testUtils/constants';
 import { createMockSnap, SnapMock } from '../../testUtils/snap.mock';
 
 describe('getVCs', () => {
@@ -18,26 +21,20 @@ describe('getVCs', () => {
     snapMock = createMockSnap();
     metamask = snapMock as unknown as MetaMaskInpageProvider;
     identitySnapParams = {
-      metamask: metamask,
+      metamask,
       snap: snapMock,
       state: snapState,
     };
 
-    let privateKey =
-      '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c';
     (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
-      privateKey,
+      hederaPrivateKey,
     );
+
     (identitySnapParams.snap as SnapMock).rpcMocks.eth_chainId.mockReturnValue(
       '0x128',
     );
 
-    let connected = await connectHederaAccount(
-      snapMock,
-      snapState,
-      metamask,
-      '0.0.15215',
-    );
+    await connectHederaAccount(snapMock, snapState, metamask, '0.0.15215');
   });
 
   it('should succeed returning VCS without filter', async () => {
@@ -47,7 +44,7 @@ describe('getVCs', () => {
 
     await createVC(identitySnapParams, { vcValue: { prop: 10 } });
 
-    let vcsReturned = await getVCs(identitySnapParams, {});
+    const vcsReturned = await getVCs(identitySnapParams, {});
     expect(vcsReturned.length).toEqual(1);
 
     expect.assertions(1);
@@ -57,13 +54,14 @@ describe('getVCs', () => {
     (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
       true,
     );
+
     await createVC(identitySnapParams, {
       vcValue: { prop: 10 },
       credTypes: ['Login'],
     });
     await createVC(identitySnapParams, { vcValue: { prop: 20 } });
 
-    let vcsReturned = await getVCs(identitySnapParams, {
+    const vcsReturned = await getVCs(identitySnapParams, {
       options: {},
       filter: { type: 'vcType', filter: 'Login' },
     });
@@ -77,10 +75,10 @@ describe('getVCs', () => {
       true,
     );
     await createVC(identitySnapParams, { vcValue: { prop: 10 } });
-    let vcs = await getVCs(identitySnapParams, {});
-    let vcId = vcs[0].metadata.id;
+    const vcs = await getVCs(identitySnapParams, {});
+    const vcId = vcs[0].metadata.id;
 
-    let vcsReturned = await getVCs(identitySnapParams, {
+    const vcsReturned = await getVCs(identitySnapParams, {
       filter: { type: 'id', filter: vcId },
     });
     expect(vcsReturned.length).toEqual(1);

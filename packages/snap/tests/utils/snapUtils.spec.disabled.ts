@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 // import { SnapProvider } from '@metamask/snap-types';
 // import {
 //   addFriendlyDapp, getCurrentNetwork,
