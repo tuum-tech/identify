@@ -1,6 +1,4 @@
 import { useGoogleLogin } from '@react-oauth/google';
-import { ProofInfo } from '@tuum-tech/identity-snap/src/types/params';
-import { VerifiablePresentation } from '@veramo/core';
 import { useContext, useEffect, useState } from 'react';
 
 import {
@@ -9,7 +7,6 @@ import {
   InstallFlaskButton,
   ReconnectButton,
   SendHelloButton,
-  TextInput,
 } from '../components';
 import {
   CardContainer,
@@ -25,7 +22,6 @@ import {
   configureGoogleAccount,
   connectHederaAccount,
   connectSnap,
-  createVP,
   getCurrentNetwork,
   getHederaAccountId,
   getSnap,
@@ -33,7 +29,6 @@ import {
   shouldDisplayReconnectButton,
   syncGoogleVCs,
   togglePopups,
-  verifyVP,
 } from '../utils';
 import { validHederaChainID } from '../utils/hedera';
 import CreateVC from './cards/CreateVC';
@@ -42,9 +37,12 @@ import GetAllVCs from './cards/GetAllVCs';
 import GetCurrentDIDMethod from './cards/GetCurrentDIDMethod';
 import GetDID from './cards/GetDID';
 import GetSpecificVC from './cards/GetSpecificVC';
+import GetVP from './cards/GetVP';
 import RemoveVC from './cards/RemoveVC';
 import ResolveDID from './cards/ResolveDID';
+import Todo from './cards/Todo';
 import VerifyVC from './cards/VerifyVC';
+import VerifyVP from './cards/VerifyVP';
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
@@ -53,9 +51,16 @@ const Index = () => {
 
   const [hederaAccountId, setHederaAccountId] = useState('0.0.15215');
 
-  const { vcId, setVcId, vc, setVc, vcIdsToBeRemoved, setVcIdsToBeRemoved } =
-    useContext(VcContext);
-  const [vp, setVp] = useState({});
+  const {
+    vcId,
+    setVcId,
+    vc,
+    setVc,
+    vcIdsToBeRemoved,
+    setVcIdsToBeRemoved,
+    vp,
+    setVp,
+  } = useContext(VcContext);
   const [loadingState, setLoadingState] = useState<string | null>(null);
 
   useEffect(() => {
@@ -136,39 +141,6 @@ const Index = () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
       await togglePopups();
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
-  const handleCreateVPClick = async () => {
-    try {
-      setCurrentChainId(await getCurrentNetwork());
-      const proofInfo: ProofInfo = {
-        proofFormat: 'jwt',
-        type: 'ProfileNamesPresentation',
-      };
-      console.log('vcId: ', vcId);
-      const vp = (await createVP(
-        vcId.trim().split(','),
-        proofInfo,
-      )) as VerifiablePresentation;
-      setVp(vp);
-      console.log(`Your VP is: ${JSON.stringify(vp, null, 4)}`);
-      alert(`Your VP is: ${JSON.stringify(vp, null, 4)}`);
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
-  const handleVerifyVPClick = async () => {
-    try {
-      setCurrentChainId(await getCurrentNetwork());
-      const verified = await verifyVP(vp);
-      console.log('VP Verified: ', verified);
-      alert(`VP Verified: ${verified}`);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -332,136 +304,61 @@ const Index = () => {
         ) : (
           ''
         )}
-        {/* =============================================================================== */}
         <GetCurrentDIDMethod
           currentChainId={currentChainId}
           setCurrentChainId={setCurrentChainId}
           hederaAccountConnected={hederaAccountConnected}
         />
-        {/* =============================================================================== */}
         <GetDID
           currentChainId={currentChainId}
           setCurrentChainId={setCurrentChainId}
           hederaAccountConnected={hederaAccountConnected}
         />
-        {/* =============================================================================== */}
         <ResolveDID
           currentChainId={currentChainId}
           setCurrentChainId={setCurrentChainId}
           hederaAccountConnected={hederaAccountConnected}
         />
-        {/* =============================================================================== */}
         <GetSpecificVC
           currentChainId={currentChainId}
           setCurrentChainId={setCurrentChainId}
           hederaAccountConnected={hederaAccountConnected}
         />
-        {/* =============================================================================== */}
         <GetAllVCs
           currentChainId={currentChainId}
           setCurrentChainId={setCurrentChainId}
           hederaAccountConnected={hederaAccountConnected}
         />
-        {/* =============================================================================== */}
         <CreateVC
           currentChainId={currentChainId}
           setCurrentChainId={setCurrentChainId}
           hederaAccountConnected={hederaAccountConnected}
         />
-        {/* =============================================================================== */}
         <VerifyVC
           currentChainId={currentChainId}
           setCurrentChainId={setCurrentChainId}
           hederaAccountConnected={hederaAccountConnected}
         />
-        {/* =============================================================================== */}
         <RemoveVC
           currentChainId={currentChainId}
           setCurrentChainId={setCurrentChainId}
           hederaAccountConnected={hederaAccountConnected}
         />
-        {/* =============================================================================== */}
         <DeleteAllVCs
           currentChainId={currentChainId}
           setCurrentChainId={setCurrentChainId}
           hederaAccountConnected={hederaAccountConnected}
         />
-        {/* =============================================================================== */}
-        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
-        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
-          <Card
-            content={{
-              title: 'getVP',
-              description: 'Generate Verifiable Presentation from your VC',
-              form: (
-                <form>
-                  <label>
-                    Enter the Verifiable Credential ID
-                    <TextInput
-                      rows={2}
-                      value={vcId}
-                      onChange={(e) => setVcId(e.target.value)}
-                      fullWidth
-                    />
-                  </label>
-                </form>
-              ),
-              button: (
-                <SendHelloButton
-                  buttonText="Generate VP"
-                  onClick={handleCreateVPClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        ) : (
-          ''
-        )}
-        {/* =============================================================================== */}
-        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
-        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
-          <Card
-            content={{
-              title: 'verifyVP',
-              description: 'Verify a VP JWT or LDS format',
-              form: (
-                <form>
-                  <label>
-                    Enter your Verifiable Presentation
-                    <TextInput
-                      rows={2}
-                      value={JSON.stringify(vp)}
-                      onChange={(e) => setVp(e.target.value)}
-                      fullWidth
-                    />
-                  </label>
-                </form>
-              ),
-              button: (
-                <SendHelloButton
-                  buttonText="Verify VP"
-                  onClick={handleVerifyVPClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        ) : (
-          ''
-        )}
+        <GetVP
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+          hederaAccountConnected={hederaAccountConnected}
+        />
+        <VerifyVP
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+          hederaAccountConnected={hederaAccountConnected}
+        />
         {/* =============================================================================== */}
         {validHederaChainID(currentChainId) && hederaAccountConnected ? (
           <Card
@@ -540,116 +437,20 @@ const Index = () => {
           ''
         )}
         {/* =============================================================================== */}
-        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
-        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
-          <Card
-            content={{
-              title: 'todo',
-              description: 'TODO',
-              /* form: (
-              <form>
-                <label>
-                  Enter your Verifiable Presentation
-                  <input
-                    type="text"
-                    value={JSON.stringify(vp)}
-                    onChange={(e) => setVp(e.target.value)}
-                  />
-                </label>
-              </form>
-            ), */
-              button: (
-                <SendHelloButton
-                  buttonText="todo"
-                  onClick={handleVerifyVPClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        ) : (
-          ''
-        )}
+        <Todo
+          currentChainId={currentChainId}
+          hederaAccountConnected={hederaAccountConnected}
+        />
         {/* =============================================================================== */}
-        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
-        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
-          <Card
-            content={{
-              title: 'todo',
-              description: 'TODO',
-              /* form: (
-              <form>
-                <label>
-                  Enter your Verifiable Presentation
-                  <input
-                    type="text"
-                    value={JSON.stringify(vp)}
-                    onChange={(e) => setVp(e.target.value)}
-                  />
-                </label>
-              </form>
-            ), */
-              button: (
-                <SendHelloButton
-                  buttonText="todo"
-                  onClick={handleVerifyVPClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        ) : (
-          ''
-        )}
+        <Todo
+          currentChainId={currentChainId}
+          hederaAccountConnected={hederaAccountConnected}
+        />
         {/* =============================================================================== */}
-        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
-        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
-          <Card
-            content={{
-              title: 'todo',
-              description: 'TODO',
-              /* form: (
-              <form>
-                <label>
-                  Enter your Verifiable Presentation
-                  <input
-                    type="text"
-                    value={JSON.stringify(vp)}
-                    onChange={(e) => setVp(e.target.value)}
-                  />
-                </label>
-              </form>
-            ), */
-              button: (
-                <SendHelloButton
-                  buttonText="todo"
-                  onClick={handleVerifyVPClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        ) : (
-          ''
-        )}
+        <Todo
+          currentChainId={currentChainId}
+          hederaAccountConnected={hederaAccountConnected}
+        />
       </CardContainer>
     </Container>
   );
