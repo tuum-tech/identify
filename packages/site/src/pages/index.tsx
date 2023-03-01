@@ -1,6 +1,5 @@
 import { useGoogleLogin } from '@react-oauth/google';
 import { ProofInfo } from '@tuum-tech/identity-snap/src/types/params';
-import { IDataManagerClearResult } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
 import { VerifiablePresentation } from '@veramo/core';
 import { useContext, useEffect, useState } from 'react';
 
@@ -27,7 +26,6 @@ import {
   connectHederaAccount,
   connectSnap,
   createVP,
-  deleteAllVCs,
   getCurrentNetwork,
   getHederaAccountId,
   getSnap,
@@ -39,6 +37,7 @@ import {
 } from '../utils';
 import { validHederaChainID } from '../utils/hedera';
 import CreateVC from './cards/CreateVC';
+import DeleteAllVCs from './cards/DeleteAllVCs';
 import GetAllVCs from './cards/GetAllVCs';
 import GetCurrentDIDMethod from './cards/GetCurrentDIDMethod';
 import GetDID from './cards/GetDID';
@@ -137,26 +136,6 @@ const Index = () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
       await togglePopups();
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
-  const handleDeleteAllVCsClick = async () => {
-    try {
-      setCurrentChainId(await getCurrentNetwork());
-      const options = {
-        // If you want to remove the VCs from multiple stores, you can pass an array like so:
-        // store: ['snap', 'googleDrive'],
-        store: 'snap',
-      };
-      const isRemoved = (await deleteAllVCs(
-        options,
-      )) as IDataManagerClearResult[];
-      console.log(`Remove VC Result: ${JSON.stringify(isRemoved, null, 4)}`);
-      setVcId('');
-      setVcIdsToBeRemoved('');
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -365,7 +344,6 @@ const Index = () => {
           setCurrentChainId={setCurrentChainId}
           hederaAccountConnected={hederaAccountConnected}
         />
-
         {/* =============================================================================== */}
         <ResolveDID
           currentChainId={currentChainId}
@@ -384,7 +362,6 @@ const Index = () => {
           setCurrentChainId={setCurrentChainId}
           hederaAccountConnected={hederaAccountConnected}
         />
-
         {/* =============================================================================== */}
         <CreateVC
           currentChainId={currentChainId}
@@ -404,30 +381,11 @@ const Index = () => {
           hederaAccountConnected={hederaAccountConnected}
         />
         {/* =============================================================================== */}
-        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
-        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
-          <Card
-            content={{
-              title: 'deleteAllVCs',
-              description: 'Delete all the VCs from the snap',
-              button: (
-                <SendHelloButton
-                  buttonText="Delete all VCs"
-                  onClick={handleDeleteAllVCsClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        ) : (
-          ''
-        )}
+        <DeleteAllVCs
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+          hederaAccountConnected={hederaAccountConnected}
+        />
         {/* =============================================================================== */}
         {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
         (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
