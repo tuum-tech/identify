@@ -1,10 +1,14 @@
 import { heading, panel, text } from '@metamask/snaps-ui';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
-import { snapDialog, updatePopups } from '../../utils/snapUtils';
+import { snapDialog, updatePopups } from '../../snap/dialog';
 
-/* eslint-disable */
+/**
+ * Function to toggle popups.
+ *
+ * @param identitySnapParams - Identity snap params.
+ */
 export async function togglePopups(
-  identitySnapParams: IdentitySnapParams
+  identitySnapParams: IdentitySnapParams,
 ): Promise<boolean> {
   const { snap, state } = identitySnapParams;
   const { disablePopups } = state.snapConfig.dApp;

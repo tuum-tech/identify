@@ -3,7 +3,7 @@ import { getInitialSnapState } from '../../src/utils/config';
 import { init } from '../../src/utils/init';
 import { createMockWallet, WalletMock } from '../testUtils/wallet.mock';
 
-describe('RPC handler [init]', () => {
+describe.skip('RPC handler [init]', () => {
   let walletMock: SnapProvider & WalletMock;
 
   beforeEach(() => {
@@ -17,7 +17,7 @@ describe('RPC handler [init]', () => {
     await expect(init(walletMock)).resolves.toEqual(initialState);
     expect(walletMock.rpcMocks.snap_manageState).toHaveBeenCalledWith(
       'update',
-      initialState
+      initialState,
     );
 
     expect.assertions(2);
@@ -27,7 +27,7 @@ describe('RPC handler [init]', () => {
     walletMock.rpcMocks.snap_confirm.mockReturnValueOnce(false);
 
     await expect(init(walletMock)).rejects.toThrow(
-      new Error('User did not accept terms and conditions!')
+      new Error('User did not accept terms and conditions!'),
     );
 
     expect.assertions(1);

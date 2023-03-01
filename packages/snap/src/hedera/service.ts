@@ -13,8 +13,7 @@ import { BigNumber } from 'bignumber.js';
 
 import { WalletHedera } from './wallet/abstract';
 
-/* eslint-disable */
-export interface HederaService {
+export type HederaService = {
   // returns null if the account ID does not match the chosen key
   createClient(options: {
     network: string;
@@ -25,9 +24,9 @@ export interface HederaService {
     // account ID we wish to associate with the wallet
     accountId: AccountId;
   }): Promise<SimpleHederaClient | null>;
-}
+};
 
-export interface SimpleHederaClient {
+export type SimpleHederaClient = {
   // get the associated private key, if available
   getPrivateKey(): PrivateKey | null;
 
@@ -43,7 +42,7 @@ export interface SimpleHederaClient {
     publicKey: PublicKey;
     initialBalance: BigNumber;
   }): Promise<AccountId | null>;
-}
+};
 
 export type HederaAccountInfo = {
   accountId: AccountId;
@@ -53,20 +52,20 @@ export type HederaAccountInfo = {
   contractAccountId: string;
   ethereumNonce: Long;
   expirationTime: Timestamp;
-  hbarAllowances: Object;
+  hbarAllowances: object;
   isDeleted: boolean;
   isReceiverSignatureRequired: boolean;
   key: PublicKey;
   ledgerId: LedgerId;
-  liveHashes: Object;
+  liveHashes: object;
   maxAutomaticTokenAssociations: Long;
-  nftAllowances: Object;
+  nftAllowances: object;
   ownedNfts: Long;
-  proxyAccountId: Object;
+  proxyAccountId: object;
   proxyReceived: Hbar;
   receiveRecordThreshold: Hbar;
   sendRecordThreshold: Hbar;
   stakingInfo: StakingInfo;
-  tokenAllowances: Object;
+  tokenAllowances: object;
   tokenRelationships: TokenRelationship;
 };

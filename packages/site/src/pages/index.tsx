@@ -53,9 +53,6 @@ const Index = () => {
   const [currentChainId, setCurrentChainId] = useState('');
   const [hederaAccountConnected, setHederaAccountConnected] = useState(false);
 
-  const [hederaPrivateKey, setHederaPrivateKey] = useState(
-    '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c',
-  );
   const [hederaAccountId, setHederaAccountId] = useState('0.0.15215');
 
   const [createVCName, setCreateVCName] = useState('Kiran Pachhai');
@@ -65,8 +62,6 @@ const Index = () => {
   const [vc, setVc] = useState({});
   const [vcIdsToBeRemoved, setVcIdsToBeRemoved] = useState('');
   const [vp, setVp] = useState({});
-  const [fileName, setFileName] = useState('vc.txt');
-  const [content, setContent] = useState('Sample Text');
   const [loadingState, setLoadingState] = useState<string | null>(null);
 
   useEffect(() => {
@@ -94,7 +89,7 @@ const Index = () => {
   const handleConfigureGoogleAccount = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       setLoadingState('configureGoogleAccount');
-      const resp = await configureGoogleAccount(tokenResponse.access_token);
+      await configureGoogleAccount(tokenResponse.access_token);
       alert('Google Account configuration was successful');
       setLoadingState(null);
     },
@@ -118,10 +113,7 @@ const Index = () => {
   const handleConfigureHederaAccountClick = async () => {
     setLoadingState('connectHederaAccount');
     try {
-      const configured = await connectHederaAccount(
-        hederaPrivateKey,
-        hederaAccountId,
-      );
+      const configured = await connectHederaAccount(hederaAccountId);
       console.log('configured: ', configured);
       if (configured) {
         setHederaAccountConnected(true);
@@ -221,7 +213,9 @@ const Index = () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
       const options = {
-        store: ['snap', 'googleDrive'],
+        // If you want to retrieve VCs from multiple stores, you can pass an array like so:
+        // store: ['snap', 'googleDrive'],
+        store: 'snap',
         returnStore: true,
       };
       const vcs = (await getVCs(
@@ -253,7 +247,9 @@ const Index = () => {
         nickname: createVCNickname,
       };
       const options = {
-        store: ['snap', 'googleDrive'],
+        // If you want to auto save the generated VCs to multiple stores, you can pass an array like so:
+        // store: ['snap', 'googleDrive'],
+        store: 'snap',
         returnStore: true,
       };
       const credTypes = ['ProfileNamesCredential'];
@@ -291,7 +287,9 @@ const Index = () => {
       setCurrentChainId(await getCurrentNetwork());
       const id = vcIdsToBeRemoved ? vcIdsToBeRemoved.trim().split(',')[0] : '';
       const options = {
-        store: ['snap', 'googleDrive'],
+        // If you want to remove the VCs from multiple stores, you can pass an array like so:
+        // store: ['snap', 'googleDrive'],
+        store: 'snap',
       };
       console.log('vcIdsToBeRemoved: ', vcIdsToBeRemoved);
       const isRemoved = (await removeVC(
@@ -311,7 +309,9 @@ const Index = () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
       const options = {
-        store: ['snap', 'googleDrive'],
+        // If you want to remove the VCs from multiple stores, you can pass an array like so:
+        // store: ['snap', 'googleDrive'],
+        store: 'snap',
       };
       const isRemoved = (await deleteAllVCs(
         options,
@@ -436,15 +436,6 @@ const Index = () => {
                 'Connect to Hedera Account. NOTE that you will need to reconnect to Hedera Account if you switch the network on Metamask at any point in time as that will cause your metamask state to point to your non-hedera account on metamask',
               form: (
                 <form>
-                  <label>
-                    Enter your Hedera Private Key
-                    <input
-                      type="text"
-                      value={hederaPrivateKey}
-                      onChange={(e) => setHederaPrivateKey(e.target.value)}
-                    />
-                  </label>
-                  <br />
                   <label>
                     Enter your Hedera Account ID
                     <input
@@ -948,30 +939,6 @@ const Index = () => {
                   onClick={handleSyncGoogleVCs}
                   disabled={!state.installedSnap}
                   loading={loadingState === 'syncGoogleVCs'}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        ) : (
-          ''
-        )}
-        {/* =============================================================================== */}
-        {validHederaChainID(currentChainId) && hederaAccountConnected ? (
-          <Card
-            content={{
-              title: 'getHederaAccountId',
-              description: 'Retrieve Hedera Account Id',
-              button: (
-                <SendHelloButton
-                  buttonText="Get Account Id"
-                  onClick={handleGetHederaAccountIdClick}
-                  disabled={!state.installedSnap}
                 />
               ),
             }}

@@ -1,6 +1,5 @@
 import { BIP44CoinTypeNode } from '@metamask/key-tree';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
-import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import {
   DIDResolutionResult,
   IIdentifier,
@@ -14,6 +13,8 @@ import {
 import cloneDeep from 'lodash.clonedeep';
 import { validHederaChainID } from '../hedera/config';
 import { IdentitySnapParams, SnapDialogParams } from '../interfaces';
+import { generateVCPanel, snapDialog } from '../snap/dialog';
+import { getCurrentNetwork } from '../snap/network';
 import { KeyPair } from '../types/crypto';
 import { CreateVPRequestParams, GetVCsOptions } from '../types/params';
 import {
@@ -27,12 +28,17 @@ import { Agent, getAgent } from '../veramo/setup';
 import { getCurrentDid } from './didUtils';
 import { getKeyPair } from './hederaUtils';
 import { getAddressKeyDeriver, snapGetKeysFromAddress } from './keyPair';
-import { getCurrentNetwork, snapDialog } from './snapUtils';
 
-/* eslint-disable */
+/**
+ * Veramo Resolves DID.
+ *
+ * @param identitySnapParams - Identity snap params.
+ * @param didUrl - DID url.
+ * @returns Resolution result.
+ */
 export async function veramoResolveDID(
   identitySnapParams: IdentitySnapParams,
-  didUrl?: string
+  didUrl?: string,
 ): Promise<DIDResolutionResult> {
   const { snap } = identitySnapParams;
   let did = didUrl;
@@ -44,7 +50,7 @@ export async function veramoResolveDID(
   if (!did) {
     const identifier = await veramoImportMetaMaskAccount(
       identitySnapParams,
-      agent
+      agent,
     );
     did = identifier.did;
   }
@@ -53,38 +59,72 @@ export async function veramoResolveDID(
   });
 }
 
+/**
+ * Veramo Get VCs.
+ *
+ * @param identitySnapParams - Identity snap params.
+ * @param options - Get VCs options.
+ * @param filter - Filter parameters.
+ * @returns VCs.
+ */
 export async function veramoGetVCs(
-  snap: SnapsGlobalObject,
+  identitySnapParams: IdentitySnapParams,
   options: GetVCsOptions,
-  filter?: Filter
+  filter?: Filter,
 ): Promise<IDataManagerQueryResult[]> {
+  const { snap, state } = identitySnapParams;
   const agent = await getAgent(snap);
-  const result = (await agent.query({
+  const result = (await agent.queryVC({
     filter,
     options,
+    accessToken:
+      state.accountState[state.currentAccount].accountConfig.identity
+        .googleAccessToken,
   })) as IDataManagerQueryResult[];
   return result;
 }
 
+/**
+ * Veramo Save VC.
+ *
+ * @param identitySnapParams - Identity snap params.
+ * @param verifiableCredential - Verifiable Credential.
+ * @param store - Store to save.
+ * @returns Save result.
+ */
 export async function veramoSaveVC(
-  snap: SnapsGlobalObject,
+  identitySnapParams: IdentitySnapParams,
   verifiableCredential: W3CVerifiableCredential,
-  store: string | string[]
+  store: string | string[],
 ): Promise<IDataManagerSaveResult[]> {
+  const { snap, state } = identitySnapParams;
   const agent = await getAgent(snap);
-  const result = await agent.save({
+  const result = await agent.saveVC({
     data: verifiableCredential,
     options: { store },
+    accessToken:
+      state.accountState[state.currentAccount].accountConfig.identity
+        .googleAccessToken,
   });
   return result;
 }
 
+/**
+ * Veramo Create VC.
+ *
+ * @param identitySnapParams - Identity snap params.
+ * @param vcKey - VC key.
+ * @param vcValue - VC value.
+ * @param store - Store to save.
+ * @param credTypes - Credential types.
+ * @returns Save result.
+ */
 export async function veramoCreateVC(
   identitySnapParams: IdentitySnapParams,
   vcKey: string,
   vcValue: object,
   store: string | string[],
-  credTypes: string[]
+  credTypes: string[],
 ): Promise<IDataManagerSaveResult[]> {
   const { snap, state, metamask } = identitySnapParams;
 
@@ -94,16 +134,17 @@ export async function veramoCreateVC(
   // GET DID
   const identifier = await veramoImportMetaMaskAccount(
     identitySnapParams,
-    agent
+    agent,
   );
-  const did = identifier.did;
+  const { did } = identifier;
 
   const issuanceDate = new Date();
+  // Set the expiration date to be 1 year from the date it's issued
   const expirationDate = cloneDeep(issuanceDate);
   expirationDate.setFullYear(
     issuanceDate.getFullYear() + 1,
     issuanceDate.getMonth(),
-    issuanceDate.getDate()
+    issuanceDate.getDate(),
   );
 
   const credential = new Map<string, unknown>();
@@ -111,8 +152,8 @@ export async function veramoCreateVC(
   credential.set('expirationDate', expirationDate.toISOString()); // when the credential was issued
   credential.set('type', credTypes);
 
-  let issuer: { id: string; hederaAccountId?: string } = { id: did };
-  let credentialSubject: { id: string; hederaAccountId?: string } = {
+  const issuer: { id: string; hederaAccountId?: string } = { id: did };
+  const credentialSubject: { id: string; hederaAccountId?: string } = {
     id: did, // identifier for the only subject of the credential
     [vcKey]: vcValue, // assertion about the only subject of the credential
   };
@@ -135,63 +176,109 @@ export async function veramoCreateVC(
 
   console.log(
     'Created verifiableCredential: ',
-    JSON.stringify(verifiableCredential, null, 4)
+    JSON.stringify(verifiableCredential, null, 4),
   );
-  const result = await agent.save({
+  const result = await agent.saveVC({
     data: verifiableCredential,
     options: { store },
+    accessToken:
+      state.accountState[state.currentAccount].accountConfig.identity
+        .googleAccessToken,
   });
+
+  console.log('Saved verifiableCredential: ', JSON.stringify(result, null, 4));
   return result;
 }
 
+/**
+ * Veramo verify vc.
+ *
+ * @param snap - Snap.
+ * @param vc - Verifiable Credential.
+ * @returns Verify result.
+ */
 export async function veramoVerifyVC(
   snap: SnapsGlobalObject,
-  vc: W3CVerifiableCredential
+  vc: W3CVerifiableCredential,
 ): Promise<IVerifyResult> {
   // Get agent
   const agent = await getAgent(snap);
   return await agent.verifyCredential({ credential: vc });
 }
 
+/**
+ * Veramo remove vc.
+ *
+ * @param identitySnapParams - Identity snap params.
+ * @param ids - Ids to remove.
+ * @param store - Store to remove from.
+ * @returns Delete result.
+ */
 export async function veramoRemoveVC(
-  snap: SnapsGlobalObject,
+  identitySnapParams: IdentitySnapParams,
   ids: string[],
-  store: string | string[]
+  store: string | string[],
 ): Promise<IDataManagerDeleteResult[]> {
+  const { snap, state } = identitySnapParams;
   const agent = await getAgent(snap);
-  let options: any = undefined;
-  if (store) options = { store };
+  let options: any;
+  if (store) {
+    options = { store };
+  }
 
   return Promise.all(
     ids.map(async (id) => {
-      return await agent.delete({
+      return await agent.deleteVC({
         id,
         options,
+        accessToken:
+          state.accountState[state.currentAccount].accountConfig.identity
+            .googleAccessToken,
       });
-    })
+    }),
   ).then((data: IDataManagerDeleteResult[][]) => {
     return data.flat();
   });
 }
 
+/**
+ * Veramo Delete all VCs.
+ *
+ * @param identitySnapParams - Identity snap params.
+ * @param store - Store to remove from.
+ * @returns Clear result.
+ */
 export async function veramoDeleteAllVCs(
-  snap: SnapsGlobalObject,
-  store: string | string[]
+  identitySnapParams: IdentitySnapParams,
+  store: string | string[],
 ): Promise<IDataManagerClearResult[]> {
+  const { snap, state } = identitySnapParams;
   const agent = await getAgent(snap);
-  let options: any = undefined;
-  if (store) options = { store };
+  let options: any;
+  if (store) {
+    options = { store };
+  }
 
-  return await agent.clear({
+  return await agent.clearVCs({
     options,
+    accessToken:
+      state.accountState[state.currentAccount].accountConfig.identity
+        .googleAccessToken,
   });
 }
 
+/**
+ * Veramo Create VP.
+ *
+ * @param identitySnapParams - Identity snap params.
+ * @param vpRequestParams - VP request params.
+ * @returns Created VP.
+ */
 export async function veramoCreateVP(
   identitySnapParams: IdentitySnapParams,
-  vpRequestParams: CreateVPRequestParams
+  vpRequestParams: CreateVPRequestParams,
 ): Promise<VerifiablePresentation | null> {
-  const { snap, state, metamask } = identitySnapParams;
+  const { snap, state } = identitySnapParams;
 
   const vcsMetadata = vpRequestParams.vcs;
   const proofFormat = vpRequestParams.proofInfo?.proofFormat
@@ -203,56 +290,53 @@ export async function veramoCreateVP(
   const domain = vpRequestParams.proofInfo?.domain;
   const challenge = vpRequestParams.proofInfo?.challenge;
 
-  //Get Veramo agent
+  // Get Veramo agent
   const agent = await getAgent(snap);
 
-  //GET DID
+  // GET DID
   const identifier = await veramoImportMetaMaskAccount(
     identitySnapParams,
-    agent
+    agent,
   );
-  const did = identifier.did;
+  const { did } = identifier;
 
   const vcs: VerifiableCredential[] = [];
+  const vcsWithMetadata: IDataManagerQueryResult[] = [];
 
   for (const vcId of vcsMetadata) {
-    const vcObj = (await agent.query({
+    const vcObj = (await agent.queryVC({
       filter: {
         type: 'id',
         filter: vcId,
       },
       options: { store: 'snap' },
     })) as IDataManagerQueryResult[];
+
     if (vcObj.length > 0) {
       const vc: VerifiableCredential = vcObj[0].data as VerifiableCredential;
       vcs.push(vc);
+      vcsWithMetadata.push({ data: vc, metadata: { id: vcId, store: 'snap' } });
     }
   }
 
-  if (vcs.length === 0) return null;
+  if (vcs.length === 0) {
+    return null;
+  }
   const config = state.snapConfig;
 
-  const panelToShow = [
-    heading('Create Verifiable Presentation'),
-    text('Do you wish to create a VP from the following VCs?'),
-    divider(),
-  ];
-  vcs.forEach((vcData, index) => {
-    const vcsToShow = {
-      credentialSubject: vcData.credentialSubject,
-      type: vcData.type,
-    };
-    panelToShow.push(divider());
-    panelToShow.push(text(`Credential #${index + 1}`));
-    panelToShow.push(divider());
-    panelToShow.push(text(JSON.stringify(vcsToShow)));
-  });
-
+  const header = 'Create Verifiable Presentation';
+  const prompt = 'Do you wish to create a VP from the following VCs?';
+  const description =
+    'A Verifiable Presentation is a secure way for someone to present information about themselves or their identity to someone else while ensuring that the information is accureate and trustworthy';
   const dialogParams: SnapDialogParams = {
     type: 'Confirmation',
-    content: panel(panelToShow),
+    content: await generateVCPanel(
+      header,
+      prompt,
+      description,
+      vcsWithMetadata,
+    ),
   };
-
   if (config.dApp.disablePopups || (await snapDialog(snap, dialogParams))) {
     const vp = await agent.createVerifiablePresentation({
       presentation: {
@@ -266,22 +350,36 @@ export async function veramoCreateVP(
     });
     return vp;
   }
-  console.log('No VCs found...');
-  return null;
+  throw new Error('User rejected');
 }
 
+/**
+ * Veramo Verify VP.
+ *
+ * @param snap - Snap.
+ * @param vp - Verifiable Presentation.
+ * @returns Verify result.
+ */
 export async function veramoVerifyVP(
   snap: SnapsGlobalObject,
-  vp: VerifiablePresentation
+  vp: VerifiablePresentation,
 ): Promise<IVerifyResult> {
   const agent = await getAgent(snap);
   return await agent.verifyPresentation({ presentation: vp });
 }
 
+/**
+ * Veramo Connect Hedera account.
+ *
+ * @param agent - Veramo agent.
+ * @param account - Account.
+ * @param privateKey - Private key.
+ * @returns Success.
+ */
 export async function veramoConnectHederaAccount(
   agent: Agent,
   account: string,
-  privateKey: string
+  privateKey: string,
 ): Promise<boolean> {
   const controllerKeyId = `metamask-${account}`;
   try {
@@ -300,9 +398,16 @@ export async function veramoConnectHederaAccount(
   return true;
 }
 
+/**
+ * Veramo Import metamask account.
+ *
+ * @param identitySnapParams - Identity snap params.
+ * @param agent - Veramo agent.
+ * @returns Identifier.
+ */
 export async function veramoImportMetaMaskAccount(
   identitySnapParams: IdentitySnapParams,
-  agent: Agent
+  agent: Agent,
 ): Promise<IIdentifier> {
   const { snap, state, metamask } = identitySnapParams;
   const method =
@@ -327,10 +432,10 @@ export async function veramoImportMetaMaskAccount(
       keyPair.publicKey = kp.publicKey;
     } catch (error) {
       console.log(
-        `Failed to get private keys from Metamask account for Hedera network. Error: ${error}`
+        `Failed to get private keys from Metamask account for Hedera network. Error: ${error}`,
       );
       throw new Error(
-        `Failed to get private keys from Metamask account for Hedera network. Error: ${error}`
+        `Failed to get private keys from Metamask account for Hedera network. Error: ${error}`,
       );
     }
   } else {
@@ -339,7 +444,7 @@ export async function veramoImportMetaMaskAccount(
       bip44CoinTypeNode as BIP44CoinTypeNode,
       state,
       state.currentAccount,
-      snap
+      snap,
     );
     if (!res) {
       console.log('Failed to get private keys from Metamask account');
@@ -364,7 +469,7 @@ export async function veramoImportMetaMaskAccount(
     ],
   });
   console.log(
-    `Importing using did=${did}, provider=${method}, controllerKeyId=${controllerKeyId}...`
+    `Importing using did=${did}, provider=${method}, controllerKeyId=${controllerKeyId}...`,
   );
 
   console.log('imported successfully');

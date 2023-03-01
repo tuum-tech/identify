@@ -3,7 +3,7 @@
  * https://jestjs.io/docs/configuration
  */
 
-export default {
+const config = {
   // All imported modules in your tests should be mocked automatically
   // automock: false,
 
@@ -195,3 +195,5 @@ export default {
 
   testTimeout: 120000,
 };
+
+export default config;

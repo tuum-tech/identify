@@ -11,7 +11,6 @@ import { HederaAccountInfo, SimpleHederaClient } from '../service';
 
 import { createAccount } from './create-account';
 
-/* eslint-disable */
 export class SimpleHederaClientImpl implements SimpleHederaClient {
   private _client: Client;
 

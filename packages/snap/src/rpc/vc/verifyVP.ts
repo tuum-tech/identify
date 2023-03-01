@@ -2,10 +2,15 @@ import { VerifiablePresentation } from '@veramo/core';
 import { IdentitySnapParams } from '../../interfaces';
 import { veramoVerifyVP } from '../../utils/veramoUtils';
 
-/* eslint-disable */
+/**
+ * Function to verify VP.
+ *
+ * @param identitySnapParams - Identity snap params.
+ * @param vp - Verifiable Presentation.
+ */
 export async function verifyVP(
   identitySnapParams: IdentitySnapParams,
-  vp: VerifiablePresentation
+  vp: VerifiablePresentation,
 ): Promise<boolean | null> {
   const { snap } = identitySnapParams;
 
@@ -13,7 +18,7 @@ export async function verifyVP(
   if (result.verified === false) {
     console.log(
       'VP Verification Error: ',
-      JSON.stringify(result.error, null, 4)
+      JSON.stringify(result.error, null, 4),
     );
   }
   return result.verified;

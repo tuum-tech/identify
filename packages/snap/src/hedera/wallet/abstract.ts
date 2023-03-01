@@ -11,18 +11,22 @@ import type { PrivateKey, PublicKey } from '@hashgraph/sdk';
 // - ledger, index: N
 // - others, not supported
 
-/* eslint-disable */
 export abstract class WalletHedera {
   // produce a transaction signer
   // that can be used to sign transactions
   abstract getTransactionSigner(
-    index: number
+    index: number,
   ): Promise<(transactionBody: Uint8Array) => Promise<Uint8Array>>;
 
   // get the public key associated with the wallet
   abstract getPublicKey(index: number): Promise<PublicKey | undefined>;
 
-  /** Get the private key associated with the wallet (if avaialble) */
+  /**
+   * Get the private key associated with the wallet (if avaialble).
+   *
+   * @param _index - Index.
+   * @returns Private key.
+   */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getPrivateKey(_index: number): Promise<PrivateKey | null> {
     return Promise.resolve(null);

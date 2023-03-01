@@ -1,3 +1,4 @@
+/* eslint-disable */
 module.exports = {
   cliOptions: {
     src: './dist/snap.js',

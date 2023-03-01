@@ -1,7 +1,31 @@
-import { IdentitySnapState, UploadData } from 'src/interfaces';
+type UploadData = {
+  fileName: string;
+  content: string;
+};
 
 export const GOOGLE_DRIVE_VCS_FILE_NAME = 'identity-snap-vcs.json';
 const BOUNDARY = '314159265358979323846';
+
+export const verifyToken = async (accessToken: string) => {
+  try {
+    const res = await fetch(
+      `https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${accessToken}`,
+      {
+        method: 'GET',
+      },
+    );
+    const data = await res.json();
+    if (res.status !== 200) {
+      throw Error(data.error_description);
+    }
+    console.log('VerifyToken: ', { data: JSON.stringify(data) });
+
+    return true;
+  } catch (error) {
+    console.error('Failed to verify token', error);
+    throw error;
+  }
+};
 
 const searchFile = async (accessToken: string, fileName: string) => {
   try {
@@ -46,12 +70,9 @@ const getRequestBodyToUpload = ({ fileName, content }: UploadData) => {
 };
 
 export const uploadToGoogleDrive = async (
-  state: IdentitySnapState,
+  accessToken: string,
   { fileName, content }: UploadData,
 ) => {
-  const accessToken =
-    state.accountState[state.currentAccount].accountConfig.identity
-      .googleAccessToken;
   if (!accessToken) {
     console.error('Access token not found');
     return false;
@@ -98,12 +119,9 @@ export const uploadToGoogleDrive = async (
 };
 
 export const createEmptyFile = async (
-  state: IdentitySnapState,
+  accessToken: string,
   fileName: string,
 ) => {
-  const accessToken =
-    state.accountState[state.currentAccount].accountConfig.identity
-      .googleAccessToken;
   if (!accessToken) {
     console.error('Access token not found');
     return false;
@@ -148,13 +166,7 @@ export const getFileContent = async (accessToken: string, fileId: string) => {
   return res.json();
 };
 
-export const getGoogleVCs = async (
-  state: IdentitySnapState,
-  fileName: string,
-) => {
-  const accessToken =
-    state.accountState[state.currentAccount].accountConfig.identity
-      .googleAccessToken;
+export const getGoogleVCs = async (accessToken: string, fileName: string) => {
   if (!accessToken) {
     console.error('Access token not found');
     throw new Error('Google account was not configured');

@@ -1,16 +1,23 @@
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
+import { snapDialog } from '../../snap/dialog';
 import { SaveVCRequestParams } from '../../types/params';
-import { snapDialog } from '../../utils/snapUtils';
 import { veramoSaveVC } from '../../utils/veramoUtils';
 import { IDataManagerSaveResult } from '../../veramo/plugins/verfiable-creds-manager';
 
-/* eslint-disable */
+/**
+ * Function to save VC.
+ *
+ * @param identitySnapParams - Identity snap params.
+ * @param options0 - Save VC request params.
+ * @param options0.verifiableCredential - Verifiable Credential.
+ * @param options0.options - Save VC options.
+ */
 export async function saveVC(
-  params: IdentitySnapParams,
-  { verifiableCredential, options }: SaveVCRequestParams
+  identitySnapParams: IdentitySnapParams,
+  { verifiableCredential, options }: SaveVCRequestParams,
 ): Promise<IDataManagerSaveResult[]> {
-  const { snap } = params;
+  const { snap } = identitySnapParams;
 
   const { store = 'snap' } = options || {};
 
@@ -21,7 +28,7 @@ export async function saveVC(
       text(
         `Would you like to save the following VC in ${
           typeof store === 'string' ? store : store.join(', ')
-        }?`
+        }?`,
       ),
       divider(),
       text(JSON.stringify(verifiableCredential)),
@@ -29,7 +36,7 @@ export async function saveVC(
   };
 
   if (await snapDialog(snap, dialogParams)) {
-    return await veramoSaveVC(snap, verifiableCredential, store);
+    return await veramoSaveVC(identitySnapParams, verifiableCredential, store);
   }
   throw new Error('User rejected');
 }

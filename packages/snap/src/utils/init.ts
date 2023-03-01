@@ -1,10 +1,14 @@
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { heading, panel, text } from '@metamask/snaps-ui';
 import { IdentitySnapState, SnapDialogParams } from '../interfaces';
-import { snapDialog } from './snapUtils';
-import { initSnapState } from './stateUtils';
+import { initSnapState } from '../snap/state';
+import { snapDialog } from '../snap/dialog';
 
-/* eslint-disable */
+/**
+ * Init snap state.
+ *
+ * @param snap - Snap.
+ */
 export async function init(
   snap: SnapsGlobalObject,
 ): Promise<IdentitySnapState> {

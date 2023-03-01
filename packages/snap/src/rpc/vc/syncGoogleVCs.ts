@@ -1,25 +1,38 @@
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
+import { snapDialog } from '../../snap/dialog';
+import { updateSnapState } from '../../snap/state';
 import {
   createEmptyFile,
   getGoogleVCs,
   GOOGLE_DRIVE_VCS_FILE_NAME,
   uploadToGoogleDrive,
-} from '../../utils/googleUtils';
-import { snapDialog } from '../../utils/snapUtils';
-import { updateSnapState } from '../../utils/stateUtils';
+} from '../../veramo/plugins/google-drive-data-store';
 
-/* eslint-disable */
+/**
+ * Function to sync Google VCs with snap.
+ *
+ * @param identitySnapParams - Identity snap params.
+ */
 export async function syncGoogleVCs(
   identitySnapParams: IdentitySnapParams,
 ): Promise<boolean> {
   const { snap, state } = identitySnapParams;
 
   const currentVCs = state.accountState[state.currentAccount].vcs;
-  let googleVCs = await getGoogleVCs(state, GOOGLE_DRIVE_VCS_FILE_NAME);
+  let googleVCs = await getGoogleVCs(
+    state.accountState[state.currentAccount].accountConfig.identity
+      .googleAccessToken,
+    GOOGLE_DRIVE_VCS_FILE_NAME,
+  );
 
   if (!googleVCs) {
-    await createEmptyFile(state, GOOGLE_DRIVE_VCS_FILE_NAME);
+    await createEmptyFile(
+      state.accountState[state.currentAccount].accountConfig.identity
+        .googleAccessToken,
+      GOOGLE_DRIVE_VCS_FILE_NAME,
+    );
+    // eslint-disable-next-line require-atomic-updates
     googleVCs = {};
   }
 
@@ -47,10 +60,14 @@ export async function syncGoogleVCs(
     await updateSnapState(snap, state);
 
     // Save to google drive
-    const gdriveResponse = await uploadToGoogleDrive(state, {
-      fileName: GOOGLE_DRIVE_VCS_FILE_NAME,
-      content: JSON.stringify(state.accountState[state.currentAccount].vcs),
-    });
+    const gdriveResponse = await uploadToGoogleDrive(
+      state.accountState[state.currentAccount].accountConfig.identity
+        .googleAccessToken,
+      {
+        fileName: GOOGLE_DRIVE_VCS_FILE_NAME,
+        content: JSON.stringify(state.accountState[state.currentAccount].vcs),
+      },
+    );
     console.log({ gdriveResponse });
 
     return true;

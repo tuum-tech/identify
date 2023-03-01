@@ -15,5 +15,5 @@ module.exports = {
     project: './tsconfig.eslint.json',
     sourceType: 'module',
   },
-  ignorePatterns: ['src/post-process/post-process.js'],
+  ignorePatterns: ['./post-process.js'],
 };

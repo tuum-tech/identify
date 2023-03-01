@@ -1,14 +1,19 @@
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import { IDataManagerDeleteResult } from 'src/veramo/plugins/verfiable-creds-manager';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
+import { snapDialog } from '../../snap/dialog';
 import { RemoveVCsRequestParams } from '../../types/params';
-import { snapDialog } from '../../utils/snapUtils';
 import { veramoRemoveVC } from '../../utils/veramoUtils';
 
-/* eslint-disable */
+/**
+ * Function to remove VC.
+ *
+ * @param identitySnapParams - Identity snap params.
+ * @param vcRequestParams - VC request params.
+ */
 export async function removeVC(
   identitySnapParams: IdentitySnapParams,
-  vcRequestParams: RemoveVCsRequestParams
+  vcRequestParams: RemoveVCsRequestParams,
 ): Promise<IDataManagerDeleteResult[] | null> {
   const { snap } = identitySnapParams;
 
@@ -16,7 +21,9 @@ export async function removeVC(
   const { store = 'snap' } = options || {};
 
   const ids = typeof id === 'string' ? [id] : id;
-  if (ids.length === 0) return null;
+  if (ids.length === 0) {
+    return null;
+  }
 
   const dialogParams: SnapDialogParams = {
     type: 'Confirmation',
@@ -29,7 +36,7 @@ export async function removeVC(
   };
 
   if (await snapDialog(snap, dialogParams)) {
-    return await veramoRemoveVC(snap, ids, store);
+    return await veramoRemoveVC(identitySnapParams, ids, store);
   }
   throw new Error('User rejected');
 }

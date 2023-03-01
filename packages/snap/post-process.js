@@ -1,3 +1,4 @@
+/* eslint-disable */
 const fs = require('fs');
 const pathUtils = require('path');
 
@@ -13,7 +14,7 @@ bundleString = 'var self = window;\n'.concat(bundleString);
 bundleString = bundleString
   .replace(
     `module.exports = function decodeAsm (stdlib, foreign, buffer) {`,
-    `module.exports = function decodeAsm (foreign, buffer) {`
+    `module.exports = function decodeAsm (foreign, buffer) {`,
   )
   .replace(/stdlib\./gu, '');
 
@@ -22,17 +23,18 @@ bundleString = bundleString.replace(
   `Gp[iteratorSymbol] = function() {
     return this;
   };`,
-  ''
+  '',
 );
 
 // Fix TextEncoder and TextDecoder
 bundleString = bundleString.replace(
   'const textEncoder = new TextEncoder();',
-  ''
+  '',
 );
+
 bundleString = bundleString.replace(
   'const textDecoder = new TextDecoder();',
-  ''
+  '',
 );
 bundleString = bundleString.replace('textEncoder.', 'new TextEncoder().');
 bundleString = bundleString.replace('textDecoder.', 'new TextDecoder().');
@@ -44,27 +46,27 @@ bundleString = bundleString.replaceAll('import(args)', 'importPKey(args)');
 // Fix root errors
 bundleString = bundleString.replaceAll(
   "var coreJsData = root['__core-js_shared__'];",
-  "if(root) {var coreJsData = root['__core-js_shared__'];}"
+  "if(root) {var coreJsData = root['__core-js_shared__'];}",
 );
 
 bundleString = bundleString.replaceAll(
   'var Symbol = root.Symbol',
-  'if(root)var Symbol = root.Symbol'
+  'if(root)var Symbol = root.Symbol',
 );
 
 bundleString = bundleString.replaceAll(
   'var Buffer = moduleExports ? root.Buffer : undefined,',
-  'if(root)var Buffer = moduleExports ? root.Buffer : undefined,'
+  'if(root)var Buffer = moduleExports ? root.Buffer : undefined,',
 );
 
 bundleString = bundleString.replaceAll(
   `process.env.NODE_ENV === 'production'`,
-  `true`
+  `true`,
 );
 
 bundleString = bundleString.replaceAll(
   `Gp[iteratorSymbol]`,
-  `Gp.iteratorSymbol`
+  `Gp.iteratorSymbol`,
 );
 
 // Remove 'use asm' tokens; they cause pointless console warnings
@@ -73,7 +75,7 @@ bundleString = bundleString.replace(/^\s*'use asm';?\n?/gmu, '');
 // workaround to be able to find the keys for a did:pkh:hedera.
 bundleString = bundleString.replace(
   'let vmEthAddr = getEthereumAddress(verificationMethod);',
-  "if (verificationMethod.blockchainAccountId?.startsWith('hedera')) { return true; };let vmEthAddr = getEthereumAddress(verificationMethod);"
+  "if (verificationMethod.blockchainAccountId?.startsWith('hedera')) { return true; };let vmEthAddr = getEthereumAddress(verificationMethod);",
 );
 
 fs.writeFileSync(bundlePath, bundleString);
