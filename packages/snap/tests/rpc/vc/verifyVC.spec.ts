@@ -85,18 +85,4 @@ describe('VerifyVC', () => {
     ).resolves.toBe(false);
     expect.assertions(1);
   });
-
-  // it.skip('should throw exception if user refused confirmation', async () => {
-
-  //     // Setup
-  //   walletMock.rpcMocks.snap_confirm.mockReturnValue(true);
-
-  //   // create VC to verify
-  //   let vcCreatedResult = await createVC(walletMock, snapState, { vcValue: {'prop':12} });
-  //   let vc = await getVCs(walletMock, snapState, {filter: {type: 'id', filter: vcCreatedResult[0].id}})
-
-  //   walletMock.rpcMocks.snap_confirm.mockReturnValue(false);
-  //   await expect(verifyVC(walletMock, snapState, vc[0].data as W3CVerifiableCredential)).rejects.toThrowError();
-  //   expect.assertions(1);
-  // });
 });

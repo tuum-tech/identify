@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { SnapProvider } from '@metamask/snap-types';
 import { getInitialSnapState } from '../../src/utils/config';
 import { init } from '../../src/utils/init';

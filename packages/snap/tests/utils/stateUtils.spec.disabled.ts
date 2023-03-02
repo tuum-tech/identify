@@ -1,9 +1,11 @@
+/* eslint-disable */
+
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import {
   getSnapStateUnchecked,
   initAccountState,
   initSnapState,
-  updateSnapState,
+  updateSnapState
 } from '../../src/snap/state';
 import { getInitialSnapState } from '../../src/utils/config';
 import { address, getDefaultSnapState } from '../testUtils/constants';
