@@ -1,4 +1,3 @@
-import { useGoogleLogin } from '@react-oauth/google';
 import { useContext, useEffect, useState } from 'react';
 
 import {
@@ -19,7 +18,6 @@ import {
 import { MetamaskActions, MetaMaskContext } from '../contexts/MetamaskContext';
 import { VcContext } from '../contexts/VcContext';
 import {
-  configureGoogleAccount,
   connectHederaAccount,
   connectSnap,
   getCurrentNetwork,
@@ -27,10 +25,10 @@ import {
   getSnap,
   sendHello,
   shouldDisplayReconnectButton,
-  syncGoogleVCs,
   togglePopups,
 } from '../utils';
 import { validHederaChainID } from '../utils/hedera';
+import ConfigureGoogleAccount from './cards/ConfigureGoogleAccount';
 import CreateVC from './cards/CreateVC';
 import DeleteAllVCs from './cards/DeleteAllVCs';
 import GetAllVCs from './cards/GetAllVCs';
@@ -40,6 +38,7 @@ import GetSpecificVC from './cards/GetSpecificVC';
 import GetVP from './cards/GetVP';
 import RemoveVC from './cards/RemoveVC';
 import ResolveDID from './cards/ResolveDID';
+import SyncGoogleVCs from './cards/SyncGoogleVCs';
 import Todo from './cards/Todo';
 import VerifyVC from './cards/VerifyVC';
 import VerifyVP from './cards/VerifyVP';
@@ -83,30 +82,6 @@ const Index = () => {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
-  };
-
-  const handleConfigureGoogleAccount = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      setLoadingState('configureGoogleAccount');
-      await configureGoogleAccount(tokenResponse.access_token);
-      alert('Google Account configuration was successful');
-      setLoadingState(null);
-    },
-    onError: (error) => {
-      console.log('Login Failed', error);
-    },
-  });
-
-  const handleSyncGoogleVCs = async () => {
-    setLoadingState('syncGoogleVCs');
-    try {
-      const resp = await syncGoogleVCs();
-      console.log('Synced with google drive: ', resp);
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-    setLoadingState(null);
   };
 
   const handleConfigureHederaAccountClick = async () => {
@@ -384,69 +359,22 @@ const Index = () => {
           ''
         )}
         {/* =============================================================================== */}
-        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
-        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
-          <Card
-            content={{
-              title: 'configureGoogleAccount',
-              description: 'Configure Google Account',
-              form: null,
-              button: (
-                <SendHelloButton
-                  buttonText="Configure Google Account"
-                  onClick={handleConfigureGoogleAccount}
-                  disabled={!state.installedSnap}
-                  loading={loadingState === 'configureGoogleAccount'}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        ) : (
-          ''
-        )}
-        {/* =============================================================================== */}
-        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
-        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
-          <Card
-            content={{
-              title: 'syncGoogleVCs',
-              description: 'Sync VCs with google drive',
-              button: (
-                <SendHelloButton
-                  buttonText="Sync Google VCs"
-                  onClick={handleSyncGoogleVCs}
-                  disabled={!state.installedSnap}
-                  loading={loadingState === 'syncGoogleVCs'}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        ) : (
-          ''
-        )}
-        {/* =============================================================================== */}
+        <ConfigureGoogleAccount
+          currentChainId={currentChainId}
+          hederaAccountConnected={hederaAccountConnected}
+        />
+        <SyncGoogleVCs
+          currentChainId={currentChainId}
+          hederaAccountConnected={hederaAccountConnected}
+        />
         <Todo
           currentChainId={currentChainId}
           hederaAccountConnected={hederaAccountConnected}
         />
-        {/* =============================================================================== */}
         <Todo
           currentChainId={currentChainId}
           hederaAccountConnected={hederaAccountConnected}
         />
-        {/* =============================================================================== */}
         <Todo
           currentChainId={currentChainId}
           hederaAccountConnected={hederaAccountConnected}
