@@ -1,13 +1,10 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
-import { IdentitySnapParams, IdentitySnapState } from 'src/interfaces';
-import { switchMethod } from '../../../src/rpc/did/switchMethods';
-import { connectHederaAccount } from '../../../src/rpc/hedera/connectHederaAccount';
-import {
-  getDefaultSnapState,
-  hederaPrivateKey,
-} from '../../testUtils/constants';
-import { createMockSnap, SnapMock } from '../../testUtils/snap.mock';
+import { IdentitySnapParams, IdentitySnapState } from '../../src/interfaces';
+import { switchMethod } from '../../src/rpc/did/switchMethods';
+import { connectHederaAccount } from '../../src/rpc/hedera/connectHederaAccount';
+import { getDefaultSnapState, hederaPrivateKey } from '../testUtils/constants';
+import { createMockSnap, SnapMock } from '../testUtils/snap.mock';
 
 describe('SwitchMethod', () => {
   let identitySnapParams: IdentitySnapParams;

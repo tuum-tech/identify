@@ -7,6 +7,7 @@ export const privateKey =
 
 export const hederaPrivateKey =
   '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c';
+
 export const hederaAccountId = '0.0.15215';
 export const hederaAddress = '0x7d871f006d97498ea338268a956af94ab2e65cdd';
 
@@ -37,11 +38,11 @@ const defaultSnapState: IdentitySnapState = {
 };
 
 export const getDefaultSnapState = (): IdentitySnapState => {
-  //defaultSnapState.accountState[address].publicKey = publicKey;
+  // defaultSnapState.accountState[address].publicKey = publicKey;
   return cloneDeep(defaultSnapState);
 };
 
 export const getSnapStateWithIdentifiers = (): IdentitySnapState => {
-  let snapStateWithIdentifiers = getDefaultSnapState();
+  const snapStateWithIdentifiers = getDefaultSnapState();
   return snapStateWithIdentifiers;
 };

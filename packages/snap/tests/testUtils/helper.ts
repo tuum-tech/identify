@@ -3,9 +3,9 @@ import { VerifiableCredential } from 'did-jwt-vc';
 export const getDefaultCredential = async (
   agent: any,
   did: string,
-  type: string = 'Default',
+  type = 'Default',
 ): Promise<VerifiableCredential> => {
-  let vc = await agent.createVerifiableCredential({
+  const vc = await agent.createVerifiableCredential({
     credential: {
       issuer: { id: did },
       '@context': [

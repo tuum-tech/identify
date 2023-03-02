@@ -3,7 +3,7 @@ import { getSupportedProofFormats } from '../../../src/rpc/vc/getSupportedProofF
 describe('GetSupportedProofFormats', () => {
   it('should return all supported proof formats', async () => {
     // get
-    let getAvailableMethodsResult = await getSupportedProofFormats();
+    const getAvailableMethodsResult = await getSupportedProofFormats();
     expect(getAvailableMethodsResult.length).toBe(3);
     expect(getAvailableMethodsResult).toContain('jwt');
     expect(getAvailableMethodsResult).toContain('lds');

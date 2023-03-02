@@ -1,3 +1,4 @@
+import { PrivateKey } from '@hashgraph/sdk';
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { heading, panel, text } from '@metamask/snaps-ui';
@@ -34,10 +35,9 @@ export async function connectHederaAccount(
       ]),
       placeholder: '2386d1d21644dc65d...', // You can use '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c' and '0.0.15215' for testing purposes
     };
-    const privateKey = (await snapDialog(
-      snap,
-      dialogParamsForPrivateKey,
-    )) as string;
+    const privateKey = PrivateKey.fromString(
+      (await snapDialog(snap, dialogParamsForPrivateKey)) as string,
+    ).toStringRaw();
 
     const hederaAccountInfo = await toHederaAccountInfo(
       privateKey,

@@ -4,7 +4,10 @@ import { IdentitySnapParams, IdentitySnapState } from '../../../src/interfaces';
 import { connectHederaAccount } from '../../../src/rpc/hedera/connectHederaAccount';
 import { createVC } from '../../../src/rpc/vc/createVC';
 import { deleteAllVCs } from '../../../src/rpc/vc/deleteAllVCs';
-import { getDefaultSnapState } from '../../testUtils/constants';
+import {
+  getDefaultSnapState,
+  hederaPrivateKey,
+} from '../../testUtils/constants';
 import { createMockSnap, SnapMock } from '../../testUtils/snap.mock';
 
 describe('delete all VC', () => {
@@ -18,33 +21,27 @@ describe('delete all VC', () => {
     snapMock = createMockSnap();
     metamask = snapMock as unknown as MetaMaskInpageProvider;
     identitySnapParams = {
-      metamask: metamask,
+      metamask,
       snap: snapMock,
       state: snapState,
     };
 
-    let privateKey =
-      '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c';
     (
       identitySnapParams.snap as SnapMock
-    ).rpcMocks.snap_dialog.mockReturnValueOnce(privateKey);
+    ).rpcMocks.snap_dialog.mockReturnValueOnce(hederaPrivateKey);
+
     (identitySnapParams.snap as SnapMock).rpcMocks.eth_chainId.mockReturnValue(
       '0x128',
     );
 
-    let connected = await connectHederaAccount(
-      snapMock,
-      snapState,
-      metamask,
-      '0.0.15215',
-    );
+    await connectHederaAccount(snapMock, snapState, metamask, '0.0.15215');
   });
 
   it('should delete all VC', async () => {
     (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
       true,
     );
-    let vcCreatedResult = await createVC(identitySnapParams, {
+    const vcCreatedResult = await createVC(identitySnapParams, {
       vcValue: { prop: 10 },
     });
     expect(vcCreatedResult.length).toBe(1);
@@ -57,8 +54,6 @@ describe('delete all VC', () => {
   });
 
   it('should throw exception if user refused confirmation', async () => {
-    let snapState: IdentitySnapState = getDefaultSnapState();
-
     (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
       false,
     );
