@@ -16,14 +16,14 @@ export const verifyToken = async (accessToken: string) => {
     );
     const data = await res.json();
     if (res.status !== 200) {
-      throw Error(data.error_description);
+      throw new Error(data.error_description);
     }
     console.log('VerifyToken: ', { data: JSON.stringify(data) });
 
     return true;
   } catch (error) {
-    console.error('Failed to verify token', error);
-    throw error;
+    console.error(`Failed to verify token: ${error}`);
+    throw new Error(`Failed to verify token: ${error}`);
   }
 };
 
@@ -45,8 +45,8 @@ const searchFile = async (accessToken: string, fileName: string) => {
 
     return { count, id: count === 1 ? data.files[0].id : null };
   } catch (error) {
-    console.error('Failed to search file', error);
-    throw error;
+    console.error(`Failed to search file: ${error}`);
+    throw new Error(`Failed to search file: ${error}`);
   }
 };
 
