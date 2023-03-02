@@ -21,7 +21,6 @@ import {
   connectHederaAccount,
   connectSnap,
   getCurrentNetwork,
-  getHederaAccountId,
   getSnap,
   sendHello,
   shouldDisplayReconnectButton,
@@ -34,6 +33,7 @@ import DeleteAllVCs from './cards/DeleteAllVCs';
 import GetAllVCs from './cards/GetAllVCs';
 import GetCurrentDIDMethod from './cards/GetCurrentDIDMethod';
 import GetDID from './cards/GetDID';
+import GetHederaAccountId from './cards/GetHederaAccountId';
 import GetSpecificVC from './cards/GetSpecificVC';
 import GetVP from './cards/GetVP';
 import RemoveVC from './cards/RemoveVC';
@@ -116,18 +116,6 @@ const Index = () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
       await togglePopups();
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
-  const handleGetHederaAccountIdClick = async () => {
-    try {
-      setCurrentChainId(await getCurrentNetwork());
-      const accountId = await getHederaAccountId();
-      console.log(`Your Hedera Account Id is: ${accountId}`);
-      alert(`Your Hedera Account Id is: ${accountId}`);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -334,31 +322,11 @@ const Index = () => {
           setCurrentChainId={setCurrentChainId}
           hederaAccountConnected={hederaAccountConnected}
         />
-        {/* =============================================================================== */}
-        {validHederaChainID(currentChainId) && hederaAccountConnected ? (
-          <Card
-            content={{
-              title: 'getHederaAccountId',
-              description: 'Retrieve Hedera Account Id',
-              button: (
-                <SendHelloButton
-                  buttonText="Get Account Id"
-                  onClick={handleGetHederaAccountIdClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        ) : (
-          ''
-        )}
-        {/* =============================================================================== */}
+        <GetHederaAccountId
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+          hederaAccountConnected={hederaAccountConnected}
+        />
         <ConfigureGoogleAccount
           currentChainId={currentChainId}
           hederaAccountConnected={hederaAccountConnected}
