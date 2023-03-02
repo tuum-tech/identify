@@ -5,7 +5,6 @@ import {
   ConnectButton,
   InstallFlaskButton,
   ReconnectButton,
-  SendHelloButton,
 } from '../components';
 import {
   CardContainer,
@@ -18,15 +17,14 @@ import {
 import { MetamaskActions, MetaMaskContext } from '../contexts/MetamaskContext';
 import { VcContext } from '../contexts/VcContext';
 import {
-  connectHederaAccount,
   connectSnap,
   getCurrentNetwork,
   getSnap,
-  sendHello,
   shouldDisplayReconnectButton,
 } from '../utils';
 import { validHederaChainID } from '../utils/hedera';
 import ConfigureGoogleAccount from './cards/ConfigureGoogleAccount';
+import ConnectHederaAccount from './cards/ConnectHederaAccount';
 import CreateVC from './cards/CreateVC';
 import DeleteAllVCs from './cards/DeleteAllVCs';
 import GetAllVCs from './cards/GetAllVCs';
@@ -37,6 +35,7 @@ import GetSpecificVC from './cards/GetSpecificVC';
 import GetVP from './cards/GetVP';
 import RemoveVC from './cards/RemoveVC';
 import ResolveDID from './cards/ResolveDID';
+import SendHelloHessage from './cards/SendHelloHessage';
 import SyncGoogleVCs from './cards/SyncGoogleVCs';
 import Todo from './cards/Todo';
 import ToggleMetamaskPopups from './cards/ToggleMetamaskPopups';
@@ -48,8 +47,6 @@ const Index = () => {
   const [currentChainId, setCurrentChainId] = useState('');
   const [hederaAccountConnected, setHederaAccountConnected] = useState(false);
 
-  const [hederaAccountId, setHederaAccountId] = useState('0.0.15215');
-
   const {
     vcId,
     setVcId,
@@ -60,7 +57,6 @@ const Index = () => {
     vp,
     setVp,
   } = useContext(VcContext);
-  const [loadingState, setLoadingState] = useState<string | null>(null);
 
   useEffect(() => {
     if (!validHederaChainID(currentChainId)) {
@@ -78,34 +74,6 @@ const Index = () => {
         type: MetamaskActions.SetInstalled,
         payload: installedSnap,
       });
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
-  const handleConfigureHederaAccountClick = async () => {
-    setLoadingState('connectHederaAccount');
-    try {
-      const configured = await connectHederaAccount(hederaAccountId);
-      console.log('configured: ', configured);
-      if (configured) {
-        setHederaAccountConnected(true);
-        alert('Hedera Account configuration was successful');
-      } else {
-        console.log('Hedera Account was not configured correctly');
-      }
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-    setLoadingState(null);
-  };
-
-  const handleSendHelloClick = async () => {
-    try {
-      setCurrentChainId(await getCurrentNetwork());
-      await sendHello();
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -170,68 +138,16 @@ const Index = () => {
           />
         )}
         {/* =============================================================================== */}
-        {validHederaChainID(currentChainId) && !hederaAccountConnected && (
-          <Card
-            content={{
-              title: 'connectHederaAccount',
-              description:
-                'Connect to Hedera Account. NOTE that you will need to reconnect to Hedera Account if you switch the network on Metamask at any point in time as that will cause your metamask state to point to your non-hedera account on metamask',
-              form: (
-                <form>
-                  <label>
-                    Enter your Hedera Account ID
-                    <input
-                      type="text"
-                      value={hederaAccountId}
-                      onChange={(e) => setHederaAccountId(e.target.value)}
-                    />
-                  </label>
-                </form>
-              ),
-              button: (
-                <SendHelloButton
-                  buttonText="Connect to Hedera Account"
-                  onClick={handleConfigureHederaAccountClick}
-                  disabled={!state.installedSnap}
-                  loading={loadingState === 'connectHederaAccount'}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        )}
-        {/* =============================================================================== */}
-        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
-        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
-          <Card
-            content={{
-              title: 'Send Hello message',
-              description:
-                'Display a custom message within a confirmation screen in MetaMask.',
-              button: (
-                <SendHelloButton
-                  buttonText="Send message"
-                  onClick={handleSendHelloClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        ) : (
-          ''
-        )}
-        {/* =============================================================================== */}
+        <ConnectHederaAccount
+          currentChainId={currentChainId}
+          hederaAccountConnected={hederaAccountConnected}
+          setHederaAccountConnected={setHederaAccountConnected}
+        />
+        <SendHelloHessage
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+          hederaAccountConnected={hederaAccountConnected}
+        />
         <ToggleMetamaskPopups
           currentChainId={currentChainId}
           setCurrentChainId={setCurrentChainId}
