@@ -24,7 +24,6 @@ import {
   getSnap,
   sendHello,
   shouldDisplayReconnectButton,
-  togglePopups,
 } from '../utils';
 import { validHederaChainID } from '../utils/hedera';
 import ConfigureGoogleAccount from './cards/ConfigureGoogleAccount';
@@ -40,6 +39,7 @@ import RemoveVC from './cards/RemoveVC';
 import ResolveDID from './cards/ResolveDID';
 import SyncGoogleVCs from './cards/SyncGoogleVCs';
 import Todo from './cards/Todo';
+import ToggleMetamaskPopups from './cards/ToggleMetamaskPopups';
 import VerifyVC from './cards/VerifyVC';
 import VerifyVP from './cards/VerifyVP';
 
@@ -106,16 +106,6 @@ const Index = () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
       await sendHello();
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
-  const handleTogglePopupsClick = async () => {
-    try {
-      setCurrentChainId(await getCurrentNetwork());
-      await togglePopups();
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -242,31 +232,11 @@ const Index = () => {
           ''
         )}
         {/* =============================================================================== */}
-        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
-        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
-          <Card
-            content={{
-              title: 'Toggle Metamask popups',
-              description:
-                'You can enable/disable the popups at anytime by calling this API',
-              button: (
-                <SendHelloButton
-                  buttonText="Toggle"
-                  onClick={handleTogglePopupsClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        ) : (
-          ''
-        )}
+        <ToggleMetamaskPopups
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+          hederaAccountConnected={hederaAccountConnected}
+        />
         <GetCurrentDIDMethod
           currentChainId={currentChainId}
           setCurrentChainId={setCurrentChainId}
