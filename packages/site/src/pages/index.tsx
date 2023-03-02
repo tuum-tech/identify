@@ -1,11 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 
-import {
-  Card,
-  ConnectButton,
-  InstallFlaskButton,
-  ReconnectButton,
-} from '../components';
+import { Card, InstallFlaskButton } from '../components';
 import {
   CardContainer,
   Container,
@@ -15,16 +10,11 @@ import {
   Subtitle,
 } from '../config/styles';
 import { MetamaskActions, MetaMaskContext } from '../contexts/MetamaskContext';
-import { VcContext } from '../contexts/VcContext';
-import {
-  connectSnap,
-  getCurrentNetwork,
-  getSnap,
-  shouldDisplayReconnectButton,
-} from '../utils';
+import { connectSnap, getCurrentNetwork, getSnap } from '../utils';
 import { validHederaChainID } from '../utils/hedera';
 import ConfigureGoogleAccount from './cards/ConfigureGoogleAccount';
 import ConnectHederaAccount from './cards/ConnectHederaAccount';
+import ConnectIdentitySnap from './cards/ConnectIdentitySnap';
 import CreateVC from './cards/CreateVC';
 import DeleteAllVCs from './cards/DeleteAllVCs';
 import GetAllVCs from './cards/GetAllVCs';
@@ -33,6 +23,7 @@ import GetDID from './cards/GetDID';
 import GetHederaAccountId from './cards/GetHederaAccountId';
 import GetSpecificVC from './cards/GetSpecificVC';
 import GetVP from './cards/GetVP';
+import ReconnectIdentitySnap from './cards/ReconnectIdentitySnap';
 import RemoveVC from './cards/RemoveVC';
 import ResolveDID from './cards/ResolveDID';
 import SendHelloHessage from './cards/SendHelloHessage';
@@ -46,17 +37,6 @@ const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [currentChainId, setCurrentChainId] = useState('');
   const [hederaAccountConnected, setHederaAccountConnected] = useState(false);
-
-  const {
-    vcId,
-    setVcId,
-    vc,
-    setVc,
-    vcIdsToBeRemoved,
-    setVcIdsToBeRemoved,
-    vp,
-    setVp,
-  } = useContext(VcContext);
 
   useEffect(() => {
     if (!validHederaChainID(currentChainId)) {
@@ -105,39 +85,8 @@ const Index = () => {
             fullWidth
           />
         )}
-        {!state.installedSnap && (
-          <Card
-            content={{
-              title: 'Connect to Identity Snap',
-              description:
-                'Get started by connecting to and installing the Identity Snap.',
-              button: (
-                <ConnectButton
-                  onClick={handleConnectClick}
-                  disabled={!state.isFlask}
-                />
-              ),
-            }}
-            disabled={!state.isFlask}
-          />
-        )}
-        {shouldDisplayReconnectButton(state.installedSnap) && (
-          <Card
-            content={{
-              title: 'Reconnect to Identity Snap',
-              description:
-                "While connected to a local running snap, this button will always be displayed in order to update the snap if a change is made. Note that you'll need to reconnect if you switch the network on Metamask at any point in time as that will cause your metamask state to change",
-              button: (
-                <ReconnectButton
-                  onClick={handleConnectClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-          />
-        )}
-        {/* =============================================================================== */}
+        <ConnectIdentitySnap handleConnectClick={handleConnectClick} />
+        <ReconnectIdentitySnap handleConnectClick={handleConnectClick} />
         <ConnectHederaAccount
           currentChainId={currentChainId}
           hederaAccountConnected={hederaAccountConnected}
