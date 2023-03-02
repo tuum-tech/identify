@@ -3,22 +3,15 @@ import { FC, useContext } from 'react';
 import { Card, SendHelloButton } from '../../components';
 import { MetaMaskContext } from '../../contexts/MetamaskContext';
 import { shouldDisplayReconnectButton } from '../../utils';
-import { validHederaChainID } from '../../utils/hedera';
 
-type Props = {
-  currentChainId: string;
-  hederaAccountConnected: boolean;
-};
-
-const Todo: FC<Props> = ({ currentChainId, hederaAccountConnected }) => {
+const Todo: FC = () => {
   const [state] = useContext(MetaMaskContext);
 
   const handleTodoClick = async () => {
     console.log('Not implemented');
   };
 
-  return (validHederaChainID(currentChainId) && hederaAccountConnected) ||
-    (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+  return (
     <Card
       content={{
         title: 'todo',
@@ -50,7 +43,7 @@ const Todo: FC<Props> = ({ currentChainId, hederaAccountConnected }) => {
         !shouldDisplayReconnectButton(state.installedSnap)
       }
     />
-  ) : null;
+  );
 };
 
 export default Todo;

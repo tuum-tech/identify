@@ -11,19 +11,12 @@ import {
   shouldDisplayReconnectButton,
   verifyVP,
 } from '../../utils';
-import { validHederaChainID } from '../../utils/hedera';
 
 type Props = {
-  currentChainId: string;
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
-  hederaAccountConnected: boolean;
 };
 
-const VerifyVP: FC<Props> = ({
-  currentChainId,
-  setCurrentChainId,
-  hederaAccountConnected,
-}) => {
+const VerifyVP: FC<Props> = ({ setCurrentChainId }) => {
   const { vp, setVp } = useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
 
@@ -39,8 +32,7 @@ const VerifyVP: FC<Props> = ({
     }
   };
 
-  return (validHederaChainID(currentChainId) && hederaAccountConnected) ||
-    (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+  return (
     <Card
       content={{
         title: 'verifyVP',
@@ -73,7 +65,7 @@ const VerifyVP: FC<Props> = ({
         !shouldDisplayReconnectButton(state.installedSnap)
       }
     />
-  ) : null;
+  );
 };
 
 export default VerifyVP;

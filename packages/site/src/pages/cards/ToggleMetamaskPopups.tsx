@@ -10,19 +10,12 @@ import {
   shouldDisplayReconnectButton,
   togglePopups,
 } from '../../utils';
-import { validHederaChainID } from '../../utils/hedera';
 
 type Props = {
-  currentChainId: string;
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
-  hederaAccountConnected: boolean;
 };
 
-const ToggleMetamaskPopups: FC<Props> = ({
-  currentChainId,
-  setCurrentChainId,
-  hederaAccountConnected,
-}) => {
+const ToggleMetamaskPopups: FC<Props> = ({ setCurrentChainId }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
 
   const handleTogglePopupsClick = async () => {
@@ -35,8 +28,7 @@ const ToggleMetamaskPopups: FC<Props> = ({
     }
   };
 
-  return (validHederaChainID(currentChainId) && hederaAccountConnected) ||
-    (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+  return (
     <Card
       content={{
         title: 'Toggle Metamask popups',
@@ -57,7 +49,7 @@ const ToggleMetamaskPopups: FC<Props> = ({
         !shouldDisplayReconnectButton(state.installedSnap)
       }
     />
-  ) : null;
+  );
 };
 
 export default ToggleMetamaskPopups;

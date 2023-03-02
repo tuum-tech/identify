@@ -10,19 +10,12 @@ import {
   sendHello,
   shouldDisplayReconnectButton,
 } from '../../utils';
-import { validHederaChainID } from '../../utils/hedera';
 
 type Props = {
-  currentChainId: string;
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
-  hederaAccountConnected: boolean;
 };
 
-const SendHelloHessage: FC<Props> = ({
-  currentChainId,
-  setCurrentChainId,
-  hederaAccountConnected,
-}) => {
+const SendHelloHessage: FC<Props> = ({ setCurrentChainId }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
 
   const handleSendHelloClick = async () => {
@@ -35,8 +28,7 @@ const SendHelloHessage: FC<Props> = ({
     }
   };
 
-  return (validHederaChainID(currentChainId) && hederaAccountConnected) ||
-    (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+  return (
     <Card
       content={{
         title: 'Send Hello message',
@@ -57,7 +49,7 @@ const SendHelloHessage: FC<Props> = ({
         !shouldDisplayReconnectButton(state.installedSnap)
       }
     />
-  ) : null;
+  );
 };
 
 export default SendHelloHessage;

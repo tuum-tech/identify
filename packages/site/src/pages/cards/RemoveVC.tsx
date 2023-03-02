@@ -12,19 +12,12 @@ import {
   removeVC,
   shouldDisplayReconnectButton,
 } from '../../utils';
-import { validHederaChainID } from '../../utils/hedera';
 
 type Props = {
-  currentChainId: string;
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
-  hederaAccountConnected: boolean;
 };
 
-const RemoveVC: FC<Props> = ({
-  currentChainId,
-  setCurrentChainId,
-  hederaAccountConnected,
-}) => {
+const RemoveVC: FC<Props> = ({ setCurrentChainId }) => {
   const { setVcId, vcIdsToBeRemoved, setVcIdsToBeRemoved } =
     useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
@@ -52,8 +45,7 @@ const RemoveVC: FC<Props> = ({
     }
   };
 
-  return (validHederaChainID(currentChainId) && hederaAccountConnected) ||
-    (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+  return (
     <Card
       content={{
         title: 'removeVC',
@@ -88,7 +80,7 @@ const RemoveVC: FC<Props> = ({
         !shouldDisplayReconnectButton(state.installedSnap)
       }
     />
-  ) : null;
+  );
 };
 
 export default RemoveVC;

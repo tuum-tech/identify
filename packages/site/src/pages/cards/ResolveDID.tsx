@@ -10,19 +10,12 @@ import {
   resolveDID,
   shouldDisplayReconnectButton,
 } from '../../utils';
-import { validHederaChainID } from '../../utils/hedera';
 
 type Props = {
-  currentChainId: string;
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
-  hederaAccountConnected: boolean;
 };
 
-const ResolveDID: FC<Props> = ({
-  currentChainId,
-  setCurrentChainId,
-  hederaAccountConnected,
-}) => {
+const ResolveDID: FC<Props> = ({ setCurrentChainId }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
 
   const handleResolveDIDClick = async () => {
@@ -37,8 +30,7 @@ const ResolveDID: FC<Props> = ({
     }
   };
 
-  return (validHederaChainID(currentChainId) && hederaAccountConnected) ||
-    (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+  return (
     <Card
       content={{
         title: 'resolveDID',
@@ -58,7 +50,7 @@ const ResolveDID: FC<Props> = ({
         !shouldDisplayReconnectButton(state.installedSnap)
       }
     />
-  ) : null;
+  );
 };
 
 export default ResolveDID;

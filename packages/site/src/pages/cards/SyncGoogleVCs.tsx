@@ -6,17 +6,8 @@ import {
   MetaMaskContext,
 } from '../../contexts/MetamaskContext';
 import { shouldDisplayReconnectButton, syncGoogleVCs } from '../../utils';
-import { validHederaChainID } from '../../utils/hedera';
 
-type Props = {
-  currentChainId: string;
-  hederaAccountConnected: boolean;
-};
-
-const SyncGoogleVCs: FC<Props> = ({
-  currentChainId,
-  hederaAccountConnected,
-}) => {
+const SyncGoogleVCs: FC = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
 
@@ -32,8 +23,7 @@ const SyncGoogleVCs: FC<Props> = ({
     setLoading(false);
   };
 
-  return (validHederaChainID(currentChainId) && hederaAccountConnected) ||
-    (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+  return (
     <Card
       content={{
         title: 'syncGoogleVCs',
@@ -54,7 +44,7 @@ const SyncGoogleVCs: FC<Props> = ({
         !shouldDisplayReconnectButton(state.installedSnap)
       }
     />
-  ) : null;
+  );
 };
 
 export default SyncGoogleVCs;

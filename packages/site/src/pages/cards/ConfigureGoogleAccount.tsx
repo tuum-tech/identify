@@ -10,17 +10,8 @@ import {
   configureGoogleAccount,
   shouldDisplayReconnectButton,
 } from '../../utils';
-import { validHederaChainID } from '../../utils/hedera';
 
-type Props = {
-  currentChainId: string;
-  hederaAccountConnected: boolean;
-};
-
-const ConfigureGoogleAccount: FC<Props> = ({
-  currentChainId,
-  hederaAccountConnected,
-}) => {
+const ConfigureGoogleAccount: FC = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
 
@@ -37,8 +28,7 @@ const ConfigureGoogleAccount: FC<Props> = ({
     },
   });
 
-  return (validHederaChainID(currentChainId) && hederaAccountConnected) ||
-    (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+  return (
     <Card
       content={{
         title: 'configureGoogleAccount',
@@ -60,7 +50,7 @@ const ConfigureGoogleAccount: FC<Props> = ({
         !shouldDisplayReconnectButton(state.installedSnap)
       }
     />
-  ) : null;
+  );
 };
 
 export default ConfigureGoogleAccount;

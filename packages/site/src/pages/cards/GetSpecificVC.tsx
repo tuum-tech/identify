@@ -12,19 +12,12 @@ import {
   getVCs,
   shouldDisplayReconnectButton,
 } from '../../utils';
-import { validHederaChainID } from '../../utils/hedera';
 
 type Props = {
-  currentChainId: string;
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
-  hederaAccountConnected: boolean;
 };
 
-const GetSpecificVC: FC<Props> = ({
-  currentChainId,
-  setCurrentChainId,
-  hederaAccountConnected,
-}) => {
+const GetSpecificVC: FC<Props> = ({ setCurrentChainId }) => {
   const { vcId, setVcId, setVc } = useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
 
@@ -53,8 +46,7 @@ const GetSpecificVC: FC<Props> = ({
     }
   };
 
-  return (validHederaChainID(currentChainId) && hederaAccountConnected) ||
-    (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+  return (
     <Card
       content={{
         title: 'getSpecificVC',
@@ -87,7 +79,7 @@ const GetSpecificVC: FC<Props> = ({
         !shouldDisplayReconnectButton(state.installedSnap)
       }
     />
-  ) : null;
+  );
 };
 
 export default GetSpecificVC;

@@ -10,19 +10,12 @@ import {
   getDID,
   shouldDisplayReconnectButton,
 } from '../../utils';
-import { validHederaChainID } from '../../utils/hedera';
 
 type Props = {
-  currentChainId: string;
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
-  hederaAccountConnected: boolean;
 };
 
-const GetDID: FC<Props> = ({
-  currentChainId,
-  setCurrentChainId,
-  hederaAccountConnected,
-}) => {
+const GetDID: FC<Props> = ({ setCurrentChainId }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
 
   const handleGetDIDClick = async () => {
@@ -37,8 +30,7 @@ const GetDID: FC<Props> = ({
     }
   };
 
-  return (validHederaChainID(currentChainId) && hederaAccountConnected) ||
-    (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
+  return (
     <Card
       content={{
         title: 'getDID',
@@ -58,7 +50,7 @@ const GetDID: FC<Props> = ({
         !shouldDisplayReconnectButton(state.installedSnap)
       }
     />
-  ) : null;
+  );
 };
 
 export default GetDID;
