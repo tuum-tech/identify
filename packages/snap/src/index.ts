@@ -20,7 +20,11 @@ import { syncGoogleVCs } from './rpc/vc/syncGoogleVCs';
 import { verifyVC } from './rpc/vc/verifyVC';
 import { verifyVP } from './rpc/vc/verifyVP';
 import { getCurrentAccount } from './snap/account';
-import { getSnapStateUnchecked, initAccountState } from './snap/state';
+import {
+  getSnapStateUnchecked,
+  initAccountState,
+  updateSnapState,
+} from './snap/state';
 import { init } from './utils/init';
 import { switchNetworkIfNecessary } from './utils/network';
 import {
@@ -79,6 +83,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
     );
   } else {
     state.currentAccount = account;
+    await updateSnapState(snap, state);
   }
 
   const identitySnapParams: IdentitySnapParams = {
