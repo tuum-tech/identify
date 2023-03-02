@@ -1,6 +1,6 @@
 import { validHederaChainID } from '../hedera/config';
 import { IdentitySnapParams } from '../interfaces';
-import { getCurrentNetwork } from '../rpc/snap/utils';
+import { getCurrentNetwork } from '../snap/network';
 import { isHederaAccountImported } from './params';
 
 /**

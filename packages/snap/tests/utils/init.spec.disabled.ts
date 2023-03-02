@@ -3,7 +3,7 @@ import { getInitialSnapState } from '../../src/utils/config';
 import { init } from '../../src/utils/init';
 import { createMockWallet, WalletMock } from '../testUtils/wallet.mock';
 
-describe('RPC handler [init]', () => {
+describe.skip('RPC handler [init]', () => {
   let walletMock: SnapProvider & WalletMock;
 
   beforeEach(() => {

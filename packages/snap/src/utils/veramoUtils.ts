@@ -13,8 +13,8 @@ import {
 import cloneDeep from 'lodash.clonedeep';
 import { validHederaChainID } from '../hedera/config';
 import { IdentitySnapParams, SnapDialogParams } from '../interfaces';
-import { generateVCPanel } from '../rpc/snap/dialogUtils';
-import { getCurrentNetwork, snapDialog } from '../rpc/snap/utils';
+import { generateVCPanel, snapDialog } from '../snap/dialog';
+import { getCurrentNetwork } from '../snap/network';
 import { KeyPair } from '../types/crypto';
 import { CreateVPRequestParams, GetVCsOptions } from '../types/params';
 import {
@@ -185,6 +185,8 @@ export async function veramoCreateVC(
       state.accountState[state.currentAccount].accountConfig.identity
         .googleAccessToken,
   });
+
+  console.log('Saved verifiableCredential: ', JSON.stringify(result, null, 4));
   return result;
 }
 
@@ -309,6 +311,7 @@ export async function veramoCreateVP(
       },
       options: { store: 'snap' },
     })) as IDataManagerQueryResult[];
+
     if (vcObj.length > 0) {
       const vc: VerifiableCredential = vcObj[0].data as VerifiableCredential;
       vcs.push(vc);
@@ -347,8 +350,7 @@ export async function veramoCreateVP(
     });
     return vp;
   }
-  console.log('No VCs found...');
-  return null;
+  throw new Error('User rejected');
 }
 
 /**

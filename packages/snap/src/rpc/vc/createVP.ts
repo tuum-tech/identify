@@ -1,5 +1,5 @@
 import { VerifiablePresentation } from '@veramo/core';
-import { IdentitySnapParams } from 'src/interfaces';
+import { IdentitySnapParams } from '../../interfaces';
 import { CreateVPRequestParams } from '../../types/params';
 import { veramoCreateVP } from '../../utils/veramoUtils';
 

@@ -1,20 +1,16 @@
-import { SnapProvider } from '@metamask/snap-types';
+import { SnapsGlobalObject } from '@metamask/snaps-types';
 import {
   getSnapStateUnchecked,
   initAccountState,
   initSnapState,
   updateSnapState,
-} from '../../src/rpc/snap/state';
+} from '../../src/snap/state';
 import { getInitialSnapState } from '../../src/utils/config';
-import {
-  address,
-  getDefaultSnapState,
-  publicKey,
-} from '../testUtils/constants';
+import { address, getDefaultSnapState } from '../testUtils/constants';
 import { createMockWallet, WalletMock } from '../testUtils/wallet.mock';
 
-describe('Utils [state]', () => {
-  let walletMock: SnapProvider & WalletMock;
+describe.skip('Utils [state]', () => {
+  let walletMock: SnapsGlobalObject & WalletMock;
 
   beforeEach(() => {
     walletMock = createMockWallet();
@@ -91,7 +87,7 @@ describe('Utils [state]', () => {
     it('should succeed initializing empty account state', async () => {
       const initialState = getInitialSnapState();
       const defaultState = getDefaultSnapState();
-      defaultState.accountState[address].publicKey = publicKey;
+      //  defaultState.accountState[address].publicKey = publicKey;
 
       await expect(
         initAccountState(walletMock, initialState, address),

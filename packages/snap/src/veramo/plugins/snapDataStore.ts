@@ -9,7 +9,7 @@ import {
 } from '@veramo/key-manager';
 import jsonpath from 'jsonpath';
 import { v4 as uuidv4 } from 'uuid';
-import { getSnapState, updateSnapState } from '../../rpc/snap/state';
+import { getSnapState, updateSnapState } from '../../snap/state';
 import { decodeJWT } from '../../utils/jwt';
 import {
   AbstractDataStore,
@@ -409,6 +409,7 @@ export class SnapVCStore extends AbstractDataStore {
     const newId = id || uuidv4();
     state.accountState[account].vcs[newId] = vc;
     await updateSnapState(this.snap, state);
+
     return newId;
   }
 

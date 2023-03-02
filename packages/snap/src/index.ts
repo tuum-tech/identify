@@ -8,9 +8,7 @@ import { switchMethod } from './rpc/did/switchMethods';
 import { configureGoogleAccount } from './rpc/gdrive/configureGoogleAccount';
 import { connectHederaAccount } from './rpc/hedera/connectHederaAccount';
 import { getHederaAccountId } from './rpc/hedera/getHederaAccountId';
-import { getSnapStateUnchecked, initAccountState } from './rpc/snap/state';
 import { togglePopups } from './rpc/snap/togglePopups';
-import { getCurrentAccount } from './rpc/snap/utils';
 import { createVC } from './rpc/vc/createVC';
 import { createVP } from './rpc/vc/createVP';
 import { deleteAllVCs } from './rpc/vc/deleteAllVCs';
@@ -21,6 +19,8 @@ import { saveVC } from './rpc/vc/saveVC';
 import { syncGoogleVCs } from './rpc/vc/syncGoogleVCs';
 import { verifyVC } from './rpc/vc/verifyVC';
 import { verifyVP } from './rpc/vc/verifyVP';
+import { getCurrentAccount } from './snap/account';
+import { getSnapStateUnchecked, initAccountState } from './snap/state';
 import { init } from './utils/init';
 import { switchNetworkIfNecessary } from './utils/network';
 import {

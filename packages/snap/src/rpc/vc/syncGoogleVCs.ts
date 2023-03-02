@@ -1,13 +1,13 @@
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
+import { snapDialog } from '../../snap/dialog';
+import { updateSnapState } from '../../snap/state';
 import {
   createEmptyFile,
   getGoogleVCs,
   GOOGLE_DRIVE_VCS_FILE_NAME,
   uploadToGoogleDrive,
 } from '../../veramo/plugins/google-drive-data-store';
-import { updateSnapState } from '../snap/state';
-import { snapDialog } from '../snap/utils';
 
 /**
  * Function to sync Google VCs with snap.

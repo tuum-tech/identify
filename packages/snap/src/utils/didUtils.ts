@@ -16,7 +16,6 @@ export async function getCurrentDid(
   let did = '';
   const method =
     state.accountState[state.currentAccount].accountConfig.identity.didMethod;
-
   if (!isValidMethod(method)) {
     console.error(
       `did method '${method}' not supported. Supported methods are: ${availableMethods}`,
