@@ -1,6 +1,6 @@
 /* eslint-disable no-alert */
 import { FC, useContext } from 'react';
-import { Card, SendHelloButton } from '../../components';
+import { Card, SendHelloButton } from '..';
 import {
   MetamaskActions,
   MetaMaskContext,

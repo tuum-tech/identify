@@ -1,15 +1,15 @@
 /* eslint-disable no-alert */
-import { IDataManagerClearResult } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
+import { IDataManagerDeleteResult } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
 import { FC, useContext } from 'react';
-import { Card, SendHelloButton } from '../../components';
+import { Card, SendHelloButton, TextInput } from '..';
 import {
   MetamaskActions,
   MetaMaskContext,
 } from '../../contexts/MetamaskContext';
 import { VcContext } from '../../contexts/VcContext';
 import {
-  deleteAllVCs,
   getCurrentNetwork,
+  removeVC,
   shouldDisplayReconnectButton,
 } from '../../utils';
 
@@ -17,21 +17,25 @@ type Props = {
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const DeleteAllVCs: FC<Props> = ({ setCurrentChainId }) => {
-  const { setVcId, setVcIdsToBeRemoved } = useContext(VcContext);
+const RemoveVC: FC<Props> = ({ setCurrentChainId }) => {
+  const { setVcId, vcIdsToBeRemoved, setVcIdsToBeRemoved } =
+    useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
 
-  const handleDeleteAllVCsClick = async () => {
+  const handleRemoveVCClick = async () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
+      const id = vcIdsToBeRemoved ? vcIdsToBeRemoved.trim().split(',')[0] : '';
       const options = {
         // If you want to remove the VCs from multiple stores, you can pass an array like so:
         // store: ['snap', 'googleDrive'],
         store: 'snap',
       };
-      const isRemoved = (await deleteAllVCs(
+      console.log('vcIdsToBeRemoved: ', vcIdsToBeRemoved);
+      const isRemoved = (await removeVC(
+        id,
         options,
-      )) as IDataManagerClearResult[];
+      )) as IDataManagerDeleteResult[];
       console.log(`Remove VC Result: ${JSON.stringify(isRemoved, null, 4)}`);
       setVcId('');
       setVcIdsToBeRemoved('');
@@ -44,12 +48,27 @@ const DeleteAllVCs: FC<Props> = ({ setCurrentChainId }) => {
   return (
     <Card
       content={{
-        title: 'deleteAllVCs',
-        description: 'Delete all the VCs from the snap',
+        title: 'removeVC',
+        description: 'Remove one or more VCs from the snap',
+        form: (
+          <form>
+            <label>
+              Enter your VC IDs to be removed separated by a comma
+              <TextInput
+                rows={2}
+                value={
+                  vcIdsToBeRemoved ? vcIdsToBeRemoved.trim().split(',')[0] : ''
+                }
+                onChange={(e) => setVcIdsToBeRemoved(e.target.value)}
+                fullWidth
+              />
+            </label>
+          </form>
+        ),
         button: (
           <SendHelloButton
-            buttonText="Delete all VCs"
-            onClick={handleDeleteAllVCsClick}
+            buttonText="Delete VC"
+            onClick={handleRemoveVCClick}
             disabled={!state.installedSnap}
           />
         ),
@@ -64,4 +83,4 @@ const DeleteAllVCs: FC<Props> = ({ setCurrentChainId }) => {
   );
 };
 
-export { DeleteAllVCs };
+export { RemoveVC };

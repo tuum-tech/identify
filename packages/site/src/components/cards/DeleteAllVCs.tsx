@@ -1,31 +1,40 @@
 /* eslint-disable no-alert */
+import { IDataManagerClearResult } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
 import { FC, useContext } from 'react';
-import { Card, SendHelloButton, TextInput } from '../../components';
+import { Card, SendHelloButton } from '..';
 import {
   MetamaskActions,
   MetaMaskContext,
 } from '../../contexts/MetamaskContext';
 import { VcContext } from '../../contexts/VcContext';
 import {
+  deleteAllVCs,
   getCurrentNetwork,
   shouldDisplayReconnectButton,
-  verifyVP,
 } from '../../utils';
 
 type Props = {
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const VerifyVP: FC<Props> = ({ setCurrentChainId }) => {
-  const { vp, setVp } = useContext(VcContext);
+const DeleteAllVCs: FC<Props> = ({ setCurrentChainId }) => {
+  const { setVcId, setVcIdsToBeRemoved } = useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
 
-  const handleVerifyVPClick = async () => {
+  const handleDeleteAllVCsClick = async () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
-      const verified = await verifyVP(vp);
-      console.log('VP Verified: ', verified);
-      alert(`VP Verified: ${verified}`);
+      const options = {
+        // If you want to remove the VCs from multiple stores, you can pass an array like so:
+        // store: ['snap', 'googleDrive'],
+        store: 'snap',
+      };
+      const isRemoved = (await deleteAllVCs(
+        options,
+      )) as IDataManagerClearResult[];
+      console.log(`Remove VC Result: ${JSON.stringify(isRemoved, null, 4)}`);
+      setVcId('');
+      setVcIdsToBeRemoved('');
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -35,25 +44,12 @@ const VerifyVP: FC<Props> = ({ setCurrentChainId }) => {
   return (
     <Card
       content={{
-        title: 'verifyVP',
-        description: 'Verify a VP JWT or LDS format',
-        form: (
-          <form>
-            <label>
-              Enter your Verifiable Presentation
-              <TextInput
-                rows={2}
-                value={JSON.stringify(vp)}
-                onChange={(e) => setVp(e.target.value)}
-                fullWidth
-              />
-            </label>
-          </form>
-        ),
+        title: 'deleteAllVCs',
+        description: 'Delete all the VCs from the snap',
         button: (
           <SendHelloButton
-            buttonText="Verify VP"
-            onClick={handleVerifyVPClick}
+            buttonText="Delete all VCs"
+            onClick={handleDeleteAllVCsClick}
             disabled={!state.installedSnap}
           />
         ),
@@ -68,4 +64,4 @@ const VerifyVP: FC<Props> = ({ setCurrentChainId }) => {
   );
 };
 
-export { VerifyVP };
+export { DeleteAllVCs };

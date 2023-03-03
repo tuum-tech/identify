@@ -1,7 +1,7 @@
 /* eslint-disable no-alert */
 import { IDataManagerQueryResult } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
 import { FC, useContext } from 'react';
-import { Card, SendHelloButton } from '../../components';
+import { Card, SendHelloButton } from '..';
 import {
   MetamaskActions,
   MetaMaskContext,

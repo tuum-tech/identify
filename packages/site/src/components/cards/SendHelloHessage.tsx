@@ -1,13 +1,13 @@
 /* eslint-disable no-alert */
 import { FC, useContext } from 'react';
-import { Card, SendHelloButton } from '../../components';
+import { Card, SendHelloButton } from '..';
 import {
   MetamaskActions,
   MetaMaskContext,
 } from '../../contexts/MetamaskContext';
 import {
   getCurrentNetwork,
-  getHederaAccountId,
+  sendHello,
   shouldDisplayReconnectButton,
 } from '../../utils';
 
@@ -15,15 +15,13 @@ type Props = {
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const GetHederaAccountId: FC<Props> = ({ setCurrentChainId }) => {
+const SendHelloHessage: FC<Props> = ({ setCurrentChainId }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
 
-  const handleGetHederaAccountIdClick = async () => {
+  const handleSendHelloClick = async () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
-      const accountId = await getHederaAccountId();
-      console.log(`Your Hedera Account Id is: ${accountId}`);
-      alert(`Your Hedera Account Id is: ${accountId}`);
+      await sendHello();
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -33,12 +31,13 @@ const GetHederaAccountId: FC<Props> = ({ setCurrentChainId }) => {
   return (
     <Card
       content={{
-        title: 'getHederaAccountId',
-        description: 'Retrieve Hedera Account Id',
+        title: 'Send Hello message',
+        description:
+          'Display a custom message within a confirmation screen in MetaMask.',
         button: (
           <SendHelloButton
-            buttonText="Get Account Id"
-            onClick={handleGetHederaAccountIdClick}
+            buttonText="Send message"
+            onClick={handleSendHelloClick}
             disabled={!state.installedSnap}
           />
         ),
@@ -53,4 +52,4 @@ const GetHederaAccountId: FC<Props> = ({ setCurrentChainId }) => {
   );
 };
 
-export { GetHederaAccountId };
+export { SendHelloHessage };

@@ -1,29 +1,31 @@
 /* eslint-disable no-alert */
 import { FC, useContext } from 'react';
-import { Card, SendHelloButton } from '../../components';
+import { Card, SendHelloButton, TextInput } from '..';
 import {
   MetamaskActions,
   MetaMaskContext,
 } from '../../contexts/MetamaskContext';
+import { VcContext } from '../../contexts/VcContext';
 import {
-  getCurrentDIDMethod,
   getCurrentNetwork,
   shouldDisplayReconnectButton,
+  verifyVP,
 } from '../../utils';
 
 type Props = {
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const GetCurrentDIDMethod: FC<Props> = ({ setCurrentChainId }) => {
+const VerifyVP: FC<Props> = ({ setCurrentChainId }) => {
+  const { vp, setVp } = useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
 
-  const handleGetCurrentDIDMethodClick = async () => {
+  const handleVerifyVPClick = async () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
-      const currentDIDMethod = await getCurrentDIDMethod();
-      console.log(`Your current DID method is: ${currentDIDMethod}`);
-      alert(`Your current DID method is: ${currentDIDMethod}`);
+      const verified = await verifyVP(vp);
+      console.log('VP Verified: ', verified);
+      alert(`VP Verified: ${verified}`);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -33,12 +35,25 @@ const GetCurrentDIDMethod: FC<Props> = ({ setCurrentChainId }) => {
   return (
     <Card
       content={{
-        title: 'getCurrentDIDMethod',
-        description: 'Get the current DID method to use',
+        title: 'verifyVP',
+        description: 'Verify a VP JWT or LDS format',
+        form: (
+          <form>
+            <label>
+              Enter your Verifiable Presentation
+              <TextInput
+                rows={2}
+                value={JSON.stringify(vp)}
+                onChange={(e) => setVp(e.target.value)}
+                fullWidth
+              />
+            </label>
+          </form>
+        ),
         button: (
           <SendHelloButton
-            buttonText="Get DID method"
-            onClick={handleGetCurrentDIDMethodClick}
+            buttonText="Verify VP"
+            onClick={handleVerifyVPClick}
             disabled={!state.installedSnap}
           />
         ),
@@ -53,4 +68,4 @@ const GetCurrentDIDMethod: FC<Props> = ({ setCurrentChainId }) => {
   );
 };
 
-export { GetCurrentDIDMethod };
+export { VerifyVP };

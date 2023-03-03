@@ -2,17 +2,6 @@ import { useContext, useEffect, useState } from 'react';
 
 import { Card, InstallFlaskButton } from '../components';
 import {
-  CardContainer,
-  Container,
-  ErrorMessage,
-  Heading,
-  Span,
-  Subtitle,
-} from '../config/styles';
-import { MetamaskActions, MetaMaskContext } from '../contexts/MetamaskContext';
-import { connectSnap, getCurrentNetwork, getSnap } from '../utils';
-import { getNetwork, validHederaChainID } from '../utils/hedera';
-import {
   ConfigureGoogleAccount,
   ConnectHederaAccount,
   ConnectIdentitySnap,
@@ -33,7 +22,18 @@ import {
   ToggleMetamaskPopups,
   VerifyVC,
   VerifyVP,
-} from './cards';
+} from '../components/cards';
+import {
+  CardContainer,
+  Container,
+  ErrorMessage,
+  Heading,
+  Span,
+  Subtitle,
+} from '../config/styles';
+import { MetamaskActions, MetaMaskContext } from '../contexts/MetamaskContext';
+import { connectSnap, getCurrentNetwork, getSnap } from '../utils';
+import { getNetwork, validHederaChainID } from '../utils/hedera';
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);

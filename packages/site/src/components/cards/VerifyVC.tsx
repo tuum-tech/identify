@@ -1,42 +1,31 @@
 /* eslint-disable no-alert */
-import { ProofInfo } from '@tuum-tech/identity-snap/src/types/params';
-import { VerifiablePresentation } from '@veramo/core';
 import { FC, useContext } from 'react';
-import { Card, SendHelloButton, TextInput } from '../../components';
+import { Card, SendHelloButton, TextInput } from '..';
 import {
   MetamaskActions,
   MetaMaskContext,
 } from '../../contexts/MetamaskContext';
 import { VcContext } from '../../contexts/VcContext';
 import {
-  createVP,
   getCurrentNetwork,
   shouldDisplayReconnectButton,
+  verifyVC,
 } from '../../utils';
 
 type Props = {
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const GetVP: FC<Props> = ({ setCurrentChainId }) => {
-  const { vcId, setVcId, setVp } = useContext(VcContext);
+const VerifyVC: FC<Props> = ({ setCurrentChainId }) => {
+  const { vc, setVc } = useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
 
-  const handleCreateVPClick = async () => {
+  const handleVerifyVCClick = async () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
-      const proofInfo: ProofInfo = {
-        proofFormat: 'jwt',
-        type: 'ProfileNamesPresentation',
-      };
-      console.log('vcId: ', vcId);
-      const vp = (await createVP(
-        vcId.trim().split(','),
-        proofInfo,
-      )) as VerifiablePresentation;
-      setVp(vp);
-      console.log(`Your VP is: ${JSON.stringify(vp, null, 4)}`);
-      alert(`Your VP is: ${JSON.stringify(vp, null, 4)}`);
+      const verified = await verifyVC(vc);
+      console.log('VC Verified: ', verified);
+      alert(`VC Verified: ${verified}`);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -46,16 +35,16 @@ const GetVP: FC<Props> = ({ setCurrentChainId }) => {
   return (
     <Card
       content={{
-        title: 'getVP',
-        description: 'Generate Verifiable Presentation from your VC',
+        title: 'verifyVC',
+        description: 'Verify a VC JWT, LDS format or EIP712',
         form: (
           <form>
             <label>
-              Enter the Verifiable Credential ID
+              Enter your Verifiable Credential
               <TextInput
-                rows={2}
-                value={vcId}
-                onChange={(e) => setVcId(e.target.value)}
+                rows={3}
+                value={JSON.stringify(vc)}
+                onChange={(e) => setVc(e.target.value)}
                 fullWidth
               />
             </label>
@@ -63,8 +52,8 @@ const GetVP: FC<Props> = ({ setCurrentChainId }) => {
         ),
         button: (
           <SendHelloButton
-            buttonText="Generate VP"
-            onClick={handleCreateVPClick}
+            buttonText="Verify VC"
+            onClick={handleVerifyVCClick}
             disabled={!state.installedSnap}
           />
         ),
@@ -79,4 +68,4 @@ const GetVP: FC<Props> = ({ setCurrentChainId }) => {
   );
 };
 
-export { GetVP };
+export { VerifyVC };

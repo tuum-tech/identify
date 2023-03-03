@@ -1,6 +1,6 @@
 /* eslint-disable no-alert */
 import { FC, useContext } from 'react';
-import { Card, ReconnectButton } from '../../components';
+import { Card, ReconnectButton } from '..';
 import { MetaMaskContext } from '../../contexts/MetamaskContext';
 import { shouldDisplayReconnectButton } from '../../utils';
 

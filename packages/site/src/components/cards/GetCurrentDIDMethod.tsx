@@ -1,13 +1,13 @@
 /* eslint-disable no-alert */
 import { FC, useContext } from 'react';
-import { Card, SendHelloButton } from '../../components';
+import { Card, SendHelloButton } from '..';
 import {
   MetamaskActions,
   MetaMaskContext,
 } from '../../contexts/MetamaskContext';
 import {
+  getCurrentDIDMethod,
   getCurrentNetwork,
-  sendHello,
   shouldDisplayReconnectButton,
 } from '../../utils';
 
@@ -15,13 +15,15 @@ type Props = {
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const SendHelloHessage: FC<Props> = ({ setCurrentChainId }) => {
+const GetCurrentDIDMethod: FC<Props> = ({ setCurrentChainId }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
 
-  const handleSendHelloClick = async () => {
+  const handleGetCurrentDIDMethodClick = async () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
-      await sendHello();
+      const currentDIDMethod = await getCurrentDIDMethod();
+      console.log(`Your current DID method is: ${currentDIDMethod}`);
+      alert(`Your current DID method is: ${currentDIDMethod}`);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -31,13 +33,12 @@ const SendHelloHessage: FC<Props> = ({ setCurrentChainId }) => {
   return (
     <Card
       content={{
-        title: 'Send Hello message',
-        description:
-          'Display a custom message within a confirmation screen in MetaMask.',
+        title: 'getCurrentDIDMethod',
+        description: 'Get the current DID method to use',
         button: (
           <SendHelloButton
-            buttonText="Send message"
-            onClick={handleSendHelloClick}
+            buttonText="Get DID method"
+            onClick={handleGetCurrentDIDMethodClick}
             disabled={!state.installedSnap}
           />
         ),
@@ -52,4 +53,4 @@ const SendHelloHessage: FC<Props> = ({ setCurrentChainId }) => {
   );
 };
 
-export { SendHelloHessage };
+export { GetCurrentDIDMethod };
