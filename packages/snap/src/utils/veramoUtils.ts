@@ -90,17 +90,20 @@ export async function veramoGetVCs(
  * @param identitySnapParams - Identity snap params.
  * @param verifiableCredential - Verifiable Credential.
  * @param store - Store to save.
+ * @param id - Id to use to save.
  * @returns Save result.
  */
 export async function veramoSaveVC(
   identitySnapParams: IdentitySnapParams,
   verifiableCredential: W3CVerifiableCredential,
   store: string | string[],
+  id?: string,
 ): Promise<IDataManagerSaveResult[]> {
   const { snap, state } = identitySnapParams;
   const agent = await getAgent(snap);
   const result = await agent.saveVC({
     data: verifiableCredential,
+    id,
     options: { store },
     accessToken:
       state.accountState[state.currentAccount].accountConfig.identity
