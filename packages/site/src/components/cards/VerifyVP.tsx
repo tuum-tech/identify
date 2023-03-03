@@ -1,6 +1,5 @@
 /* eslint-disable no-alert */
 import { FC, useContext } from 'react';
-import { Card, SendHelloButton, TextInput } from '..';
 import {
   MetamaskActions,
   MetaMaskContext,
@@ -11,6 +10,7 @@ import {
   shouldDisplayReconnectButton,
   verifyVP,
 } from '../../utils';
+import { Card, SendHelloButton, TextInput } from '../base';
 
 type Props = {
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;

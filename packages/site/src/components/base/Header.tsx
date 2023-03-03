@@ -1,7 +1,10 @@
 import { useContext } from 'react';
 import styled, { useTheme } from 'styled-components';
-import { MetamaskActions, MetaMaskContext } from '../contexts/MetamaskContext';
-import { connectSnap, getSnap, getThemePreference } from '../utils';
+import {
+  MetamaskActions,
+  MetaMaskContext,
+} from '../../contexts/MetamaskContext';
+import { connectSnap, getSnap, getThemePreference } from '../../utils';
 import { HeaderButtons } from './Buttons';
 import { SnapLogo } from './SnapLogo';
 import { Toggle } from './Toggle';

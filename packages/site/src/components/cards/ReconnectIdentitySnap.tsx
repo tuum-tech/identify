@@ -1,8 +1,8 @@
 /* eslint-disable no-alert */
 import { FC, useContext } from 'react';
-import { Card, ReconnectButton } from '..';
 import { MetaMaskContext } from '../../contexts/MetamaskContext';
 import { shouldDisplayReconnectButton } from '../../utils';
+import { Card, ReconnectButton } from '../base';
 
 type Props = {
   handleConnectClick: () => Promise<void>;

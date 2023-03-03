@@ -2,7 +2,6 @@
 import { ProofInfo } from '@tuum-tech/identity-snap/src/types/params';
 import { VerifiablePresentation } from '@veramo/core';
 import { FC, useContext } from 'react';
-import { Card, SendHelloButton, TextInput } from '..';
 import {
   MetamaskActions,
   MetaMaskContext,
@@ -13,6 +12,7 @@ import {
   getCurrentNetwork,
   shouldDisplayReconnectButton,
 } from '../../utils';
+import { Card, SendHelloButton, TextInput } from '../base';
 
 type Props = {
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;

@@ -1,11 +1,11 @@
 /* eslint-disable no-alert */
 import { FC, useContext, useState } from 'react';
-import { Card, SendHelloButton } from '..';
 import {
   MetamaskActions,
   MetaMaskContext,
 } from '../../contexts/MetamaskContext';
 import { shouldDisplayReconnectButton, syncGoogleVCs } from '../../utils';
+import { Card, SendHelloButton } from '../base';
 
 const SyncGoogleVCs: FC = () => {
   const [state, dispatch] = useContext(MetaMaskContext);

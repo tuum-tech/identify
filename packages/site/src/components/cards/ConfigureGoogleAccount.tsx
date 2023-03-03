@@ -1,7 +1,6 @@
 /* eslint-disable no-alert */
 import { useGoogleLogin } from '@react-oauth/google';
 import { FC, useContext, useState } from 'react';
-import { Card, SendHelloButton } from '..';
 import {
   MetamaskActions,
   MetaMaskContext,
@@ -10,6 +9,7 @@ import {
   configureGoogleAccount,
   shouldDisplayReconnectButton,
 } from '../../utils';
+import { Card, SendHelloButton } from '../base';
 
 const ConfigureGoogleAccount: FC = () => {
   const [state, dispatch] = useContext(MetaMaskContext);

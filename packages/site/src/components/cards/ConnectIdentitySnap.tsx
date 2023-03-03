@@ -1,7 +1,7 @@
 /* eslint-disable no-alert */
 import { FC, useContext } from 'react';
-import { Card, ConnectButton } from '..';
 import { MetaMaskContext } from '../../contexts/MetamaskContext';
+import { Card, ConnectButton } from '../base';
 
 type Props = {
   handleConnectClick: () => Promise<void>;

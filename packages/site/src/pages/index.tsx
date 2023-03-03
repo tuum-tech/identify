@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 
-import { Card, InstallFlaskButton } from '../components';
+import { Card, InstallFlaskButton } from '../components/base';
 import {
   ConfigureGoogleAccount,
   ConnectHederaAccount,

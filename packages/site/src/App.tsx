@@ -1,7 +1,7 @@
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { FunctionComponent, ReactNode, useContext } from 'react';
 import styled from 'styled-components';
-import { Footer, Header } from './components';
+import { Footer, Header } from './components/base';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { GlobalStyle } from './config/theme';

@@ -1,7 +1,6 @@
 /* eslint-disable no-alert */
 import { IDataManagerQueryResult } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
 import { FC, useContext } from 'react';
-import { Card, SendHelloButton } from '..';
 import {
   MetamaskActions,
   MetaMaskContext,
@@ -12,6 +11,7 @@ import {
   getVCs,
   shouldDisplayReconnectButton,
 } from '../../utils';
+import { Card, SendHelloButton } from '../base';
 
 type Props = {
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;

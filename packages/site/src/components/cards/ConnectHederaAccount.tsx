@@ -1,6 +1,5 @@
 /* eslint-disable no-alert */
 import { FC, useContext, useState } from 'react';
-import { Card, SendHelloButton } from '..';
 import {
   MetamaskActions,
   MetaMaskContext,
@@ -9,6 +8,7 @@ import {
   connectHederaAccount,
   shouldDisplayReconnectButton,
 } from '../../utils';
+import { Card, SendHelloButton } from '../base';
 
 type Props = {
   setHederaAccountConnected: React.Dispatch<React.SetStateAction<boolean>>;

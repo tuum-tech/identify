@@ -1,9 +1,9 @@
 import { ComponentProps } from 'react';
 import Spinner from 'react-bootstrap/Spinner';
 import styled from 'styled-components';
-import { ReactComponent as FlaskFox } from '../assets/flask_fox.svg';
-import { MetamaskState } from '../hooks';
-import { shouldDisplayReconnectButton } from '../utils';
+import { ReactComponent as FlaskFox } from '../../assets/flask_fox.svg';
+import { MetamaskState } from '../../contexts/MetamaskContext';
+import { shouldDisplayReconnectButton } from '../../utils';
 
 const Link = styled.a`
   display: flex;

@@ -1,6 +1,5 @@
 /* eslint-disable no-alert */
 import { FC, useContext, useState } from 'react';
-import { Card, SendHelloButton } from '..';
 import {
   MetamaskActions,
   MetaMaskContext,
@@ -11,6 +10,7 @@ import {
   getCurrentNetwork,
   shouldDisplayReconnectButton,
 } from '../../utils';
+import { Card, SendHelloButton } from '../base';
 
 type Props = {
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;

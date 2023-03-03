@@ -1,8 +1,8 @@
 /* eslint-disable no-alert */
 import { FC, useContext } from 'react';
-import { Card, SendHelloButton } from '..';
 import { MetaMaskContext } from '../../contexts/MetamaskContext';
 import { shouldDisplayReconnectButton } from '../../utils';
+import { Card, SendHelloButton } from '../base';
 
 const Todo: FC = () => {
   const [state] = useContext(MetaMaskContext);

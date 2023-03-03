@@ -21,7 +21,7 @@ import {
   InstallFlaskButton,
   ReconnectButton,
   SendHelloButton,
-} from '../components';
+} from '../components/base';
 import {
   CardContainer,
   Container,
