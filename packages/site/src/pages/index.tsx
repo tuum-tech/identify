@@ -38,9 +38,12 @@ const Index = () => {
   const [currentChainId, setCurrentChainId] = useState('');
   const [hederaAccountConnected, setHederaAccountConnected] = useState(false);
 
-  const isNonHedera =
-    (validHederaChainID(currentChainId) && hederaAccountConnected) ||
-    (!validHederaChainID(currentChainId) && !hederaAccountConnected);
+  const isHedera = validHederaChainID(currentChainId) && hederaAccountConnected;
+  const noHedera =
+    !validHederaChainID(currentChainId) && !hederaAccountConnected;
+  const isNonHedera = isHedera || noHedera;
+  const requireHedera =
+    validHederaChainID(currentChainId) && !hederaAccountConnected;
 
   useEffect(() => {
     if (!validHederaChainID(currentChainId)) {
@@ -91,16 +94,14 @@ const Index = () => {
         )}
         <ConnectIdentitySnap handleConnectClick={handleConnectClick} />
         <ReconnectIdentitySnap handleConnectClick={handleConnectClick} />
-        <ConnectHederaAccount
-          currentChainId={currentChainId}
-          hederaAccountConnected={hederaAccountConnected}
-          setHederaAccountConnected={setHederaAccountConnected}
-        />
-        <GetHederaAccountId
-          currentChainId={currentChainId}
-          setCurrentChainId={setCurrentChainId}
-          hederaAccountConnected={hederaAccountConnected}
-        />
+        {requireHedera && (
+          <ConnectHederaAccount
+            setHederaAccountConnected={setHederaAccountConnected}
+          />
+        )}
+        {isHedera && (
+          <GetHederaAccountId setCurrentChainId={setCurrentChainId} />
+        )}
         {isNonHedera && (
           <>
             <SendHelloHessage setCurrentChainId={setCurrentChainId} />

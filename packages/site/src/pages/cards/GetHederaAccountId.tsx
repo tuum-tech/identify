@@ -10,19 +10,12 @@ import {
   getHederaAccountId,
   shouldDisplayReconnectButton,
 } from '../../utils';
-import { validHederaChainID } from '../../utils/hedera';
 
 type Props = {
-  currentChainId: string;
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
-  hederaAccountConnected: boolean;
 };
 
-const GetHederaAccountId: FC<Props> = ({
-  currentChainId,
-  setCurrentChainId,
-  hederaAccountConnected,
-}) => {
+const GetHederaAccountId: FC<Props> = ({ setCurrentChainId }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
 
   const handleGetHederaAccountIdClick = async () => {
@@ -37,7 +30,7 @@ const GetHederaAccountId: FC<Props> = ({
     }
   };
 
-  return validHederaChainID(currentChainId) && hederaAccountConnected ? (
+  return (
     <Card
       content={{
         title: 'getHederaAccountId',
@@ -57,7 +50,7 @@ const GetHederaAccountId: FC<Props> = ({
         !shouldDisplayReconnectButton(state.installedSnap)
       }
     />
-  ) : null;
+  );
 };
 
 export default GetHederaAccountId;
