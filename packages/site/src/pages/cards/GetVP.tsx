@@ -79,4 +79,4 @@ const GetVP: FC<Props> = ({ setCurrentChainId }) => {
   );
 };
 
-export default GetVP;
+export { GetVP };

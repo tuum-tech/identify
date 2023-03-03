@@ -29,4 +29,4 @@ const ReconnectIdentitySnap: FC<Props> = ({ handleConnectClick }) => {
   ) : null;
 };
 
-export default ReconnectIdentitySnap;
+export { ReconnectIdentitySnap };

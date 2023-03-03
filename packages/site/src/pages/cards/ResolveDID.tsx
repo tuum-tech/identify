@@ -53,4 +53,4 @@ const ResolveDID: FC<Props> = ({ setCurrentChainId }) => {
   );
 };
 
-export default ResolveDID;
+export { ResolveDID };

@@ -82,4 +82,4 @@ const GetSpecificVC: FC<Props> = ({ setCurrentChainId }) => {
   );
 };
 
-export default GetSpecificVC;
+export { GetSpecificVC };

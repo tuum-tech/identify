@@ -32,4 +32,4 @@ const ConnectIdentitySnap: FC<Props> = ({ handleConnectClick }) => {
   );
 };
 
-export default ConnectIdentitySnap;
+export { ConnectIdentitySnap };

@@ -46,4 +46,4 @@ const Todo: FC = () => {
   );
 };
 
-export default Todo;
+export { Todo };

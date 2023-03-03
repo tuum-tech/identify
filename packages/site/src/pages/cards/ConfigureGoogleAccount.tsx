@@ -53,4 +53,4 @@ const ConfigureGoogleAccount: FC = () => {
   );
 };
 
-export default ConfigureGoogleAccount;
+export { ConfigureGoogleAccount };

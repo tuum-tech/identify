@@ -68,4 +68,4 @@ const VerifyVP: FC<Props> = ({ setCurrentChainId }) => {
   );
 };
 
-export default VerifyVP;
+export { VerifyVP };

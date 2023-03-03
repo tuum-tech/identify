@@ -53,4 +53,4 @@ const GetCurrentDIDMethod: FC<Props> = ({ setCurrentChainId }) => {
   );
 };
 
-export default GetCurrentDIDMethod;
+export { GetCurrentDIDMethod };

@@ -52,4 +52,4 @@ const ToggleMetamaskPopups: FC<Props> = ({ setCurrentChainId }) => {
   );
 };
 
-export default ToggleMetamaskPopups;
+export { ToggleMetamaskPopups };

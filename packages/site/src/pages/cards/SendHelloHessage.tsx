@@ -52,4 +52,4 @@ const SendHelloHessage: FC<Props> = ({ setCurrentChainId }) => {
   );
 };
 
-export default SendHelloHessage;
+export { SendHelloHessage };

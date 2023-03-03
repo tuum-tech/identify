@@ -83,4 +83,4 @@ const RemoveVC: FC<Props> = ({ setCurrentChainId }) => {
   );
 };
 
-export default RemoveVC;
+export { RemoveVC };

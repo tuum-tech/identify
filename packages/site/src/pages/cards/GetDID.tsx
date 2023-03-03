@@ -53,4 +53,4 @@ const GetDID: FC<Props> = ({ setCurrentChainId }) => {
   );
 };
 
-export default GetDID;
+export { GetDID };

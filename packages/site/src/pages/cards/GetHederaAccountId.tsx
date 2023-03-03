@@ -53,4 +53,4 @@ const GetHederaAccountId: FC<Props> = ({ setCurrentChainId }) => {
   );
 };
 
-export default GetHederaAccountId;
+export { GetHederaAccountId };

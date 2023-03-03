@@ -12,26 +12,28 @@ import {
 import { MetamaskActions, MetaMaskContext } from '../contexts/MetamaskContext';
 import { connectSnap, getCurrentNetwork, getSnap } from '../utils';
 import { validHederaChainID } from '../utils/hedera';
-import ConfigureGoogleAccount from './cards/ConfigureGoogleAccount';
-import ConnectHederaAccount from './cards/ConnectHederaAccount';
-import ConnectIdentitySnap from './cards/ConnectIdentitySnap';
-import CreateVC from './cards/CreateVC';
-import DeleteAllVCs from './cards/DeleteAllVCs';
-import GetAllVCs from './cards/GetAllVCs';
-import GetCurrentDIDMethod from './cards/GetCurrentDIDMethod';
-import GetDID from './cards/GetDID';
-import GetHederaAccountId from './cards/GetHederaAccountId';
-import GetSpecificVC from './cards/GetSpecificVC';
-import GetVP from './cards/GetVP';
-import ReconnectIdentitySnap from './cards/ReconnectIdentitySnap';
-import RemoveVC from './cards/RemoveVC';
-import ResolveDID from './cards/ResolveDID';
-import SendHelloHessage from './cards/SendHelloHessage';
-import SyncGoogleVCs from './cards/SyncGoogleVCs';
-import Todo from './cards/Todo';
-import ToggleMetamaskPopups from './cards/ToggleMetamaskPopups';
-import VerifyVC from './cards/VerifyVC';
-import VerifyVP from './cards/VerifyVP';
+import {
+  ConfigureGoogleAccount,
+  ConnectHederaAccount,
+  ConnectIdentitySnap,
+  CreateVC,
+  DeleteAllVCs,
+  GetAllVCs,
+  GetCurrentDIDMethod,
+  GetDID,
+  GetHederaAccountId,
+  GetSpecificVC,
+  GetVP,
+  ReconnectIdentitySnap,
+  RemoveVC,
+  ResolveDID,
+  SendHelloHessage,
+  SyncGoogleVCs,
+  Todo,
+  ToggleMetamaskPopups,
+  VerifyVC,
+  VerifyVP,
+} from './cards';
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);

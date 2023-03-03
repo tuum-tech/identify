@@ -73,4 +73,4 @@ const GetAllVCs: FC<Props> = ({ setCurrentChainId }) => {
   );
 };
 
-export default GetAllVCs;
+export { GetAllVCs };

@@ -100,4 +100,4 @@ const CreateVC: FC<Props> = ({ setCurrentChainId }) => {
   );
 };
 
-export default CreateVC;
+export { CreateVC };

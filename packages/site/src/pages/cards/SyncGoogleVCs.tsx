@@ -47,4 +47,4 @@ const SyncGoogleVCs: FC = () => {
   );
 };
 
-export default SyncGoogleVCs;
+export { SyncGoogleVCs };

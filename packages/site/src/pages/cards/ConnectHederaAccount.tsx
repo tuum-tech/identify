@@ -74,4 +74,4 @@ const ConnectHederaAccount: FC<Props> = ({ setHederaAccountConnected }) => {
   );
 };
 
-export default ConnectHederaAccount;
+export { ConnectHederaAccount };

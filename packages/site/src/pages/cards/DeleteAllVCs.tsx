@@ -64,4 +64,4 @@ const DeleteAllVCs: FC<Props> = ({ setCurrentChainId }) => {
   );
 };
 
-export default DeleteAllVCs;
+export { DeleteAllVCs };
