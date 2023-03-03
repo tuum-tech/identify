@@ -11,7 +11,7 @@ import {
 } from '../config/styles';
 import { MetamaskActions, MetaMaskContext } from '../contexts/MetamaskContext';
 import { connectSnap, getCurrentNetwork, getSnap } from '../utils';
-import { validHederaChainID } from '../utils/hedera';
+import { getNetwork, validHederaChainID } from '../utils/hedera';
 import {
   ConfigureGoogleAccount,
   ConnectHederaAccount,
@@ -39,6 +39,7 @@ const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [currentChainId, setCurrentChainId] = useState('');
   const [hederaAccountConnected, setHederaAccountConnected] = useState(false);
+  const [currentNetwork, setCurrentNetwork] = useState('');
 
   const isHedera = validHederaChainID(currentChainId) && hederaAccountConnected;
   const noHedera =
@@ -51,6 +52,7 @@ const Index = () => {
     if (!validHederaChainID(currentChainId)) {
       setHederaAccountConnected(false);
     }
+    setCurrentNetwork(getNetwork(currentChainId));
   }, [currentChainId]);
 
   const handleConnectClick = async () => {
@@ -74,9 +76,7 @@ const Index = () => {
       <Heading>
         Welcome to <Span>Identity Snap</Span>
       </Heading>
-      <Subtitle>
-        Get started by editing <code>src/index.ts</code>
-      </Subtitle>
+      <Subtitle>Current Network: {currentNetwork}</Subtitle>
       {state.error && (
         <ErrorMessage>
           <b>An error happened:</b> {state.error.message}

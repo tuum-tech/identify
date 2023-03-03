@@ -16,3 +16,15 @@ export const getHederaNetwork = (chainId: string): string => {
 
 export const validHederaChainID = (x: string) =>
   isIn(Array.from(hederaChainIDs.keys()), x);
+
+const chainIDs = new Map([
+  ['0x1', 'Ethereum Mainnet'],
+  ['0x5', 'Goerli test network'],
+]);
+
+export const getNetwork = (chainId: string): string => {
+  if (validHederaChainID(chainId)) {
+    return `Hedera ${getHederaNetwork(chainId)}`;
+  }
+  return chainIDs.get(chainId) || '';
+};
