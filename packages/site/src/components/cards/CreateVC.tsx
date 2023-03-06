@@ -1,5 +1,7 @@
 /* eslint-disable no-alert */
 import { FC, useContext, useState } from 'react';
+import Select from 'react-select';
+import { storeOptions } from '../../config/constants';
 import {
   MetamaskActions,
   MetaMaskContext,
@@ -21,6 +23,7 @@ const CreateVC: FC<Props> = ({ setCurrentChainId }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [createVCName, setCreateVCName] = useState('Kiran Pachhai');
   const [createVCNickname, setCreateVCNickname] = useState('KP Woods');
+  const [selectedOptions, setSelectedOptions] = useState([storeOptions[0]]);
 
   const handleCreateVCClick = async () => {
     try {
@@ -33,7 +36,7 @@ const CreateVC: FC<Props> = ({ setCurrentChainId }) => {
       const options = {
         // If you want to auto save the generated VCs to multiple stores, you can pass an array like so:
         // store: ['snap', 'googleDrive'],
-        store: 'snap',
+        store: selectedOptions.map((option) => option.value),
         returnStore: true,
       };
       const credTypes = ['ProfileNamesCredential'];
@@ -52,6 +55,10 @@ const CreateVC: FC<Props> = ({ setCurrentChainId }) => {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
+  };
+
+  const handleChange = (options: any) => {
+    setSelectedOptions(options);
   };
 
   return (
@@ -80,6 +87,23 @@ const CreateVC: FC<Props> = ({ setCurrentChainId }) => {
                 onChange={(e) => setCreateVCNickname(e.target.value)}
               />
             </label>
+            <label>Select store</label>
+            <Select
+              closeMenuOnSelect
+              isMulti
+              isSearchable={false}
+              isClearable={false}
+              options={storeOptions}
+              value={selectedOptions}
+              onChange={handleChange}
+              styles={{
+                control: (base: any) => ({
+                  ...base,
+                  border: `1px solid grey`,
+                  marginBottom: 8,
+                }),
+              }}
+            />
           </form>
         ),
         button: (
