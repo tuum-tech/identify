@@ -1,12 +1,12 @@
 /* eslint-disable */
 
-import { SnapProvider } from '@metamask/snap-types';
+import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { getInitialSnapState } from '../../src/utils/config';
 import { init } from '../../src/utils/init';
 import { createMockWallet, WalletMock } from '../testUtils/wallet.mock';
 
 describe.skip('RPC handler [init]', () => {
-  let walletMock: SnapProvider & WalletMock;
+  let walletMock: SnapsGlobalObject & WalletMock;
 
   beforeEach(() => {
     walletMock = createMockWallet();

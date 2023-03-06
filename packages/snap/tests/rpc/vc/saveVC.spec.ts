@@ -6,7 +6,7 @@ import { IdentitySnapParams, IdentitySnapState } from '../../../src/interfaces';
 import { connectHederaAccount } from '../../../src/rpc/hedera/connectHederaAccount';
 import { saveVC } from '../../../src/rpc/vc/saveVC';
 import { SaveVCRequestParams } from '../../../src/types/params';
-import { getAgent } from '../../../src/veramo/agent';
+import { VeramoAgent } from '../../../src/veramo/agent';
 import { getDefaultSnapState } from '../../testUtils/constants';
 import { getDefaultCredential } from '../../testUtils/helper';
 import { createMockSnap, SnapMock } from '../../testUtils/snap.mock';
@@ -45,13 +45,14 @@ describe('saveVC', () => {
   });
 
   it('should succeed saving passing VC', async () => {
-    let agent = await getAgent(snapMock);
+    // Get Veramo agent
+    const agent = new VeramoAgent(identitySnapParams);
 
     (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
       true,
     );
 
-    let identifier = await agent.didManagerCreate({
+    let identifier = await agent.agent.didManagerCreate({
       kms: 'snap',
       provider: 'did:pkh',
       options: { chainId: '1' },
