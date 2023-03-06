@@ -1,12 +1,12 @@
 import { W3CVerifiableCredential } from '@veramo/core';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
-import { generateVCPanel, snapDialog } from '../../snap/dialog';
-import { veramoGetVCs, veramoSaveVC } from '../../utils/veramoUtils';
-import { verifyToken } from '../../veramo/plugins/google-drive-data-store';
+import { verifyToken } from '../../plugins/veramo/google-drive-data-store';
 import {
   IDataManagerQueryResult,
   IDataManagerSaveResult,
-} from '../../veramo/plugins/verfiable-creds-manager';
+} from '../../plugins/veramo/verfiable-creds-manager';
+import { generateVCPanel, snapDialog } from '../../snap/dialog';
+import { VeramoAgent } from '../../veramo/agent';
 
 /**
  * Function to sync Google VCs with snap.
@@ -21,13 +21,14 @@ export async function syncGoogleVCs(
     state.accountState[state.currentAccount].accountConfig.identity
       .googleAccessToken,
   );
-  const snapVCs = await veramoGetVCs(
-    identitySnapParams,
+  // Get Veramo agent
+  const agent = new VeramoAgent(identitySnapParams);
+
+  const snapVCs = await agent.getVCs(
     { store: 'snap', returnStore: true },
     undefined,
   );
-  const googleVCs = await veramoGetVCs(
-    identitySnapParams,
+  const googleVCs = await agent.getVCs(
     { store: 'googleDrive', returnStore: true },
     undefined,
   );
@@ -49,7 +50,7 @@ export async function syncGoogleVCs(
   let vcsNotInSnapSync = true;
   if (vcsNotInSnap.length > 0) {
     vcsNotInSnapSync = await handleSync(
-      identitySnapParams,
+      agent,
       `${header} - Import VCs from Google drive`,
       'Would you like to sync VCs in Google drive with Metamask snap?',
       'This action will import the VCs that are in Google drive to the Metamask snap',
@@ -59,7 +60,7 @@ export async function syncGoogleVCs(
   let vcsNotInGDriveSync = false;
   if (vcsNotInGDrive.length > 0) {
     vcsNotInGDriveSync = await handleSync(
-      identitySnapParams,
+      agent,
       `${header} - Export VCs to Google drive`,
       'Would you like to sync VCs in Metamask snap with Google drive?',
       'This action will export the VCs that are in Metamask snap to Google drive',
@@ -82,14 +83,14 @@ export async function syncGoogleVCs(
 /**
  * Function to handle the snap dialog and import/export each VC.
  *
- * @param identitySnapParams - Identity snap params.
+ * @param agent - Veramo agent.
  * @param header - Header text of the metamask dialog box(eg. 'Retrieve Verifiable Credentials').
  * @param prompt - Prompt text of the metamask dialog box(eg. 'Are you sure you want to send VCs to the dApp?').
  * @param description - Description text of the metamask dialog box(eg. 'Some dApps are less secure than others and could save data from VCs against your will. Be careful where you send your private VCs! Number of VCs submitted is 2').
  * @param vcs - The Verifiable Credentials to show on the metamask dialog box.
  */
 async function handleSync(
-  identitySnapParams: IdentitySnapParams,
+  agent: VeramoAgent,
   header: string,
   prompt: string,
   description: string,
@@ -101,8 +102,7 @@ async function handleSync(
   };
   if (await snapDialog(snap, dialogParams)) {
     for (const vc of vcs) {
-      const result = (await veramoSaveVC(
-        identitySnapParams,
+      const result = (await agent.saveVC(
         vc.data as W3CVerifiableCredential,
         'snap',
         vc.metadata.id,

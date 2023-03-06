@@ -1,8 +1,8 @@
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
+import { IDataManagerQueryResult } from '../../plugins/veramo/verfiable-creds-manager';
 import { generateVCPanel, snapDialog } from '../../snap/dialog';
 import { GetVCsRequestParams } from '../../types/params';
-import { veramoGetVCs } from '../../utils/veramoUtils';
-import { IDataManagerQueryResult } from '../../veramo/plugins/verfiable-creds-manager';
+import { VeramoAgent } from '../../veramo/agent';
 
 /**
  * Function to get VCs.
@@ -19,11 +19,9 @@ export async function getVCs(
   const { filter, options } = vcRequestParams || {};
   const { store = 'snap', returnStore = true } = options || {};
 
-  const vcs = await veramoGetVCs(
-    identitySnapParams,
-    { store, returnStore },
-    filter,
-  );
+  // Get Veramo agent
+  const agent = new VeramoAgent(identitySnapParams);
+  const vcs = await agent.getVCs({ store, returnStore }, filter);
 
   console.log('VCs: ', JSON.stringify(vcs, null, 4));
 

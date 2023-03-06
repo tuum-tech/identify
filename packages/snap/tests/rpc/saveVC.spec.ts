@@ -4,7 +4,7 @@ import { IdentitySnapParams, IdentitySnapState } from '../../src/interfaces';
 import { connectHederaAccount } from '../../src/rpc/hedera/connectHederaAccount';
 import { saveVC } from '../../src/rpc/vc/saveVC';
 import { SaveVCRequestParams } from '../../src/types/params';
-import { getAgent } from '../../src/veramo/setup';
+import { getAgent } from '../../src/veramo/agent';
 import { getDefaultSnapState, hederaPrivateKey } from '../testUtils/constants';
 import { getDefaultCredential } from '../testUtils/helper';
 import { createMockSnap, SnapMock } from '../testUtils/snap.mock';

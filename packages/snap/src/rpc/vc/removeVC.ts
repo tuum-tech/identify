@@ -1,9 +1,9 @@
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
-import { IDataManagerDeleteResult } from 'src/veramo/plugins/verfiable-creds-manager';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
+import { IDataManagerDeleteResult } from '../../plugins/veramo/verfiable-creds-manager';
 import { snapDialog } from '../../snap/dialog';
 import { RemoveVCsRequestParams } from '../../types/params';
-import { veramoRemoveVC } from '../../utils/veramoUtils';
+import { VeramoAgent } from '../../veramo/agent';
 
 /**
  * Function to remove VC.
@@ -36,7 +36,9 @@ export async function removeVC(
   };
 
   if (await snapDialog(snap, dialogParams)) {
-    return await veramoRemoveVC(identitySnapParams, ids, store);
+    // Get Veramo agent
+    const agent = new VeramoAgent(identitySnapParams);
+    return await agent.removeVC(ids, store);
   }
   throw new Error('User rejected');
 }

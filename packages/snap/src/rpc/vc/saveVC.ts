@@ -1,9 +1,9 @@
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
+import { IDataManagerSaveResult } from '../../plugins/veramo/verfiable-creds-manager';
 import { snapDialog } from '../../snap/dialog';
 import { SaveVCRequestParams } from '../../types/params';
-import { veramoSaveVC } from '../../utils/veramoUtils';
-import { IDataManagerSaveResult } from '../../veramo/plugins/verfiable-creds-manager';
+import { VeramoAgent } from '../../veramo/agent';
 
 /**
  * Function to save VC.
@@ -36,7 +36,9 @@ export async function saveVC(
   };
 
   if (await snapDialog(snap, dialogParams)) {
-    return await veramoSaveVC(identitySnapParams, verifiableCredential, store);
+    // Get Veramo agent
+    const agent = new VeramoAgent(identitySnapParams);
+    return await agent.saveVC(verifiableCredential, store);
   }
   throw new Error('User rejected');
 }

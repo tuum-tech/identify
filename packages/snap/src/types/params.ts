@@ -1,5 +1,5 @@
 import { ProofFormat, W3CVerifiableCredential } from '@veramo/core';
-import { Filter } from '../veramo/plugins/verfiable-creds-manager';
+import { Filter } from '../plugins/veramo/verfiable-creds-manager';
 
 export type GetVCsOptions = {
   store?: string | string[];

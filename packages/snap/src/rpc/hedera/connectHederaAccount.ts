@@ -8,8 +8,8 @@ import { IdentitySnapState, SnapDialogParams } from '../../interfaces';
 import { snapDialog } from '../../snap/dialog';
 import { getCurrentNetwork } from '../../snap/network';
 import { initAccountState, updateSnapState } from '../../snap/state';
-import { veramoConnectHederaAccount } from '../../utils/veramoUtils';
-import { getAgent } from '../../veramo/setup';
+import { veramoImportHederaAccount } from '../../veramo/accountImport';
+import { VeramoAgent } from '../../veramo/agent';
 
 /**
  * Connect Hedera Account.
@@ -60,9 +60,10 @@ export async function connectHederaAccount(
       state.accountState[state.currentAccount].hederaAccount.accountId =
         _accountId;
       await updateSnapState(snap, state);
-      const agent = await getAgent(snap);
-      return await veramoConnectHederaAccount(
-        agent,
+      // Get Veramo agent
+      const agent = new VeramoAgent({ snap, state, metamask });
+      return await veramoImportHederaAccount(
+        agent.agent,
         state.currentAccount,
         privateKey,
       );

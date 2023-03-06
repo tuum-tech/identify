@@ -9,13 +9,13 @@ import {
 } from '@veramo/key-manager';
 import jsonpath from 'jsonpath';
 import { v4 as uuidv4 } from 'uuid';
-import { getSnapState, updateSnapState } from '../../snap/state';
-import { decodeJWT } from '../../utils/jwt';
+import { getSnapState, updateSnapState } from '../../../../snap/state';
+import { decodeJWT } from '../../../../utils/jwt';
 import {
   AbstractDataStore,
   IFilterArgs,
   IQueryResult,
-} from './verfiable-creds-manager';
+} from '../../verfiable-creds-manager';
 
 /**
  * An implementation of {@link AbstractKeyStore} that holds everything in snap state.

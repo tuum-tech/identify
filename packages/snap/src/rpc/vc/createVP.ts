@@ -1,7 +1,7 @@
 import { VerifiablePresentation } from '@veramo/core';
 import { IdentitySnapParams } from '../../interfaces';
 import { CreateVPRequestParams } from '../../types/params';
-import { veramoCreateVP } from '../../utils/veramoUtils';
+import { VeramoAgent } from '../../veramo/agent';
 
 /**
  * Function to create verifiable presentation.
@@ -13,5 +13,7 @@ export async function createVP(
   identitySnapParams: IdentitySnapParams,
   vcRequestParams: CreateVPRequestParams,
 ): Promise<VerifiablePresentation | null> {
-  return await veramoCreateVP(identitySnapParams, vcRequestParams);
+  // Get Veramo agent
+  const agent = new VeramoAgent(identitySnapParams);
+  return await agent.createVP(vcRequestParams);
 }
