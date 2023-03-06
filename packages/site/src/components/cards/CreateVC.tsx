@@ -25,6 +25,10 @@ const CreateVC: FC<Props> = ({ setCurrentChainId }) => {
   const [createVCNickname, setCreateVCNickname] = useState('KP Woods');
   const [selectedOptions, setSelectedOptions] = useState([storeOptions[0]]);
 
+  const handleChange = (options: any) => {
+    setSelectedOptions(options);
+  };
+
   const handleCreateVCClick = async () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
@@ -55,10 +59,6 @@ const CreateVC: FC<Props> = ({ setCurrentChainId }) => {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
-  };
-
-  const handleChange = (options: any) => {
-    setSelectedOptions(options);
   };
 
   return (
