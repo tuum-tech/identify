@@ -53,7 +53,7 @@ describe('saveVC', () => {
       identifier.did
     ] = identifier;
 
-    const credential = await getDefaultCredential(agent, identifier.did);
+    const credential = await getDefaultCredential(agent);
     const params: SaveVCRequestParams = {
       verifiableCredential: credential,
       options: {},

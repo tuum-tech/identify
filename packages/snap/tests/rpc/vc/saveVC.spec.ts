@@ -61,7 +61,7 @@ describe('saveVC', () => {
       identifier.did
     ] = identifier;
 
-    let credential = await getDefaultCredential(agent, identifier.did);
+    let credential = await getDefaultCredential(agent);
     let params: SaveVCRequestParams = {
       verifiableCredential: credential,
       options: {},

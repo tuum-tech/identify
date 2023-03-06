@@ -14,7 +14,9 @@ import { Agent } from './agent';
 /**
  * Veramo Import metamask account.
  *
- * @param identitySnapParams - Identity snap params.
+ * @param snap - Snap.
+ * @param state - Snap state.
+ * @param metamask - Metamask.
  * @param agent - Veramo agent.
  * @returns Identifier.
  */

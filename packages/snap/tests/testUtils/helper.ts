@@ -1,25 +1,19 @@
 import { VerifiableCredential } from 'did-jwt-vc';
+import { VeramoAgent } from 'src/veramo/agent';
 
 export const getDefaultCredential = async (
-  agent: any,
-  did: string,
+  agent: VeramoAgent,
   type = 'Default',
 ): Promise<VerifiableCredential> => {
-  const vc = await agent.createVerifiableCredential({
-    credential: {
-      issuer: { id: did },
-      '@context': [
-        'https://www.w3.org/2018/credentials/v1',
-        'https://veramo.io/contexts/profile/v1',
-      ],
-      type: ['VerifiableCredential', type],
-      issuanceDate: new Date().toISOString(),
-      credentialSubject: {
-        name: 'Diego, the tester',
-      },
-    },
-    save: false,
-    proofFormat: 'jwt',
-  });
-  return vc;
+  const createVcResult = await agent.createVC(
+    'vcData',
+    { name: 'Diego, the tester' },
+    'snap',
+    ['VerifiableCredential', type],
+  );
+  const getVcsResult = await agent.getVCs(
+    { store: 'snap' },
+    { type: 'id', filter: createVcResult[0].id },
+  );
+  return getVcsResult[0].data as VerifiableCredential;
 };

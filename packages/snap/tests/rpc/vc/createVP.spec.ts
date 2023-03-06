@@ -1,12 +1,13 @@
-/* eslint-disable */
-
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { IdentitySnapParams, IdentitySnapState } from '../../../src/interfaces';
 import { connectHederaAccount } from '../../../src/rpc/hedera/connectHederaAccount';
 import { createVC } from '../../../src/rpc/vc/createVC';
 import { createVP } from '../../../src/rpc/vc/createVP';
-import { getDefaultSnapState } from '../../testUtils/constants';
+import {
+  getDefaultSnapState,
+  hederaPrivateKey,
+} from '../../testUtils/constants';
 import { createMockSnap, SnapMock } from '../../testUtils/snap.mock';
 
 describe('createVP', () => {
@@ -20,34 +21,29 @@ describe('createVP', () => {
     snapMock = createMockSnap();
     metamask = snapMock as unknown as MetaMaskInpageProvider;
     identitySnapParams = {
-      metamask: metamask,
+      metamask,
       snap: snapMock,
       state: snapState,
     };
 
-    let privateKey =
-      '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c';
     (
       identitySnapParams.snap as SnapMock
-    ).rpcMocks.snap_dialog.mockReturnValueOnce(privateKey);
+    ).rpcMocks.snap_dialog.mockReturnValueOnce(hederaPrivateKey);
+
     (identitySnapParams.snap as SnapMock).rpcMocks.eth_chainId.mockReturnValue(
       '0x128',
     );
 
-    let connected = await connectHederaAccount(
-      snapMock,
-      snapState,
-      metamask,
-      '0.0.15215',
-    );
+    await connectHederaAccount(snapMock, snapState, metamask, '0.0.15215');
   });
+
   it('should succeed creating VP from 1 VC', async () => {
     // Setup snap confirm return
     (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
       true,
     );
 
-    let createCredentialResult = await createVC(identitySnapParams, {
+    const createCredentialResult = await createVC(identitySnapParams, {
       vcValue: { name: 'Diego' },
       credTypes: ['Login'],
     });
@@ -68,7 +64,7 @@ describe('createVP', () => {
       true,
     );
 
-    let createCredentialResult = await createVC(identitySnapParams, {
+    const createCredentialResult = await createVC(identitySnapParams, {
       vcValue: { name: 'Diego' },
       credTypes: ['Login'],
     });

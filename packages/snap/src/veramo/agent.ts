@@ -13,11 +13,7 @@ import {
   W3CVerifiableCredential,
 } from '@veramo/core';
 import { CredentialIssuerEIP712 } from '@veramo/credential-eip712';
-/* import {
-  CredentialIssuerLD,
-  LdDefaultContexts,
-  VeramoEcdsaSecp256k1RecoverySignature2020,
-} from '@veramo/credential-ld'; */
+
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { CredentialPlugin, W3cMessageHandler } from '@veramo/credential-w3c';
 import { JwtMessageHandler } from '@veramo/did-jwt';
@@ -29,18 +25,13 @@ import { KeyManagementSystem } from '@veramo/kms-local';
 import { MessageHandler } from '@veramo/message-handler';
 import { SdrMessageHandler } from '@veramo/selective-disclosure';
 import { DIDResolutionResult, Resolver } from 'did-resolver';
-import {
-  AbstractDataStore,
-  DataManager,
-  Filter,
-  IDataManager,
-  IDataManagerClearResult,
-  IDataManagerDeleteResult,
-  IDataManagerQueryResult,
-  IDataManagerSaveResult,
-} from '../plugins/veramo/verfiable-creds-manager';
 
 import { MetaMaskInpageProvider } from '@metamask/providers';
+import {
+  CredentialIssuerLD,
+  LdDefaultContexts,
+  VeramoEcdsaSecp256k1RecoverySignature2020,
+} from '@veramo/credential-ld';
 import cloneDeep from 'lodash.clonedeep';
 import { validHederaChainID } from '../hedera/config';
 import {
@@ -55,6 +46,16 @@ import {
   SnapPrivateKeyStore,
   SnapVCStore,
 } from '../plugins/veramo/snap-data-store/src/snapDataStore';
+import {
+  AbstractDataStore,
+  DataManager,
+  Filter,
+  IDataManager,
+  IDataManagerClearResult,
+  IDataManagerDeleteResult,
+  IDataManagerQueryResult,
+  IDataManagerSaveResult,
+} from '../plugins/veramo/verfiable-creds-manager';
 import { generateVCPanel, snapDialog } from '../snap/dialog';
 import { getCurrentNetwork } from '../snap/network';
 import { CreateVPRequestParams, GetVCsOptions } from '../types/params';
@@ -71,8 +72,11 @@ export type Agent = TAgent<
 
 export class VeramoAgent {
   snap: SnapsGlobalObject;
+
   state: IdentitySnapState;
+
   metamask: MetaMaskInpageProvider;
+
   agent: Agent;
 
   constructor(identitySnapParams: IdentitySnapParams) {
@@ -362,7 +366,10 @@ export class VeramoAgent {
         vcsWithMetadata,
       ),
     };
-    if (config.dApp.disablePopups || (await snapDialog(snap, dialogParams))) {
+    if (
+      config.dApp.disablePopups ||
+      (await snapDialog(this.snap, dialogParams))
+    ) {
       const vp = await this.agent.createVerifiablePresentation({
         presentation: {
           holder: did, //
@@ -424,10 +431,10 @@ export class VeramoAgent {
         new DataManager({ store: vcStorePlugins }),
         new CredentialPlugin(),
         new CredentialIssuerEIP712(),
-        /*  new CredentialIssuerLD({
-        contextMaps: [LdDefaultContexts],
-        suites: [new VeramoEcdsaSecp256k1RecoverySignature2020()],
-      }), */
+        new CredentialIssuerLD({
+          contextMaps: [LdDefaultContexts],
+          suites: [new VeramoEcdsaSecp256k1RecoverySignature2020()],
+        }),
         new MessageHandler({
           messageHandlers: [
             new JwtMessageHandler(),
