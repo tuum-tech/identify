@@ -24,9 +24,9 @@ import {
 } from '../components/base';
 import {
   CardContainer,
-  Container,
   ErrorMessage,
   Heading,
+  PageContainer,
   Span,
   Subtitle,
 } from '../config/styles';
@@ -45,7 +45,7 @@ function LoginPage() {
   const [loginName, setLoginName] = useState('exampleUsername');
 
   // TODO: get did by calling getDid
-  const [identifier, setIdentifier] = useState(''); //useState('did:pkh:eip155:296:0x7d871f006d97498ea338268a956af94ab2e65cdd');
+  const [identifier, setIdentifier] = useState(''); // useState('did:pkh:eip155:296:0x7d871f006d97498ea338268a956af94ab2e65cdd');
   const [currentChainId, setCurrentChainId] = useState('');
   const [presentation, setPresentation] = useState<
     VerifiablePresentation | undefined
@@ -131,10 +131,7 @@ function LoginPage() {
 
   const handleConfigureHederaAccountClick = async () => {
     try {
-      const configured = await connectHederaAccount(
-        hederaPrivateKey,
-        hederaAccountId,
-      );
+      const configured = await connectHederaAccount(hederaAccountId);
       console.log('configured: ', configured);
       if (configured) {
         setHederaAccountConnected(true);
@@ -232,7 +229,7 @@ function LoginPage() {
   };
 
   return (
-    <Container>
+    <PageContainer>
       <Heading>
         Welcome to <Span>Identity Snap</Span>
       </Heading>
@@ -416,7 +413,7 @@ function LoginPage() {
           ''
         )}
       </CardContainer>
-    </Container>
+    </PageContainer>
   );
 }
 

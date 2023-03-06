@@ -1,12 +1,16 @@
 import { useContext, useEffect, useState } from 'react';
+import { Container } from 'react-bootstrap';
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
 
-import { Card, InstallFlaskButton } from '../components/base';
+import { Card, ConnectButton, InstallFlaskButton } from '../components/base';
 import {
   ConfigureGoogleAccount,
   ConnectHederaAccount,
   ConnectIdentitySnap,
   CreateVC,
   DeleteAllVCs,
+  GetAccountInfo,
   GetAllVCs,
   GetCurrentDIDMethod,
   GetDID,
@@ -25,11 +29,10 @@ import {
 } from '../components/cards';
 import {
   CardContainer,
-  Container,
   ErrorMessage,
   Heading,
+  PageContainer,
   Span,
-  Subtitle,
 } from '../config/styles';
 import { MetamaskActions, MetaMaskContext } from '../contexts/MetamaskContext';
 import { connectSnap, getCurrentNetwork, getSnap } from '../utils';
@@ -72,11 +75,32 @@ const Index = () => {
   };
 
   return (
-    <Container>
+    <PageContainer>
       <Heading>
         Welcome to <Span>Identity Snap</Span>
       </Heading>
-      <Subtitle>Current Network: {currentNetwork}</Subtitle>
+      <Container>
+        <Row xs={2} md={4}>
+          <Col>
+            <dt>Status:</dt>
+            <dd>{currentNetwork ? 'Connected' : 'Disconnected'}</dd>
+            {!currentNetwork && (
+              <ConnectButton
+                style={{ height: 20, minHeight: '3.2rem' }}
+                onClick={handleConnectClick}
+              />
+            )}
+          </Col>
+          <Col>
+            <dt>Current Network:</dt>
+            <dd>{currentNetwork}</dd>
+          </Col>
+          <Col>
+            <dt>Account Address:</dt>
+            <dd></dd>
+          </Col>
+        </Row>
+      </Container>
       {state.error && (
         <ErrorMessage>
           <b>An error happened:</b> {state.error.message}
@@ -110,6 +134,7 @@ const Index = () => {
             <ToggleMetamaskPopups setCurrentChainId={setCurrentChainId} />
             <GetCurrentDIDMethod setCurrentChainId={setCurrentChainId} />
             <GetDID setCurrentChainId={setCurrentChainId} />
+            <GetAccountInfo setCurrentChainId={setCurrentChainId} />
             <ResolveDID setCurrentChainId={setCurrentChainId} />
             <GetSpecificVC setCurrentChainId={setCurrentChainId} />
             <GetAllVCs setCurrentChainId={setCurrentChainId} />
@@ -127,7 +152,7 @@ const Index = () => {
           </>
         )}
       </CardContainer>
-    </Container>
+    </PageContainer>
   );
 };
 

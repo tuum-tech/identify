@@ -3,6 +3,7 @@ export { ConnectHederaAccount } from './ConnectHederaAccount';
 export { ConnectIdentitySnap } from './ConnectIdentitySnap';
 export { CreateVC } from './CreateVC';
 export { DeleteAllVCs } from './DeleteAllVCs';
+export { GetAccountInfo } from './GetAccountInfo';
 export { GetAllVCs } from './GetAllVCs';
 export { GetCurrentDIDMethod } from './GetCurrentDIDMethod';
 export { GetDID } from './GetDID';
