@@ -13,15 +13,17 @@ import { Card, SendHelloButton } from '../base';
 
 type Props = {
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
+  setAccountInfo: React.Dispatch<React.SetStateAction<unknown>>;
 };
 
-const GetAccountInfo: FC<Props> = ({ setCurrentChainId }) => {
+const GetAccountInfo: FC<Props> = ({ setCurrentChainId, setAccountInfo }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
 
   const handleGetAccountInfoClick = async () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
       const accountInfo = await getAccountInfo();
+      setAccountInfo(accountInfo);
       console.log(`Your account info:`, accountInfo);
       alert(`Your account info: ${JSON.stringify(accountInfo)}`);
     } catch (e) {

@@ -43,6 +43,7 @@ const Index = () => {
   const [currentChainId, setCurrentChainId] = useState('');
   const [hederaAccountConnected, setHederaAccountConnected] = useState(false);
   const [currentNetwork, setCurrentNetwork] = useState('');
+  const [accountInfo, setAccountInfo] = useState<unknown>(null);
 
   const isHedera = validHederaChainID(currentChainId) && hederaAccountConnected;
   const noHedera =
@@ -68,6 +69,7 @@ const Index = () => {
         type: MetamaskActions.SetInstalled,
         payload: installedSnap,
       });
+      setAccountInfo(null);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -80,7 +82,7 @@ const Index = () => {
         Welcome to <Span>Identity Snap</Span>
       </Heading>
       <Container>
-        <Row xs={2} md={4}>
+        <Row>
           <Col>
             <dt>Status:</dt>
             <dd>{currentNetwork ? 'Connected' : 'Disconnected'}</dd>
@@ -90,14 +92,27 @@ const Index = () => {
                 onClick={handleConnectClick}
               />
             )}
-          </Col>
-          <Col>
             <dt>Current Network:</dt>
             <dd>{currentNetwork}</dd>
           </Col>
-          <Col>
-            <dt>Account Address:</dt>
-            <dd></dd>
+          <Col sm="12" md="8">
+            <dt>Account Info</dt>
+            {isHedera && accountInfo?.hederaAccount && (
+              <>
+                <dd>
+                  Hedera Account ID: {accountInfo?.hederaAccount.accountId}
+                </dd>
+                <dd>EVM Address: {accountInfo?.hederaAccount.evmAddress}</dd>
+                <dd>
+                  Public Key:{' '}
+                  {
+                    accountInfo?.snapPrivateKeyStore[
+                      `metamask-${accountInfo?.hederaAccount.evmAddress}`
+                    ].publicKeyHex
+                  }
+                </dd>
+              </>
+            )}
           </Col>
         </Row>
       </Container>
@@ -134,7 +149,10 @@ const Index = () => {
             <ToggleMetamaskPopups setCurrentChainId={setCurrentChainId} />
             <GetCurrentDIDMethod setCurrentChainId={setCurrentChainId} />
             <GetDID setCurrentChainId={setCurrentChainId} />
-            <GetAccountInfo setCurrentChainId={setCurrentChainId} />
+            <GetAccountInfo
+              setCurrentChainId={setCurrentChainId}
+              setAccountInfo={setAccountInfo}
+            />
             <ResolveDID setCurrentChainId={setCurrentChainId} />
             <GetSpecificVC setCurrentChainId={setCurrentChainId} />
             <GetAllVCs setCurrentChainId={setCurrentChainId} />
