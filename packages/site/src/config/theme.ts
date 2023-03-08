@@ -183,4 +183,8 @@ export const GlobalStyle = createGlobalStyle`
       border: 1px solid ${(props) => props.theme.colors.background.inverse};
     }
   }
+
+  .modal-content {
+    background: ${(props) => props.theme.colors.background.default}
+  }
 `;

@@ -1,10 +1,11 @@
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { FunctionComponent, ReactNode, useContext } from 'react';
 import styled from 'styled-components';
-import { Footer, Header } from './components/base';
+import { Footer, Header, Modal } from './components/base';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { GlobalStyle } from './config/theme';
+import { ModalContextProvider } from './contexts/ModalContext';
 import { VcContextProvider } from './contexts/VcContext';
 import { ToggleThemeContext } from './Root';
 
@@ -28,13 +29,16 @@ export const App: FunctionComponent<AppProps> = ({ children }) => {
       <GlobalStyle />
       <Wrapper>
         <Header handleToggleClick={toggleTheme} />
-        <VcContextProvider>
-          <GoogleOAuthProvider
-            clientId={`${process.env.GATSBY_GOOGLE_DRIVE_CLIENT_ID}`}
-          >
-            {children}
-          </GoogleOAuthProvider>
-        </VcContextProvider>
+        <ModalContextProvider>
+          <VcContextProvider>
+            <GoogleOAuthProvider
+              clientId={`${process.env.GATSBY_GOOGLE_DRIVE_CLIENT_ID}`}
+            >
+              {children}
+            </GoogleOAuthProvider>
+          </VcContextProvider>
+          <Modal />
+        </ModalContextProvider>
         <Footer />
       </Wrapper>
     </>

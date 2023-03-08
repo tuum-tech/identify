@@ -5,6 +5,7 @@ import {
   MetamaskActions,
   MetaMaskContext,
 } from '../../contexts/MetamaskContext';
+import useModal from '../../hooks/useModal';
 import {
   configureGoogleAccount,
   shouldDisplayReconnectButton,
@@ -14,12 +15,16 @@ import { Card, SendHelloButton } from '../base';
 const ConfigureGoogleAccount: FC = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
+  const { showModal } = useModal();
 
   const handleConfigureGoogleAccount = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       setLoading(true);
       await configureGoogleAccount(tokenResponse.access_token);
-      alert('Google Account configuration was successful');
+      showModal({
+        title: 'Google Account Configuration',
+        content: 'Google Account configuration was successful!',
+      });
       setLoading(false);
     },
     onError: (e) => {
