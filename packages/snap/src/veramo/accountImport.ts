@@ -5,6 +5,7 @@ import { IIdentifier, MinimalImportableKey } from '@veramo/core';
 import { validHederaChainID } from '../hedera/config';
 import { IdentitySnapState } from '../interfaces';
 import { getCurrentNetwork } from '../snap/network';
+import { DEFAULTCOINTYPE, HEDERACOINTYPE } from '../types/constants';
 import { KeyPair } from '../types/crypto';
 import { getCurrentDid } from '../utils/didUtils';
 import { getKeyPair } from '../utils/hederaUtils';
@@ -30,43 +31,25 @@ export async function veramoImportMetaMaskAccount(
 
   const controllerKeyId = `metamask-${state.currentAccount}`;
 
-  const keyPair: KeyPair = { privateKey: '', publicKey: '' };
-  // Use metamask private keys if it's not hedera network since we can directly use those
-  // unlike for hedera where we request the user for their private key and accountId while configuring
   const chainId = await getCurrentNetwork(metamask);
+  let coinType = DEFAULTCOINTYPE;
   if (validHederaChainID(chainId)) {
-    // TODO: This is a very hacky way to retrieve private key for hedera account. Try to use veramo agent if possible
-    try {
-      const privateKey =
-        state.accountState[state.currentAccount].snapPrivateKeyStore[
-          controllerKeyId
-        ].privateKeyHex;
-      const kp = await getKeyPair(privateKey);
-      keyPair.privateKey = kp.privateKey;
-      keyPair.publicKey = kp.publicKey;
-    } catch (error) {
-      console.log(
-        `Failed to get private keys from Metamask account for Hedera network. Error: ${error}`,
-      );
-      throw new Error(
-        `Failed to get private keys from Metamask account for Hedera network. Error: ${error}`,
-      );
-    }
-  } else {
-    const bip44CoinTypeNode = await getAddressKeyDeriver(snap);
-    const res = await snapGetKeysFromAddress(
-      bip44CoinTypeNode as BIP44CoinTypeNode,
-      state,
-      state.currentAccount,
-      snap,
-    );
-    if (!res) {
-      console.log('Failed to get private keys from Metamask account');
-      throw new Error('Failed to get private keys from Metamask account');
-    }
-    keyPair.privateKey = res.privateKey.split('0x')[1];
-    keyPair.publicKey = res.publicKey.split('0x')[1];
+    coinType = HEDERACOINTYPE;
   }
+
+  const bip44CoinTypeNode = await getAddressKeyDeriver(snap, coinType);
+  const res = await snapGetKeysFromAddress(
+    bip44CoinTypeNode as BIP44CoinTypeNode,
+    state,
+    state.currentAccount,
+    snap,
+  );
+  if (!res) {
+    console.log('Failed to get private keys from Metamask account');
+    throw new Error('Failed to get private keys from Metamask account');
+  }
+  const privateKey = res.privateKey.split('0x')[1];
+  const publicKey = res.publicKey.split('0x')[1];
 
   const identifier = await agent.didManagerImport({
     did,
@@ -77,8 +60,8 @@ export async function veramoImportMetaMaskAccount(
         kid: controllerKeyId,
         type: 'Secp256k1',
         kms: 'snap',
-        privateKeyHex: keyPair.privateKey,
-        publicKeyHex: keyPair.publicKey,
+        privateKeyHex: privateKey,
+        publicKeyHex: publicKey,
       } as MinimalImportableKey,
     ],
   });

@@ -1,3 +1,4 @@
+import { BIP44CoinTypeNode } from '@metamask/key-tree';
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { Panel } from '@metamask/snaps-ui';
@@ -54,6 +55,7 @@ export type IdentitySnapParams = {
   snap: SnapsGlobalObject;
   state: IdentitySnapState;
   metamask: MetaMaskInpageProvider;
+  bip44CoinTypeNode?: BIP44CoinTypeNode;
 };
 
 export type HederaAccount = {

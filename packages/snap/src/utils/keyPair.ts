@@ -81,8 +81,7 @@ export async function getAddressKey(
 ) {
   const keyDeriver = await getBIP44AddressKeyDeriver(bip44CoinTypeNode);
   const derivedKey = await keyDeriver(addressIndex);
-  const { privateKey } = derivedKey;
-  const { chainCode } = derivedKey;
+  const { privateKey, chainCode } = derivedKey;
   const addressKey = `${privateKey as string}${chainCode.split('0x')[1]}`;
   if (privateKey === undefined) {
     return null;

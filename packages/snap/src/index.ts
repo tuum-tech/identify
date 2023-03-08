@@ -20,13 +20,10 @@ import { syncGoogleVCs } from './rpc/vc/syncGoogleVCs';
 import { verifyVC } from './rpc/vc/verifyVC';
 import { verifyVP } from './rpc/vc/verifyVP';
 import { getCurrentAccount } from './snap/account';
-import {
-  getSnapStateUnchecked,
-  initAccountState,
-  updateSnapState,
-} from './snap/state';
+import { getSnapStateUnchecked, initAccountState } from './snap/state';
 import { init } from './utils/init';
-import { switchNetworkIfNecessary } from './utils/network';
+import { getAddressKeyDeriver } from './utils/keyPair';
+//  import { switchNetworkIfNecessary } from './utils/network';
 import {
   isValidConfigueGoogleRequest,
   isValidCreateVCRequest,
@@ -73,7 +70,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
       request.params.accountId,
     );
   }
-  const account = await getCurrentAccount(state, ethereum);
+
+  const { bip44CoinTypeNode, account } = await getCurrentAccount(ethereum);
   console.log('account:', account);
 
   // FIXME: HANDLE NULL maybe throw ?
@@ -81,9 +79,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
     throw new Error(
       'Error while trying to get the account. Please connect to an account first',
     );
-  } else {
-    state.currentAccount = account;
-    await updateSnapState(snap, state);
   }
 
   const identitySnapParams: IdentitySnapParams = {
@@ -94,6 +89,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
 
   if (!(account in state.accountState)) {
     await initAccountState(snap, state, state.currentAccount);
+    identitySnapParams.bip44CoinTypeNode = await getAddressKeyDeriver(snap);
   }
 
   console.log('Request:', JSON.stringify(request, null, 4));
@@ -121,46 +117,46 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
     case 'togglePopups':
       return await togglePopups(identitySnapParams);
     case 'getDID':
-      await switchNetworkIfNecessary(identitySnapParams);
+      // await switchNetworkIfNecessary(identitySnapParams);
       return await getDid(identitySnapParams);
     case 'resolveDID':
       isValidResolveDIDRequest(request.params);
-      await switchNetworkIfNecessary(identitySnapParams);
+      // await switchNetworkIfNecessary(identitySnapParams);
       return await resolveDID(identitySnapParams, request.params.did);
     case 'getVCs':
       isValidGetVCsRequest(request.params);
-      await switchNetworkIfNecessary(identitySnapParams);
+      // await switchNetworkIfNecessary(identitySnapParams);
       return await getVCs(identitySnapParams, request.params);
     case 'saveVC':
       isValidSaveVCRequest(request.params);
-      await switchNetworkIfNecessary(identitySnapParams);
+      // await switchNetworkIfNecessary(identitySnapParams);
       return await saveVC(identitySnapParams, request.params);
     case 'createVC':
       isValidCreateVCRequest(request.params);
-      await switchNetworkIfNecessary(identitySnapParams);
+      // await switchNetworkIfNecessary(identitySnapParams);
       return await createVC(identitySnapParams, request.params);
     case 'verifyVC':
       isValidVerifyVCRequest(request.params);
-      await switchNetworkIfNecessary(identitySnapParams);
+      // await switchNetworkIfNecessary(identitySnapParams);
       return await verifyVC(
         identitySnapParams,
         request.params.verifiableCredential,
       );
     case 'removeVC':
       isValidRemoveVCRequest(request.params);
-      await switchNetworkIfNecessary(identitySnapParams);
+      // await switchNetworkIfNecessary(identitySnapParams);
       return await removeVC(identitySnapParams, request.params);
     case 'deleteAllVCs':
       isValidDeleteAllVCsRequest(request.params);
-      await switchNetworkIfNecessary(identitySnapParams);
+      // await switchNetworkIfNecessary(identitySnapParams);
       return await deleteAllVCs(identitySnapParams, request.params);
     case 'createVP':
       isValidCreateVPRequest(request.params);
-      await switchNetworkIfNecessary(identitySnapParams);
+      // await switchNetworkIfNecessary(identitySnapParams);
       return await createVP(identitySnapParams, request.params);
     case 'verifyVP':
       isValidVerifyVPRequest(request.params);
-      await switchNetworkIfNecessary(identitySnapParams);
+      // await switchNetworkIfNecessary(identitySnapParams);
       return await verifyVP(
         identitySnapParams,
         request.params.verifiablePresentation,
@@ -168,7 +164,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
     case 'getAvailableMethods':
       return getAvailableMethods();
     case 'getCurrentDIDMethod':
-      await switchNetworkIfNecessary(identitySnapParams);
+      // await switchNetworkIfNecessary(identitySnapParams);
       return state.accountState[state.currentAccount].accountConfig.identity
         .didMethod;
     case 'switchMethod':

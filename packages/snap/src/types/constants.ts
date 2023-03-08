@@ -11,6 +11,7 @@ export const availableMethods = ['did:pkh'] as const;
 export const isValidMethod = (x: string) => isIn(availableMethods, x);
 
 export const DEFAULTCOINTYPE = 60;
+export const HEDERACOINTYPE = 3030;
 
 export const validProofFormats = [
   'jwt' as ProofFormat,

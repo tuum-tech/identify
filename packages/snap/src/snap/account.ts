@@ -1,7 +1,13 @@
+import { BIP44CoinTypeNode } from '@metamask/key-tree';
 import { MetaMaskInpageProvider } from '@metamask/providers';
+import { DEFAULTCOINTYPE, HEDERACOINTYPE } from 'src/types/constants';
+import {
+  getAddressKeyDeriver,
+  getKeysFromAddressIndex,
+  snapGetKeysFromAddress,
+} from 'src/utils/keyPair';
 import { validHederaChainID } from '../hedera/config';
 import { IdentitySnapState } from '../interfaces';
-import { isHederaAccountImported } from '../utils/params';
 import { getCurrentNetwork } from './network';
 
 /**
@@ -15,12 +21,15 @@ import { getCurrentNetwork } from './network';
 export async function getCurrentAccount(
   state: IdentitySnapState,
   metamask: MetaMaskInpageProvider,
-): Promise<string | null> {
+): Promise<{ bip44CoinTypeNode: BIP44CoinTypeNode; account: string }> {
   try {
     const chainId = await getCurrentNetwork(metamask);
+    let coinType = DEFAULTCOINTYPE;
     if (validHederaChainID(chainId)) {
       // Handle Hedera
-      if (isHederaAccountImported(state)) {
+      coinType = HEDERACOINTYPE;
+
+      /*       if (isHederaAccountImported(state)) {
         console.log(
           `Hedera Metamask accounts: EVM Address: ${
             state.accountState[state.currentAccount].hederaAccount.evmAddress
@@ -28,15 +37,18 @@ export async function getCurrentAccount(
             state.accountState[state.currentAccount].hederaAccount.accountId
           }`,
         );
-        return state.accountState[state.currentAccount].hederaAccount
-          .evmAddress;
-      }
-
-      console.error(
-        'Hedera Network was selected but Hedera Account has not yet been configured. Please configure it first by calling "configureHederaAccount" API',
-      );
-      return null;
+      } */
     }
+
+    const bip44CoinTypeNode = await getAddressKeyDeriver(snap, coinType);
+    const res = await getKeysFromAddressIndex(bip44CoinTypeNode, 0);
+    if (!res) {
+      console.log('Failed to get private keys from Metamask account');
+      throw new Error('Failed to get private keys from Metamask account');
+    }
+    const privateKey = res.privateKey.split('0x')[1];
+    const publicKey = res.publicKey.split('0x')[1];
+
     // Handle everything else
     const accounts = (await metamask.request({
       method: 'eth_requestAccounts',
