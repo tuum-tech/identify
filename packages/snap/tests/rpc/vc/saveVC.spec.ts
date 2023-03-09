@@ -5,7 +5,10 @@ import { connectHederaAccount } from '../../../src/rpc/hedera/connectHederaAccou
 import { saveVC } from '../../../src/rpc/vc/saveVC';
 import { SaveVCRequestParams } from '../../../src/types/params';
 import { VeramoAgent } from '../../../src/veramo/agent';
-import { getDefaultSnapState, hederaPrivateKey } from '../../testUtils/constants';
+import {
+  getDefaultSnapState,
+  hederaPrivateKey,
+} from '../../testUtils/constants';
 import { getDefaultCredential } from '../../testUtils/helper';
 import { createMockSnap, SnapMock } from '../../testUtils/snap.mock';
 
@@ -20,7 +23,7 @@ describe('saveVC', () => {
     snapMock = createMockSnap();
     metamask = snapMock as unknown as MetaMaskInpageProvider;
     identitySnapParams = {
-      metamask: metamask,
+      metamask,
       snap: snapMock,
       state: snapState,
     };
@@ -28,16 +31,12 @@ describe('saveVC', () => {
     (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
       hederaPrivateKey,
     );
+
     (identitySnapParams.snap as SnapMock).rpcMocks.eth_chainId.mockReturnValue(
       '0x128',
     );
 
-    await connectHederaAccount(
-      snapMock,
-      snapState,
-      metamask,
-      '0.0.15215',
-    );
+    await connectHederaAccount(snapMock, snapState, metamask, '0.0.15215');
   });
 
   it('should succeed saving passing VC', async () => {
@@ -48,7 +47,7 @@ describe('saveVC', () => {
       true,
     );
 
-    let identifier = await agent.agent.didManagerCreate({
+    const identifier = await agent.agent.didManagerCreate({
       kms: 'snap',
       provider: 'did:pkh',
       options: { chainId: '1' },
@@ -57,13 +56,13 @@ describe('saveVC', () => {
       identifier.did
     ] = identifier;
 
-    let credential = await getDefaultCredential(agent);
-    let params: SaveVCRequestParams = {
+    const credential = await getDefaultCredential(agent);
+    const params: SaveVCRequestParams = {
       verifiableCredentials: [credential],
       options: {},
     };
 
-    let result = await saveVC(identitySnapParams, params);
+    const result = await saveVC(identitySnapParams, params);
     expect(result.length).toBe(1);
 
     expect.assertions(1);
@@ -77,7 +76,7 @@ describe('saveVC', () => {
       true,
     );
 
-    let identifier = await agent.agent.didManagerCreate({
+    const identifier = await agent.agent.didManagerCreate({
       kms: 'snap',
       provider: 'did:pkh',
       options: { chainId: '1' },
@@ -86,14 +85,14 @@ describe('saveVC', () => {
       identifier.did
     ] = identifier;
 
-    let credential1 = await getDefaultCredential(agent, "type1");
-    let credential2 = await getDefaultCredential(agent, "type2");
-    let params: SaveVCRequestParams = {
+    const credential1 = await getDefaultCredential(agent, 'type1');
+    const credential2 = await getDefaultCredential(agent, 'type2');
+    const params: SaveVCRequestParams = {
       verifiableCredentials: [credential1, credential2],
       options: {},
     };
 
-    let result = await saveVC(identitySnapParams, params);
+    const result = await saveVC(identitySnapParams, params);
     expect(result.length).toBe(2);
 
     expect.assertions(1);

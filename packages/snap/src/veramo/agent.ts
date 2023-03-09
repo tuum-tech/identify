@@ -217,7 +217,7 @@ export class VeramoAgent {
   /**
    * Veramo Save VC.
    *
-   * @param data - ISave args
+   * @param data - ISave args.
    * @param store - Store to save.
    * @returns Save result.
    */
