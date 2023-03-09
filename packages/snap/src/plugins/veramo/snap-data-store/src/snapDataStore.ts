@@ -15,6 +15,7 @@ import {
   AbstractDataStore,
   IFilterArgs,
   IQueryResult,
+  ISaveVC,
 } from '../../verfiable-creds-manager';
 
 /**
@@ -394,23 +395,27 @@ export class SnapVCStore extends AbstractDataStore {
   }
 
   async saveVC(args: {
-    data: W3CVerifiableCredential;
-    id: string;
-  }): Promise<string> {
+    data: ISaveVC[];
+    options?: unknown;
+  }): Promise<string[]> {
     // TODO check if VC is correct type
 
-    const { data: vc, id } = args;
+    const { data: vcs } = args;
     const state = await getSnapState(this.snap);
     const account = state.currentAccount;
     if (!account) {
       throw Error(`SnapVCStore - Cannot get current account: ${account}`);
     }
 
-    const newId = id || uuidv4();
-    state.accountState[account].vcs[newId] = vc;
+    const ids: string[] = [];
+    vcs.forEach((vc) => {
+      const newId = vc.id || uuidv4();
+      ids.push(newId);
+      state.accountState[account].vcs[newId] = vc.vc as W3CVerifiableCredential;
+    });
     await updateSnapState(this.snap, state);
 
-    return newId;
+    return ids;
   }
 
   async deleteVC({ id }: { id: string }): Promise<boolean> {

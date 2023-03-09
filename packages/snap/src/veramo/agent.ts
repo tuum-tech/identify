@@ -55,6 +55,7 @@ import {
   IDataManagerDeleteResult,
   IDataManagerQueryResult,
   IDataManagerSaveResult,
+  ISaveArgs,
 } from '../plugins/veramo/verfiable-creds-manager';
 import { generateVCPanel, snapDialog } from '../snap/dialog';
 import { getCurrentNetwork } from '../snap/network';
@@ -197,7 +198,9 @@ export class VeramoAgent {
       JSON.stringify(verifiableCredential, null, 4),
     );
     const result = await this.agent.saveVC({
-      data: verifiableCredential,
+      data: {
+        data: [{ vc: verifiableCredential }],
+      },
       options: { store },
       accessToken:
         this.state.accountState[this.state.currentAccount].accountConfig
@@ -214,19 +217,16 @@ export class VeramoAgent {
   /**
    * Veramo Save VC.
    *
-   * @param verifiableCredential - Verifiable Credential.
+   * @param data - ISave args
    * @param store - Store to save.
-   * @param id - Id to use to save.
    * @returns Save result.
    */
   async saveVC(
-    verifiableCredential: W3CVerifiableCredential,
+    data: ISaveArgs,
     store: string | string[],
-    id?: string,
   ): Promise<IDataManagerSaveResult[]> {
     const result = await this.agent.saveVC({
-      data: verifiableCredential,
-      id,
+      data,
       options: { store },
       accessToken:
         this.state.accountState[this.state.currentAccount].accountConfig

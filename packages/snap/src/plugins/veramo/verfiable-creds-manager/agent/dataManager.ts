@@ -1,5 +1,4 @@
 import { IAgentPlugin } from '@veramo/core';
-import { v4 as uuidv4 } from 'uuid';
 import { AbstractDataStore } from '../data-store/abstractDataStore';
 import {
   IDataManager,
@@ -36,8 +35,6 @@ export class DataManager implements IAgentPlugin {
       store = [store];
     }
 
-    const id = uuidv4();
-
     const res: IDataManagerSaveResult[] = [];
     for (const storeName of store) {
       const storePlugin = this.stores[storeName];
@@ -49,8 +46,11 @@ export class DataManager implements IAgentPlugin {
         if (accessToken && storePlugin.configure) {
           await storePlugin.configure({ accessToken });
         }
-        const result = await storePlugin.saveVC({ data, options, id });
-        res.push({ id: result, store: storeName });
+        const result = await storePlugin.saveVC(data);
+
+        result.forEach((savedId: string) => {
+          res.push({ id: savedId, store: storeName });
+        });
       } catch (e) {
         console.log(e);
       }

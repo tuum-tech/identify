@@ -10,12 +10,12 @@ import { VeramoAgent } from '../../veramo/agent';
  *
  * @param identitySnapParams - Identity snap params.
  * @param options0 - Save VC request params.
- * @param options0.verifiableCredential - Verifiable Credential.
+ * @param options0.verifiableCredentials - Verifiable Credential.
  * @param options0.options - Save VC options.
  */
 export async function saveVC(
   identitySnapParams: IdentitySnapParams,
-  { verifiableCredential, options }: SaveVCRequestParams,
+  { verifiableCredentials, options }: SaveVCRequestParams,
 ): Promise<IDataManagerSaveResult[]> {
   const { snap } = identitySnapParams;
 
@@ -31,14 +31,17 @@ export async function saveVC(
         }?`,
       ),
       divider(),
-      text(JSON.stringify(verifiableCredential)),
+      text(JSON.stringify(verifiableCredentials)),
     ]),
   };
 
   if (await snapDialog(snap, dialogParams)) {
     // Get Veramo agent
     const agent = new VeramoAgent(identitySnapParams);
-    return await agent.saveVC(verifiableCredential, store);
+    return await agent.saveVC(
+      { data: verifiableCredentials.map((x) => ({ vc: x })) },
+      store,
+    );
   }
   throw new Error('User rejected');
 }

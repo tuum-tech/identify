@@ -7,6 +7,7 @@ import {
   IConfigureArgs,
   IFilterArgs,
   IQueryResult,
+  ISaveVC,
 } from '../../verfiable-creds-manager';
 import {
   createEmptyFile,
@@ -114,6 +115,22 @@ export class GoogleDriveVCStore extends AbstractDataStore {
   }
 
   async saveVC(args: {
+    data: ISaveVC[];
+    options?: unknown;
+  }): Promise<string[]> {
+    const { data: vcs } = args;
+    const saveVcs: string[] = [];
+    vcs.map(async (vc) => {
+      const savedId = await this.save({
+        data: vc.vc as W3CVerifiableCredential,
+        id: vc.id as string,
+      });
+      saveVcs.push(savedId);
+    });
+    return saveVcs;
+  }
+
+  async save(args: {
     data: W3CVerifiableCredential;
     id: string;
   }): Promise<string> {

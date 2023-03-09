@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { IdentitySnapParams, IdentitySnapState } from '../../../src/interfaces';
@@ -7,7 +5,7 @@ import { connectHederaAccount } from '../../../src/rpc/hedera/connectHederaAccou
 import { saveVC } from '../../../src/rpc/vc/saveVC';
 import { SaveVCRequestParams } from '../../../src/types/params';
 import { VeramoAgent } from '../../../src/veramo/agent';
-import { getDefaultSnapState } from '../../testUtils/constants';
+import { getDefaultSnapState, hederaPrivateKey } from '../../testUtils/constants';
 import { getDefaultCredential } from '../../testUtils/helper';
 import { createMockSnap, SnapMock } from '../../testUtils/snap.mock';
 
@@ -27,16 +25,14 @@ describe('saveVC', () => {
       state: snapState,
     };
 
-    let privateKey =
-      '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c';
     (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
-      privateKey,
+      hederaPrivateKey,
     );
     (identitySnapParams.snap as SnapMock).rpcMocks.eth_chainId.mockReturnValue(
       '0x128',
     );
 
-    let connected = await connectHederaAccount(
+    await connectHederaAccount(
       snapMock,
       snapState,
       metamask,
@@ -63,12 +59,42 @@ describe('saveVC', () => {
 
     let credential = await getDefaultCredential(agent);
     let params: SaveVCRequestParams = {
-      verifiableCredential: credential,
+      verifiableCredentials: [credential],
       options: {},
     };
 
     let result = await saveVC(identitySnapParams, params);
     expect(result.length).toBe(1);
+
+    expect.assertions(1);
+  });
+
+  it('should succeed saving 2 VCs', async () => {
+    // Get Veramo agent
+    const agent = new VeramoAgent(identitySnapParams);
+
+    (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
+      true,
+    );
+
+    let identifier = await agent.agent.didManagerCreate({
+      kms: 'snap',
+      provider: 'did:pkh',
+      options: { chainId: '1' },
+    });
+    snapState.accountState[snapState.currentAccount].identifiers[
+      identifier.did
+    ] = identifier;
+
+    let credential1 = await getDefaultCredential(agent, "type1");
+    let credential2 = await getDefaultCredential(agent, "type2");
+    let params: SaveVCRequestParams = {
+      verifiableCredentials: [credential1, credential2],
+      options: {},
+    };
+
+    let result = await saveVC(identitySnapParams, params);
+    expect(result.length).toBe(2);
 
     expect.assertions(1);
   });

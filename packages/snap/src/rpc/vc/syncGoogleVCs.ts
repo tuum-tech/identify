@@ -1,9 +1,9 @@
-import { W3CVerifiableCredential } from '@veramo/core';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
 import { verifyToken } from '../../plugins/veramo/google-drive-data-store';
 import {
   IDataManagerQueryResult,
   IDataManagerSaveResult,
+  ISaveArgs,
 } from '../../plugins/veramo/verfiable-creds-manager';
 import { generateVCPanel, snapDialog } from '../../snap/dialog';
 import { VeramoAgent } from '../../veramo/agent';
@@ -101,16 +101,19 @@ async function handleSync(
     content: await generateVCPanel(header, prompt, description, vcs),
   };
   if (await snapDialog(snap, dialogParams)) {
-    for (const vc of vcs) {
-      const result = (await agent.saveVC(
-        vc.data as W3CVerifiableCredential,
-        'snap',
-        vc.metadata.id,
-      )) as IDataManagerSaveResult[];
-      if (!(result.length > 0 && result[0].id !== '')) {
-        console.log('Could not sync the vc: ', JSON.stringify(vc, null, 4));
-        return false;
-      }
+    const saveArgs: ISaveArgs = {
+      data: vcs.map((x) => ({ vc: x.data, id: x.metadata.id })),
+    };
+    const result = (await agent.saveVC(
+      saveArgs,
+      'snap',
+    )) as IDataManagerSaveResult[];
+    if (!(result.length > 0 && result[0].id !== '')) {
+      console.log(
+        'Could not sync the vc: ',
+        JSON.stringify(saveArgs.data, null, 4),
+      );
+      return false;
     }
   }
   console.log('User rejected the sync operation');

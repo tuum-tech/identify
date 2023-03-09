@@ -16,7 +16,7 @@ export type SaveVCOptions = {
 };
 
 export type SaveVCRequestParams = {
-  verifiableCredential: W3CVerifiableCredential;
+  verifiableCredentials: W3CVerifiableCredential[];
   options?: SaveVCOptions;
 };
 

@@ -17,10 +17,10 @@ export class MemoryDataStore extends AbstractDataStore {
   configure: undefined;
 
   // eslint-disable-next-line @typescript-eslint/require-await
-  public async saveVC(args: ISaveArgs): Promise<string> {
+  public async saveVC(args: ISaveArgs): Promise<string[]> {
     const id = v4();
     this.data[id] = args.data;
-    return id;
+    return [id];
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await

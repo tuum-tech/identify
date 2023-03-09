@@ -1,4 +1,5 @@
 import { IPluginMethodMap } from '@veramo/core';
+import { ISaveArgs } from '../data-store/abstractDataStore';
 
 export type IDataManager = {
   queryVC(args: IDataManagerQueryArgs): Promise<IDataManagerQueryResult[]>;
@@ -56,10 +57,9 @@ export type IDataManagerDeleteArgs = {
 };
 
 export type IDataManagerSaveArgs = {
-  data: unknown;
+  data: ISaveArgs;
   options: SaveOptions;
   accessToken?: string;
-  id?: string;
 };
 
 export type IDataManagerClearArgs = {
