@@ -1,4 +1,3 @@
-/* eslint-disable no-alert */
 import { IDataManagerDeleteResult } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
 import { FC, useContext, useState } from 'react';
 import Select from 'react-select';
@@ -24,12 +23,14 @@ const RemoveVC: FC<Props> = ({ setCurrentChainId }) => {
     useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
   const [selectedOptions, setSelectedOptions] = useState([storeOptions[0]]);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (options: any) => {
     setSelectedOptions(options);
   };
 
   const handleRemoveVCClick = async () => {
+    setLoading(true);
     try {
       setCurrentChainId(await getCurrentNetwork());
       const id = vcIdsToBeRemoved ? vcIdsToBeRemoved.trim().split(',')[0] : '';
@@ -50,6 +51,7 @@ const RemoveVC: FC<Props> = ({ setCurrentChainId }) => {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
+    setLoading(false);
   };
 
   return (
@@ -94,6 +96,7 @@ const RemoveVC: FC<Props> = ({ setCurrentChainId }) => {
             buttonText="Delete VC"
             onClick={handleRemoveVCClick}
             disabled={!state.installedSnap}
+            loading={loading}
           />
         ),
       }}

@@ -187,4 +187,7 @@ export const GlobalStyle = createGlobalStyle`
   .modal-content {
     background: ${(props) => props.theme.colors.background.default}
   }
+  .modal-body {
+    overflow: auto;
+  }
 `;

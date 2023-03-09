@@ -1,4 +1,3 @@
-/* eslint-disable no-alert */
 import { useGoogleLogin } from '@react-oauth/google';
 import { FC, useContext, useState } from 'react';
 import {

@@ -1,4 +1,3 @@
-/* eslint-disable no-alert */
 import { IDataManagerQueryResult } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
 import { FC, useContext, useState } from 'react';
 import Select from 'react-select';
@@ -23,12 +22,14 @@ const GetSpecificVC: FC<Props> = ({ setCurrentChainId }) => {
   const { vcId, setVcId, setVc } = useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
   const [selectedOptions, setSelectedOptions] = useState([storeOptions[0]]);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (options: any) => {
     setSelectedOptions(options);
   };
 
   const handleGetSpecificVCClick = async () => {
+    setLoading(true);
     try {
       setCurrentChainId(await getCurrentNetwork());
       const filter = {
@@ -51,6 +52,7 @@ const GetSpecificVC: FC<Props> = ({ setCurrentChainId }) => {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
+    setLoading(false);
   };
 
   return (
@@ -93,6 +95,7 @@ const GetSpecificVC: FC<Props> = ({ setCurrentChainId }) => {
             buttonText="Retrieve VC"
             onClick={handleGetSpecificVCClick}
             disabled={!state.installedSnap}
+            loading={loading}
           />
         ),
       }}

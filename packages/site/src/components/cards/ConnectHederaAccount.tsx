@@ -1,9 +1,9 @@
-/* eslint-disable no-alert */
 import { FC, useContext, useState } from 'react';
 import {
   MetamaskActions,
   MetaMaskContext,
 } from '../../contexts/MetamaskContext';
+import useModal from '../../hooks/useModal';
 import {
   connectHederaAccount,
   shouldDisplayReconnectButton,
@@ -18,6 +18,7 @@ const ConnectHederaAccount: FC<Props> = ({ setHederaAccountConnected }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [hederaAccountId, setHederaAccountId] = useState('0.0.15215');
   const [loading, setLoading] = useState(false);
+  const { showModal } = useModal();
 
   const handleConfigureHederaAccountClick = async () => {
     setLoading(true);
@@ -26,7 +27,10 @@ const ConnectHederaAccount: FC<Props> = ({ setHederaAccountConnected }) => {
       console.log('configured: ', configured);
       if (configured) {
         setHederaAccountConnected(true);
-        alert('Hedera Account configuration was successful');
+        showModal({
+          title: 'Connect Hedera Account',
+          content: 'Hedera Account configuration was successful!',
+        });
       } else {
         console.log('Hedera Account was not configured correctly');
       }

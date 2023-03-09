@@ -1,4 +1,3 @@
-/* eslint-disable no-alert */
 import { FC, useContext, useState } from 'react';
 import Select from 'react-select';
 import { storeOptions } from '../../config/constants';
@@ -7,6 +6,7 @@ import {
   MetaMaskContext,
 } from '../../contexts/MetamaskContext';
 import { VcContext } from '../../contexts/VcContext';
+import useModal from '../../hooks/useModal';
 import {
   createVC,
   getCurrentNetwork,
@@ -24,12 +24,15 @@ const CreateVC: FC<Props> = ({ setCurrentChainId }) => {
   const [createVCName, setCreateVCName] = useState('Kiran Pachhai');
   const [createVCNickname, setCreateVCNickname] = useState('KP Woods');
   const [selectedOptions, setSelectedOptions] = useState([storeOptions[0]]);
+  const [loading, setLoading] = useState(false);
+  const { showModal } = useModal();
 
   const handleChange = (options: any) => {
     setSelectedOptions(options);
   };
 
   const handleCreateVCClick = async () => {
+    setLoading(true);
     try {
       setCurrentChainId(await getCurrentNetwork());
       const vcKey = 'profile';
@@ -54,11 +57,21 @@ const CreateVC: FC<Props> = ({ setCurrentChainId }) => {
         setVcId(vcIdsToAdd.toString());
         setVcIdsToBeRemoved(vcIdsToAdd.toString());
         console.log('created and saved VC: ', saved);
+        showModal({
+          title: 'Create VC',
+          content: `Created and saved VC:
+          ${savedJson.map(
+            (data: any) => `${JSON.stringify(data)}
+          `,
+          )}
+          `,
+        });
       }
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
+    setLoading(false);
   };
 
   return (
@@ -111,6 +124,7 @@ const CreateVC: FC<Props> = ({ setCurrentChainId }) => {
             buttonText="Generate VC"
             onClick={handleCreateVCClick}
             disabled={!state.installedSnap}
+            loading={loading}
           />
         ),
       }}

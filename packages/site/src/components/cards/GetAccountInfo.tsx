@@ -1,9 +1,9 @@
-/* eslint-disable no-alert */
-import { FC, useContext } from 'react';
+import { FC, useContext, useState } from 'react';
 import {
   MetamaskActions,
   MetaMaskContext,
 } from '../../contexts/MetamaskContext';
+import useModal from '../../hooks/useModal';
 import {
   getAccountInfo,
   getCurrentNetwork,
@@ -18,18 +18,25 @@ type Props = {
 
 const GetAccountInfo: FC<Props> = ({ setCurrentChainId, setAccountInfo }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
+  const [loading, setLoading] = useState(false);
+  const { showModal } = useModal();
 
   const handleGetAccountInfoClick = async () => {
+    setLoading(true);
     try {
       setCurrentChainId(await getCurrentNetwork());
       const accountInfo = await getAccountInfo();
       setAccountInfo(accountInfo);
       console.log(`Your account info:`, accountInfo);
-      alert(`Your account info: ${JSON.stringify(accountInfo)}`);
+      showModal({
+        title: 'Your account info',
+        content: JSON.stringify(accountInfo),
+      });
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
+    setLoading(false);
   };
 
   return (
@@ -42,6 +49,7 @@ const GetAccountInfo: FC<Props> = ({ setCurrentChainId, setAccountInfo }) => {
             buttonText="Get Account Info"
             onClick={handleGetAccountInfoClick}
             disabled={!state.installedSnap}
+            loading={loading}
           />
         ),
       }}

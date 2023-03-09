@@ -1,4 +1,3 @@
-/* eslint-disable no-alert */
 import { IDataManagerQueryResult } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
 import { FC, useContext, useState } from 'react';
 import Select from 'react-select';
@@ -8,6 +7,7 @@ import {
   MetaMaskContext,
 } from '../../contexts/MetamaskContext';
 import { VcContext } from '../../contexts/VcContext';
+import useModal from '../../hooks/useModal';
 import {
   getCurrentNetwork,
   getVCs,
@@ -23,12 +23,15 @@ const GetAllVCs: FC<Props> = ({ setCurrentChainId }) => {
   const { setVcId, setVc, setVcIdsToBeRemoved } = useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
   const [selectedOptions, setSelectedOptions] = useState([storeOptions[0]]);
+  const [loading, setLoading] = useState(false);
+  const { showModal } = useModal();
 
   const handleChange = (options: any) => {
     setSelectedOptions(options);
   };
 
   const handleGetVCsClick = async () => {
+    setLoading(true);
     try {
       setCurrentChainId(await getCurrentNetwork());
       const options = {
@@ -48,13 +51,14 @@ const GetAllVCs: FC<Props> = ({ setCurrentChainId }) => {
           setVcId(keys.toString());
           setVcIdsToBeRemoved(keys.toString());
           setVc(vcs[keys.length - 1].data as IDataManagerQueryResult);
-          alert(`Your VC IDs are: ${keys.toString()}`);
+          showModal({ title: 'Your VC IDs', content: keys.toString() });
         }
       }
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
+    setLoading(false);
   };
 
   return (
@@ -88,6 +92,7 @@ const GetAllVCs: FC<Props> = ({ setCurrentChainId }) => {
             buttonText="Retrieve all VCs"
             onClick={handleGetVCsClick}
             disabled={!state.installedSnap}
+            loading={loading}
           />
         ),
       }}

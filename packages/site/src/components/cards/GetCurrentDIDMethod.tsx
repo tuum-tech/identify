@@ -1,9 +1,9 @@
-/* eslint-disable no-alert */
-import { FC, useContext } from 'react';
+import { FC, useContext, useState } from 'react';
 import {
   MetamaskActions,
   MetaMaskContext,
 } from '../../contexts/MetamaskContext';
+import useModal from '../../hooks/useModal';
 import {
   getCurrentDIDMethod,
   getCurrentNetwork,
@@ -17,17 +17,23 @@ type Props = {
 
 const GetCurrentDIDMethod: FC<Props> = ({ setCurrentChainId }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
+  const [loading, setLoading] = useState(false);
+  const { showModal } = useModal();
 
   const handleGetCurrentDIDMethodClick = async () => {
+    setLoading(true);
     try {
       setCurrentChainId(await getCurrentNetwork());
       const currentDIDMethod = await getCurrentDIDMethod();
-      console.log(`Your current DID method is: ${currentDIDMethod}`);
-      alert(`Your current DID method is: ${currentDIDMethod}`);
+      showModal({
+        title: 'Current DID method',
+        content: `Your current DID method is: ${currentDIDMethod}`,
+      });
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
+    setLoading(false);
   };
 
   return (
@@ -40,6 +46,7 @@ const GetCurrentDIDMethod: FC<Props> = ({ setCurrentChainId }) => {
             buttonText="Get DID method"
             onClick={handleGetCurrentDIDMethodClick}
             disabled={!state.installedSnap}
+            loading={loading}
           />
         ),
       }}
