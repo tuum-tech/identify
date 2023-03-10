@@ -1,31 +1,23 @@
 import { PrivateKey } from '@hashgraph/sdk';
-import { MetaMaskInpageProvider } from '@metamask/providers';
-import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { heading, panel, text } from '@metamask/snaps-ui';
 import { toHederaAccountInfo } from '../../hedera';
 import { getHederaNetwork, validHederaChainID } from '../../hedera/config';
 import { IdentitySnapState, SnapDialogParams } from '../../interfaces';
+import { importIdentitySnapAccount } from '../../snap/account';
 import { snapDialog } from '../../snap/dialog';
 import { getCurrentNetwork } from '../../snap/network';
-import { initAccountState, updateSnapState } from '../../snap/state';
-import { veramoImportHederaAccount } from '../../veramo/accountImport';
-import { VeramoAgent } from '../../veramo/agent';
 
 /**
  * Connect Hedera Account.
  *
- * @param snap - Snap.
- * @param state - IdentitySnapState.
- * @param metamask - Metamask provider.
- * @param _accountId - Account id.
+ * @param state - Identity state.
+ * @param accountId - Account id.
  */
 export async function connectHederaAccount(
-  snap: SnapsGlobalObject,
   state: IdentitySnapState,
-  metamask: MetaMaskInpageProvider,
-  _accountId: string,
+  accountId: string,
 ): Promise<boolean> {
-  const chainId = await getCurrentNetwork(metamask);
+  const chainId = await getCurrentNetwork(ethereum);
   if (validHederaChainID(chainId)) {
     const dialogParamsForPrivateKey: SnapDialogParams = {
       type: 'Prompt',
@@ -41,7 +33,7 @@ export async function connectHederaAccount(
 
     const hederaAccountInfo = await toHederaAccountInfo(
       privateKey,
-      _accountId,
+      accountId,
       getHederaNetwork(chainId),
     );
     if (hederaAccountInfo !== null) {
@@ -49,24 +41,7 @@ export async function connectHederaAccount(
         ? hederaAccountInfo.contractAccountId
         : `0x${hederaAccountInfo.contractAccountId}`;
 
-      state.currentAccount = evmAddress;
-      if (!(state.currentAccount in state.accountState)) {
-        await initAccountState(snap, state, state.currentAccount);
-      }
-
-      state.accountState[state.currentAccount].hederaAccount.evmAddress =
-        evmAddress;
-
-      state.accountState[state.currentAccount].hederaAccount.accountId =
-        _accountId;
-      await updateSnapState(snap, state);
-      // Get Veramo agent
-      const agent = new VeramoAgent({ snap, state, metamask });
-      return await veramoImportHederaAccount(
-        agent.agent,
-        state.currentAccount,
-        privateKey,
-      );
+      await importIdentitySnapAccount(state, evmAddress, privateKey);
     }
     console.error('Could not retrieve hedera account info');
     return false;

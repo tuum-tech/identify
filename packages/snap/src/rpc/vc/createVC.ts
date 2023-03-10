@@ -1,9 +1,21 @@
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
+import {
+  MinimalImportableKey,
+  ProofFormat,
+  W3CVerifiableCredential,
+} from '@veramo/core';
+import cloneDeep from 'lodash.clonedeep';
+import { validHederaChainID } from '../../hedera/config';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
-import { IDataManagerSaveResult } from '../../plugins/veramo/verfiable-creds-manager';
+import {
+  IDataManagerSaveResult,
+  SaveOptions,
+} from '../../plugins/veramo/verfiable-creds-manager';
 import { snapDialog } from '../../snap/dialog';
+import { getCurrentNetwork } from '../../snap/network';
+import { getAccountStateByCoinType } from '../../snap/state';
 import { CreateVCRequestParams } from '../../types/params';
-import { VeramoAgent } from '../../veramo/agent';
+import { getVeramoAgent } from '../../veramo/agent';
 
 /**
  * Function to create VC.
@@ -15,7 +27,28 @@ export async function createVC(
   identitySnapParams: IdentitySnapParams,
   vcRequestParams: CreateVCRequestParams,
 ): Promise<IDataManagerSaveResult[]> {
-  const { snap } = identitySnapParams;
+  const { snap, state, metamask, account } = identitySnapParams;
+
+  // Get Veramo agent
+  const agent = await getVeramoAgent(snap, state);
+
+  const identifier = await agent.didManagerImport({
+    did: account.identifier.did,
+    provider: account.method,
+    controllerKeyId: account.identifier.controllerKeyId,
+    keys: [
+      {
+        kid: account.identifier.controllerKeyId,
+        type: 'Secp256k1',
+        kms: 'snap',
+        privateKeyHex: account.privateKey,
+        publicKeyHex: account.publicKey,
+      } as MinimalImportableKey,
+    ],
+  });
+
+  // GET DID
+  const { did } = identifier;
 
   const {
     vcKey = 'vcData',
@@ -40,9 +73,64 @@ export async function createVC(
   };
 
   if (await snapDialog(snap, dialogParams)) {
-    // Get Veramo agent
-    const agent = new VeramoAgent(identitySnapParams);
-    return await agent.createVC(vcKey, vcValue, store, credTypes);
+    const issuanceDate = new Date();
+    // Set the expiration date to be 1 year from the date it's issued
+    const expirationDate = cloneDeep(issuanceDate);
+    expirationDate.setFullYear(
+      issuanceDate.getFullYear() + 1,
+      issuanceDate.getMonth(),
+      issuanceDate.getDate(),
+    );
+
+    const credential = new Map<string, unknown>();
+    credential.set('issuanceDate', issuanceDate.toISOString()); // the entity that issued the credential+
+    credential.set('expirationDate', expirationDate.toISOString()); // when the credential was issued
+    credential.set('type', credTypes);
+
+    const issuer: { id: string; hederaAccountId?: string } = { id: did };
+    const credentialSubject: { id: string; hederaAccountId?: string } = {
+      id: did, // identifier for the only subject of the credential
+      [vcKey]: vcValue, // assertion about the only subject of the credential
+    };
+    const chainId = await getCurrentNetwork(metamask);
+    const accountState = await getAccountStateByCoinType(
+      state,
+      account.evmAddress,
+    );
+    if (validHederaChainID(chainId)) {
+      const hederaAccountId = accountState.extraData as string;
+      issuer.hederaAccountId = hederaAccountId;
+      credentialSubject.hederaAccountId = hederaAccountId;
+    }
+    credential.set('issuer', issuer); // the entity that issued the credential
+    credential.set('credentialSubject', credentialSubject);
+
+    // Generate a Verifiable Credential
+    const verifiableCredential: W3CVerifiableCredential =
+      await agent.createVerifiableCredential({
+        credential: JSON.parse(JSON.stringify(Object.fromEntries(credential))),
+        // digital proof that makes the credential tamper-evident
+        proofFormat: 'jwt' as ProofFormat,
+      });
+
+    console.log(
+      'Created verifiableCredential: ',
+      JSON.stringify(verifiableCredential, null, 4),
+    );
+
+    // Save the Verifiable Credential
+    const optionsFiltered = { store } as SaveOptions;
+    const result: IDataManagerSaveResult[] = await agent.saveVC({
+      data: verifiableCredential,
+      options: optionsFiltered,
+      accessToken: accountState.accountConfig.identity.googleAccessToken,
+    });
+
+    console.log(
+      'Saved verifiableCredential: ',
+      JSON.stringify(result, null, 4),
+    );
+    return result;
   }
   throw new Error('User rejected');
 }

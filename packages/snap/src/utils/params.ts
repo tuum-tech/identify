@@ -1,14 +1,17 @@
 import { VerifiablePresentation, W3CVerifiableCredential } from '@veramo/core';
 import { GoogleToken, IdentitySnapState } from '../interfaces';
-import { isValidProofFormat, isValidVCStore } from '../types/constants';
 import {
-  CreateVCRequestParams,
-  CreateVPRequestParams,
-  DeleteAllVCsRequestParams,
-  GetVCsRequestParams,
-  RemoveVCsRequestParams,
-  SaveVCRequestParams,
-} from '../types/params';
+  IDataManagerClearArgs,
+  IDataManagerDeleteArgs,
+  IDataManagerQueryArgs,
+  IDataManagerSaveArgs,
+} from '../plugins/veramo/verfiable-creds-manager';
+import {
+  HEDERACOINTYPE,
+  isValidProofFormat,
+  isValidVCStore,
+} from '../types/constants';
+import { CreateVCRequestParams, CreateVPRequestParams } from '../types/params';
 
 type HederaAccountParams = {
   accountId: string;
@@ -40,14 +43,20 @@ export function isValidHederaAccountParams(
  * Check if Hedera account was imported.
  *
  * @param state - IdentitySnapState.
+ * @param accountId - Hedera identifier.
  * @returns Result.
  */
-export function isHederaAccountImported(state: IdentitySnapState): boolean {
-  if (
-    state.accountState[state.currentAccount].hederaAccount.evmAddress ===
-      state.currentAccount &&
-    state.accountState[state.currentAccount].hederaAccount.accountId !== ''
-  ) {
+export function isHederaAccountImported(
+  state: IdentitySnapState,
+  accountId: string,
+): boolean {
+  const hederaAccountId = state.accountState[HEDERACOINTYPE][
+    state.currentAccount.evmAddress
+  ].extraData
+    ? (state.accountState[HEDERACOINTYPE][state.currentAccount.evmAddress]
+        .extraData as string)
+    : '';
+  if (hederaAccountId === accountId) {
     return true;
   }
   return false;
@@ -103,11 +112,11 @@ export function isValidResolveDIDRequest(
  */
 export function isValidGetVCsRequest(
   params: unknown,
-): asserts params is GetVCsRequestParams {
+): asserts params is IDataManagerQueryArgs {
   if (params === null) {
     return;
   }
-  const parameter = params as GetVCsRequestParams;
+  const parameter = params as IDataManagerQueryArgs;
 
   // Check if filter is valid
   if (
@@ -176,13 +185,13 @@ export function isValidGetVCsRequest(
  */
 export function isValidSaveVCRequest(
   params: unknown,
-): asserts params is SaveVCRequestParams {
-  const parameter = params as SaveVCRequestParams;
+): asserts params is IDataManagerSaveArgs {
+  const parameter = params as IDataManagerSaveArgs;
   if (
     parameter !== null &&
     typeof parameter === 'object' &&
-    'verifiableCredential' in parameter &&
-    parameter.verifiableCredential !== null
+    'data' in parameter &&
+    parameter.data !== null
   ) {
     if (
       'options' in parameter &&
@@ -287,11 +296,11 @@ export function isValidVerifyVCRequest(
  */
 export function isValidRemoveVCRequest(
   params: unknown,
-): asserts params is RemoveVCsRequestParams {
+): asserts params is IDataManagerDeleteArgs {
   if (params === null) {
     return;
   }
-  const parameter = params as RemoveVCsRequestParams;
+  const parameter = params as IDataManagerDeleteArgs;
 
   // Check if id exists
   if ('id' in parameter && parameter.id !== null) {
@@ -337,11 +346,11 @@ export function isValidRemoveVCRequest(
  */
 export function isValidDeleteAllVCsRequest(
   params: unknown,
-): asserts params is DeleteAllVCsRequestParams {
+): asserts params is IDataManagerClearArgs {
   if (params === null) {
     return;
   }
-  const parameter = params as DeleteAllVCsRequestParams;
+  const parameter = params as IDataManagerClearArgs;
 
   // Check if options is valid
   if (

@@ -1,25 +1,34 @@
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
+import { W3CVerifiableCredential } from '@veramo/core';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
-import { IDataManagerSaveResult } from '../../plugins/veramo/verfiable-creds-manager';
+import {
+  IDataManagerSaveArgs,
+  IDataManagerSaveResult,
+  SaveOptions,
+} from '../../plugins/veramo/verfiable-creds-manager';
 import { snapDialog } from '../../snap/dialog';
-import { SaveVCRequestParams } from '../../types/params';
-import { VeramoAgent } from '../../veramo/agent';
+import { getAccountStateByCoinType } from '../../snap/state';
+import { getVeramoAgent } from '../../veramo/agent';
 
 /**
  * Function to save VC.
  *
  * @param identitySnapParams - Identity snap params.
- * @param options0 - Save VC request params.
- * @param options0.verifiableCredential - Verifiable Credential.
- * @param options0.options - Save VC options.
+ * @param vcSaveRequestParams - VC save request params.
  */
 export async function saveVC(
   identitySnapParams: IdentitySnapParams,
-  { verifiableCredential, options }: SaveVCRequestParams,
+  vcSaveRequestParams: IDataManagerSaveArgs,
 ): Promise<IDataManagerSaveResult[]> {
-  const { snap } = identitySnapParams;
+  const { snap, state, account } = identitySnapParams;
 
+  const { data: verifiableCredential, options } = vcSaveRequestParams || {};
   const { store = 'snap' } = options || {};
+
+  const optionsFiltered = { store } as SaveOptions;
+
+  // Get Veramo agent
+  const agent = await getVeramoAgent(snap, state);
 
   const dialogParams: SnapDialogParams = {
     type: 'Confirmation',
@@ -36,9 +45,16 @@ export async function saveVC(
   };
 
   if (await snapDialog(snap, dialogParams)) {
-    // Get Veramo agent
-    const agent = new VeramoAgent(identitySnapParams);
-    return await agent.saveVC(verifiableCredential, store);
+    // Save the Verifiable Credential
+    const accountState = await getAccountStateByCoinType(
+      state,
+      account.evmAddress,
+    );
+    return (await agent.saveVC({
+      data: verifiableCredential as W3CVerifiableCredential,
+      options: optionsFiltered,
+      accessToken: accountState.accountConfig.identity.googleAccessToken,
+    })) as IDataManagerSaveResult[];
   }
   throw new Error('User rejected');
 }

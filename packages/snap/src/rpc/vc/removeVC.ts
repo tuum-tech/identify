@@ -1,9 +1,13 @@
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
-import { IDataManagerDeleteResult } from '../../plugins/veramo/verfiable-creds-manager';
+import {
+  DeleteOptions,
+  IDataManagerDeleteArgs,
+  IDataManagerDeleteResult,
+} from '../../plugins/veramo/verfiable-creds-manager';
 import { snapDialog } from '../../snap/dialog';
-import { RemoveVCsRequestParams } from '../../types/params';
-import { VeramoAgent } from '../../veramo/agent';
+import { getAccountStateByCoinType } from '../../snap/state';
+import { getVeramoAgent } from '../../veramo/agent';
 
 /**
  * Function to remove VC.
@@ -13,12 +17,16 @@ import { VeramoAgent } from '../../veramo/agent';
  */
 export async function removeVC(
   identitySnapParams: IdentitySnapParams,
-  vcRequestParams: RemoveVCsRequestParams,
+  vcRequestParams: IDataManagerDeleteArgs,
 ): Promise<IDataManagerDeleteResult[] | null> {
-  const { snap } = identitySnapParams;
+  const { snap, state, account } = identitySnapParams;
 
   const { id = '', options } = vcRequestParams || {};
   const { store = 'snap' } = options || {};
+  const optionsFiltered = { store } as DeleteOptions;
+
+  // Get Veramo agent
+  const agent = await getVeramoAgent(snap, state);
 
   const ids = typeof id === 'string' ? [id] : id;
   if (ids.length === 0) {
@@ -36,9 +44,22 @@ export async function removeVC(
   };
 
   if (await snapDialog(snap, dialogParams)) {
-    // Get Veramo agent
-    const agent = new VeramoAgent(identitySnapParams);
-    return await agent.removeVC(ids, store);
+    // Remove the specified Verifiable Credentials from the store based on their IDs
+    const accountState = await getAccountStateByCoinType(
+      state,
+      account.evmAddress,
+    );
+    return Promise.all(
+      ids.map(async (_id: string) => {
+        return await agent.deleteVC({
+          id: _id,
+          options: optionsFiltered,
+          accessToken: accountState.accountConfig.identity.googleAccessToken,
+        });
+      }),
+    ).then((data: IDataManagerDeleteResult[][]) => {
+      return data.flat();
+    });
   }
   throw new Error('User rejected');
 }

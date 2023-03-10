@@ -1,7 +1,7 @@
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
 import { snapDialog } from '../../snap/dialog';
-import { updateSnapState } from '../../snap/state';
+import { getAccountStateByCoinType, updateSnapState } from '../../snap/state';
 import { availableMethods, isValidMethod } from '../../types/constants';
 
 /**
@@ -14,10 +14,13 @@ export async function switchMethod(
   identitySnapParams: IdentitySnapParams,
   didMethod: string,
 ): Promise<boolean> {
-  const { snap, state } = identitySnapParams;
+  const { snap, state, account } = identitySnapParams;
 
-  const method =
-    state.accountState[state.currentAccount].accountConfig.identity.didMethod;
+  const accountState = await getAccountStateByCoinType(
+    state,
+    account.evmAddress,
+  );
+  const method = accountState.accountConfig.identity.didMethod;
   if (!isValidMethod(didMethod)) {
     console.error(
       `did method '${didMethod}' not supported. Supported methods are: ${availableMethods}`,
@@ -39,9 +42,7 @@ export async function switchMethod(
     };
 
     if (await snapDialog(snap, dialogParams)) {
-      state.accountState[
-        state.currentAccount
-      ].accountConfig.identity.didMethod = didMethod;
+      accountState.accountConfig.identity.didMethod = didMethod;
       await updateSnapState(snap, state);
       return true;
     }

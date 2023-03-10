@@ -1,5 +1,4 @@
 import { IdentitySnapParams } from '../../interfaces';
-import { getCurrentDid } from '../../utils/didUtils';
 
 /**
  * Get did.
@@ -9,6 +8,6 @@ import { getCurrentDid } from '../../utils/didUtils';
 export async function getDid(
   identitySnapParams: IdentitySnapParams,
 ): Promise<string> {
-  const { state, metamask } = identitySnapParams;
-  return await getCurrentDid(state, metamask);
+  const { account } = identitySnapParams;
+  return account.identifier.did;
 }

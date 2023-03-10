@@ -2,7 +2,7 @@ import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { divider, heading, panel, Panel, text } from '@metamask/snaps-ui';
 import { VerifiableCredential } from '@veramo/core';
 import cloneDeep from 'lodash.clonedeep';
-import { IdentitySnapState, SnapDialogParams } from 'src/interfaces';
+import { IdentitySnapState, SnapDialogParams } from '../interfaces';
 import { IDataManagerQueryResult } from '../plugins/veramo/verfiable-creds-manager';
 import { updateSnapState } from './state';
 

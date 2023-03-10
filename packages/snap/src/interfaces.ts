@@ -1,17 +1,25 @@
-import { BIP44CoinTypeNode } from '@metamask/key-tree';
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { Panel } from '@metamask/snaps-ui';
 import { IIdentifier, IKey, W3CVerifiableCredential } from '@veramo/core';
 import { ManagedPrivateKey } from '@veramo/key-manager';
 
+export type Account = {
+  evmAddress: string;
+  method: string;
+  identifier: IIdentifier;
+  privateKey: string;
+  publicKey: string;
+};
+
 export type IdentitySnapState = {
-  currentAccount: string;
+  currentAccount: Account;
 
   /**
    * Account specific storage
+   * mapping(coinType -> mapping(address -> state))
    */
-  accountState: Record<string, IdentityAccountState>;
+  accountState: Record<string, Record<string, IdentityAccountState>>;
 
   /**
    * Configuration for IdentitySnap
@@ -38,9 +46,9 @@ export type IdentityAccountState = {
   identifiers: Record<string, IIdentifier>;
   vcs: Record<string, W3CVerifiableCredential>;
 
-  index?: number;
   accountConfig: IdentityAccountConfig;
-  hederaAccount: HederaAccount;
+  index?: number;
+  extraData?: unknown;
 };
 
 export type IdentityAccountConfig = {
@@ -55,12 +63,7 @@ export type IdentitySnapParams = {
   snap: SnapsGlobalObject;
   state: IdentitySnapState;
   metamask: MetaMaskInpageProvider;
-  bip44CoinTypeNode?: BIP44CoinTypeNode;
-};
-
-export type HederaAccount = {
-  accountId: string;
-  evmAddress: string;
+  account: Account;
 };
 
 export type SnapDialogParams = {

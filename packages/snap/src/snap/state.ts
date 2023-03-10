@@ -1,6 +1,13 @@
 import { SnapsGlobalObject } from '@metamask/snaps-types';
-import { IdentitySnapState } from '../interfaces';
+import { validHederaChainID } from '../hedera/config';
+import {
+  Account,
+  IdentityAccountState,
+  IdentitySnapState,
+} from '../interfaces';
+import { DEFAULTCOINTYPE, HEDERACOINTYPE } from '../types/constants';
 import { getEmptyAccountState, getInitialSnapState } from '../utils/config';
+import { getCurrentNetwork } from './network';
 
 /**
  * Function for updating IdentitySnapState object in the MetaMask state.
@@ -37,6 +44,7 @@ export async function getSnapState(
   if (!state) {
     throw Error('IdentitySnapState is not initialized!');
   }
+
   return state;
 }
 
@@ -50,10 +58,12 @@ export async function getSnapState(
 export async function getSnapStateUnchecked(
   snap: SnapsGlobalObject,
 ): Promise<IdentitySnapState | null> {
-  return (await snap.request({
+  const state = (await snap.request({
     method: 'snap_manageState',
     params: { operation: 'get' },
   })) as IdentitySnapState | null;
+
+  return state;
 }
 
 /**
@@ -74,16 +84,47 @@ export async function initSnapState(
 /**
  * Function that creates an empty IdentitySnapState object in the Identity Snap state for the provided address.
  *
- * @public
  * @param snap - Snap.
  * @param state - IdentitySnapState.
- * @param currentAccount - Current account.
+ * @param coinType - The type of cointype.
+ * @param evmAddress - The account address.
  */
 export async function initAccountState(
   snap: SnapsGlobalObject,
   state: IdentitySnapState,
-  currentAccount: string,
+  coinType: string,
+  evmAddress: string,
 ): Promise<void> {
-  state.accountState[currentAccount] = getEmptyAccountState();
+  state.currentAccount = { evmAddress } as Account;
+  state.accountState[coinType][evmAddress] = getEmptyAccountState();
   await updateSnapState(snap, state);
+}
+
+/**
+ * Function that returns the current coin type based on what network is selected.
+ *
+ * @returns Result.
+ */
+export async function getCurrentCoinType(): Promise<number> {
+  const chainId = await getCurrentNetwork(ethereum);
+  let coinType = DEFAULTCOINTYPE;
+  if (validHederaChainID(chainId)) {
+    coinType = HEDERACOINTYPE;
+  }
+  return coinType;
+}
+
+/**
+ * Function that get account state according to coin type.
+ *
+ * @param state - IdentitySnapState.
+ * @param evmAddress - The account address.
+ * @returns Result.
+ */
+export async function getAccountStateByCoinType(
+  state: IdentitySnapState,
+  evmAddress: string,
+): Promise<IdentityAccountState> {
+  const coinType = await getCurrentCoinType();
+  return state.accountState[coinType][evmAddress];
 }
