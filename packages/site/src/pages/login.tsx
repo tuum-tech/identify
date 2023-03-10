@@ -1,19 +1,9 @@
-import axios from 'axios';
-import { useContext, useEffect, useState } from 'react';
-import {
-  connectHederaAccount,
-  connectSnap,
-  createVP,
-  getCurrentNetwork,
-  getDID,
-  getSnap,
-  getVCs,
-  saveVC,
-} from './../utils/snap';
-
+/* eslint-disable no-alert */
 import { ProofInfo } from '@tuum-tech/identity-snap/src/types/params';
 import { IDataManagerQueryResult } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
 import { VerifiableCredential, VerifiablePresentation } from '@veramo/core';
+import axios from 'axios';
+import { useContext, useEffect, useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import {
   Card,
@@ -33,6 +23,16 @@ import {
 import { MetamaskActions, MetaMaskContext } from '../contexts/MetamaskContext';
 import { shouldDisplayReconnectButton } from '../utils';
 import { validHederaChainID } from '../utils/hedera';
+import {
+  connectHederaAccount,
+  connectSnap,
+  createVP,
+  getCurrentNetwork,
+  getDID,
+  getSnap,
+  getVCs,
+  saveVC,
+} from '../utils/snap';
 
 function LoginPage() {
   const [state, dispatch] = useContext(MetaMaskContext);
@@ -53,9 +53,46 @@ function LoginPage() {
 
   const [challenge, setChallenge] = useState('');
   const [vc, setVC] = useState('');
-  const [vcId, setVcId] = useState('');
   const [vcList, setVcList] = useState([] as any);
   const [showVcsModal, setShowVcsModal] = useState(false);
+
+  const handleSaveVC = async () => {
+    // Send a POST request
+    if (vc !== '') {
+      const parsedVC: VerifiableCredential = JSON.parse(
+        vc,
+      ) as VerifiableCredential;
+      await saveVC(parsedVC);
+    }
+  };
+
+  const handleSignIn = async () => {
+    try {
+      setCurrentChainId(await getCurrentNetwork());
+      const options = {
+        store: 'snap',
+        returnStore: true,
+      };
+      const vcs = (await getVCs(
+        {
+          type: 'vcType',
+          filter: 'SiteLoginCredential',
+        },
+        options,
+      )) as IDataManagerQueryResult[];
+
+      console.log(`Your VCs are: ${JSON.stringify(vcs, null, 4)}`);
+      if (vcs.length > 0) {
+        setVcList(vcs);
+        setShowVcsModal(true);
+      } else {
+        alert('no Vcs found');
+      }
+    } catch (e) {
+      console.error(e);
+      // dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
 
   useEffect(() => {
     (async () => {
@@ -72,15 +109,15 @@ function LoginPage() {
   useEffect(() => {
     (async () => {
       if (presentation !== undefined) {
-        const backend_url = process.env.GATSBY_BACKEND_URL;
+        const backendUrl = process.env.GATSBY_BACKEND_URL;
         const ret = await axios({
           method: 'post',
-          url: `${backend_url}api/v1/credential/signin`,
+          url: `${backendUrl}api/v1/credential/signin`,
           data: {
             presentation,
           },
         });
-        alert('Verified: ' + JSON.stringify(ret.data));
+        alert(`Verified: ${JSON.stringify(ret.data)}`);
       }
     })();
   }, [presentation]);
@@ -89,10 +126,10 @@ function LoginPage() {
     (async () => {
       if (identifier !== '') {
         // Send a POST request to obtain a signed VC from the backend
-        const backend_url = process.env.GATSBY_BACKEND_URL;
+        const backendUrl = process.env.GATSBY_BACKEND_URL;
         const ret = await axios({
           method: 'post',
-          url: `${backend_url}api/v1/credential/register`,
+          url: `${backendUrl}api/v1/credential/register`,
           data: {
             loginName,
             identifier,
@@ -151,16 +188,6 @@ function LoginPage() {
     setIdentifier((await getDID()) as string);
   };
 
-  const handleSaveVC = async () => {
-    // Send a POST request
-    if (vc !== '') {
-      let parsedVC: VerifiableCredential = JSON.parse(
-        vc,
-      ) as VerifiableCredential;
-      await saveVC(parsedVC);
-    }
-  };
-
   const handleVCClicked = async (vcId: string) => {
     try {
       setCurrentChainId(await getCurrentNetwork());
@@ -183,48 +210,22 @@ function LoginPage() {
   const handleChallenge = async () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
-      let identifier = (await getDID()) as string;
-      const backend_url = process.env.GATSBY_BACKEND_URL;
+      const did = (await getDID()) as string;
+      const backendUrl = process.env.GATSBY_BACKEND_URL;
       const ret = await axios({
         method: 'post',
-        url: `${backend_url}api/v1/credential/challenge`,
+        url: `${backendUrl}api/v1/credential/challenge`,
         data: {
-          did: identifier,
+          did,
         },
       });
 
       if (ret.status === 200) {
         setChallenge(ret.data.challenge);
-        alert('challenge ' + ret.data.challenge);
-      }
-    } catch (e) {}
-  };
-
-  const handleSignIn = async () => {
-    try {
-      setCurrentChainId(await getCurrentNetwork());
-      const options = {
-        store: 'snap',
-        returnStore: true,
-      };
-      const vcs = (await getVCs(
-        {
-          type: 'vcType',
-          filter: 'SiteLoginCredential',
-        },
-        options,
-      )) as IDataManagerQueryResult[];
-
-      console.log(`Your VCs are: ${JSON.stringify(vcs, null, 4)}`);
-      if (vcs.length > 0) {
-        setVcList(vcs);
-        setShowVcsModal(true);
-      } else {
-        alert('no Vcs found');
+        alert(`challenge ${ret.data.challenge}`);
       }
     } catch (e) {
       console.error(e);
-      // dispatch({ type: MetamaskActions.SetError, payload: e });
     }
   };
 
