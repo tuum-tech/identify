@@ -7,7 +7,7 @@
     "url": "https://github.com/tuum-tech/identity-snap.git"
   },
   "source": {
-    "shasum": "VRdjxHLB7WE+kS/UihAS8PoMeK/7SBjALscKG3wl5WA=",
+    "shasum": "JjI4+Zn41AzE1X3yAVqhocx+kvw0RMmGUFw4XeHV5yM=",
     "location": {
       "npm": {
         "filePath": "dist/snap.js",

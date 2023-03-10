@@ -1,6 +1,10 @@
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
+import { W3CVerifiableCredential } from '@veramo/core';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
-import { IDataManagerSaveResult } from '../../plugins/veramo/verfiable-creds-manager';
+import {
+  IDataManagerSaveResult,
+  ISaveVC,
+} from '../../plugins/veramo/verfiable-creds-manager';
 import { snapDialog } from '../../snap/dialog';
 import { SaveVCRequestParams } from '../../types/params';
 import { VeramoAgent } from '../../veramo/agent';
@@ -26,7 +30,7 @@ export async function saveVC(
     content: panel([
       heading('Save Verifiable Credential'),
       text(
-        `Would you like to save the following VC in ${
+        `Would you like to save the following VCs in ${
           typeof store === 'string' ? store : store.join(', ')
         }?`,
       ),
@@ -38,8 +42,20 @@ export async function saveVC(
   if (await snapDialog(snap, dialogParams)) {
     // Get Veramo agent
     const agent = new VeramoAgent(identitySnapParams);
+
+    const filteredCredentials: W3CVerifiableCredential[] =
+      verifiableCredentials.filter((x: W3CVerifiableCredential) => {
+        const vcObj = JSON.parse(JSON.stringify(x));
+        const subjectDid: string = vcObj.credentialSubject.id;
+        const subjectAccount = subjectDid.split(':')[4];
+        return identitySnapParams.state.currentAccount === subjectAccount;
+      });
     return await agent.saveVC(
-      { data: verifiableCredentials.map((x) => ({ vc: x })) },
+      {
+        data: filteredCredentials.map((x: W3CVerifiableCredential) => {
+          return { vc: x } as ISaveVC;
+        }) as ISaveVC[],
+      },
       store,
     );
   }
