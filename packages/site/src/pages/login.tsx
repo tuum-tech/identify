@@ -5,13 +5,12 @@ import { VerifiableCredential, VerifiablePresentation } from '@veramo/core';
 import axios from 'axios';
 import { useContext, useEffect, useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
+import { Card, InstallFlaskButton, SendHelloButton } from '../components/base';
 import {
-  Card,
-  ConnectButton,
-  InstallFlaskButton,
-  ReconnectButton,
-  SendHelloButton,
-} from '../components/base';
+  ConnectHederaAccount,
+  ConnectIdentitySnap,
+  ReconnectIdentitySnap,
+} from '../components/cards';
 import {
   CardContainer,
   ErrorMessage,
@@ -24,7 +23,6 @@ import { MetamaskActions, MetaMaskContext } from '../contexts/MetamaskContext';
 import { shouldDisplayReconnectButton } from '../utils';
 import { validHederaChainID } from '../utils/hedera';
 import {
-  connectHederaAccount,
   connectSnap,
   createVP,
   getCurrentNetwork,
@@ -37,11 +35,6 @@ import {
 function LoginPage() {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [hederaAccountConnected, setHederaAccountConnected] = useState(false);
-  const [hederaPrivateKey, setHederaPrivateKey] = useState(
-    '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c',
-  );
-  const [hederaAccountId, setHederaAccountId] = useState('0.0.15215');
-
   const [loginName, setLoginName] = useState('exampleUsername');
 
   // TODO: get did by calling getDid
@@ -55,6 +48,13 @@ function LoginPage() {
   const [vc, setVC] = useState('');
   const [vcList, setVcList] = useState([] as any);
   const [showVcsModal, setShowVcsModal] = useState(false);
+
+  const isHedera = validHederaChainID(currentChainId) && hederaAccountConnected;
+  const noHedera =
+    !validHederaChainID(currentChainId) && !hederaAccountConnected;
+  const isNonHedera = isHedera || noHedera;
+  const requireHedera =
+    validHederaChainID(currentChainId) && !hederaAccountConnected;
 
   const handleSaveVC = async () => {
     // Send a POST request
@@ -166,22 +166,6 @@ function LoginPage() {
     }
   };
 
-  const handleConfigureHederaAccountClick = async () => {
-    try {
-      const configured = await connectHederaAccount(hederaAccountId);
-      console.log('configured: ', configured);
-      if (configured) {
-        setHederaAccountConnected(true);
-        alert('Hedera Account configuration was successful');
-      } else {
-        console.log('Hedera Account was not configured correctly');
-      }
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
-
   const handleCreateVC = async () => {
     // Get the current did
 
@@ -258,12 +242,12 @@ function LoginPage() {
         </Modal.Footer>
       </Modal>
 
+      {state.error && (
+        <ErrorMessage>
+          <b>An error happened:</b> {state.error.message}
+        </ErrorMessage>
+      )}
       <CardContainer>
-        {state.error && (
-          <ErrorMessage>
-            <b>An error happened:</b> {state.error.message}
-          </ErrorMessage>
-        )}
         {!state.isFlask && (
           <Card
             content={{
@@ -275,141 +259,67 @@ function LoginPage() {
             fullWidth
           />
         )}
-        {!state.installedSnap && (
-          <Card
-            content={{
-              title: 'Connect to Metamask Snap',
-              description:
-                'Get started by connecting to and installing the Identity Snap.',
-              button: (
-                <ConnectButton
-                  onClick={handleConnectClick}
-                  disabled={!state.isFlask}
-                />
-              ),
-            }}
-            disabled={!state.isFlask}
+        <ConnectIdentitySnap handleConnectClick={handleConnectClick} />
+        <ReconnectIdentitySnap handleConnectClick={handleConnectClick} />
+        {requireHedera && (
+          <ConnectHederaAccount
+            setHederaAccountConnected={setHederaAccountConnected}
           />
         )}
-        {shouldDisplayReconnectButton(state.installedSnap) && (
-          <Card
-            content={{
-              title: 'Reconnect to Metamask Snap',
-              description:
-                "While connected to a local running snap, this button will always be displayed in order to update the snap if a change is made. Note that you'll need to reconnect if you switch the network on Metamask at any point in time as that will cause your metamask state to change",
-              button: (
-                <ReconnectButton
-                  onClick={handleConnectClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-          />
-        )}
-        {validHederaChainID(currentChainId) && !hederaAccountConnected && (
-          <Card
-            content={{
-              title: 'connectHederaAccount',
-              description:
-                'Connect to Hedera Account. NOTE that you will need to reconnect to Hedera Account if you switch the network on Metamask at any point in time as that will cause your metamask state to point to your non-hedera account on metamask',
-              form: (
-                <form>
-                  <label>
-                    Enter your Hedera Private Key
-                    <input
-                      type="text"
-                      value={hederaPrivateKey}
-                      onChange={(e) => setHederaPrivateKey(e.target.value)}
-                    />
-                  </label>
-                  <br />
-                  <label>
-                    Enter your Hedera Account ID
-                    <input
-                      type="text"
-                      value={hederaAccountId}
-                      onChange={(e) => setHederaAccountId(e.target.value)}
-                    />
-                  </label>
-                </form>
-              ),
-              button: (
-                <SendHelloButton
-                  buttonText="Connect to Hedera Account"
-                  onClick={handleConfigureHederaAccountClick}
-                  disabled={!state.installedSnap}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        )}
-
-        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
-        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
-          <Card
-            content={{
-              title: 'Sign Up',
-              description:
-                'This will create a Login Verifiable Credential which you can use later to login',
-              form: (
-                <form>
-                  <label>
-                    Enter your username
-                    <input
-                      type="text"
-                      value={loginName}
-                      onChange={(e) => setLoginName(e.target.value)}
-                    />
-                  </label>
-                </form>
-              ),
-              button: (
-                <SendHelloButton
-                  buttonText="Generate VC"
-                  onClick={handleCreateVC}
-                  disabled={false}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
-        ) : (
-          ''
-        )}
-
-        {(validHederaChainID(currentChainId) && hederaAccountConnected) ||
-        (!validHederaChainID(currentChainId) && !hederaAccountConnected) ? (
-          <Card
-            content={{
-              title: 'Sign In',
-              description: 'Present VerifiableCredential so we could verify',
-              button: (
-                <SendHelloButton
-                  buttonText="SignIn"
-                  onClick={handleChallenge}
-                  disabled={false}
-                />
-              ),
-            }}
-            disabled={!state.installedSnap}
-            fullWidth={
-              state.isFlask &&
-              Boolean(state.installedSnap) &&
-              !shouldDisplayReconnectButton(state.installedSnap)
-            }
-          />
+        {isNonHedera ? (
+          <>
+            <Card
+              content={{
+                title: 'Sign Up',
+                description:
+                  'This will create a Login Verifiable Credential which you can use later to login',
+                form: (
+                  <form>
+                    <label>
+                      Enter your username
+                      <input
+                        type="text"
+                        value={loginName}
+                        onChange={(e) => setLoginName(e.target.value)}
+                      />
+                    </label>
+                  </form>
+                ),
+                button: (
+                  <SendHelloButton
+                    buttonText="Generate VC"
+                    onClick={handleCreateVC}
+                    disabled={false}
+                  />
+                ),
+              }}
+              disabled={!state.installedSnap}
+              fullWidth={
+                state.isFlask &&
+                Boolean(state.installedSnap) &&
+                !shouldDisplayReconnectButton(state.installedSnap)
+              }
+            />
+            <Card
+              content={{
+                title: 'Sign In',
+                description: 'Present VerifiableCredential so we could verify',
+                button: (
+                  <SendHelloButton
+                    buttonText="SignIn"
+                    onClick={handleChallenge}
+                    disabled={false}
+                  />
+                ),
+              }}
+              disabled={!state.installedSnap}
+              fullWidth={
+                state.isFlask &&
+                Boolean(state.installedSnap) &&
+                !shouldDisplayReconnectButton(state.installedSnap)
+              }
+            />
+          </>
         ) : (
           ''
         )}
