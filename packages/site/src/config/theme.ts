@@ -190,4 +190,8 @@ export const GlobalStyle = createGlobalStyle`
   .modal-body {
     overflow: auto;
   }
+
+  dd {
+    overflow: auto;
+  }
 `;

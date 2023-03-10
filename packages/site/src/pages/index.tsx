@@ -35,7 +35,7 @@ import {
   Span,
 } from '../config/styles';
 import { MetamaskActions, MetaMaskContext } from '../contexts/MetamaskContext';
-import { connectSnap, getCurrentNetwork, getSnap } from '../utils';
+import { AccountInfo, connectSnap, getCurrentNetwork, getSnap } from '../utils';
 import { getNetwork, validHederaChainID } from '../utils/hedera';
 
 const Index = () => {
@@ -43,7 +43,9 @@ const Index = () => {
   const [currentChainId, setCurrentChainId] = useState('');
   const [hederaAccountConnected, setHederaAccountConnected] = useState(false);
   const [currentNetwork, setCurrentNetwork] = useState('');
-  const [accountInfo, setAccountInfo] = useState<unknown>(null);
+  const [accountInfo, setAccountInfo] = useState<AccountInfo | undefined>(
+    undefined,
+  );
 
   const isHedera = validHederaChainID(currentChainId) && hederaAccountConnected;
   const noHedera =
@@ -69,7 +71,7 @@ const Index = () => {
         type: MetamaskActions.SetInstalled,
         payload: installedSnap,
       });
-      setAccountInfo(null);
+      setAccountInfo(undefined);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -97,22 +99,39 @@ const Index = () => {
           </Col>
           <Col sm="12" md="8">
             <dt>Account Info</dt>
-            {isHedera && accountInfo?.hederaAccount && (
-              <>
-                <dd>
-                  Hedera Account ID: {accountInfo?.hederaAccount.accountId}
-                </dd>
-                <dd>EVM Address: {accountInfo?.hederaAccount.evmAddress}</dd>
-                <dd>
-                  Public Key:{' '}
-                  {
-                    accountInfo?.snapPrivateKeyStore[
-                      `metamask-${accountInfo?.hederaAccount.evmAddress}`
-                    ].publicKeyHex
-                  }
-                </dd>
-              </>
-            )}
+            {isHedera
+              ? accountInfo?.info?.hederaAccount && (
+                  <>
+                    <dd>
+                      Hedera Account ID:{' '}
+                      {accountInfo?.info?.hederaAccount.accountId}
+                    </dd>
+                    <dd>
+                      EVM Address: {accountInfo?.info?.hederaAccount.evmAddress}
+                    </dd>
+                    <dd>
+                      Public Key:{' '}
+                      {
+                        accountInfo?.info?.snapPrivateKeyStore[
+                          `metamask-${accountInfo?.info?.hederaAccount.evmAddress}`
+                        ].publicKeyHex
+                      }
+                    </dd>
+                  </>
+                )
+              : accountInfo?.account && (
+                  <>
+                    <dd>EVM Address: {accountInfo?.account}</dd>
+                    <dd>
+                      Public Key:{' '}
+                      {
+                        accountInfo?.info?.snapPrivateKeyStore[
+                          `metamask-${accountInfo?.account}`
+                        ].publicKeyHex
+                      }
+                    </dd>
+                  </>
+                )}
           </Col>
         </Row>
       </Container>
@@ -147,12 +166,12 @@ const Index = () => {
           <>
             <SendHelloHessage setCurrentChainId={setCurrentChainId} />
             <ToggleMetamaskPopups setCurrentChainId={setCurrentChainId} />
-            <GetCurrentDIDMethod setCurrentChainId={setCurrentChainId} />
-            <GetDID setCurrentChainId={setCurrentChainId} />
             <GetAccountInfo
               setCurrentChainId={setCurrentChainId}
               setAccountInfo={setAccountInfo}
             />
+            <GetCurrentDIDMethod setCurrentChainId={setCurrentChainId} />
+            <GetDID setCurrentChainId={setCurrentChainId} />
             <ResolveDID setCurrentChainId={setCurrentChainId} />
             <GetSpecificVC setCurrentChainId={setCurrentChainId} />
             <GetAllVCs setCurrentChainId={setCurrentChainId} />

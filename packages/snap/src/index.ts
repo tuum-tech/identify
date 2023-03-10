@@ -122,7 +122,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
       return await togglePopups(identitySnapParams);
     case 'getAccountInfo':
       await switchNetworkIfNecessary(identitySnapParams);
-      return state.accountState[account];
+      return {
+        account,
+        info: state.accountState[account],
+      };
     case 'getDID':
       await switchNetworkIfNecessary(identitySnapParams);
       return await getDid(identitySnapParams);

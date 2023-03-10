@@ -5,6 +5,7 @@ import {
 } from '../../contexts/MetamaskContext';
 import useModal from '../../hooks/useModal';
 import {
+  AccountInfo,
   getAccountInfo,
   getCurrentNetwork,
   shouldDisplayReconnectButton,
@@ -13,7 +14,7 @@ import { Card, SendHelloButton } from '../base';
 
 type Props = {
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
-  setAccountInfo: React.Dispatch<React.SetStateAction<unknown>>;
+  setAccountInfo: React.Dispatch<React.SetStateAction<AccountInfo | undefined>>;
 };
 
 const GetAccountInfo: FC<Props> = ({ setCurrentChainId, setAccountInfo }) => {
@@ -30,7 +31,7 @@ const GetAccountInfo: FC<Props> = ({ setCurrentChainId, setAccountInfo }) => {
       console.log(`Your account info:`, accountInfo);
       showModal({
         title: 'Your account info',
-        content: JSON.stringify(accountInfo),
+        content: JSON.stringify(accountInfo.info),
       });
     } catch (e) {
       console.error(e);

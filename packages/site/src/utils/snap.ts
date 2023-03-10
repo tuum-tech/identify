@@ -118,18 +118,23 @@ export const getCurrentDIDMethod = async () => {
   });
 };
 
+export type AccountInfo = {
+  account: string;
+  info: any;
+};
+
 /**
  * Invoke the "getAccountInfo" method from the snap.
  */
 
-export const getAccountInfo = async () => {
-  return await window.ethereum.request({
+export const getAccountInfo = async (): Promise<AccountInfo> => {
+  return (await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
       method: 'getAccountInfo',
       params: {},
     },
-  });
+  })) as AccountInfo;
 };
 
 /**
