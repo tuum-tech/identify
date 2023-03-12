@@ -1,4 +1,3 @@
-/* eslint-disable no-alert */
 import { FC, useContext } from 'react';
 import {
   MetamaskActions,

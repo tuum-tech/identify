@@ -1,10 +1,10 @@
-/* eslint-disable no-alert */
-import { FC, useContext } from 'react';
+import { FC, useContext, useState } from 'react';
 import {
   MetamaskActions,
   MetaMaskContext,
 } from '../../contexts/MetamaskContext';
 import { VcContext } from '../../contexts/VcContext';
+import useModal from '../../hooks/useModal';
 import {
   getCurrentNetwork,
   shouldDisplayReconnectButton,
@@ -19,17 +19,21 @@ type Props = {
 const VerifyVC: FC<Props> = ({ setCurrentChainId }) => {
   const { vc, setVc } = useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
+  const [loading, setLoading] = useState(false);
+  const { showModal } = useModal();
 
   const handleVerifyVCClick = async () => {
+    setLoading(true);
     try {
       setCurrentChainId(await getCurrentNetwork());
       const verified = await verifyVC(vc);
       console.log('VC Verified: ', verified);
-      alert(`VC Verified: ${verified}`);
+      showModal({ title: 'Verify VC', content: `VC Verified: ${verified}` });
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
+    setLoading(false);
   };
 
   return (
@@ -55,6 +59,7 @@ const VerifyVC: FC<Props> = ({ setCurrentChainId }) => {
             buttonText="Verify VC"
             onClick={handleVerifyVCClick}
             disabled={!state.installedSnap}
+            loading={loading}
           />
         ),
       }}

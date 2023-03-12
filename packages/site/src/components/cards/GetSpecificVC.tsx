@@ -1,6 +1,7 @@
-/* eslint-disable no-alert */
 import { IDataManagerQueryResult } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
-import { FC, useContext } from 'react';
+import { FC, useContext, useState } from 'react';
+import Select from 'react-select';
+import { storeOptions } from '../../config/constants';
 import {
   MetamaskActions,
   MetaMaskContext,
@@ -20,8 +21,15 @@ type Props = {
 const GetSpecificVC: FC<Props> = ({ setCurrentChainId }) => {
   const { vcId, setVcId, setVc } = useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
+  const [selectedOptions, setSelectedOptions] = useState([storeOptions[0]]);
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (options: any) => {
+    setSelectedOptions(options);
+  };
 
   const handleGetSpecificVCClick = async () => {
+    setLoading(true);
     try {
       setCurrentChainId(await getCurrentNetwork());
       const filter = {
@@ -29,7 +37,7 @@ const GetSpecificVC: FC<Props> = ({ setCurrentChainId }) => {
         filter: vcId ? vcId.trim().split(',')[0] : undefined,
       };
       const options = {
-        store: 'snap',
+        store: selectedOptions.map((option) => option.value),
         returnStore: true,
       };
       const vcs = (await getVCs(filter, options)) as IDataManagerQueryResult[];
@@ -44,6 +52,7 @@ const GetSpecificVC: FC<Props> = ({ setCurrentChainId }) => {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
+    setLoading(false);
   };
 
   return (
@@ -62,6 +71,23 @@ const GetSpecificVC: FC<Props> = ({ setCurrentChainId }) => {
                 fullWidth
               />
             </label>
+            <label>Select store</label>
+            <Select
+              closeMenuOnSelect
+              isMulti
+              isSearchable={false}
+              isClearable={false}
+              options={storeOptions}
+              value={selectedOptions}
+              onChange={handleChange}
+              styles={{
+                control: (base: any) => ({
+                  ...base,
+                  border: `1px solid grey`,
+                  marginBottom: 8,
+                }),
+              }}
+            />
           </form>
         ),
         button: (
@@ -69,6 +95,7 @@ const GetSpecificVC: FC<Props> = ({ setCurrentChainId }) => {
             buttonText="Retrieve VC"
             onClick={handleGetSpecificVCClick}
             disabled={!state.installedSnap}
+            loading={loading}
           />
         ),
       }}

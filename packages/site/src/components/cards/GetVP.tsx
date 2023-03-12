@@ -1,12 +1,12 @@
-/* eslint-disable no-alert */
 import { ProofInfo } from '@tuum-tech/identity-snap/src/types/params';
 import { VerifiablePresentation } from '@veramo/core';
-import { FC, useContext } from 'react';
+import { FC, useContext, useState } from 'react';
 import {
   MetamaskActions,
   MetaMaskContext,
 } from '../../contexts/MetamaskContext';
 import { VcContext } from '../../contexts/VcContext';
+import useModal from '../../hooks/useModal';
 import {
   createVP,
   getCurrentNetwork,
@@ -21,8 +21,11 @@ type Props = {
 const GetVP: FC<Props> = ({ setCurrentChainId }) => {
   const { vcId, setVcId, setVp } = useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
+  const [loading, setLoading] = useState(false);
+  const { showModal } = useModal();
 
   const handleCreateVPClick = async () => {
+    setLoading(true);
     try {
       setCurrentChainId(await getCurrentNetwork());
       const proofInfo: ProofInfo = {
@@ -35,12 +38,15 @@ const GetVP: FC<Props> = ({ setCurrentChainId }) => {
         proofInfo,
       )) as VerifiablePresentation;
       setVp(vp);
-      console.log(`Your VP is: ${JSON.stringify(vp, null, 4)}`);
-      alert(`Your VP is: ${JSON.stringify(vp, null, 4)}`);
+      showModal({
+        title: 'Get VP',
+        content: `Your VP is: ${JSON.stringify(vp, null, 4)}`,
+      });
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
+    setLoading(false);
   };
 
   return (
@@ -66,6 +72,7 @@ const GetVP: FC<Props> = ({ setCurrentChainId }) => {
             buttonText="Generate VP"
             onClick={handleCreateVPClick}
             disabled={!state.installedSnap}
+            loading={loading}
           />
         ),
       }}

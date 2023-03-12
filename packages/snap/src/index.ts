@@ -1,6 +1,7 @@
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import { IdentitySnapParams } from './interfaces';
+import { getAccountInfo } from './rpc/account/getAccountInfo';
 import { getAvailableMethods } from './rpc/did/getAvailableMethods';
 import { getCurrentDIDMethod } from './rpc/did/getCurrentDIDMethod';
 import { getDid } from './rpc/did/getDID';
@@ -99,6 +100,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
 
     case 'togglePopups': {
       return await togglePopups(identitySnapParams);
+    }
+
+    case 'getAccountInfo': {
+      return await getAccountInfo(identitySnapParams, hederaAccountId);
     }
 
     case 'getDID': {

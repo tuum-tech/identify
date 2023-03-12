@@ -1,10 +1,12 @@
-/* eslint-disable no-alert */
 import { FC, useContext, useState } from 'react';
+import Select from 'react-select';
+import { storeOptions } from '../../config/constants';
 import {
   MetamaskActions,
   MetaMaskContext,
 } from '../../contexts/MetamaskContext';
 import { VcContext } from '../../contexts/VcContext';
+import useModal from '../../hooks/useModal';
 import {
   createVC,
   getCurrentNetwork,
@@ -21,8 +23,16 @@ const CreateVC: FC<Props> = ({ setCurrentChainId }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [createVCName, setCreateVCName] = useState('Kiran Pachhai');
   const [createVCNickname, setCreateVCNickname] = useState('KP Woods');
+  const [selectedOptions, setSelectedOptions] = useState([storeOptions[0]]);
+  const [loading, setLoading] = useState(false);
+  const { showModal } = useModal();
+
+  const handleChange = (options: any) => {
+    setSelectedOptions(options);
+  };
 
   const handleCreateVCClick = async () => {
+    setLoading(true);
     try {
       setCurrentChainId(await getCurrentNetwork());
       const vcKey = 'profile';
@@ -33,7 +43,7 @@ const CreateVC: FC<Props> = ({ setCurrentChainId }) => {
       const options = {
         // If you want to auto save the generated VCs to multiple stores, you can pass an array like so:
         // store: ['snap', 'googleDrive'],
-        store: 'snap',
+        store: selectedOptions.map((option) => option.value),
         returnStore: true,
       };
       const credTypes = ['ProfileNamesCredential'];
@@ -47,11 +57,21 @@ const CreateVC: FC<Props> = ({ setCurrentChainId }) => {
         setVcId(vcIdsToAdd.toString());
         setVcIdsToBeRemoved(vcIdsToAdd.toString());
         console.log('created and saved VC: ', saved);
+        showModal({
+          title: 'Create VC',
+          content: `Created and saved VC:
+          ${savedJson.map(
+            (data: any) => `${JSON.stringify(data)}
+          `,
+          )}
+          `,
+        });
       }
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
+    setLoading(false);
   };
 
   return (
@@ -80,6 +100,23 @@ const CreateVC: FC<Props> = ({ setCurrentChainId }) => {
                 onChange={(e) => setCreateVCNickname(e.target.value)}
               />
             </label>
+            <label>Select store</label>
+            <Select
+              closeMenuOnSelect
+              isMulti
+              isSearchable={false}
+              isClearable={false}
+              options={storeOptions}
+              value={selectedOptions}
+              onChange={handleChange}
+              styles={{
+                control: (base: any) => ({
+                  ...base,
+                  border: `1px solid grey`,
+                  marginBottom: 8,
+                }),
+              }}
+            />
           </form>
         ),
         button: (
@@ -87,6 +124,7 @@ const CreateVC: FC<Props> = ({ setCurrentChainId }) => {
             buttonText="Generate VC"
             onClick={handleCreateVCClick}
             disabled={!state.installedSnap}
+            loading={loading}
           />
         ),
       }}

@@ -1,12 +1,15 @@
 import { useContext, useEffect, useState } from 'react';
+import { Container } from 'react-bootstrap';
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
 
-import { Card, InstallFlaskButton } from '../components/base';
+import { Card, ConnectButton, InstallFlaskButton } from '../components/base';
 import {
   ConfigureGoogleAccount,
-  ConnectHederaAccount,
   ConnectIdentitySnap,
   CreateVC,
   DeleteAllVCs,
+  GetAccountInfo,
   GetAllVCs,
   GetCurrentDIDMethod,
   GetDID,
@@ -25,31 +28,32 @@ import {
 } from '../components/cards';
 import {
   CardContainer,
-  Container,
   ErrorMessage,
   Heading,
+  PageContainer,
   Span,
-  Subtitle,
 } from '../config/styles';
 import { MetamaskActions, MetaMaskContext } from '../contexts/MetamaskContext';
-import { connectSnap, getCurrentNetwork, getSnap } from '../utils';
+import {
+  connectSnap,
+  getCurrentNetwork,
+  getSnap,
+  PublicAccountInfo,
+} from '../utils';
 import { getNetwork, validHederaChainID } from '../utils/hedera';
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [currentChainId, setCurrentChainId] = useState('');
-  const [hederaAccountConnected, setHederaAccountConnected] = useState(false);
+  const [isHederaNetwork, setIsHederaNetwork] = useState(false);
   const [currentNetwork, setCurrentNetwork] = useState('');
-
-  const isHedera = validHederaChainID(currentChainId) && hederaAccountConnected;
-  const noHedera =
-    !validHederaChainID(currentChainId) && !hederaAccountConnected;
-  const requireHedera =
-    validHederaChainID(currentChainId) && !hederaAccountConnected;
+  const [accountInfo, setAccountInfo] = useState<PublicAccountInfo>({});
 
   useEffect(() => {
-    if (!validHederaChainID(currentChainId)) {
-      setHederaAccountConnected(false);
+    if (validHederaChainID(currentChainId)) {
+      setIsHederaNetwork(true);
+    } else {
+      setIsHederaNetwork(false);
     }
     setCurrentNetwork(getNetwork(currentChainId));
   }, [currentChainId]);
@@ -64,6 +68,7 @@ const Index = () => {
         type: MetamaskActions.SetInstalled,
         payload: installedSnap,
       });
+      setAccountInfo({} as AccountInfo);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -71,11 +76,45 @@ const Index = () => {
   };
 
   return (
-    <Container>
+    <PageContainer>
       <Heading>
         Welcome to <Span>Identity Snap</Span>
       </Heading>
-      <Subtitle>Current Network: {currentNetwork}</Subtitle>
+      <Container>
+        <Row>
+          <Col>
+            <dt>Status:</dt>
+            <dd>{currentNetwork ? 'Connected' : 'Disconnected'}</dd>
+            {!currentNetwork && (
+              <ConnectButton
+                style={{ height: 20, minHeight: '3.2rem' }}
+                onClick={handleConnectClick}
+              />
+            )}
+            <dt>Current Network:</dt>
+            <dd>{currentNetwork}</dd>
+          </Col>
+          <Col sm="12" md="8">
+            <dt>Account Info</dt>
+            {isHederaNetwork
+              ? accountInfo && (
+                  <>
+                    <dd>Hedera Account ID: {accountInfo.hederaAccountId}</dd>
+                    <dd>Did: {accountInfo?.did}</dd>
+                    <dd>EVM Address: {accountInfo?.evmAddress}</dd>
+                    <dd>Public Key: {accountInfo?.publicKey}</dd>
+                  </>
+                )
+              : accountInfo && (
+                  <>
+                    <dd>Did: {accountInfo?.did}</dd>
+                    <dd>EVM Address: {accountInfo?.evmAddress}</dd>
+                    <dd>Public Key: {accountInfo?.publicKey}</dd>
+                  </>
+                )}
+          </Col>
+        </Row>
+      </Container>
       {state.error && (
         <ErrorMessage>
           <b>An error happened:</b> {state.error.message}
@@ -95,17 +134,16 @@ const Index = () => {
         )}
         <ConnectIdentitySnap handleConnectClick={handleConnectClick} />
         <ReconnectIdentitySnap handleConnectClick={handleConnectClick} />
-        {requireHedera && (
-          <ConnectHederaAccount
-            setHederaAccountConnected={setHederaAccountConnected}
-          />
-        )}
-        {isHedera && (
+        {isHederaNetwork && (
           <GetHederaAccountId setCurrentChainId={setCurrentChainId} />
         )}
 
         <SendHelloHessage setCurrentChainId={setCurrentChainId} />
         <ToggleMetamaskPopups setCurrentChainId={setCurrentChainId} />
+        <GetAccountInfo
+          setCurrentChainId={setCurrentChainId}
+          setAccountInfo={setAccountInfo}
+        />
         <GetCurrentDIDMethod setCurrentChainId={setCurrentChainId} />
         <GetDID setCurrentChainId={setCurrentChainId} />
         <ResolveDID setCurrentChainId={setCurrentChainId} />
@@ -123,7 +161,7 @@ const Index = () => {
         <Todo />
         <Todo />
       </CardContainer>
-    </Container>
+    </PageContainer>
   );
 };
 

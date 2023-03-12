@@ -12,6 +12,14 @@ export type Account = {
   publicKey: string;
 };
 
+export type PublicAccountInfo = {
+  evmAddress: string;
+  did: string;
+  publicKey: string;
+  method: string;
+  hederaAccountId?: string;
+};
+
 export type IdentitySnapState = {
   currentAccount: Account;
 

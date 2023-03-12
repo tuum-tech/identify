@@ -1,9 +1,9 @@
-/* eslint-disable no-alert */
-import { FC, useContext } from 'react';
+import { FC, useContext, useState } from 'react';
 import {
   MetamaskActions,
   MetaMaskContext,
 } from '../../contexts/MetamaskContext';
+import useModal from '../../hooks/useModal';
 import {
   getCurrentNetwork,
   getDID,
@@ -17,17 +17,21 @@ type Props = {
 
 const GetDID: FC<Props> = ({ setCurrentChainId }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
+  const [loading, setLoading] = useState(false);
+  const { showModal } = useModal();
 
   const handleGetDIDClick = async () => {
+    setLoading(true);
     try {
       setCurrentChainId(await getCurrentNetwork());
       const did = await getDID();
       console.log(`Your DID is: ${did}`);
-      alert(`Your DID is: ${did}`);
+      showModal({ title: 'Current DID', content: `Your DID is: ${did}` });
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
+    setLoading(false);
   };
 
   return (
@@ -40,6 +44,7 @@ const GetDID: FC<Props> = ({ setCurrentChainId }) => {
             buttonText="Get DID"
             onClick={handleGetDIDClick}
             disabled={!state.installedSnap}
+            loading={loading}
           />
         ),
       }}

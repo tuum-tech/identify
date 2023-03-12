@@ -1,9 +1,9 @@
-/* eslint-disable no-alert */
-import { FC, useContext } from 'react';
+import { FC, useContext, useState } from 'react';
 import {
   MetamaskActions,
   MetaMaskContext,
 } from '../../contexts/MetamaskContext';
+import useModal from '../../hooks/useModal';
 import {
   getCurrentNetwork,
   resolveDID,
@@ -17,17 +17,24 @@ type Props = {
 
 const ResolveDID: FC<Props> = ({ setCurrentChainId }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
+  const [loading, setLoading] = useState(false);
+  const { showModal } = useModal();
 
   const handleResolveDIDClick = async () => {
+    setLoading(true);
     try {
       setCurrentChainId(await getCurrentNetwork());
       const doc = await resolveDID();
-      console.log(`Your DID document is is: ${JSON.stringify(doc, null, 4)}`);
-      alert(`Your DID document is: ${JSON.stringify(doc, null, 4)}`);
+      console.log(`Your DID document is : ${JSON.stringify(doc, null, 4)}`);
+      showModal({
+        title: 'Resolve DID',
+        content: `Your DID document is: ${JSON.stringify(doc, null, 4)}`,
+      });
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
+    setLoading(false);
   };
 
   return (
@@ -40,6 +47,7 @@ const ResolveDID: FC<Props> = ({ setCurrentChainId }) => {
             buttonText="Resolve DID"
             onClick={handleResolveDIDClick}
             disabled={!state.installedSnap}
+            loading={loading}
           />
         ),
       }}

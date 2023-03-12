@@ -118,6 +118,28 @@ export const getCurrentDIDMethod = async () => {
   });
 };
 
+export type PublicAccountInfo = {
+  evmAddress: string;
+  did: string;
+  publicKey: string;
+  method: string;
+  hederaAccountId?: string;
+};
+
+/**
+ * Invoke the "getAccountInfo" method from the snap.
+ */
+
+export const getAccountInfo = async () => {
+  return await window.ethereum.request({
+    method: `wallet_snap_${defaultSnapOrigin}`,
+    params: {
+      method: 'getAccountInfo',
+      params: {},
+    },
+  });
+};
+
 /**
  * Invoke the "getDID" method from the snap.
  */

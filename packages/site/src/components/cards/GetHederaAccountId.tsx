@@ -1,9 +1,9 @@
-/* eslint-disable no-alert */
-import { FC, useContext } from 'react';
+import { FC, useContext, useState } from 'react';
 import {
   MetamaskActions,
   MetaMaskContext,
 } from '../../contexts/MetamaskContext';
+import useModal from '../../hooks/useModal';
 import {
   getCurrentNetwork,
   getHederaAccountId,
@@ -17,17 +17,23 @@ type Props = {
 
 const GetHederaAccountId: FC<Props> = ({ setCurrentChainId }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
+  const [loading, setLoading] = useState(false);
+  const { showModal } = useModal();
 
   const handleGetHederaAccountIdClick = async () => {
+    setLoading(true);
     try {
       setCurrentChainId(await getCurrentNetwork());
       const accountId = await getHederaAccountId();
-      console.log(`Your Hedera Account Id is: ${accountId}`);
-      alert(`Your Hedera Account Id is: ${accountId}`);
+      showModal({
+        title: 'Hedera Account Id',
+        content: `Your Hedera Account Id is: ${accountId}`,
+      });
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
+    setLoading(false);
   };
 
   return (
@@ -40,6 +46,7 @@ const GetHederaAccountId: FC<Props> = ({ setCurrentChainId }) => {
             buttonText="Get Account Id"
             onClick={handleGetHederaAccountIdClick}
             disabled={!state.installedSnap}
+            loading={loading}
           />
         ),
       }}

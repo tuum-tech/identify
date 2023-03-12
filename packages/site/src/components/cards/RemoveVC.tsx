@@ -1,6 +1,7 @@
-/* eslint-disable no-alert */
 import { IDataManagerDeleteResult } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
-import { FC, useContext } from 'react';
+import { FC, useContext, useState } from 'react';
+import Select from 'react-select';
+import { storeOptions } from '../../config/constants';
 import {
   MetamaskActions,
   MetaMaskContext,
@@ -21,15 +22,22 @@ const RemoveVC: FC<Props> = ({ setCurrentChainId }) => {
   const { setVcId, vcIdsToBeRemoved, setVcIdsToBeRemoved } =
     useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
+  const [selectedOptions, setSelectedOptions] = useState([storeOptions[0]]);
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (options: any) => {
+    setSelectedOptions(options);
+  };
 
   const handleRemoveVCClick = async () => {
+    setLoading(true);
     try {
       setCurrentChainId(await getCurrentNetwork());
       const id = vcIdsToBeRemoved ? vcIdsToBeRemoved.trim().split(',')[0] : '';
       const options = {
         // If you want to remove the VCs from multiple stores, you can pass an array like so:
         // store: ['snap', 'googleDrive'],
-        store: 'snap',
+        store: selectedOptions.map((option) => option.value),
       };
       console.log('vcIdsToBeRemoved: ', vcIdsToBeRemoved);
       const isRemoved = (await removeVC(
@@ -43,6 +51,7 @@ const RemoveVC: FC<Props> = ({ setCurrentChainId }) => {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
+    setLoading(false);
   };
 
   return (
@@ -63,6 +72,23 @@ const RemoveVC: FC<Props> = ({ setCurrentChainId }) => {
                 fullWidth
               />
             </label>
+            <label>Select store</label>
+            <Select
+              closeMenuOnSelect
+              isMulti
+              isSearchable={false}
+              isClearable={false}
+              options={storeOptions}
+              value={selectedOptions}
+              onChange={handleChange}
+              styles={{
+                control: (base: any) => ({
+                  ...base,
+                  border: `1px solid grey`,
+                  marginBottom: 8,
+                }),
+              }}
+            />
           </form>
         ),
         button: (
@@ -70,6 +96,7 @@ const RemoveVC: FC<Props> = ({ setCurrentChainId }) => {
             buttonText="Delete VC"
             onClick={handleRemoveVCClick}
             disabled={!state.installedSnap}
+            loading={loading}
           />
         ),
       }}
