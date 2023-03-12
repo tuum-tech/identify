@@ -1,21 +1,26 @@
 import { GoogleToken, IdentitySnapParams } from '../../interfaces';
 import { verifyToken } from '../../plugins/veramo/google-drive-data-store';
-import { updateSnapState } from '../../snap/state';
+import { getCurrentCoinType, updateSnapState } from '../../snap/state';
 
 export const configureGoogleAccount = async (
   identitySnapParams: IdentitySnapParams,
   { accessToken }: GoogleToken,
 ) => {
-  const { snap, state } = identitySnapParams;
+  const { snap, state, account } = identitySnapParams;
   try {
     await verifyToken(accessToken);
-    state.accountState[
-      state.currentAccount
+    const coinType = await getCurrentCoinType();
+    state.accountState[coinType][
+      account.evmAddress
     ].accountConfig.identity.googleAccessToken = accessToken;
+    console.log('new state: ', JSON.stringify(state, null, 4));
     await updateSnapState(snap, state);
     return true;
   } catch (error) {
-    console.error('Could not configure google account', error);
+    console.error(
+      'Could not configure google account',
+      JSON.stringify(error, null, 4),
+    );
     throw error;
   }
 };

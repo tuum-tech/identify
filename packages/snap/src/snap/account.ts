@@ -1,50 +1,65 @@
-import { MetaMaskInpageProvider } from '@metamask/providers';
-import { validHederaChainID } from '../hedera/config';
-import { IdentitySnapState } from '../interfaces';
-import { isHederaAccountImported } from '../utils/params';
-import { getCurrentNetwork } from './network';
+import {
+  Account,
+  AccountViaPrivateKey,
+  IdentitySnapState,
+} from '../interfaces';
+import { connectHederaAccount } from '../rpc/hedera/connectHederaAccount';
+import { veramoImportMetaMaskAccount } from '../veramo/accountImport';
+import { getCurrentCoinType, initAccountState } from './state';
 
 /**
- * Function that returns address of the currently selected MetaMask account.
+ * Function that returns account info of the currently selected MetaMask account.
  *
  * @param state - IdentitySnapState.
- * @param metamask - Metamask provider.
- * @private
- * @returns MetaMask address.
+ * @param hederaAccountId - Hedera Identifier.
+ * @returns MetaMask address and did.
  */
 export async function getCurrentAccount(
   state: IdentitySnapState,
-  metamask: MetaMaskInpageProvider,
-): Promise<string | null> {
+  hederaAccountId?: string,
+): Promise<Account> {
   try {
-    const chainId = await getCurrentNetwork(metamask);
-    if (validHederaChainID(chainId)) {
-      // Handle Hedera
-      if (isHederaAccountImported(state)) {
-        console.log(
-          `Hedera Metamask accounts: EVM Address: ${
-            state.accountState[state.currentAccount].hederaAccount.evmAddress
-          }, AccountId: ${
-            state.accountState[state.currentAccount].hederaAccount.accountId
-          }`,
-        );
-        return state.accountState[state.currentAccount].hederaAccount
-          .evmAddress;
-      }
-
-      console.error(
-        'Hedera Network was selected but Hedera Account has not yet been configured. Please configure it first by calling "configureHederaAccount" API',
-      );
-      return null;
-    }
-    // Handle everything else
-    const accounts = (await metamask.request({
+    const accounts = (await ethereum.request({
       method: 'eth_requestAccounts',
     })) as string[];
-    console.log(`MetaMask accounts: EVM Address: ${accounts}`);
-    return accounts[0];
+    if (hederaAccountId) {
+      return await connectHederaAccount(state, hederaAccountId, true);
+    }
+    return await importIdentitySnapAccount(state, accounts[0]);
   } catch (e) {
     console.error(`Error while trying to get the account: ${e}`);
-    return null;
+    throw new Error(`Error while trying to get the account: ${e}`);
   }
+}
+
+/**
+ * Helper function to import metamask account using the private key.
+ *
+ * @param state - IdentitySnapState.
+ * @param evmAddress - Ethereum address.
+ * @param accountViaPrivateKey - Account to import using private key.
+ */
+export async function importIdentitySnapAccount(
+  state: IdentitySnapState,
+  evmAddress: string,
+  accountViaPrivateKey?: AccountViaPrivateKey,
+): Promise<Account> {
+  // Initialize if not there
+  const coinType = (await getCurrentCoinType()).toString();
+  if (evmAddress && !(evmAddress in state.accountState[coinType])) {
+    console.log(
+      `The address ${evmAddress} has NOT yet been configured in the Identity Snap. Configuring now...`,
+    );
+    await initAccountState(snap, state, coinType, evmAddress);
+  }
+
+  // Initialize Identity Snap account
+  const account: Account = await veramoImportMetaMaskAccount(
+    snap,
+    state,
+    ethereum,
+    evmAddress,
+    accountViaPrivateKey,
+  );
+  return account;
 }

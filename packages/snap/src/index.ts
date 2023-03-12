@@ -2,6 +2,7 @@ import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import { IdentitySnapParams } from './interfaces';
 import { getAvailableMethods } from './rpc/did/getAvailableMethods';
+import { getCurrentDIDMethod } from './rpc/did/getCurrentDIDMethod';
 import { getDid } from './rpc/did/getDID';
 import { resolveDID } from './rpc/did/resolveDID';
 import { switchMethod } from './rpc/did/switchMethods';
@@ -20,14 +21,10 @@ import { syncGoogleVCs } from './rpc/vc/syncGoogleVCs';
 import { verifyVC } from './rpc/vc/verifyVC';
 import { verifyVP } from './rpc/vc/verifyVP';
 import { getCurrentAccount } from './snap/account';
-import {
-  getSnapStateUnchecked,
-  initAccountState,
-  updateSnapState,
-} from './snap/state';
+import { getSnapStateUnchecked } from './snap/state';
 import { init } from './utils/init';
-import { switchNetworkIfNecessary } from './utils/network';
 import {
+  isExternalAccountFlagSet,
   isValidConfigueGoogleRequest,
   isValidCreateVCRequest,
   isValidCreateVPRequest,
@@ -51,51 +48,6 @@ import {
  * @throws If the request method is not valid for this snap.
  */
 export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
-  let state = await getSnapStateUnchecked(snap);
-
-  if (state === null) {
-    state = await init(snap);
-  }
-  console.log('state:', JSON.stringify(state, null, 4));
-
-  /*
-    We will need to call this API before trying to get the account because sometimes when connecting to hedera,
-    the account may be null but to set the account, we need to call this API so it's a chicken and egg problem.
-    To avoid the error, we are calling this method in the beginning
-    To set the account for Hedera, we need to set the private key and the accountId first
-   */
-  if (request.method === 'connectHederaAccount') {
-    isValidHederaAccountParams(request.params);
-    return await connectHederaAccount(
-      snap,
-      state,
-      ethereum,
-      request.params.accountId,
-    );
-  }
-  const account = await getCurrentAccount(state, ethereum);
-  console.log('account:', account);
-
-  // FIXME: HANDLE NULL maybe throw ?
-  if (account === null) {
-    throw new Error(
-      'Error while trying to get the account. Please connect to an account first',
-    );
-  } else {
-    state.currentAccount = account;
-    await updateSnapState(snap, state);
-  }
-
-  const identitySnapParams: IdentitySnapParams = {
-    snap,
-    state,
-    metamask: ethereum,
-  };
-
-  if (!(account in state.accountState)) {
-    await initAccountState(snap, state, state.currentAccount);
-  }
-
   console.log('Request:', JSON.stringify(request, null, 4));
   console.log('Origin:', origin);
   console.log('-------------------------------------------------------------');
@@ -104,8 +56,33 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
     JSON.stringify(request.params, null, 4),
   );
 
+  let state = await getSnapStateUnchecked(snap);
+  if (state === null) {
+    state = await init(snap);
+  }
+  console.log('state:', JSON.stringify(state, null, 4));
+
+  let hederaAccountId = '';
+  if (isExternalAccountFlagSet(request.params)) {
+    isValidHederaAccountParams(request.params);
+    hederaAccountId = request.params.accountId;
+  }
+
+  const account = await getCurrentAccount(state, hederaAccountId);
+  console.log(
+    `Evm Address: ${account.evmAddress}, did: ${account.identifier.did}`,
+  );
+
+  const identitySnapParams: IdentitySnapParams = {
+    snap,
+    state,
+    metamask: ethereum,
+    account,
+    isExternalAccount: isExternalAccountFlagSet(request.params),
+  };
+
   switch (request.method) {
-    case 'hello':
+    case 'hello': {
       return snap.request({
         method: 'snap_dialog',
         params: {
@@ -118,73 +95,105 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
           ]),
         },
       });
-    case 'togglePopups':
+    }
+
+    case 'togglePopups': {
       return await togglePopups(identitySnapParams);
-    case 'getDID':
-      await switchNetworkIfNecessary(identitySnapParams);
+    }
+
+    case 'getDID': {
       return await getDid(identitySnapParams);
-    case 'resolveDID':
+    }
+
+    case 'resolveDID': {
       isValidResolveDIDRequest(request.params);
-      await switchNetworkIfNecessary(identitySnapParams);
       return await resolveDID(identitySnapParams, request.params.did);
-    case 'getVCs':
+    }
+
+    case 'getVCs': {
       isValidGetVCsRequest(request.params);
-      await switchNetworkIfNecessary(identitySnapParams);
       return await getVCs(identitySnapParams, request.params);
-    case 'saveVC':
+    }
+
+    case 'saveVC': {
       isValidSaveVCRequest(request.params);
-      await switchNetworkIfNecessary(identitySnapParams);
       return await saveVC(identitySnapParams, request.params);
-    case 'createVC':
+    }
+
+    case 'createVC': {
       isValidCreateVCRequest(request.params);
-      await switchNetworkIfNecessary(identitySnapParams);
       return await createVC(identitySnapParams, request.params);
-    case 'verifyVC':
+    }
+
+    case 'verifyVC': {
       isValidVerifyVCRequest(request.params);
-      await switchNetworkIfNecessary(identitySnapParams);
       return await verifyVC(
         identitySnapParams,
         request.params.verifiableCredential,
       );
-    case 'removeVC':
+    }
+
+    case 'removeVC': {
       isValidRemoveVCRequest(request.params);
-      await switchNetworkIfNecessary(identitySnapParams);
       return await removeVC(identitySnapParams, request.params);
-    case 'deleteAllVCs':
+    }
+
+    case 'deleteAllVCs': {
       isValidDeleteAllVCsRequest(request.params);
-      await switchNetworkIfNecessary(identitySnapParams);
       return await deleteAllVCs(identitySnapParams, request.params);
-    case 'createVP':
+    }
+
+    case 'createVP': {
       isValidCreateVPRequest(request.params);
-      await switchNetworkIfNecessary(identitySnapParams);
       return await createVP(identitySnapParams, request.params);
-    case 'verifyVP':
+    }
+
+    case 'verifyVP': {
       isValidVerifyVPRequest(request.params);
-      await switchNetworkIfNecessary(identitySnapParams);
       return await verifyVP(
         identitySnapParams,
         request.params.verifiablePresentation,
       );
-    case 'getAvailableMethods':
+    }
+
+    case 'getAvailableMethods': {
       return getAvailableMethods();
-    case 'getCurrentDIDMethod':
-      await switchNetworkIfNecessary(identitySnapParams);
-      return state.accountState[state.currentAccount].accountConfig.identity
-        .didMethod;
-    case 'switchMethod':
+    }
+
+    case 'getCurrentDIDMethod': {
+      return getCurrentDIDMethod(identitySnapParams);
+    }
+
+    case 'switchMethod': {
       isValidSwitchMethodRequest(request.params);
       return await switchMethod(identitySnapParams, request.params.didMethod);
-    case 'getSupportedProofFormats':
+    }
+
+    case 'getSupportedProofFormats': {
       return getSupportedProofFormats();
-    case 'configureGoogleAccount':
+    }
+
+    case 'configureGoogleAccount': {
       isValidConfigueGoogleRequest(request.params);
       return await configureGoogleAccount(identitySnapParams, request.params);
-    case 'syncGoogleVCs':
+    }
+
+    case 'syncGoogleVCs': {
       return await syncGoogleVCs(identitySnapParams);
-    case 'getHederaAccountId':
+    }
+
+    case 'connectHederaAccount': {
+      isValidHederaAccountParams(request.params);
+      return await connectHederaAccount(state, request.params.accountId);
+    }
+
+    case 'getHederaAccountId': {
       return await getHederaAccountId(identitySnapParams);
-    default:
+    }
+
+    default: {
       console.error('Method not found');
       throw new Error('Method not found');
+    }
   }
 };

@@ -1,6 +1,6 @@
 import { DIDResolutionResult } from '@veramo/core';
 import { IdentitySnapParams } from '../../interfaces';
-import { VeramoAgent } from '../../veramo/agent';
+import { getVeramoAgent } from '../../veramo/agent';
 
 /**
  * Resolve DID.
@@ -12,7 +12,17 @@ export async function resolveDID(
   identitySnapParams: IdentitySnapParams,
   didUrl?: string,
 ): Promise<DIDResolutionResult | null> {
+  const { state, account } = identitySnapParams;
+
   // Get Veramo agent
-  const agent = new VeramoAgent(identitySnapParams);
-  return await agent.resolveDid(didUrl);
+  const agent = await getVeramoAgent(snap, state);
+
+  let did = didUrl;
+  // GET DID if not exists
+  if (!did) {
+    did = account.identifier.did;
+  }
+  return await agent.resolveDid({
+    didUrl: did,
+  });
 }

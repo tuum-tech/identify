@@ -18,24 +18,24 @@ export type Filter = {
   filter: unknown;
 };
 
-type QueryOptions = {
+export type QueryOptions = {
   store?: string | string[];
   returnStore?: boolean;
 };
 
-type DeleteOptions = {
+export type SaveOptions = {
   store: string | string[];
 };
 
-type SaveOptions = {
+export type DeleteOptions = {
   store: string | string[];
 };
 
-type ClearOptions = {
+export type ClearOptions = {
   store: string | string[];
 };
 
-type QueryMetadata = {
+export type QueryMetadata = {
   id: string;
   store?: string;
 };
@@ -49,12 +49,6 @@ export type IDataManagerQueryArgs = {
   accessToken?: string;
 };
 
-export type IDataManagerDeleteArgs = {
-  id: string;
-  options?: DeleteOptions;
-  accessToken?: string;
-};
-
 export type IDataManagerSaveArgs = {
   data: unknown;
   options: SaveOptions;
@@ -65,6 +59,12 @@ export type IDataManagerSaveArgs = {
 export type IDataManagerClearArgs = {
   filter?: Filter;
   options?: ClearOptions;
+  accessToken?: string;
+};
+
+export type IDataManagerDeleteArgs = {
+  id: string;
+  options?: DeleteOptions;
   accessToken?: string;
 };
 

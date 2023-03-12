@@ -1,18 +1,41 @@
 import { VerifiablePresentation, W3CVerifiableCredential } from '@veramo/core';
 import { GoogleToken, IdentitySnapState } from '../interfaces';
-import { isValidProofFormat, isValidVCStore } from '../types/constants';
 import {
-  CreateVCRequestParams,
-  CreateVPRequestParams,
-  DeleteAllVCsRequestParams,
-  GetVCsRequestParams,
-  RemoveVCsRequestParams,
-  SaveVCRequestParams,
-} from '../types/params';
+  IDataManagerClearArgs,
+  IDataManagerDeleteArgs,
+  IDataManagerQueryArgs,
+  IDataManagerSaveArgs,
+} from '../plugins/veramo/verfiable-creds-manager';
+import { getAccountStateByCoinType } from '../snap/state';
+import {
+  HEDERACOINTYPE,
+  isValidProofFormat,
+  isValidVCStore,
+} from '../types/constants';
+import { CreateVCRequestParams, CreateVPRequestParams } from '../types/params';
 
 type HederaAccountParams = {
   accountId: string;
 };
+
+/**
+ * Check whether the the account was imported using private key(external account).
+ *
+ * @param params - Request params.
+ * @returns Whether to treat it as an external account that was imported using private key.
+ */
+export function isExternalAccountFlagSet(params: unknown): boolean {
+  if (
+    params !== null &&
+    typeof params === 'object' &&
+    'externalAccount' in params &&
+    params.externalAccount !== null &&
+    typeof params.externalAccount === 'boolean'
+  ) {
+    return params.externalAccount;
+  }
+  return false;
+}
 
 /**
  * Check validation of Hedera account.
@@ -40,17 +63,28 @@ export function isValidHederaAccountParams(
  * Check if Hedera account was imported.
  *
  * @param state - IdentitySnapState.
+ * @param accountId - Hedera identifier.
+ * @param evmAddress - Ethereum address.
  * @returns Result.
  */
-export function isHederaAccountImported(state: IdentitySnapState): boolean {
-  if (
-    state.accountState[state.currentAccount].hederaAccount.evmAddress ===
-      state.currentAccount &&
-    state.accountState[state.currentAccount].hederaAccount.accountId !== ''
-  ) {
-    return true;
+export async function getHederaAccountIfExists(
+  state: IdentitySnapState,
+  accountId: string | undefined,
+  evmAddress: string | undefined,
+): Promise<string> {
+  let result = '';
+  for (const address of Object.keys(state.accountState[HEDERACOINTYPE])) {
+    const accountState = await getAccountStateByCoinType(state, address);
+    const hederaAccountId = accountState.extraData;
+    if (evmAddress && evmAddress === address) {
+      result = hederaAccountId as string;
+    }
+
+    if (accountId && hederaAccountId === accountId) {
+      result = address;
+    }
   }
-  return false;
+  return result;
 }
 
 type SwitchMethodRequestParams = {
@@ -103,11 +137,11 @@ export function isValidResolveDIDRequest(
  */
 export function isValidGetVCsRequest(
   params: unknown,
-): asserts params is GetVCsRequestParams {
+): asserts params is IDataManagerQueryArgs {
   if (params === null) {
     return;
   }
-  const parameter = params as GetVCsRequestParams;
+  const parameter = params as IDataManagerQueryArgs;
 
   // Check if filter is valid
   if (
@@ -176,13 +210,13 @@ export function isValidGetVCsRequest(
  */
 export function isValidSaveVCRequest(
   params: unknown,
-): asserts params is SaveVCRequestParams {
-  const parameter = params as SaveVCRequestParams;
+): asserts params is IDataManagerSaveArgs {
+  const parameter = params as IDataManagerSaveArgs;
   if (
     parameter !== null &&
     typeof parameter === 'object' &&
-    'verifiableCredential' in parameter &&
-    parameter.verifiableCredential !== null
+    'data' in parameter &&
+    parameter.data !== null
   ) {
     if (
       'options' in parameter &&
@@ -287,11 +321,11 @@ export function isValidVerifyVCRequest(
  */
 export function isValidRemoveVCRequest(
   params: unknown,
-): asserts params is RemoveVCsRequestParams {
+): asserts params is IDataManagerDeleteArgs {
   if (params === null) {
     return;
   }
-  const parameter = params as RemoveVCsRequestParams;
+  const parameter = params as IDataManagerDeleteArgs;
 
   // Check if id exists
   if ('id' in parameter && parameter.id !== null) {
@@ -337,11 +371,11 @@ export function isValidRemoveVCRequest(
  */
 export function isValidDeleteAllVCsRequest(
   params: unknown,
-): asserts params is DeleteAllVCsRequestParams {
+): asserts params is IDataManagerClearArgs {
   if (params === null) {
     return;
   }
-  const parameter = params as DeleteAllVCsRequestParams;
+  const parameter = params as IDataManagerClearArgs;
 
   // Check if options is valid
   if (

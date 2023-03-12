@@ -5,7 +5,7 @@ import {
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { ethers } from 'ethers';
 import { IdentitySnapState } from '../interfaces';
-import { updateSnapState } from '../snap/state';
+import { getAccountStateByCoinType, updateSnapState } from '../snap/state';
 import { DEFAULTCOINTYPE } from '../types/constants';
 
 /**
@@ -15,12 +15,13 @@ import { DEFAULTCOINTYPE } from '../types/constants';
  * @param account - Account.
  * @returns Account index.
  */
-export function getAccountIndex(
+export async function getAccountIndex(
   state: IdentitySnapState,
   account: string,
-): number | undefined {
-  if (state.accountState[account].index) {
-    return state.accountState[account].index;
+): Promise<number | undefined> {
+  const accountState = await getAccountStateByCoinType(state, account);
+  if (accountState.index) {
+    return accountState.index;
   }
   return undefined;
 }
@@ -39,8 +40,9 @@ export async function setAccountIndex(
   account: string,
   index: number,
 ) {
+  const accountState = await getAccountStateByCoinType(state, account);
   // eslint-disable-next-line no-param-reassign
-  state.accountState[account].index = index;
+  accountState.index = index;
   await updateSnapState(snap, state);
 }
 
@@ -81,8 +83,8 @@ export async function getAddressKey(
 ) {
   const keyDeriver = await getBIP44AddressKeyDeriver(bip44CoinTypeNode);
   const derivedKey = await keyDeriver(addressIndex);
-  const { privateKey } = derivedKey;
-  const { chainCode } = derivedKey;
+
+  const { privateKey, chainCode } = derivedKey;
   const addressKey = `${privateKey as string}${chainCode.split('0x')[1]}`;
   if (privateKey === undefined) {
     return null;
@@ -107,12 +109,12 @@ export const getKeysFromAddressIndex = async (
     return null;
   }
   const { privateKey, derivationPath } = result;
-  const snap = new ethers.Wallet(privateKey);
+  const wallet = new ethers.Wallet(privateKey);
 
   return {
     privateKey,
-    publicKey: snap.publicKey,
-    address: snap.address,
+    publicKey: wallet.publicKey,
+    address: wallet.address,
     addressIndex,
     derivationPath,
   };
@@ -146,7 +148,7 @@ export const snapGetKeysFromAddress = async (
   snap: SnapsGlobalObject,
   maxScan = 20,
 ): Promise<KeysType | null> => {
-  const addressIndex = getAccountIndex(state, account);
+  const addressIndex = await getAccountIndex(state, account);
   if (addressIndex) {
     return getKeysFromAddress(
       bip44CoinTypeNode,
@@ -164,7 +166,7 @@ export const snapGetKeysFromAddress = async (
   return null;
 };
 
-type KeysType = {
+export type KeysType = {
   privateKey: string;
   publicKey: string;
   address: string;

@@ -1,10 +1,11 @@
 import cloneDeep from 'lodash.clonedeep';
 import {
-  HederaAccount,
+  Account,
   IdentityAccountConfig,
   IdentityAccountState,
   IdentitySnapState,
 } from '../interfaces';
+import { DEFAULTCOINTYPE, HEDERACOINTYPE } from '../types/constants';
 
 const emptyAccountState = {
   snapPrivateKeyStore: {},
@@ -18,7 +19,6 @@ const emptyAccountState = {
       vcStore: 'snap',
     },
   } as IdentityAccountConfig,
-  hederaAccount: {} as HederaAccount,
 } as IdentityAccountState;
 
 export const getEmptyAccountState = () => {
@@ -26,8 +26,11 @@ export const getEmptyAccountState = () => {
 };
 
 const initialSnapState: IdentitySnapState = {
-  currentAccount: '',
-  accountState: {},
+  currentAccount: {} as Account,
+  accountState: {
+    [DEFAULTCOINTYPE]: {},
+    [HEDERACOINTYPE]: {},
+  },
   snapConfig: {
     dApp: {
       disablePopups: false,

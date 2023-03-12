@@ -1,8 +1,12 @@
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
-import { IDataManagerQueryResult } from '../../plugins/veramo/verfiable-creds-manager';
+import {
+  IDataManagerQueryArgs,
+  IDataManagerQueryResult,
+  QueryOptions,
+} from '../../plugins/veramo/verfiable-creds-manager';
 import { generateVCPanel, snapDialog } from '../../snap/dialog';
-import { GetVCsRequestParams } from '../../types/params';
-import { VeramoAgent } from '../../veramo/agent';
+import { getAccountStateByCoinType } from '../../snap/state';
+import { getVeramoAgent } from '../../veramo/agent';
 
 /**
  * Function to get VCs.
@@ -12,17 +16,27 @@ import { VeramoAgent } from '../../veramo/agent';
  */
 export async function getVCs(
   identitySnapParams: IdentitySnapParams,
-  vcRequestParams: GetVCsRequestParams,
+  vcRequestParams: IDataManagerQueryArgs,
 ): Promise<IDataManagerQueryResult[]> {
-  const { snap, state } = identitySnapParams;
+  const { snap, state, account } = identitySnapParams;
 
   const { filter, options } = vcRequestParams || {};
   const { store = 'snap', returnStore = true } = options || {};
 
   // Get Veramo agent
-  const agent = new VeramoAgent(identitySnapParams);
-  const vcs = await agent.getVCs({ store, returnStore }, filter);
+  const agent = await getVeramoAgent(snap, state);
 
+  // Get VCs
+  const accountState = await getAccountStateByCoinType(
+    state,
+    account.evmAddress,
+  );
+  const optionsFiltered = { store, returnStore } as QueryOptions;
+  const vcs = (await agent.queryVC({
+    filter,
+    options: optionsFiltered,
+    accessToken: accountState.accountConfig.identity.googleAccessToken,
+  })) as IDataManagerQueryResult[];
   console.log('VCs: ', JSON.stringify(vcs, null, 4));
 
   const header = 'Retrieve Verifiable Credentials';

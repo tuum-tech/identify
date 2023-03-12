@@ -44,7 +44,6 @@ const Index = () => {
   const isHedera = validHederaChainID(currentChainId) && hederaAccountConnected;
   const noHedera =
     !validHederaChainID(currentChainId) && !hederaAccountConnected;
-  const isNonHedera = isHedera || noHedera;
   const requireHedera =
     validHederaChainID(currentChainId) && !hederaAccountConnected;
 
@@ -104,28 +103,25 @@ const Index = () => {
         {isHedera && (
           <GetHederaAccountId setCurrentChainId={setCurrentChainId} />
         )}
-        {isNonHedera && (
-          <>
-            <SendHelloHessage setCurrentChainId={setCurrentChainId} />
-            <ToggleMetamaskPopups setCurrentChainId={setCurrentChainId} />
-            <GetCurrentDIDMethod setCurrentChainId={setCurrentChainId} />
-            <GetDID setCurrentChainId={setCurrentChainId} />
-            <ResolveDID setCurrentChainId={setCurrentChainId} />
-            <GetSpecificVC setCurrentChainId={setCurrentChainId} />
-            <GetAllVCs setCurrentChainId={setCurrentChainId} />
-            <CreateVC setCurrentChainId={setCurrentChainId} />
-            <VerifyVC setCurrentChainId={setCurrentChainId} />
-            <RemoveVC setCurrentChainId={setCurrentChainId} />
-            <DeleteAllVCs setCurrentChainId={setCurrentChainId} />
-            <GetVP setCurrentChainId={setCurrentChainId} />
-            <VerifyVP setCurrentChainId={setCurrentChainId} />
-            <ConfigureGoogleAccount />
-            <SyncGoogleVCs />
-            <Todo />
-            <Todo />
-            <Todo />
-          </>
-        )}
+
+        <SendHelloHessage setCurrentChainId={setCurrentChainId} />
+        <ToggleMetamaskPopups setCurrentChainId={setCurrentChainId} />
+        <GetCurrentDIDMethod setCurrentChainId={setCurrentChainId} />
+        <GetDID setCurrentChainId={setCurrentChainId} />
+        <ResolveDID setCurrentChainId={setCurrentChainId} />
+        <GetSpecificVC setCurrentChainId={setCurrentChainId} />
+        <GetAllVCs setCurrentChainId={setCurrentChainId} />
+        <CreateVC setCurrentChainId={setCurrentChainId} />
+        <VerifyVC setCurrentChainId={setCurrentChainId} />
+        <RemoveVC setCurrentChainId={setCurrentChainId} />
+        <DeleteAllVCs setCurrentChainId={setCurrentChainId} />
+        <GetVP setCurrentChainId={setCurrentChainId} />
+        <VerifyVP setCurrentChainId={setCurrentChainId} />
+        <ConfigureGoogleAccount />
+        <SyncGoogleVCs />
+        <Todo />
+        <Todo />
+        <Todo />
       </CardContainer>
     </Container>
   );
