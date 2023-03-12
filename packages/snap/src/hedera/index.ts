@@ -26,6 +26,7 @@ export class HederaServiceImpl implements HederaService {
     accountId: AccountId;
   }): Promise<SimpleHederaClient | null> {
     const client = Client.forNetwork(options.network as any);
+
     const transactionSigner = await options.walletHedera.getTransactionSigner(
       options.keyIndex,
     );
@@ -33,6 +34,10 @@ export class HederaServiceImpl implements HederaService {
       options.keyIndex,
     );
     const publicKey = await options.walletHedera.getPublicKey(options.keyIndex);
+
+    if (publicKey === null) {
+      return null;
+    }
 
     // TODO: Fix
     client.setOperatorWith(
@@ -74,11 +79,10 @@ export async function testClientOperatorMatch(client: Client) {
 
         return true;
       }
-      console.error(`Error: ${err}`);
+      console.log(`Error: ${JSON.stringify(err, null, 4)}`);
       return false;
     }
-
-    throw err;
+    throw new Error(`Error: ${JSON.stringify(err, null, 4)}`);
   }
 
   // under *no* cirumstances should this transaction succeed

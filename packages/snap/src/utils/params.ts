@@ -6,6 +6,7 @@ import {
   IDataManagerQueryArgs,
   IDataManagerSaveArgs,
 } from '../plugins/veramo/verfiable-creds-manager';
+import { getAccountStateByCoinType } from '../snap/state';
 import {
   HEDERACOINTYPE,
   isValidProofFormat,
@@ -16,6 +17,25 @@ import { CreateVCRequestParams, CreateVPRequestParams } from '../types/params';
 type HederaAccountParams = {
   accountId: string;
 };
+
+/**
+ * Check whether the the account was imported using private key(external account).
+ *
+ * @param params - Request params.
+ * @returns Whether to treat it as an external account that was imported using private key.
+ */
+export function isExternalAccountFlagSet(params: unknown): boolean {
+  if (
+    params !== null &&
+    typeof params === 'object' &&
+    'externalAccount' in params &&
+    params.externalAccount !== null &&
+    typeof params.externalAccount === 'boolean'
+  ) {
+    return params.externalAccount;
+  }
+  return false;
+}
 
 /**
  * Check validation of Hedera account.
@@ -44,22 +64,27 @@ export function isValidHederaAccountParams(
  *
  * @param state - IdentitySnapState.
  * @param accountId - Hedera identifier.
+ * @param evmAddress - Ethereum address.
  * @returns Result.
  */
-export function isHederaAccountImported(
+export async function getHederaAccountIfExists(
   state: IdentitySnapState,
-  accountId: string,
-): boolean {
-  const hederaAccountId = state.accountState[HEDERACOINTYPE][
-    state.currentAccount.evmAddress
-  ].extraData
-    ? (state.accountState[HEDERACOINTYPE][state.currentAccount.evmAddress]
-        .extraData as string)
-    : '';
-  if (hederaAccountId === accountId) {
-    return true;
+  accountId: string | undefined,
+  evmAddress: string | undefined,
+): Promise<string> {
+  let result = '';
+  for (const address of Object.keys(state.accountState[HEDERACOINTYPE])) {
+    const accountState = await getAccountStateByCoinType(state, address);
+    const hederaAccountId = accountState.extraData;
+    if (evmAddress && evmAddress === address) {
+      result = hederaAccountId as string;
+    }
+
+    if (accountId && hederaAccountId === accountId) {
+      result = address;
+    }
   }
-  return false;
+  return result;
 }
 
 type SwitchMethodRequestParams = {

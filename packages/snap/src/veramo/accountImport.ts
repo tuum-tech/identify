@@ -2,46 +2,57 @@ import { BIP44CoinTypeNode } from '@metamask/key-tree';
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { IIdentifier, MinimalImportableKey } from '@veramo/core';
-import { validHederaChainID } from '../hedera/config';
-import { Account, IdentitySnapState } from '../interfaces';
-import { getCurrentNetwork } from '../snap/network';
-import { getAccountStateByCoinType, updateSnapState } from '../snap/state';
-import { DEFAULTCOINTYPE, HEDERACOINTYPE } from '../types/constants';
-import { KeyPair } from '../types/crypto';
-import { getKeyPair } from '../utils/hederaUtils';
+import { toHederaAccountInfo } from '../hedera';
+import { getHederaNetwork, validHederaChainID } from '../hedera/config';
 import {
-  getAddressKeyDeriver,
-  getKeysFromAddressIndex,
-  snapGetKeysFromAddress,
-} from '../utils/keyPair';
+  Account,
+  AccountViaPrivateKey,
+  IdentitySnapState,
+} from '../interfaces';
+import { requestHederaAccountId } from '../snap/dialog';
+import { getCurrentNetwork } from '../snap/network';
+import {
+  getAccountStateByCoinType,
+  getCurrentCoinType,
+  initAccountState,
+  updateSnapState,
+} from '../snap/state';
+import { getAddressKeyDeriver, snapGetKeysFromAddress } from '../utils/keyPair';
 import { convertChainIdFromHex } from '../utils/network';
+import { getHederaAccountIfExists } from '../utils/params';
 import { getVeramoAgent } from './agent';
 
 /**
  * Veramo Import metamask account.
  *
  * @param identitySnapParams - Identity snap params.
- * @param agent - Veramo agent.
- * @returns Identifier.
+ * @param snap - SnapsGlobalObject.
+ * @param state - IdentitySnapState.
+ * @param metamask - MetaMaskInpageProvider.
+ * @param evmAddress - Ethereum address.
+ * @param _privateKey - Private key(only used for Hedera accounts currently).
+ * @returns Account.
  */
 export async function veramoImportMetaMaskAccount(
   snap: SnapsGlobalObject,
   state: IdentitySnapState,
   metamask: MetaMaskInpageProvider,
   evmAddress: string,
-  pKey?: string,
+  accountViaPrivateKey?: AccountViaPrivateKey,
 ): Promise<Account> {
   const chainId = await getCurrentNetwork(metamask);
 
   let privateKey: string;
   let publicKey: string;
   let address: string = evmAddress;
+  let hederaAccountId: string = '';
 
-  if (pKey) {
+  if (accountViaPrivateKey) {
     try {
-      const keyPair: KeyPair = await getKeyPair(pKey);
-      privateKey = keyPair.privateKey;
-      publicKey = keyPair.publicKey;
+      privateKey = accountViaPrivateKey.privateKey;
+      publicKey = accountViaPrivateKey.publicKey;
+      address = accountViaPrivateKey.address;
+      hederaAccountId = accountViaPrivateKey.extraData as string;
     } catch (error) {
       console.log(
         `Private key was passed but it is not a valid private key: ${error}`,
@@ -51,23 +62,13 @@ export async function veramoImportMetaMaskAccount(
       );
     }
   } else {
-    let coinType = DEFAULTCOINTYPE;
-    if (validHederaChainID(chainId)) {
-      coinType = HEDERACOINTYPE;
-    }
-
-    const bip44CoinTypeNode = await getAddressKeyDeriver(snap, coinType);
-    let res: any;
-    if (validHederaChainID(chainId)) {
-      res = await getKeysFromAddressIndex(bip44CoinTypeNode, 0);
-    } else {
-      res = await snapGetKeysFromAddress(
-        bip44CoinTypeNode as BIP44CoinTypeNode,
-        state,
-        address,
-        snap,
-      );
-    }
+    const bip44CoinTypeNode = await getAddressKeyDeriver(snap);
+    const res = await snapGetKeysFromAddress(
+      bip44CoinTypeNode as BIP44CoinTypeNode,
+      state,
+      address,
+      snap,
+    );
 
     if (!res) {
       console.log('Failed to get private keys from Metamask account');
@@ -79,12 +80,52 @@ export async function veramoImportMetaMaskAccount(
   }
 
   address = address.toLowerCase();
-  console.log('privateKey: ', privateKey);
-  console.log('publicKey: ', publicKey);
-  console.log('address: ', address);
+
+  if (validHederaChainID(chainId)) {
+    const coinType = (await getCurrentCoinType()).toString();
+    if (!accountViaPrivateKey) {
+      hederaAccountId = await getHederaAccountIfExists(
+        state,
+        undefined,
+        address,
+      );
+    }
+    if (!hederaAccountId) {
+      hederaAccountId = await requestHederaAccountId(snap);
+      // Initialize accountstate since it doesn't exist
+      console.log(
+        `The address ${address} has NOT yet been configured in the Identity Snap. Configuring now...`,
+      );
+      await initAccountState(snap, state, coinType, address);
+    }
+
+    let hederaAccountInfo = await toHederaAccountInfo(
+      privateKey,
+      hederaAccountId,
+      getHederaNetwork(chainId),
+    );
+    if (hederaAccountInfo === null && hederaAccountId) {
+      hederaAccountId = await requestHederaAccountId(snap, hederaAccountId);
+      hederaAccountInfo = await toHederaAccountInfo(
+        privateKey,
+        hederaAccountId,
+        getHederaNetwork(chainId),
+      );
+    }
+
+    if (hederaAccountInfo !== null) {
+      state.accountState[coinType][address].extraData = hederaAccountId;
+    } else {
+      console.error(
+        `Could not retrieve hedera account info using the accountId '${hederaAccountId}'`,
+      );
+      throw new Error(
+        `Could not retrieve hedera account info using the accountId '${hederaAccountId}'`,
+      );
+    }
+  }
 
   const accountState = await getAccountStateByCoinType(state, address);
-  console.log('accountState: ', accountState);
   const method = accountState.accountConfig.identity.didMethod;
 
   let did = '';
@@ -97,8 +138,6 @@ export async function veramoImportMetaMaskAccount(
   }
 
   state.currentAccount.evmAddress = address;
-  /*   const newState = cloneDeep(state);
-  newState.currentAccount = account; */
 
   // Get Veramo agent
   const agent = await getVeramoAgent(snap, state);

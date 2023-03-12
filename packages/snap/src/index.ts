@@ -24,6 +24,7 @@ import { getCurrentAccount } from './snap/account';
 import { getSnapStateUnchecked } from './snap/state';
 import { init } from './utils/init';
 import {
+  isExternalAccountFlagSet,
   isValidConfigueGoogleRequest,
   isValidCreateVCRequest,
   isValidCreateVPRequest,
@@ -47,24 +48,27 @@ import {
  * @throws If the request method is not valid for this snap.
  */
 export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
+  console.log('Request:', JSON.stringify(request, null, 4));
+  console.log('Origin:', origin);
+  console.log('-------------------------------------------------------------');
+  console.log(
+    'request.params=========',
+    JSON.stringify(request.params, null, 4),
+  );
+
   let state = await getSnapStateUnchecked(snap);
   if (state === null) {
     state = await init(snap);
   }
   console.log('state:', JSON.stringify(state, null, 4));
 
-  /*
-    We will need to call this API before trying to get the account because sometimes the user may be connecting using 
-    their private key directly(Eg. when using hedera account)
-    To set the account for Hedera, we need to set the private key and the accountId first
-    If privatekey was already set before, just enter the accountId
-   */
-  if (request.method === 'connectHederaAccount') {
+  let hederaAccountId = '';
+  if (isExternalAccountFlagSet(request.params)) {
     isValidHederaAccountParams(request.params);
-    return await connectHederaAccount(state, request.params.accountId);
+    hederaAccountId = request.params.accountId;
   }
 
-  const account = await getCurrentAccount(state);
+  const account = await getCurrentAccount(state, hederaAccountId);
   console.log(
     `Evm Address: ${account.evmAddress}, did: ${account.identifier.did}`,
   );
@@ -74,15 +78,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
     state,
     metamask: ethereum,
     account,
+    isExternalAccount: isExternalAccountFlagSet(request.params),
   };
-
-  console.log('Request:', JSON.stringify(request, null, 4));
-  console.log('Origin:', origin);
-  console.log('-------------------------------------------------------------');
-  console.log(
-    'request.params=========',
-    JSON.stringify(request.params, null, 4),
-  );
 
   switch (request.method) {
     case 'hello': {

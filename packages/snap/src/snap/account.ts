@@ -1,4 +1,9 @@
-import { Account, IdentitySnapState } from '../interfaces';
+import {
+  Account,
+  AccountViaPrivateKey,
+  IdentitySnapState,
+} from '../interfaces';
+import { connectHederaAccount } from '../rpc/hedera/connectHederaAccount';
 import { veramoImportMetaMaskAccount } from '../veramo/accountImport';
 import { getCurrentCoinType, initAccountState } from './state';
 
@@ -6,15 +11,20 @@ import { getCurrentCoinType, initAccountState } from './state';
  * Function that returns account info of the currently selected MetaMask account.
  *
  * @param state - IdentitySnapState.
+ * @param hederaAccountId - Hedera Identifier.
  * @returns MetaMask address and did.
  */
 export async function getCurrentAccount(
   state: IdentitySnapState,
+  hederaAccountId?: string,
 ): Promise<Account> {
   try {
     const accounts = (await ethereum.request({
       method: 'eth_requestAccounts',
     })) as string[];
+    if (hederaAccountId) {
+      return await connectHederaAccount(state, hederaAccountId, true);
+    }
     return await importIdentitySnapAccount(state, accounts[0]);
   } catch (e) {
     console.error(`Error while trying to get the account: ${e}`);
@@ -27,18 +37,18 @@ export async function getCurrentAccount(
  *
  * @param state - IdentitySnapState.
  * @param evmAddress - Ethereum address.
- * @param pKey - Private key(only used for Hedera accounts currently).
+ * @param accountViaPrivateKey - Account to import using private key.
  */
 export async function importIdentitySnapAccount(
   state: IdentitySnapState,
   evmAddress: string,
-  pKey?: string,
+  accountViaPrivateKey?: AccountViaPrivateKey,
 ): Promise<Account> {
   // Initialize if not there
   const coinType = (await getCurrentCoinType()).toString();
-  if (!(evmAddress in state.accountState[coinType])) {
+  if (evmAddress && !(evmAddress in state.accountState[coinType])) {
     console.log(
-      `The address ${evmAddress} has NOT yet been configured. Configuring...`,
+      `The address ${evmAddress} has NOT yet been configured in the Identity Snap. Configuring now...`,
     );
     await initAccountState(snap, state, coinType, evmAddress);
   }
@@ -49,7 +59,7 @@ export async function importIdentitySnapAccount(
     state,
     ethereum,
     evmAddress,
-    pKey,
+    accountViaPrivateKey,
   );
   return account;
 }

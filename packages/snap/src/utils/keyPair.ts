@@ -83,6 +83,7 @@ export async function getAddressKey(
 ) {
   const keyDeriver = await getBIP44AddressKeyDeriver(bip44CoinTypeNode);
   const derivedKey = await keyDeriver(addressIndex);
+
   const { privateKey, chainCode } = derivedKey;
   const addressKey = `${privateKey as string}${chainCode.split('0x')[1]}`;
   if (privateKey === undefined) {
@@ -108,12 +109,12 @@ export const getKeysFromAddressIndex = async (
     return null;
   }
   const { privateKey, derivationPath } = result;
-  const snap = new ethers.Wallet(privateKey);
+  const wallet = new ethers.Wallet(privateKey);
 
   return {
     privateKey,
-    publicKey: snap.publicKey,
-    address: snap.address,
+    publicKey: wallet.publicKey,
+    address: wallet.address,
     addressIndex,
     derivationPath,
   };

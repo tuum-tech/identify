@@ -64,6 +64,7 @@ export type IdentitySnapParams = {
   state: IdentitySnapState;
   metamask: MetaMaskInpageProvider;
   account: Account;
+  isExternalAccount: boolean;
 };
 
 export type SnapDialogParams = {
@@ -79,4 +80,11 @@ export type UploadData = {
 
 export type GoogleToken = {
   accessToken: string;
+};
+
+export type AccountViaPrivateKey = {
+  privateKey: string;
+  publicKey: string;
+  address: string;
+  extraData?: unknown;
 };

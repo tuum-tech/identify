@@ -104,3 +104,28 @@ export async function generateVCPanel(
   });
   return panel(panelToShow);
 }
+
+/**
+ * Request Hedera Account Id.
+ *
+ * @param snap - SnapGlobalObject.
+ * @param prevHederaAccountId - HederaIdentifier.
+ */
+export async function requestHederaAccountId(
+  snap: SnapsGlobalObject,
+  prevHederaAccountId?: string,
+): Promise<string> {
+  const dialogParamsForHederaAccountId: SnapDialogParams = {
+    type: 'Prompt',
+    content: panel([
+      heading('Connect to Hedera Account'),
+      prevHederaAccountId
+        ? text(
+            `You had previously set your account Id to be ${prevHederaAccountId} however, this is not the correct account Id associated with this account. Please re-enter your account Id`,
+          )
+        : text(`Enter your hedera account Id associated with this account`),
+    ]),
+    placeholder: '0.0.3658062',
+  };
+  return (await snapDialog(snap, dialogParamsForHederaAccountId)) as string;
+}
