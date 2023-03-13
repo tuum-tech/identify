@@ -1,5 +1,4 @@
 import { IAgentPlugin } from '@veramo/core';
-import { v4 as uuidv4 } from 'uuid';
 import { AbstractDataStore } from '../data-store/abstractDataStore';
 import {
   IDataManager,
@@ -31,14 +30,21 @@ export class DataManager implements IAgentPlugin {
     args: IDataManagerSaveArgs,
   ): Promise<IDataManagerSaveResult[]> {
     const { data, options, accessToken } = args;
-    let { store } = options;
+
+    let store;
+    if (options === undefined) {
+      store = Object.keys(this.stores);
+    } else if (options.store === undefined) {
+      store = Object.keys(this.stores);
+    } else {
+      store = options.store;
+    }
+
     if (typeof store === 'string') {
       store = [store];
     }
 
-    const id = uuidv4();
-
-    const res: IDataManagerSaveResult[] = [];
+    let res: IDataManagerSaveResult[] = [];
     for (const storeName of store) {
       const storePlugin = this.stores[storeName];
       if (!storePlugin) {
@@ -49,8 +55,11 @@ export class DataManager implements IAgentPlugin {
         if (accessToken && storePlugin.configure) {
           await storePlugin.configure({ accessToken });
         }
-        const result = await storePlugin.saveVC({ data, options, id });
-        res.push({ id: result, store: storeName });
+        const result = await storePlugin.saveVC({ data });
+        const mappedResult = result.map((savedId) => {
+          return { id: savedId, store: storeName };
+        });
+        res = [...res, ...mappedResult];
       } catch (e) {
         console.log(e);
       }
@@ -66,6 +75,7 @@ export class DataManager implements IAgentPlugin {
       options,
       accessToken,
     } = args;
+
     let store;
     let returnStore = true;
     if (options === undefined) {
@@ -85,8 +95,8 @@ export class DataManager implements IAgentPlugin {
     if (typeof store === 'string') {
       store = [store];
     }
-    let res: IDataManagerQueryResult[] = [];
 
+    let res: IDataManagerQueryResult[] = [];
     for (const storeName of store) {
       const storePlugin = this.stores[storeName];
       if (!storePlugin) {
@@ -122,6 +132,8 @@ export class DataManager implements IAgentPlugin {
     let store;
     if (options === undefined) {
       store = Object.keys(this.stores);
+    } else if (options.store === undefined) {
+      store = Object.keys(this.stores);
     } else {
       store = options.store;
     }
@@ -130,9 +142,6 @@ export class DataManager implements IAgentPlugin {
       store = [store];
     }
 
-    if (store === undefined) {
-      store = Object.keys(this.stores);
-    }
     const res: IDataManagerDeleteResult[] = [];
     for (const storeName of store) {
       const storePlugin = this.stores[storeName];

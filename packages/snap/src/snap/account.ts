@@ -3,8 +3,8 @@ import {
   AccountViaPrivateKey,
   IdentitySnapState,
 } from '../interfaces';
-import { connectHederaAccount } from '../rpc/hedera/connectHederaAccount';
 import { veramoImportMetaMaskAccount } from '../veramo/accountImport';
+import { connectHederaAccount } from './hedera';
 import { getCurrentCoinType, initAccountState } from './state';
 
 /**

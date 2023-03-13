@@ -1,5 +1,4 @@
 import { SnapsGlobalObject } from '@metamask/snaps-types';
-import { W3CVerifiableCredential } from '@veramo/core';
 import jsonpath from 'jsonpath';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -7,6 +6,7 @@ import {
   IConfigureArgs,
   IFilterArgs,
   IQueryResult,
+  ISaveVC,
 } from '../../verfiable-creds-manager';
 import {
   createEmptyFile,
@@ -114,13 +114,10 @@ export class GoogleDriveVCStore extends AbstractDataStore {
   }
 
   async saveVC(args: {
-    data: W3CVerifiableCredential;
-    id: string;
-  }): Promise<string> {
-    // TODO check if VC is correct type
-    const { data: vc, id } = args;
-
-    const newId = id || uuidv4();
+    data: ISaveVC[];
+    options?: unknown;
+  }): Promise<string[]> {
+    const { data: vcs } = args;
 
     let googleVCs = await getGoogleVCs(
       this.accessToken,
@@ -132,14 +129,20 @@ export class GoogleDriveVCStore extends AbstractDataStore {
       googleVCs = {};
     }
 
-    const newVCs = { ...googleVCs, [newId]: vc };
-    const gdriveResponse = await uploadToGoogleDrive(this.accessToken, {
+    const ids: string[] = [];
+    const newVCs = [...googleVCs];
+    for (const vc of vcs) {
+      const newId = vc.id || uuidv4();
+      newVCs.push({ [newId]: vc });
+      ids.push(newId);
+    }
+
+    await uploadToGoogleDrive(this.accessToken, {
       fileName: GOOGLE_DRIVE_VCS_FILE_NAME,
       content: JSON.stringify(newVCs),
     });
-    console.log({ gdriveResponse });
 
-    return newId;
+    return ids;
   }
 
   async deleteVC({ id }: { id: string }): Promise<boolean> {

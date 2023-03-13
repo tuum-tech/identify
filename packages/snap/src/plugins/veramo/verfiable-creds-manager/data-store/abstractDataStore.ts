@@ -1,6 +1,10 @@
 export type ISaveArgs = {
   data: unknown;
   options?: unknown;
+};
+
+export type ISaveVC = {
+  vc: unknown;
   id?: string;
 };
 
@@ -28,7 +32,7 @@ export type IQueryResult = {
 };
 
 export abstract class AbstractDataStore {
-  abstract saveVC(args: ISaveArgs): Promise<string>;
+  abstract saveVC(args: ISaveArgs): Promise<string[]>;
 
   abstract deleteVC(args: IDeleteArgs): Promise<boolean>;
 

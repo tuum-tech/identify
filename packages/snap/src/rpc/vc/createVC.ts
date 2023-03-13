@@ -9,6 +9,7 @@ import { validHederaChainID } from '../../hedera/config';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
 import {
   IDataManagerSaveResult,
+  ISaveVC,
   SaveOptions,
 } from '../../plugins/veramo/verfiable-creds-manager';
 import { snapDialog } from '../../snap/dialog';
@@ -121,7 +122,7 @@ export async function createVC(
     // Save the Verifiable Credential
     const optionsFiltered = { store } as SaveOptions;
     const result: IDataManagerSaveResult[] = await agent.saveVC({
-      data: verifiableCredential,
+      data: [{ vc: verifiableCredential }] as ISaveVC[],
       options: optionsFiltered,
       accessToken: accountState.accountConfig.identity.googleAccessToken,
     });

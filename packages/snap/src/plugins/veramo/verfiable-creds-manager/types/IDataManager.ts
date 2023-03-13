@@ -53,7 +53,6 @@ export type IDataManagerSaveArgs = {
   data: unknown;
   options: SaveOptions;
   accessToken?: string;
-  id?: string;
 };
 
 export type IDataManagerClearArgs = {

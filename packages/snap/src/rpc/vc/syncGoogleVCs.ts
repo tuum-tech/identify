@@ -1,4 +1,3 @@
-import { W3CVerifiableCredential } from '@veramo/core';
 import {
   Account,
   IdentitySnapParams,
@@ -9,6 +8,7 @@ import { verifyToken } from '../../plugins/veramo/google-drive-data-store';
 import {
   IDataManagerQueryResult,
   IDataManagerSaveResult,
+  ISaveVC,
   QueryOptions,
   SaveOptions,
 } from '../../plugins/veramo/verfiable-creds-manager';
@@ -125,26 +125,26 @@ async function handleSync(
     content: await generateVCPanel(header, prompt, description, vcs),
   };
   if (await snapDialog(snap, dialogParams)) {
-    for (const vc of vcs) {
-      // Save the Verifiable Credential
-      const accountState = await getAccountStateByCoinType(
-        state,
-        account.evmAddress,
-      );
-      const options = {
-        store: 'snap',
-      } as SaveOptions;
-      const result = (await agent.saveVC({
-        data: vc.data as W3CVerifiableCredential,
-        id: vc.metadata.id,
-        options,
-        accessToken: accountState.accountConfig.identity.googleAccessToken,
-      })) as IDataManagerSaveResult[];
-      if (!(result.length > 0 && result[0].id !== '')) {
-        console.log('Could not sync the vc: ', JSON.stringify(vc, null, 4));
-        return false;
-      }
+    const options = {
+      store: 'snap',
+    } as SaveOptions;
+    const accountState = await getAccountStateByCoinType(
+      state,
+      account.evmAddress,
+    );
+    const data = vcs.map((x) => {
+      return { vc: x.data, id: x.metadata.id } as ISaveVC;
+    }) as ISaveVC[];
+    const result: IDataManagerSaveResult[] = await agent.saveVC({
+      data,
+      options,
+      accessToken: accountState.accountConfig.identity.googleAccessToken,
+    });
+    if (!(result.length > 0 && result[0].id !== '')) {
+      console.log('Could not sync the vc: ', JSON.stringify(data, null, 4));
+      return false;
     }
+    return true;
   }
   console.log('User rejected the sync operation');
   return false;

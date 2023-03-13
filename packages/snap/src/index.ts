@@ -8,7 +8,6 @@ import { getDid } from './rpc/did/getDID';
 import { resolveDID } from './rpc/did/resolveDID';
 import { switchMethod } from './rpc/did/switchMethods';
 import { configureGoogleAccount } from './rpc/gdrive/configureGoogleAccount';
-import { connectHederaAccount } from './rpc/hedera/connectHederaAccount';
 import { getHederaAccountId } from './rpc/hedera/getHederaAccountId';
 import { togglePopups } from './rpc/snap/togglePopups';
 import { createVC } from './rpc/vc/createVC';
@@ -79,7 +78,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
     state,
     metamask: ethereum,
     account,
-    isExternalAccount: isExternalAccountFlagSet(request.params),
   };
 
   switch (request.method) {
@@ -185,11 +183,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
 
     case 'syncGoogleVCs': {
       return await syncGoogleVCs(identitySnapParams);
-    }
-
-    case 'connectHederaAccount': {
-      isValidHederaAccountParams(request.params);
-      return await connectHederaAccount(state, request.params.accountId);
     }
 
     case 'getHederaAccountId': {

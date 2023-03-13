@@ -72,7 +72,6 @@ export type IdentitySnapParams = {
   state: IdentitySnapState;
   metamask: MetaMaskInpageProvider;
   account: Account;
-  isExternalAccount: boolean;
 };
 
 export type SnapDialogParams = {
