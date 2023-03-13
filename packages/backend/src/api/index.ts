@@ -1,8 +1,8 @@
 import express from 'express';
 
 import MessageResponse from '../interfaces/MessageResponse';
-import credentialRouter  from './credential';
-import emojiRouter  from './emoji';
+import credentialRouter from './credential';
+import emojiRouter from './emoji';
 
 const router = express.Router();
 
@@ -13,6 +13,5 @@ router.get<{}, MessageResponse>('/', (req, res) => {
     message: 'API - 👋🌎🌍🌏',
   });
 });
-
 
 export default router;

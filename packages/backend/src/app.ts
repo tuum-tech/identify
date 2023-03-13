@@ -14,15 +14,14 @@ const app = express();
 
 // const init = async () => {
 //   await setupAgent();
-  
+
 //   let agent = await getAgent();
 //   console.log("1-----------");
 //   let privateKey = "2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c";
 //   await agent.keyManagerImport({ kms: "local", type: 'Secp256k1', privateKeyHex: privateKey as string });
-// } 
+// }
 
 // Promise.all([init]);
-
 
 app.use(morgan('dev'));
 app.use(helmet());
@@ -36,10 +35,7 @@ app.get<{}, MessageResponse>('/', (req, res) => {
   });
 });
 
-
 app.use(middlewares.notFound);
 app.use(middlewares.errorHandler);
 
 export default app;
-
-

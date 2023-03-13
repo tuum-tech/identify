@@ -1,5 +1,6 @@
 // import { IVCManager, VCManager } from '@blockchain-lab-um/veramo-vc-manager';
 // import { AbstractVCStore } from '@blockchain-lab-um/veramo-vc-manager/build/vc-store/abstract-vc-store';
+import console from 'console';
 import { contexts as credential_contexts } from '@transmute/credentials-context';
 import { getDidPkhResolver } from '@tuum-tech/did-provider-pkh';
 import {
@@ -11,12 +12,25 @@ import {
   IKeyManager,
   IMessageHandler,
   IResolver,
-  TAgent
+  TAgent,
 } from '@veramo/core';
-import { CredentialIssuerEIP712, ICredentialIssuerEIP712 } from '@veramo/credential-eip712';
-import { CredentialIssuerLD, ICredentialIssuerLD, LdDefaultContexts, VeramoEcdsaSecp256k1RecoverySignature2020, VeramoEd25519Signature2018 } from '@veramo/credential-ld';
+import {
+  CredentialIssuerEIP712,
+  ICredentialIssuerEIP712,
+} from '@veramo/credential-eip712';
+import {
+  CredentialIssuerLD,
+  ICredentialIssuerLD,
+  LdDefaultContexts,
+  VeramoEcdsaSecp256k1RecoverySignature2020,
+  VeramoEd25519Signature2018,
+} from '@veramo/credential-ld';
 import { CredentialPlugin, W3cMessageHandler } from '@veramo/credential-w3c';
-import { DataStoreJson, KeyStoreJson, PrivateKeyStoreJson } from '@veramo/data-store-json';
+import {
+  DataStoreJson,
+  KeyStoreJson,
+  PrivateKeyStoreJson,
+} from '@veramo/data-store-json';
 import { DIDComm, DIDCommMessageHandler, IDIDComm } from '@veramo/did-comm';
 import { JwtMessageHandler } from '@veramo/did-jwt';
 import { getDidKeyResolver } from '@veramo/did-provider-key';
@@ -25,17 +39,21 @@ import { KeyManager } from '@veramo/key-manager';
 import { KeyManagementSystem, SecretBox } from '@veramo/kms-local';
 import { Web3KeyManagementSystem } from '@veramo/kms-web3';
 import { MessageHandler } from '@veramo/message-handler';
-import { ISelectiveDisclosure, SdrMessageHandler, SelectiveDisclosure } from '@veramo/selective-disclosure';
-import console from 'console';
+import {
+  ISelectiveDisclosure,
+  SdrMessageHandler,
+  SelectiveDisclosure,
+} from '@veramo/selective-disclosure';
 import { Resolver } from 'did-resolver';
 import { JsonFileStore } from './utils/json-file-store';
 
-let databaseFile: string
-const secretKey = '29739248cad1bd1a0fc4d9b75cd4d2990de535baf5caadfdf8d8f86664aa830c'
+let databaseFile: string;
+const secretKey =
+  '29739248cad1bd1a0fc4d9b75cd4d2990de535baf5caadfdf8d8f86664aa830c';
 
 let agent: TAgent<
-  //IDIDManager &
-    IKeyManager &
+  // IDIDManager &
+  IKeyManager &
     IDataStore &
     IResolver &
     IMessageHandler &
@@ -44,17 +62,17 @@ let agent: TAgent<
     ICredentialIssuerLD &
     ICredentialIssuerEIP712 &
     ISelectiveDisclosure
-> 
+>;
 
 export const getAgent = async () => {
   await setup();
   return agent;
-}
+};
 
 export const setupAgent = async () => {
-  console.log("Setup");
+  console.log('Setup');
   await setup();
-}
+};
 
 /* eslint-disable */
 const setup = async (options?: IAgentOptions): Promise<boolean> => {

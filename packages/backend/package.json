@@ -13,7 +13,6 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon src/index.ts",
-    "lint": "eslint --fix src test",
     "start": "node dist/src/index.js",
     "test": "jest"
   },

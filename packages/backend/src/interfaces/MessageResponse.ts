@@ -1,3 +1,4 @@
-export default interface MessageResponse {
+type MessageResponse = {
   message: string;
-}
+};
+export default MessageResponse;
