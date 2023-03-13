@@ -4102,13 +4102,13 @@ __metadata:
   linkType: hard
 
 "@peculiar/asn1-schema@npm:^2.1.6, @peculiar/asn1-schema@npm:^2.3.0":
-  version: 2.3.3
-  resolution: "@peculiar/asn1-schema@npm:2.3.3"
+  version: 2.3.6
+  resolution: "@peculiar/asn1-schema@npm:2.3.6"
   dependencies:
     asn1js: ^3.0.5
     pvtsutils: ^1.3.2
     tslib: ^2.4.0
-  checksum: 2b1902543ec65d677c709f05a6a845b033490444dd7c9cbfba22290a26623c55f53a13995f8401cdb67e36b8182d55ca9278d50dd3f2d9ae757fbd9ddadab927
+  checksum: fc09387c6e3dea07fca21b54ea8c71ce3ec0f8c92377237e51aef729f0c2df92781aa7a18a546a6fe809519faeaa222df576ec21a35c6095037a78677204a55b
   languageName: node
   linkType: hard
 
@@ -5208,21 +5208,6 @@ __metadata:
   version: 0.0.2
   resolution: "@turist/time@npm:0.0.2"
   checksum: a46f8e8129f9a69970d5a4e70a367886b0101624dccbee2494dd81e7294233ce28b356ff70b4a6b6cab65fd2a9fad165f0e25b6762a9fb65c611f19b7c3085ee
-  languageName: node
-  linkType: hard
-
-"@tuum-tech/did-provider-pkh@npm:4.0.4":
-  version: 4.0.4
-  resolution: "@tuum-tech/did-provider-pkh@npm:4.0.4"
-  dependencies:
-    "@ethersproject/bignumber": ^5.7.0
-    "@ethersproject/signing-key": ^5.7.0
-    "@ethersproject/transactions": ^5.7.0
-    "@hashgraph/sdk": ^2.18.6
-    "@veramo/core": ^4.0.0
-    "@veramo/did-manager": ^4.0.0
-    debug: ^4.3.3
-  checksum: 7eded6e2770d5dcd03736631d24d76ffae0b9c7479a93122b949e558fd7eefe9759bb23ffe2c83d3dc90c216976950cdf1c21c9ef75c0735c649fa82eee778ab
   languageName: node
   linkType: hard
 
@@ -6357,7 +6342,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@veramo/core@npm:^4.0.0, @veramo/core@npm:^4.2.0, @veramo/core@npm:^4.3.0":
+"@veramo/core@npm:^4.2.0, @veramo/core@npm:^4.3.0":
   version: 4.3.0
   resolution: "@veramo/core@npm:4.3.0"
   dependencies:
@@ -6623,7 +6608,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@veramo/did-manager@npm:^4.0.0, @veramo/did-manager@npm:^4.3.0":
+"@veramo/did-manager@npm:^4.3.0":
   version: 4.3.0
   resolution: "@veramo/did-manager@npm:4.3.0"
   dependencies:
@@ -6695,6 +6680,22 @@ __metadata:
     debug: ^4.3.3
     did-resolver: ^4.0.1
   checksum: eb708e85147329847f51692433e535ef36e50efbfe00d7637d8cc81e8f59229c6c38fb4f7d275943db155a758b53bae7890cc08719e49692fe896e173d6f7edb
+  languageName: node
+  linkType: hard
+
+"@veramo/did-provider-pkh@npm:^4.0.2":
+  version: 4.3.0
+  resolution: "@veramo/did-provider-pkh@npm:4.3.0"
+  dependencies:
+    "@ethersproject/abstract-provider": ^5.7.0
+    "@ethersproject/bignumber": ^5.7.0
+    "@ethersproject/signing-key": ^5.7.0
+    "@ethersproject/transactions": ^5.7.0
+    "@veramo/core": ^4.3.0
+    "@veramo/did-manager": ^4.3.0
+    debug: ^4.3.3
+    did-resolver: ^4.0.1
+  checksum: 8d71e9c440a47921b746855c8771a3c0915f91fbaa9845f0fa8a46679e0d98aa62d740f64d114eca3da0345a7bbee218b984f4b12e09374bab85d67548de7070
   languageName: node
   linkType: hard
 
@@ -12000,7 +12001,6 @@ __metadata:
   resolution: "express-api-starter-ts@workspace:packages/backend"
   dependencies:
     "@transmute/credentials-context": ^0.7.0-unstable.77
-    "@tuum-tech/did-provider-pkh": 4.0.4
     "@types/cors": ^2.8.13
     "@types/express": ^4.17.15
     "@types/jest": ^29.2.5
@@ -12018,6 +12018,7 @@ __metadata:
     "@veramo/did-jwt": ^4.2.0
     "@veramo/did-provider-ethr": ^4.2.0
     "@veramo/did-provider-key": ^4.2.0
+    "@veramo/did-provider-pkh": ^4.0.2
     "@veramo/did-provider-web": ^4.2.0
     "@veramo/did-resolver": ^4.2.0
     "@veramo/key-manager": ^4.2.0
