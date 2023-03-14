@@ -11,8 +11,6 @@ import {
   DeleteAllVCs,
   GetAccountInfo,
   GetAllVCs,
-  GetCurrentDIDMethod,
-  GetDID,
   GetSpecificVC,
   GetVP,
   ReconnectIdentitySnap,
@@ -142,8 +140,6 @@ const Index = () => {
           setCurrentChainId={setCurrentChainId}
           setAccountInfo={setAccountInfo}
         />
-        <GetCurrentDIDMethod setCurrentChainId={setCurrentChainId} />
-        <GetDID setCurrentChainId={setCurrentChainId} />
         <ResolveDID setCurrentChainId={setCurrentChainId} />
         <GetSpecificVC setCurrentChainId={setCurrentChainId} />
         <GetAllVCs setCurrentChainId={setCurrentChainId} />
