@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import {
+  CreateVPRequestParams,
   GetVCsOptions,
-  ProofInfo,
   RemoveVCOptions,
 } from '@tuum-tech/identity-snap/src/types/params';
 import { Filter } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
@@ -307,12 +307,16 @@ export const deleteAllVCs = async (options: RemoveVCOptions) => {
  * Invoke the "createVP" method from the snap.
  */
 
-export const createVP = async (vcs: string[], proofInfo: ProofInfo) => {
+export const createVP = async ({
+  vcIds,
+  vcs,
+  proofInfo,
+}: CreateVPRequestParams) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
       method: 'createVP',
-      params: { vcs, proofInfo },
+      params: { vcIds, vcs, proofInfo },
     },
   });
 };
@@ -327,20 +331,6 @@ export const verifyVP = async (vp: VerifiablePresentation | {}) => {
     params: {
       method: 'verifyVP',
       params: { verifiablePresentation: vp },
-    },
-  });
-};
-
-/**
- * Invoke the "getHederaAccountId" method from the snap.
- */
-
-export const getHederaAccountId = async () => {
-  return await window.ethereum.request({
-    method: `wallet_snap_${defaultSnapOrigin}`,
-    params: {
-      method: 'getHederaAccountId',
-      params: {},
     },
   });
 };

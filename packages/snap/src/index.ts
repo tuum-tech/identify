@@ -8,7 +8,6 @@ import { getDid } from './rpc/did/getDID';
 import { resolveDID } from './rpc/did/resolveDID';
 import { switchMethod } from './rpc/did/switchMethods';
 import { configureGoogleAccount } from './rpc/gdrive/configureGoogleAccount';
-import { getHederaAccountId } from './rpc/hedera/getHederaAccountId';
 import { togglePopups } from './rpc/snap/togglePopups';
 import { createVC } from './rpc/vc/createVC';
 import { createVP } from './rpc/vc/createVP';
@@ -183,10 +182,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
 
     case 'syncGoogleVCs': {
       return await syncGoogleVCs(identitySnapParams);
-    }
-
-    case 'getHederaAccountId': {
-      return await getHederaAccountId(identitySnapParams);
     }
 
     default: {

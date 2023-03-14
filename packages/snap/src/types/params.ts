@@ -1,4 +1,4 @@
-import { ProofFormat } from '@veramo/core';
+import { ProofFormat, W3CVerifiableCredential } from '@veramo/core';
 import { SaveOptions } from '../plugins/veramo/verfiable-creds-manager';
 
 export type CreateVCRequestParams = {
@@ -17,6 +17,7 @@ export type ProofInfo = {
 };
 
 export type CreateVPRequestParams = {
-  vcs: string[];
+  vcIds?: string[];
+  vcs?: W3CVerifiableCredential[];
   proofInfo?: ProofInfo;
 };

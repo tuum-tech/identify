@@ -3,6 +3,7 @@ import {
   ProofFormat,
   VerifiableCredential,
   VerifiablePresentation,
+  W3CVerifiableCredential,
 } from '@veramo/core';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
 import {
@@ -25,7 +26,10 @@ export async function createVP(
 ): Promise<VerifiablePresentation | null> {
   const { snap, state, account } = identitySnapParams;
 
-  const vcsMetadata = vpRequestParams.vcs;
+  const vcIds: string[] = vpRequestParams.vcIds ? vpRequestParams.vcIds : [];
+  const vcs: W3CVerifiableCredential[] = vpRequestParams.vcs
+    ? vpRequestParams.vcs
+    : [];
   const proofFormat = vpRequestParams.proofInfo?.proofFormat
     ? vpRequestParams.proofInfo.proofFormat
     : ('jwt' as ProofFormat);
@@ -56,10 +60,11 @@ export async function createVP(
   // GET DID
   const { did } = identifier;
 
-  const vcs: VerifiableCredential[] = [];
+  const vcsRes: VerifiableCredential[] = [];
   const vcsWithMetadata: IDataManagerQueryResult[] = [];
 
-  for (const vcId of vcsMetadata) {
+  // Iterate through vcIds
+  for (const vcId of vcIds) {
     const vcObj = (await agent.queryVC({
       filter: {
         type: 'id',
@@ -70,7 +75,7 @@ export async function createVP(
 
     if (vcObj.length > 0) {
       const vc: VerifiableCredential = vcObj[0].data as VerifiableCredential;
-      vcs.push(vc);
+      vcsRes.push(vc);
       vcsWithMetadata.push({
         data: vc,
         metadata: { id: vcId, store: 'snap' },
@@ -78,7 +83,16 @@ export async function createVP(
     }
   }
 
-  if (vcs.length === 0) {
+  // Iterate through vcs
+  vcs.forEach(function (vc, index) {
+    vcsRes.push(vc as VerifiableCredential);
+    vcsWithMetadata.push({
+      data: vc,
+      metadata: { id: `External VC #${(index + 1).toString()}`, store: 'snap' },
+    });
+  });
+
+  if (vcsRes.length === 0) {
     return null;
   }
   const config = state.snapConfig;
@@ -102,7 +116,7 @@ export async function createVP(
       presentation: {
         holder: did, //
         type: ['VerifiablePresentation', type],
-        verifiableCredential: vcs,
+        verifiableCredential: vcsRes,
       },
       proofFormat, // The desired format for the VerifiablePresentation to be created
       domain, // Optional string domain parameter to add to the verifiable presentation
