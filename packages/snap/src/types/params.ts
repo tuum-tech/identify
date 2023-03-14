@@ -1,5 +1,8 @@
 import { ProofFormat, W3CVerifiableCredential } from '@veramo/core';
-import { SaveOptions } from '../plugins/veramo/verfiable-creds-manager';
+import {
+  QueryMetadata,
+  SaveOptions,
+} from '../plugins/veramo/verfiable-creds-manager';
 
 export type CreateVCRequestParams = {
   vcValue: object;
@@ -7,6 +10,11 @@ export type CreateVCRequestParams = {
   credTypes?: string[];
   options?: SaveOptions;
   accessToken?: string;
+};
+
+export type CreateVCResponseResult = {
+  data: W3CVerifiableCredential;
+  metadata: QueryMetadata;
 };
 
 export type ProofInfo = {
