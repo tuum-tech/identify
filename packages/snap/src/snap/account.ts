@@ -46,12 +46,16 @@ export async function importIdentitySnapAccount(
 ): Promise<Account> {
   // Initialize if not there
   const coinType = (await getCurrentCoinType()).toString();
+
+  console.log(`cointype ${coinType}`);
+  console.log(`acc state ${JSON.stringify(state.accountState[coinType])}`);
   if (evmAddress && !(evmAddress in state.accountState[coinType])) {
     console.log(
       `The address ${evmAddress} has NOT yet been configured in the Identity Snap. Configuring now...`,
     );
     await initAccountState(snap, state, coinType, evmAddress);
   }
+  console.log('veramo import metamask acc');
 
   // Initialize Identity Snap account
   const account: Account = await veramoImportMetaMaskAccount(

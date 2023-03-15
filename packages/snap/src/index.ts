@@ -44,10 +44,14 @@ import {
  *
  * @param args - The request handler args as object.
  * @param args.request - A validated JSON-RPC request object.
+ * @param args.origin - Origin of the request.
  * @returns `null` if the request succeeded.
  * @throws If the request method is not valid for this snap.
  */
-export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
+export const onRpcRequest: OnRpcRequestHandler = async ({
+  origin,
+  request,
+}) => {
   console.log('Request:', JSON.stringify(request, null, 4));
   console.log('Origin:', origin);
   console.log('-------------------------------------------------------------');

@@ -5,13 +5,16 @@ import { getEmptyAccountState } from '../../src/utils/config';
 export const privateKey =
   '0x63ce0077f0d617dbf54d5f335de2983313c6356f25b45e0f68f85bee1490a6ae';
 
+export const mnemonic =
+  'final runway match relax bamboo carry budget guilt dish weapon magnet alarm';
+export const address = '0xf49d65c80c3d2d98231654513b2da4652f09c9fe';
+
 export const hederaPrivateKey =
   '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c';
 
 export const hederaAccountId = '0.0.15215';
 export const hederaAddress = '0x7d871f006d97498ea338268a956af94ab2e65cdd';
 
-export const address = '0xb6665128eE91D84590f70c3268765384A9CAfBCd';
 export const publicKey =
   '0x0480a9cd48fd436f8c1f81b156eb615618cd573c3eb1e6d937a17b8222027cae850a9f561d414001a8bdefdb713c619d2caf08a0c9655b0cf42de065bc51e0169a';
 export const signedMsg =
@@ -22,9 +25,17 @@ export const exampleDIDPkh = `did:pkh:eip155:4:${address}`;
 export const exampleDIDResolved = `{'didDocument': {'@context': ['https://www.w3.org/ns/did/v1', {'EcdsaSecp256k1RecoveryMethod2020': 'https://identity.foundation/EcdsaSecp256k1RecoverySignature2020#EcdsaSecp256k1RecoveryMethod2020', 'Ed25519VerificationKey2018': 'https://w3id.org/security#Ed25519VerificationKey2018', 'blockchainAccountId': 'https://w3id.org/security#blockchainAccountId'}], 'assertionMethod': ['did:pkh:eip155:4:0xb6665128eE91D84590f70c3268765384A9CAfBCd#blockchainAccountId'], 'authentication': ['did:pkh:eip155:4:0xb6665128eE91D84590f70c3268765384A9CAfBCd#blockchainAccountId'], 'id': 'did:pkh:eip155:4:0xb6665128eE91D84590f70c3268765384A9CAfBCd', 'verificationMethod': [{'blockchainAccountId': 'eip155:4:0xb6665128eE91D84590f70c3268765384A9CAfBCd', 'controller': 'did:pkh:eip155:4:0xb6665128eE91D84590f70c3268765384A9CAfBCd', 'id': 'did:pkh:eip155:4:0xb6665128eE91D84590f70c3268765384A9CAfBCd#blockchainAccountId', 'type': 'EcdsaSecp256k1RecoveryMethod2020'}]}, 'didDocumentMetadata': {}, 'didResolutionMetadata': {'contentType': 'application/did+ld+json'}}`;
 
 const defaultSnapState: IdentitySnapState = {
-  currentAccount: address,
+  currentAccount: {
+    evmAddress: '0xb6665128eE91D84590f70c3268765384A9CAfBCd',
+    method: '',
+    identifier: {} as any,
+    privateKey: '',
+    publicKey: '',
+  },
   accountState: {
-    '0xb6665128eE91D84590f70c3268765384A9CAfBCd': getEmptyAccountState(),
+    '60': {
+      '0xb6665128eE91D84590f70c3268765384A9CAfBCd': getEmptyAccountState(),
+    },
   },
   snapConfig: {
     dApp: {

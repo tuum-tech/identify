@@ -20,10 +20,12 @@ export async function updateSnapState(
   snap: SnapsGlobalObject,
   snapState: IdentitySnapState,
 ) {
+  console.log('update snap state start');
   await snap.request({
     method: 'snap_manageState',
     params: { operation: 'update', newState: snapState },
   });
+  console.log('update snap state end');
 }
 
 /**
@@ -126,5 +128,8 @@ export async function getAccountStateByCoinType(
   evmAddress: string,
 ): Promise<IdentityAccountState> {
   const coinType = await getCurrentCoinType();
+  console.log(`cointype ${coinType} evmAddress ${evmAddress}`);
+  console.log(`state ${JSON.stringify(state)}`);
+
   return state.accountState[coinType][evmAddress];
 }

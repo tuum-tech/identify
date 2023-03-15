@@ -1,102 +1,140 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
-import { IdentitySnapParams, IdentitySnapState } from 'src/interfaces';
-import { connectHederaAccount } from '../../../src/rpc/hedera/connectHederaAccount';
-import { createVC } from '../../../src/rpc/vc/createVC';
-import { getVCs } from '../../../src/rpc/vc/getVCs';
+import { IDataManagerQueryResult, IDataManagerSaveResult } from 'src/plugins/veramo/verfiable-creds-manager';
+import { onRpcRequest } from '../../../src';
+import { getRequestParams } from '../../testUtils/helper';
+// import { connectHederaAccount } from '../../../src/rpc/hedera/connectHederaAccount';
 import {
-  getDefaultSnapState,
-  hederaPrivateKey,
+  getDefaultSnapState
 } from '../../testUtils/constants';
 import { createMockSnap, SnapMock } from '../../testUtils/snap.mock';
 
 describe('getVCs', () => {
-  let identitySnapParams: IdentitySnapParams;
-  let snapState: IdentitySnapState;
   let snapMock: SnapsGlobalObject & SnapMock;
   let metamask: MetaMaskInpageProvider;
 
-  beforeEach(async () => {
-    snapState = getDefaultSnapState();
+ 
+  beforeAll(async () => {
     snapMock = createMockSnap();
     metamask = snapMock as unknown as MetaMaskInpageProvider;
-    identitySnapParams = {
-      metamask,
-      snap: snapMock,
-      state: snapState,
-    };
+    
+    global.snap = snapMock;
+    global.ethereum = metamask;
+    
+  });
+  
+  beforeEach(async () => {
+    snapMock.rpcMocks.snap_dialog.mockReturnValue(true);
+    snapMock.rpcMocks.snap_manageState.mockReturnValue(getDefaultSnapState());
+    snapMock.rpcMocks.snap_manageState('update', getDefaultSnapState());
+    snapMock.rpcMocks.eth_chainId.mockReturnValue('0x1');
+    
+    const createVcRequest1 = getRequestParams('createVC', {
+      vcValue: { prop: 10 },
+      credTypes: ['Login'],
+    });
+    
+    const createVcRequest2 = getRequestParams('createVC', {
+      vcValue: { prop: 20 },
+      credTypes: ['NotLogin'],
+    });
 
-    (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
-      hederaPrivateKey,
-    );
-
-    (identitySnapParams.snap as SnapMock).rpcMocks.eth_chainId.mockReturnValue(
-      '0x128',
-    );
-
-    await connectHederaAccount(snapMock, snapState, metamask, '0.0.15215');
+    await onRpcRequest({ origin: 'tests', request: createVcRequest1 as any });
+    await onRpcRequest({ origin: 'tests', request: createVcRequest2 as any });
   });
 
   it('should succeed returning VCS without filter', async () => {
-    (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
-      true,
-    );
+    
+    const getVcRequest = getRequestParams('getVCs', {});
+    const vcsReturned: IDataManagerQueryResult[] = (await onRpcRequest({
+      origin: 'tests',
+      request: getVcRequest as any,
+    })) as IDataManagerQueryResult[];
 
-    await createVC(identitySnapParams, { vcValue: { prop: 10 } });
-
-    const vcsReturned = await getVCs(identitySnapParams, {});
-    expect(vcsReturned.length).toEqual(1);
+    expect(vcsReturned.length).toBe(2);
 
     expect.assertions(1);
   });
 
   it('should filter Login Type VCs', async () => {
-    (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
-      true,
-    );
+    snapMock.rpcMocks.snap_dialog.mockReturnValue(true);
 
-    await createVC(identitySnapParams, {
+    const getVcRequest = getRequestParams('getVCs', 
+    { 
+      options: {},
+      filter: { type: 'vcType', filter: 'Login' }
+    });
+    
+    const vcsReturned: IDataManagerQueryResult[] = (await onRpcRequest({
+      origin: 'tests',
+      request: getVcRequest as any,
+    })) as IDataManagerQueryResult[];
+
+    expect(vcsReturned.length).toBe(1);
+    expect.assertions(1);
+    
+  });
+
+  it('should return empty if filter is invalid', async () => {
+    snapMock.rpcMocks.snap_dialog.mockReturnValue(true);
+
+    const createVcRequest1 = getRequestParams('createVC', {
       vcValue: { prop: 10 },
       credTypes: ['Login'],
     });
-    await createVC(identitySnapParams, { vcValue: { prop: 20 } });
+    
+    await onRpcRequest({ origin: 'tests', request: createVcRequest1 as any });
 
-    const vcsReturned = await getVCs(identitySnapParams, {
+    const getVcRequest = getRequestParams('getVCs', 
+    { 
       options: {},
-      filter: { type: 'vcType', filter: 'Login' },
+      filter: { type: 'invalidFilter', filter: 'Login' }
     });
-    expect(vcsReturned.length).toEqual(1);
+    
+    await expect(onRpcRequest({origin: 'tests', request: getVcRequest as any})).resolves.toStrictEqual([]);
 
     expect.assertions(1);
+    
   });
 
+
   it('should filter VCs by id', async () => {
-    (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
-      true,
-    );
-    await createVC(identitySnapParams, { vcValue: { prop: 10 } });
-    const vcs = await getVCs(identitySnapParams, {});
-    const vcId = vcs[0].metadata.id;
+    snapMock.rpcMocks.snap_dialog.mockReturnValue(true);
 
-    const vcsReturned = await getVCs(identitySnapParams, {
-      filter: { type: 'id', filter: vcId },
+    const createVcRequest1 = getRequestParams('createVC', {
+      vcValue: { prop: 10 },
+      credTypes: ['Login'],
     });
-    expect(vcsReturned.length).toEqual(1);
+    
+    const createVcRequest2 = getRequestParams('createVC', {
+      vcValue: { prop: 20 },
+      credTypes: ['NotLogin'],
+    });
 
+    let createVcResponse: IDataManagerSaveResult[] = await onRpcRequest({ origin: 'tests', request: createVcRequest1 as any }) as IDataManagerSaveResult[];
+    await onRpcRequest({ origin: 'tests', request: createVcRequest2 as any });
+
+    const getVcRequest = getRequestParams('getVCs', 
+    { 
+      options: {},
+      filter: { type: 'id', filter: createVcResponse[0].id }
+    });
+    
+    const vcsReturned: IDataManagerQueryResult[] = (await onRpcRequest({
+      origin: 'tests',
+      request: getVcRequest as any,
+    })) as IDataManagerQueryResult[];
+
+    expect(vcsReturned.length).toBe(1);
     expect.assertions(1);
   });
 
   it('should return empty if user rejects confirm', async () => {
-    (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
-      true,
-    );
-    await createVC(identitySnapParams, { vcValue: { prop: 10 } });
 
-    (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
-      false,
-    );
-
-    await expect(getVCs(identitySnapParams, {})).resolves.toStrictEqual([]);
+    snapMock.rpcMocks.snap_dialog.mockReturnValue(false);
+    
+    const getVcRequest = getRequestParams('getVCs', {});
+    await expect(onRpcRequest({origin: 'tests', request: getVcRequest as any})).resolves.toStrictEqual([]);
 
     expect.assertions(1);
   });

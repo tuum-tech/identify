@@ -1,12 +1,13 @@
 /* eslint-disable */
 
+import { BIP44CoinTypeNode } from '@metamask/key-tree';
 import { RequestArguments } from '@metamask/providers/dist/BaseProvider';
 import { Maybe } from '@metamask/providers/dist/utils';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 
 import { providers, Wallet } from 'ethers';
 import { IdentitySnapState } from '../../src/interfaces';
-import { address, privateKey } from './constants';
+import { address, privateKey, mnemonic } from './constants';
 
 type ISnapMock = {
   request<T>(args: RequestArguments): Promise<Maybe<T>>;
@@ -66,17 +67,17 @@ export class SnapMock implements ISnapMock {
     eth_requestAccounts: jest.fn().mockResolvedValue([address]),
     eth_chainId: jest.fn().mockResolvedValue('0x5'),
     net_version: jest.fn().mockResolvedValue('5'),
-    // snap_getBip44Entropy: jest
-    //   .fn()
-    //   .mockImplementation(async (params: { coinType: number }) => {
-    //     const node = await BIP44CoinTypeNode.fromDerivationPath([
-    //       `bip39:${mnemonic}`,
-    //       `bip32:44'`,
-    //       `bip32:${params.coinType}'`,
-    //     ]);
+   snap_getBip44Entropy: jest
+      .fn()
+      .mockImplementation(async (params: { coinType: number }) => {
+        const node = await BIP44CoinTypeNode.fromDerivationPath([
+          `bip39:${mnemonic}`,
+          `bip32:44'`,
+          `bip32:${params.coinType}'`,
+        ]);
 
-    //     return node.toJSON();
-    //   }),
+        return node.toJSON();
+      }),
     snap_manageState: jest
       .fn()
       .mockImplementation((params: unknown) =>
