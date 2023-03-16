@@ -1,8 +1,8 @@
-import { createContext, PropsWithChildren, ReactNode, useState } from 'react';
+import { createContext, PropsWithChildren, useState } from 'react';
 
 export type ModalType = {
   title: string;
-  content: ReactNode;
+  content: string;
 };
 
 const ModalContext = createContext<{
