@@ -7,7 +7,8 @@ export const privateKey =
 
 export const mnemonic =
   'final runway match relax bamboo carry budget guilt dish weapon magnet alarm';
-export const address = '0xf49d65c80c3d2d98231654513b2da4652f09c9fe';
+export const ETH_ADDRESS = '0xf49d65c80c3d2d98231654513b2da4652f09c9fe';
+export const ETH_CHAIN_ID = '0x1';
 
 export const hederaPrivateKey =
   '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c';
@@ -20,13 +21,11 @@ export const publicKey =
 export const signedMsg =
   '0x30eb4dbf93e7bfdb109ed03f7803f2378fa27d18ddc233cb3d121b5ba13253fe2515076d1ba66f3dc282c182479b843c925c62eb1f5a0676bcaf995e8e7552941c';
 
-export const exampleDIDPkh = `did:pkh:eip155:4:${address}`;
-
-export const exampleDIDResolved = `{'didDocument': {'@context': ['https://www.w3.org/ns/did/v1', {'EcdsaSecp256k1RecoveryMethod2020': 'https://identity.foundation/EcdsaSecp256k1RecoverySignature2020#EcdsaSecp256k1RecoveryMethod2020', 'Ed25519VerificationKey2018': 'https://w3id.org/security#Ed25519VerificationKey2018', 'blockchainAccountId': 'https://w3id.org/security#blockchainAccountId'}], 'assertionMethod': ['did:pkh:eip155:4:0xb6665128eE91D84590f70c3268765384A9CAfBCd#blockchainAccountId'], 'authentication': ['did:pkh:eip155:4:0xb6665128eE91D84590f70c3268765384A9CAfBCd#blockchainAccountId'], 'id': 'did:pkh:eip155:4:0xb6665128eE91D84590f70c3268765384A9CAfBCd', 'verificationMethod': [{'blockchainAccountId': 'eip155:4:0xb6665128eE91D84590f70c3268765384A9CAfBCd', 'controller': 'did:pkh:eip155:4:0xb6665128eE91D84590f70c3268765384A9CAfBCd', 'id': 'did:pkh:eip155:4:0xb6665128eE91D84590f70c3268765384A9CAfBCd#blockchainAccountId', 'type': 'EcdsaSecp256k1RecoveryMethod2020'}]}, 'didDocumentMetadata': {}, 'didResolutionMetadata': {'contentType': 'application/did+ld+json'}}`;
+export const exampleDIDPkh = `did:pkh:eip155:4:${ETH_ADDRESS}`;
 
 const defaultSnapState: IdentitySnapState = {
   currentAccount: {
-    evmAddress: '0xb6665128eE91D84590f70c3268765384A9CAfBCd',
+    evmAddress: ETH_ADDRESS,
     method: '',
     identifier: {} as any,
     privateKey: '',
@@ -34,7 +33,7 @@ const defaultSnapState: IdentitySnapState = {
   },
   accountState: {
     '60': {
-      '0xb6665128eE91D84590f70c3268765384A9CAfBCd': getEmptyAccountState(),
+      '0xf49d65c80c3d2d98231654513b2da4652f09c9fe': getEmptyAccountState(),
     },
   },
   snapConfig: {
