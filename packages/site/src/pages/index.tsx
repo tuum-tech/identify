@@ -7,6 +7,7 @@ import { Card, ConnectButton, InstallFlaskButton } from '../components/base';
 import {
   ConfigureGoogleAccount,
   ConnectIdentitySnap,
+  CreateNewHederaAccount,
   CreateVC,
   DeleteAllVCs,
   GetAccountInfo,
@@ -46,7 +47,9 @@ const Index = () => {
   const [currentChainId, setCurrentChainId] = useState('');
   const [isHederaNetwork, setIsHederaNetwork] = useState(false);
   const [currentNetwork, setCurrentNetwork] = useState('');
-  const [accountInfo, setAccountInfo] = useState<PublicAccountInfo>({});
+  const [accountInfo, setAccountInfo] = useState<PublicAccountInfo>(
+    {} as PublicAccountInfo,
+  );
 
   useEffect(() => {
     if (validHederaChainID(currentChainId)) {
@@ -67,7 +70,7 @@ const Index = () => {
         type: MetamaskActions.SetInstalled,
         payload: installedSnap,
       });
-      setAccountInfo({} as AccountInfo);
+      setAccountInfo({} as PublicAccountInfo);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -135,6 +138,11 @@ const Index = () => {
         <ReconnectIdentitySnap handleConnectClick={handleConnectClick} />
 
         <SendHelloHessage setCurrentChainId={setCurrentChainId} />
+
+        {isHederaNetwork && (
+          <CreateNewHederaAccount setCurrentChainId={setCurrentChainId} />
+        )}
+
         <ToggleMetamaskPopups setCurrentChainId={setCurrentChainId} />
         <GetAccountInfo
           setCurrentChainId={setCurrentChainId}

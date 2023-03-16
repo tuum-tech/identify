@@ -17,10 +17,6 @@ import {
 } from '../types/constants';
 import { CreateVCRequestParams, CreateVPRequestParams } from '../types/params';
 
-type HederaAccountParams = {
-  accountId: string;
-};
-
 /**
  * Check whether the the account was imported using private key(external account).
  *
@@ -39,6 +35,10 @@ export function isExternalAccountFlagSet(params: unknown): boolean {
   }
   return false;
 }
+
+type HederaAccountParams = {
+  accountId: string;
+};
 
 /**
  * Check validation of Hedera account.
@@ -72,6 +72,62 @@ export function isValidHederaAccountParams(
   throw new Error(
     'Invalid Hedera Params passed. "accountId" must be passed as a parameter and it must be a string',
   );
+}
+
+type CreateNewHederaAccountParams = {
+  newAccountPublickey: string;
+  hbarAmountToSend: number;
+};
+
+/**
+ * Check validation of when trying to create a new Hedera account.
+ *
+ * @param params - Request params.
+ */
+export function isValidCreateNewHederaAccountParams(
+  params: unknown,
+): asserts params is CreateNewHederaAccountParams {
+  if (params === null || _.isEmpty(params)) {
+    console.error(
+      'Invalid createNewHederaAccount Params passed. "newAccountPublickey" and "hbarAmountToSend" must be passed as parameters',
+    );
+    throw new Error(
+      'Invalid createNewHederaAccount Params passed. "newAccountPublickey" and "hbarAmountToSend" must be passed as parameters',
+    );
+  }
+  const parameter = params as CreateNewHederaAccountParams;
+
+  // Check if newAccountPublickey is valid
+  if (
+    !(
+      'newAccountPublickey' in parameter &&
+      parameter.newAccountPublickey !== null &&
+      typeof parameter.newAccountPublickey === 'string'
+    )
+  ) {
+    console.error(
+      'Invalid createNewHederaAccount Params passed. "newAccountPublickey" is either missing or is not a string',
+    );
+    throw new Error(
+      'Invalid createNewHederaAccount Params passed. "newAccountPublickey" is either missing or is not a string',
+    );
+  }
+
+  // Check if hbarAmountToSend is valid
+  if (
+    !(
+      'hbarAmountToSend' in parameter &&
+      parameter.hbarAmountToSend !== null &&
+      typeof parameter.hbarAmountToSend === 'number'
+    )
+  ) {
+    console.error(
+      'Invalid createNewHederaAccount Params passed. "hbarAmountToSend" is either missing or is not a number',
+    );
+    throw new Error(
+      'Invalid createNewHederaAccount Params passed. "hbarAmountToSend" is either missing or is not a number',
+    );
+  }
 }
 
 /**

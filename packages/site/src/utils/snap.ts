@@ -77,6 +77,26 @@ export const connectHederaAccount = async (accountId: string) => {
 };
 
 /**
+ * Invoke "createNewHederaAccount" method from the snap
+ */
+
+export const createNewHederaAccount = async (
+  newAccountPublickey: string,
+  hbarAmountToSend: number,
+) => {
+  return await window.ethereum.request({
+    method: `wallet_snap_${defaultSnapOrigin}`,
+    params: {
+      method: 'createNewHederaAccount',
+      params: {
+        newAccountPublickey,
+        hbarAmountToSend,
+      },
+    },
+  });
+};
+
+/**
  * Invoke the "hello" method from the snap.
  */
 
@@ -149,7 +169,10 @@ export const getDID = async () => {
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
       method: 'getDID',
-      params: {},
+      params: {
+        externalAccount: true,
+        accountId: '0.0.3831609',
+      },
     },
   });
 };

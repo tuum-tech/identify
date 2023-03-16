@@ -2,7 +2,7 @@ import { BIP44CoinTypeNode } from '@metamask/key-tree';
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { IIdentifier, MinimalImportableKey } from '@veramo/core';
-import { toHederaAccountInfo } from '../hedera';
+import { isValidHederaAccountInfo } from '../hedera';
 import { getHederaNetwork, validHederaChainID } from '../hedera/config';
 import {
   Account,
@@ -43,7 +43,7 @@ export async function veramoImportMetaMaskAccount(
 
   let privateKey: string;
   let publicKey: string;
-  let address: string = evmAddress;
+  let address: string = evmAddress.toLowerCase();
   let hederaAccountId = '';
 
   if (accountViaPrivateKey) {
@@ -80,6 +80,10 @@ export async function veramoImportMetaMaskAccount(
 
   address = address.toLowerCase();
 
+  console.log('privateKey: ', privateKey);
+  console.log('publicKey: ', publicKey);
+  console.log('address: ', address);
+
   if (validHederaChainID(chainId)) {
     const coinType = (await getCurrentCoinType()).toString();
     if (!accountViaPrivateKey) {
@@ -99,21 +103,21 @@ export async function veramoImportMetaMaskAccount(
       await initAccountState(snap, state, coinType, address);
     }
 
-    let hederaAccountInfo = await toHederaAccountInfo(
+    let hederaClient = await isValidHederaAccountInfo(
       privateKey,
       hederaAccountId,
       getHederaNetwork(chainId),
     );
-    if (hederaAccountInfo === null && hederaAccountId) {
+    if (hederaClient === null && hederaAccountId) {
       hederaAccountId = await requestHederaAccountId(snap, hederaAccountId);
-      hederaAccountInfo = await toHederaAccountInfo(
+      hederaClient = await isValidHederaAccountInfo(
         privateKey,
         hederaAccountId,
         getHederaNetwork(chainId),
       );
     }
 
-    if (hederaAccountInfo) {
+    if (hederaClient) {
       // eslint-disable-next-line
       state.accountState[coinType][address].extraData = hederaAccountId;
     } else {

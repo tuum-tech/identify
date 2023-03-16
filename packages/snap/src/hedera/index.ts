@@ -8,14 +8,11 @@ import {
   TransferTransaction,
 } from '@hashgraph/sdk';
 
-import {
-  HederaAccountInfo,
-  HederaService,
-  SimpleHederaClient,
-} from './service';
-import { WalletHedera } from './wallet/abstract';
+import _ from 'lodash';
 
 import { SimpleHederaClientImpl } from './client';
+import { HederaService, SimpleHederaClient } from './service';
+import { WalletHedera } from './wallet/abstract';
 import { PrivateKeySoftwareWallet } from './wallet/software-private-key';
 
 export class HederaServiceImpl implements HederaService {
@@ -76,13 +73,25 @@ export async function testClientOperatorMatch(client: Client) {
         // If the transaction fails with Insufficient Tx Fee, this means
         // that the account ID verification succeeded before this point
         // Same for Insufficient Payer Balance
-
         return true;
       }
-      console.log(`Error: ${JSON.stringify(err, null, 4)}`);
       return false;
     }
-    throw new Error(`Error: ${JSON.stringify(err, null, 4)}`);
+
+    console.log(
+      `Error while validating private key and account id: ${JSON.stringify(
+        err,
+        null,
+        4,
+      )}`,
+    );
+    throw new Error(
+      `Error while validating private key and account id: ${JSON.stringify(
+        err,
+        null,
+        4,
+      )}`,
+    );
   }
 
   // under *no* cirumstances should this transaction succeed
@@ -98,11 +107,11 @@ export async function testClientOperatorMatch(client: Client) {
  * @param _accountId - Account Id.
  * @param _network - Network.
  */
-export async function toHederaAccountInfo(
+export async function isValidHederaAccountInfo(
   _privateKey: string,
   _accountId: string,
   _network: string,
-): Promise<HederaAccountInfo | null> {
+): Promise<SimpleHederaClient | null> {
   const accountId = AccountId.fromString(_accountId);
   const privateKey = PrivateKey.fromStringECDSA(_privateKey);
   const walletHedera: WalletHedera = new PrivateKeySoftwareWallet(privateKey);
@@ -114,9 +123,11 @@ export async function toHederaAccountInfo(
     accountId,
     network: _network,
   });
-  if (client !== null) {
-    return await client.getAccountInfo(_accountId);
+
+  if (client === null || _.isEmpty(client)) {
+    console.error('Invalid private key or account Id of the operator');
+    return null;
   }
-  console.error('Invalid private key or account Id');
-  return null;
+
+  return client;
 }

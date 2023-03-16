@@ -36,14 +36,15 @@ export async function getCurrentAccount(
  * Helper function to import metamask account using the private key.
  *
  * @param state - IdentitySnapState.
- * @param evmAddress - Ethereum address.
+ * @param address - Ethereum address.
  * @param accountViaPrivateKey - Account to import using private key.
  */
 export async function importIdentitySnapAccount(
   state: IdentitySnapState,
-  evmAddress: string,
+  address: string,
   accountViaPrivateKey?: AccountViaPrivateKey,
 ): Promise<Account> {
+  const evmAddress = address.toLowerCase();
   // Initialize if not there
   const coinType = (await getCurrentCoinType()).toString();
   if (evmAddress && !(evmAddress in state.accountState[coinType])) {
@@ -61,5 +62,8 @@ export async function importIdentitySnapAccount(
     evmAddress,
     accountViaPrivateKey,
   );
+
+  console.log('account: ', account);
+
   return account;
 }
