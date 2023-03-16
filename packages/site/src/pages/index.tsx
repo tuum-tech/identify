@@ -137,6 +137,7 @@ const Index = () => {
         <SendHelloHessage setCurrentChainId={setCurrentChainId} />
         <ToggleMetamaskPopups setCurrentChainId={setCurrentChainId} />
         <GetAccountInfo
+          currentChainId={currentChainId}
           setCurrentChainId={setCurrentChainId}
           setAccountInfo={setAccountInfo}
         />
