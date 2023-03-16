@@ -8,11 +8,11 @@ import {
   IdentitySnapState,
   SnapDialogParams,
 } from '../../interfaces';
-import { HEDERACOINTYPE } from '../../types/constants';
-import { getHederaAccountIfExists } from '../../utils/params';
-import { importIdentitySnapAccount } from '../../snap/account';
 import { snapDialog } from '../../snap/dialog';
 import { getCurrentNetwork } from '../../snap/network';
+import { HEDERACOINTYPE } from '../../types/constants';
+import { getHederaAccountIfExists } from '../../utils/params';
+import { veramoImportMetaMaskAccount } from '../../veramo/accountImport';
 
 /**
  * Connect Hedera Account.
@@ -62,8 +62,10 @@ export async function connectHederaAccount(
       extraData: accountId,
     };
 
-    const account = await importIdentitySnapAccount(
+    const account: Account = await veramoImportMetaMaskAccount(
+      snap,
       state,
+      ethereum,
       '',
       accountViaPrivateKey,
     );
