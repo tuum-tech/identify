@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import {
+  CreateNewHederaAccountRequestParams,
   CreateVPRequestParams,
   GetVCsOptions,
   RemoveVCOptions,
@@ -80,20 +81,34 @@ export const connectHederaAccount = async (accountId: string) => {
  * Invoke "createNewHederaAccount" method from the snap
  */
 
-export const createNewHederaAccount = async (
-  newAccountPublickey: string,
-  hbarAmountToSend: number,
-) => {
-  return await window.ethereum.request({
-    method: `wallet_snap_${defaultSnapOrigin}`,
-    params: {
-      method: 'createNewHederaAccount',
+export const createNewHederaAccount = async ({
+  hbarAmountToSend,
+  newAccountPublickey = '',
+  newAccountEvmAddress = '',
+}: CreateNewHederaAccountRequestParams) => {
+  if (newAccountPublickey) {
+    return await window.ethereum.request({
+      method: `wallet_snap_${defaultSnapOrigin}`,
       params: {
-        newAccountPublickey,
-        hbarAmountToSend,
+        method: 'createNewHederaAccount',
+        params: {
+          hbarAmountToSend,
+          newAccountPublickey,
+        },
       },
-    },
-  });
+    });
+  } else {
+    return await window.ethereum.request({
+      method: `wallet_snap_${defaultSnapOrigin}`,
+      params: {
+        method: 'createNewHederaAccount',
+        params: {
+          hbarAmountToSend,
+          newAccountEvmAddress,
+        },
+      },
+    });
+  }
 };
 
 /**

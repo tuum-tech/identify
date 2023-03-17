@@ -29,3 +29,9 @@ export type CreateVPRequestParams = {
   vcs?: W3CVerifiableCredential[];
   proofInfo?: ProofInfo;
 };
+
+export type CreateNewHederaAccountRequestParams = {
+  hbarAmountToSend: number;
+  newAccountPublickey?: string;
+  newAccountEvmAddress?: string;
+};

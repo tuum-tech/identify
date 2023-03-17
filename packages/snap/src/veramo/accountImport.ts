@@ -74,7 +74,7 @@ export async function veramoImportMetaMaskAccount(
       throw new Error('Failed to get private keys from Metamask account');
     }
     privateKey = res.privateKey.split('0x')[1];
-    publicKey = res.publicKey.split('0x')[1];
+    publicKey = res.publicKey;
     address = res.address;
   }
 

@@ -1,3 +1,4 @@
+import { ethers } from 'ethers';
 import { validHederaChainID } from '../../hedera/config';
 import { IdentitySnapParams, PublicAccountInfo } from '../../interfaces';
 import { getCurrentNetwork } from '../../snap/network';
@@ -15,10 +16,15 @@ export async function getAccountInfo(
 ): Promise<PublicAccountInfo> {
   const { state, account } = identitySnapParams;
 
+  const publicKey = ethers.utils.computePublicKey(
+    ethers.utils.arrayify(account.publicKey),
+    true,
+  );
+
   const publicAccountInfo: PublicAccountInfo = {
     evmAddress: account.evmAddress,
     did: account.identifier.did,
-    publicKey: account.publicKey,
+    publicKey,
     method: account.method,
     hederaAccountId,
   };

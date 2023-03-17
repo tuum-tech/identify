@@ -21,6 +21,9 @@ const CreateNewHederaAccount: FC<Props> = ({ setCurrentChainId }) => {
   const [newAccountPublickey, setNewAccountPublickey] = useState(
     '302d300706052b8104000a032200034920445ae433dbfa7b11da73305566f143bfdff959779ac8a005b13a875460f2',
   );
+  const [newAccountEvmAddress, setNewAccountEvmAddress] = useState(
+    '0x7d871f006d97498ea338268a956af94ab2e65cdd',
+  );
   const [hbarAmountToSend, setHbarAmountToSend] = useState(0);
   const [loading, setLoading] = useState(false);
 
@@ -31,10 +34,11 @@ const CreateNewHederaAccount: FC<Props> = ({ setCurrentChainId }) => {
     try {
       setCurrentChainId(await getCurrentNetwork());
       if (hbarAmountToSend > 0) {
-        const newHederaAccountId = (await createNewHederaAccount(
-          newAccountPublickey,
+        const newHederaAccountId = (await createNewHederaAccount({
           hbarAmountToSend,
-        )) as AccountId;
+          newAccountEvmAddress,
+          // newAccountPublickey,
+        })) as AccountId;
         console.log(`Your new hedera account Id: ${newHederaAccountId}`);
         showModal({
           title: 'New Hedera Account Id',
@@ -62,13 +66,22 @@ const CreateNewHederaAccount: FC<Props> = ({ setCurrentChainId }) => {
           'Create a new hedera account by sending some HBARs to a hedera publickey address',
         form: (
           <form>
-            <label>
+            {/* <label>
               Enter the publickey address to create a hedera account for
               <input
                 type="text"
                 style={{ width: '100%' }}
                 value={newAccountPublickey}
                 onChange={(e) => setNewAccountPublickey(e.target.value)}
+              />
+            </label> */}
+            <label>
+              Enter the evm address to create a hedera account for
+              <input
+                type="text"
+                style={{ width: '100%' }}
+                value={newAccountEvmAddress}
+                onChange={(e) => setNewAccountEvmAddress(e.target.value)}
               />
             </label>
             <br />

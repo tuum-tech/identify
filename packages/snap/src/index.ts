@@ -115,8 +115,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
       isValidCreateNewHederaAccountParams(request.params);
       return await createNewHederaAccount(
         identitySnapParams,
-        request.params.newAccountPublickey,
-        request.params.hbarAmountToSend,
+        request.params,
         hederaAccountId,
       );
     }

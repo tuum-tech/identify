@@ -6,23 +6,27 @@ import { getHederaNetwork, validHederaChainID } from '../../hedera/config';
 import { SimpleHederaClient } from '../../hedera/service';
 import { IdentitySnapParams } from '../../interfaces';
 import { getCurrentNetwork } from '../../snap/network';
+import { CreateNewHederaAccountRequestParams } from '../../types/params';
 import { getHederaAccountIfExists } from '../../utils/params';
 
 /**
  * Function to create a new hedera account.
  *
  * @param identitySnapParams - Identity snap params.
- * @param newAccountPublickey - Public key of the account to send some HBAR to.
- * @param hbarAmountToSend - Amount of hbars to send to the new account.
- * @param hederaAccountId - Hedera account identifier.
+ * @param newHederaAccountParams - Parameters for creating a new hedera account.
+ * @param hederaAccountIdToFundFrom - Hedera account identifier.
  */
 export async function createNewHederaAccount(
   identitySnapParams: IdentitySnapParams,
-  newAccountPublickey: string,
-  hbarAmountToSend: number,
-  hederaAccountId?: string,
+  newHederaAccountParams: CreateNewHederaAccountRequestParams,
+  hederaAccountIdToFundFrom?: string,
 ): Promise<string> {
   const { state, account } = identitySnapParams;
+  const {
+    hbarAmountToSend,
+    newAccountPublickey = '',
+    newAccountEvmAddress = '',
+  } = newHederaAccountParams;
 
   const chainId = await getCurrentNetwork(ethereum);
   if (!validHederaChainID(chainId)) {
@@ -35,7 +39,10 @@ export async function createNewHederaAccount(
   }
 
   let _accountId = '';
-  if (hederaAccountId === null || _.isEmpty(hederaAccountId)) {
+  if (
+    hederaAccountIdToFundFrom === null ||
+    _.isEmpty(hederaAccountIdToFundFrom)
+  ) {
     _accountId = await getHederaAccountIfExists(
       state,
       undefined,
@@ -49,17 +56,25 @@ export async function createNewHederaAccount(
     getHederaNetwork(chainId),
   )) as SimpleHederaClient;
 
-  const options = {
-    publicKey: PublicKey.fromString(newAccountPublickey),
-    initialBalance: BigNumber(hbarAmountToSend),
-  };
-  const result = await hederaClient.createAccountForPublicKey(options);
+  let result;
+  if (newAccountPublickey) {
+    result = await hederaClient.createAccountForPublicKey({
+      publicKey: PublicKey.fromString(newAccountPublickey),
+      initialBalance: BigNumber(hbarAmountToSend),
+    });
+  } else {
+    result = await hederaClient.createAccountForEvmAddress({
+      evmAddress: newAccountEvmAddress,
+      initialBalance: BigNumber(hbarAmountToSend),
+    });
+  }
+
   if (result === null || _.isEmpty(result)) {
     console.error(
-      'Could not create a new account for the given public key. Please try again',
+      'Could not create a new hedera account id for the given public key or evm address. Please try again',
     );
     throw new Error(
-      'Could not create a new account for the given public key. Please try again',
+      'Could not create a new hedera account id for the given public key or evm address. Please try again',
     );
   }
   return result.toString();

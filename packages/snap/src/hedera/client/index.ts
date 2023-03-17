@@ -1,10 +1,12 @@
 import {
   AccountId,
+  AccountInfo,
   AccountInfoQuery,
   Client,
   Hbar,
   PrivateKey,
   PublicKey,
+  Status,
   TransactionReceipt,
   TransactionReceiptQuery,
   TransferTransaction,
@@ -44,7 +46,7 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
     const query = new AccountInfoQuery().setAccountId(accountId);
 
     // Sign with client operator private key and submit the query to a Hedera network
-    const accountInfo = await query.execute(this._client);
+    const accountInfo: AccountInfo = await query.execute(this._client);
 
     return accountInfo as unknown as HederaAccountInfo;
   }
@@ -52,7 +54,7 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
   createAccountForPublicKey(options: {
     publicKey: PublicKey;
     initialBalance: BigNumber;
-  }): Promise<AccountId | null> {
+  }): Promise<string | null> {
     return createAccountForPublicKey(this._client, options);
   }
 
@@ -66,7 +68,7 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
   async createAccountForEvmAddress(options: {
     evmAddress: string;
     initialBalance: BigNumber;
-  }): Promise<AccountId | null> {
+  }): Promise<string | null> {
     const privateKey = this.getPrivateKey();
     if (!privateKey) {
       console.log("Private key doesn't exist for the operator");
@@ -83,6 +85,10 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
 
     const transferTxSign = await transferTx.sign(privateKey);
     const transferTxSubmit = await transferTxSign.execute(this._client);
+    console.log(
+      'transferTxSubmit: ',
+      JSON.stringify(transferTxSubmit, null, 4),
+    );
 
     // Get the child receipt or child record to return the Hedera Account ID for the new account that was created
     const receipt: TransactionReceipt = await new TransactionReceiptQuery()
@@ -90,11 +96,28 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
       .setIncludeChildren(true)
       .execute(this._client);
 
-    const newAccountId = receipt.children[0].accountId
-      ? receipt.children[0].accountId.toString()
-      : '';
+    console.log('receipt: ', JSON.stringify(receipt, null, 4));
+
+    const newAccountId =
+      receipt.children.length > 0 && receipt.children[0].accountId
+        ? receipt.children[0].accountId.toString()
+        : '';
 
     if (!newAccountId) {
+      if (receipt.status === Status.Success) {
+        console.log(
+          'An accountId for this EVM address already exists. Nothing to do',
+        );
+        /* TODO: 
+            Retrieve account id using the transaction hash
+            transferTxSubmit:  {
+              "nodeId": "0.0.3",
+              "transactionHash": "d7e1ce9cfcee30e21e0346cf18e7f326de6122717ee3c5fc5026f9053a5d20e9eb5ae5bfb6f2108819ff78a3308a783d",
+              "transactionId": "0.0.3658062@1679084656.359980153"
+            }
+       */
+      }
+
       console.log(
         "The transaction didn't process so a new accountId was not created",
       );
@@ -103,19 +126,6 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
 
     console.log(`Account ID of the newly created account: ${newAccountId}`);
 
-    // Get the `AccountInfo` of the account
-    const info = await new AccountInfoQuery()
-      .setAccountId(newAccountId)
-      .execute(this._client);
-
-    if (!info.key) {
-      console.log('Account info was not retrieved properly');
-      return null;
-    }
-
-    console.log(
-      `Account info of the new account: ${JSON.stringify(info, null, 4)}`,
-    );
-    return info.accountId;
+    return newAccountId;
   }
 }
