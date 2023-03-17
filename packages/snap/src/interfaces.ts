@@ -17,7 +17,7 @@ export type PublicAccountInfo = {
   did: string;
   publicKey: string;
   method: string;
-  hederaAccountId?: string;
+  externalAccountInfo?: unknown;
 };
 
 export type IdentitySnapState = {
@@ -94,4 +94,15 @@ export type AccountViaPrivateKey = {
   publicKey: string;
   address: string;
   extraData?: unknown;
+};
+
+export type ExternalAccount = {
+  externalAccount: {
+    network: string;
+    data: unknown;
+  };
+};
+
+export type HederaAccountParams = {
+  accountId: string;
 };

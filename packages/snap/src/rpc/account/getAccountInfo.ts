@@ -13,6 +13,7 @@ export async function getAccountInfo(
   identitySnapParams: IdentitySnapParams,
   hederaAccountId?: string,
 ): Promise<PublicAccountInfo> {
+  let accountId = hederaAccountId;
   const { state, account } = identitySnapParams;
   const publicAccountInfo: PublicAccountInfo = {
     evmAddress: account.evmAddress,
@@ -20,14 +21,19 @@ export async function getAccountInfo(
     publicKey: account.publicKey,
     method: account.method,
   };
-  console.log('hederaAccountId: ', hederaAccountId);
   const chainId = await getCurrentNetwork(ethereum);
   if (validHederaChainID(chainId) && !hederaAccountId) {
-    publicAccountInfo.hederaAccountId = await getHederaAccountIfExists(
+    accountId = await getHederaAccountIfExists(
       state,
       undefined,
       account.evmAddress,
     );
+  }
+
+  if (accountId) {
+    publicAccountInfo.externalAccountInfo = {
+      accountId,
+    };
   }
   console.log(JSON.stringify(publicAccountInfo, null, 4));
   return publicAccountInfo;

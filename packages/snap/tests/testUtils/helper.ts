@@ -16,6 +16,7 @@
 // };
 
 /**
+ * Get RPC Request params.
  *
  * @param method - RPC method to be executed.
  * @param params - Params of the specific method.

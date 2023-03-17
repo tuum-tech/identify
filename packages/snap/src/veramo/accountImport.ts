@@ -78,12 +78,11 @@ export async function veramoImportMetaMaskAccount(
     address = res.address;
   }
 
-  console.log('here too');
   address = address.toLowerCase();
 
   if (validHederaChainID(chainId)) {
-    console.log('here 2 ');
     const coinType = (await getCurrentCoinType()).toString();
+
     if (!accountViaPrivateKey) {
       hederaAccountId = await getHederaAccountIfExists(
         state,
@@ -93,14 +92,16 @@ export async function veramoImportMetaMaskAccount(
     }
 
     if (!hederaAccountId) {
-      console.log('here 3');
       hederaAccountId = await requestHederaAccountId(snap);
       // Initialize accountstate since it doesn't exist
       console.log(
         `The address ${address} has NOT yet been configured in the Identity Snap. Configuring now...`,
       );
-      await initAccountState(snap, state, coinType, address);
+
+      // await initAccountState(snap, state, coinType, address);
     }
+    // Attention: This line was inside of the
+    await initAccountState(snap, state, coinType, address);
 
     let hederaAccountInfo = await toHederaAccountInfo(
       privateKey,
@@ -131,7 +132,6 @@ export async function veramoImportMetaMaskAccount(
 
   const accountState = await getAccountStateByCoinType(state, address);
 
-  console.log(`account state ${JSON.stringify(accountState)}`);
   const method = accountState.accountConfig.identity.didMethod;
 
   let did = '';

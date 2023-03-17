@@ -1,6 +1,6 @@
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
-import { IdentitySnapParams } from './interfaces';
+import { HederaAccountParams, IdentitySnapParams } from './interfaces';
 import { getAccountInfo } from './rpc/account/getAccountInfo';
 import { getAvailableMethods } from './rpc/did/getAvailableMethods';
 import { getCurrentDIDMethod } from './rpc/did/getCurrentDIDMethod';
@@ -69,7 +69,9 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   let hederaAccountId = '';
   if (isExternalAccountFlagSet(request.params)) {
     isValidHederaAccountParams(request.params);
-    hederaAccountId = request.params.accountId;
+    hederaAccountId = (
+      (request.params as any).externalAccount.data as HederaAccountParams
+    ).accountId;
   }
 
   const account = await getCurrentAccount(state, hederaAccountId);

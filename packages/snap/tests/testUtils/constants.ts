@@ -10,11 +10,19 @@ export const mnemonic =
 export const ETH_ADDRESS = '0xf49d65c80c3d2d98231654513b2da4652f09c9fe';
 export const ETH_CHAIN_ID = '0x1';
 
-export const hederaPrivateKey =
-  '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c';
+export const HEDERA_CHAIN_ID = {
+  mainnet: '0x127',
+  testnet: '0x128',
+  previewnet: '0x129',
+  localnet: '0x12a',
+};
 
-export const hederaAccountId = '0.0.15215';
-export const hederaAddress = '0x7d871f006d97498ea338268a956af94ab2e65cdd';
+export const HEDERA_ACCOUNT = {
+  accountId: '0.0.15215',
+  address: '0x7d871f006d97498ea338268a956af94ab2e65cdd',
+  privateKey:
+    '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c',
+};
 
 export const publicKey =
   '0x0480a9cd48fd436f8c1f81b156eb615618cd573c3eb1e6d937a17b8222027cae850a9f561d414001a8bdefdb713c619d2caf08a0c9655b0cf42de065bc51e0169a';

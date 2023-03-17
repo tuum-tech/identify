@@ -1,5 +1,10 @@
 import { VerifiablePresentation, W3CVerifiableCredential } from '@veramo/core';
-import { GoogleToken, IdentitySnapState } from '../interfaces';
+import {
+  ExternalAccount,
+  GoogleToken,
+  HederaAccountParams,
+  IdentitySnapState,
+} from '../interfaces';
 import {
   IDataManagerClearArgs,
   IDataManagerDeleteArgs,
@@ -14,10 +19,6 @@ import {
 } from '../types/constants';
 import { CreateVCRequestParams, CreateVPRequestParams } from '../types/params';
 
-type HederaAccountParams = {
-  accountId: string;
-};
-
 /**
  * Check whether the the account was imported using private key(external account).
  *
@@ -30,9 +31,9 @@ export function isExternalAccountFlagSet(params: unknown): boolean {
     typeof params === 'object' &&
     'externalAccount' in params &&
     params.externalAccount !== null &&
-    typeof params.externalAccount === 'boolean'
+    typeof params.externalAccount === 'object'
   ) {
-    return params.externalAccount;
+    return true;
   }
   return false;
 }
@@ -44,13 +45,19 @@ export function isExternalAccountFlagSet(params: unknown): boolean {
  */
 export function isValidHederaAccountParams(
   params: unknown,
-): asserts params is HederaAccountParams {
+): asserts params is ExternalAccount {
   if (
     params !== null &&
     typeof params === 'object' &&
-    'accountId' in params &&
-    (params as HederaAccountParams).accountId !== null &&
-    typeof (params as HederaAccountParams).accountId === 'string'
+    'externalAccount' in params &&
+    (params as unknown as ExternalAccount).externalAccount.network ===
+      'hedera' &&
+    typeof (params as unknown as ExternalAccount).externalAccount.data ===
+      'object' &&
+    typeof (
+      (params as unknown as ExternalAccount).externalAccount
+        .data as HederaAccountParams
+    ).accountId === 'string'
   ) {
     return;
   }
