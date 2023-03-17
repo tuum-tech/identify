@@ -38,8 +38,13 @@ export type SimpleHederaClient = {
 
   getAccountInfo(accountId: string): Promise<HederaAccountInfo>;
 
-  createAccount(options: {
+  createAccountForPublicKey(options: {
     publicKey: PublicKey;
+    initialBalance: BigNumber;
+  }): Promise<AccountId | null>;
+
+  createAccountForEvmAddress(options: {
+    evmAddress: string;
     initialBalance: BigNumber;
   }): Promise<AccountId | null>;
 };

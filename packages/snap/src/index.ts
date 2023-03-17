@@ -9,6 +9,7 @@ import { getDid } from './rpc/did/getDID';
 import { resolveDID } from './rpc/did/resolveDID';
 import { switchMethod } from './rpc/did/switchMethods';
 import { configureGoogleAccount } from './rpc/gdrive/configureGoogleAccount';
+import { createNewHederaAccount } from './rpc/hedera/createNewHederaAccount';
 import { togglePopups } from './rpc/snap/togglePopups';
 import { createVC } from './rpc/vc/createVC';
 import { createVP } from './rpc/vc/createVP';
@@ -26,6 +27,7 @@ import { init } from './utils/init';
 import {
   isExternalAccountFlagSet,
   isValidConfigueGoogleRequest,
+  isValidCreateNewHederaAccountParams,
   isValidCreateVCRequest,
   isValidCreateVPRequest,
   isValidDeleteAllVCsRequest,
@@ -70,7 +72,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
 
   const account = await getCurrentAccount(state, hederaAccountId);
   console.log(
-    `Evm Address: ${account.evmAddress}, did: ${account.identifier.did}`,
+    `Currently connected account: ${JSON.stringify(account, null, 4)}`,
   );
 
   const identitySnapParams: IdentitySnapParams = {
@@ -107,6 +109,16 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
     case 'connectHederaAccount': {
       isValidHederaAccountParams(request.params);
       return await connectHederaAccount(state, request.params.accountId, false);
+    }
+
+    case 'createNewHederaAccount': {
+      isValidCreateNewHederaAccountParams(request.params);
+      return await createNewHederaAccount(
+        identitySnapParams,
+        request.params.newAccountPublickey,
+        request.params.hbarAmountToSend,
+        hederaAccountId,
+      );
     }
 
     case 'getDID': {
