@@ -1,6 +1,6 @@
 {
-  "name": "express-api-starter-ts",
-  "version": "1.2.0",
+  "name": "@tuum-tech/identity-snap-example-backend",
+  "version": "0.5.0",
   "description": " A basic starter for an express.js API with Typescript",
   "keywords": [],
   "repository": {
@@ -13,7 +13,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon src/index.ts",
-    "start": "node dist/src/index.js",
+    "start": "yarn build && node dist/src/index.js",
     "test": "jest"
   },
   "dependencies": {

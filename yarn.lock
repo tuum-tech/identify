@@ -5211,6 +5211,58 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tuum-tech/identity-snap-example-backend@workspace:packages/backend":
+  version: 0.0.0-use.local
+  resolution: "@tuum-tech/identity-snap-example-backend@workspace:packages/backend"
+  dependencies:
+    "@transmute/credentials-context": ^0.7.0-unstable.77
+    "@types/cors": ^2.8.13
+    "@types/express": ^4.17.15
+    "@types/jest": ^29.2.5
+    "@types/morgan": ^1.9.4
+    "@types/node": ^18.11.18
+    "@types/supertest": ^2.0.12
+    "@typescript-eslint/eslint-plugin": ^5.47.1
+    "@typescript-eslint/parser": ^5.47.1
+    "@veramo/core": ^4.2.0
+    "@veramo/credential-eip712": ^4.2.0
+    "@veramo/credential-ld": ^4.2.0
+    "@veramo/credential-w3c": ^4.2.0
+    "@veramo/data-store-json": ^4.2.0
+    "@veramo/did-comm": ^4.2.0
+    "@veramo/did-jwt": ^4.2.0
+    "@veramo/did-provider-ethr": ^4.2.0
+    "@veramo/did-provider-key": ^4.2.0
+    "@veramo/did-provider-pkh": ^4.0.2
+    "@veramo/did-provider-web": ^4.2.0
+    "@veramo/did-resolver": ^4.2.0
+    "@veramo/key-manager": ^4.2.0
+    "@veramo/kms-local": ^4.2.0
+    "@veramo/kms-web3": ^4.2.0
+    "@veramo/message-handler": ^4.2.0
+    "@veramo/selective-disclosure": ^4.2.0
+    caip: ^1.1.0
+    cors: ^2.8.5
+    crypto: ^1.0.1
+    dotenv: ^16.0.3
+    eslint: ^8.31.0
+    eslint-config-airbnb-typescript: ^16.1.1
+    eslint-import-resolver-typescript: ^3.5.2
+    eslint-plugin-import: ^2.24.1
+    express: ^4.18.2
+    helmet: ^6.0.1
+    jest: ^29.3.1
+    jwt-decode: ^3.1.2
+    morgan: ^1.10.0
+    node-cache: ^5.1.2
+    nodemon: ^2.0.20
+    supertest: ^6.3.3
+    ts-jest: ^29.0.3
+    ts-node: ^10.9.1
+    typescript: ^4.9.4
+  languageName: unknown
+  linkType: soft
+
 "@tuum-tech/identity-snap-example-site@workspace:packages/site":
   version: 0.0.0-use.local
   resolution: "@tuum-tech/identity-snap-example-site@workspace:packages/site"
@@ -11996,58 +12048,6 @@ __metadata:
   checksum: ff790eb806d2122465718ba481bbfa2827476a680834766d99b555ddc4935d53d44d028bd13f67f128fcfd9207230cf89e4185029fe7a70193b406e42a181a0d
   languageName: node
   linkType: hard
-
-"express-api-starter-ts@workspace:packages/backend":
-  version: 0.0.0-use.local
-  resolution: "express-api-starter-ts@workspace:packages/backend"
-  dependencies:
-    "@transmute/credentials-context": ^0.7.0-unstable.77
-    "@types/cors": ^2.8.13
-    "@types/express": ^4.17.15
-    "@types/jest": ^29.2.5
-    "@types/morgan": ^1.9.4
-    "@types/node": ^18.11.18
-    "@types/supertest": ^2.0.12
-    "@typescript-eslint/eslint-plugin": ^5.47.1
-    "@typescript-eslint/parser": ^5.47.1
-    "@veramo/core": ^4.2.0
-    "@veramo/credential-eip712": ^4.2.0
-    "@veramo/credential-ld": ^4.2.0
-    "@veramo/credential-w3c": ^4.2.0
-    "@veramo/data-store-json": ^4.2.0
-    "@veramo/did-comm": ^4.2.0
-    "@veramo/did-jwt": ^4.2.0
-    "@veramo/did-provider-ethr": ^4.2.0
-    "@veramo/did-provider-key": ^4.2.0
-    "@veramo/did-provider-pkh": ^4.0.2
-    "@veramo/did-provider-web": ^4.2.0
-    "@veramo/did-resolver": ^4.2.0
-    "@veramo/key-manager": ^4.2.0
-    "@veramo/kms-local": ^4.2.0
-    "@veramo/kms-web3": ^4.2.0
-    "@veramo/message-handler": ^4.2.0
-    "@veramo/selective-disclosure": ^4.2.0
-    caip: ^1.1.0
-    cors: ^2.8.5
-    crypto: ^1.0.1
-    dotenv: ^16.0.3
-    eslint: ^8.31.0
-    eslint-config-airbnb-typescript: ^16.1.1
-    eslint-import-resolver-typescript: ^3.5.2
-    eslint-plugin-import: ^2.24.1
-    express: ^4.18.2
-    helmet: ^6.0.1
-    jest: ^29.3.1
-    jwt-decode: ^3.1.2
-    morgan: ^1.10.0
-    node-cache: ^5.1.2
-    nodemon: ^2.0.20
-    supertest: ^6.3.3
-    ts-jest: ^29.0.3
-    ts-node: ^10.9.1
-    typescript: ^4.9.4
-  languageName: unknown
-  linkType: soft
 
 "express-graphql@npm:^0.12.0":
   version: 0.12.0
