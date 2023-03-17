@@ -1,6 +1,7 @@
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import { IdentitySnapParams } from './interfaces';
+import { connectHederaAccount } from './rpc/account/connectHederaAccount';
 import { getAccountInfo } from './rpc/account/getAccountInfo';
 import { getAvailableMethods } from './rpc/did/getAvailableMethods';
 import { getCurrentDIDMethod } from './rpc/did/getCurrentDIDMethod';
@@ -8,7 +9,6 @@ import { getDid } from './rpc/did/getDID';
 import { resolveDID } from './rpc/did/resolveDID';
 import { switchMethod } from './rpc/did/switchMethods';
 import { configureGoogleAccount } from './rpc/gdrive/configureGoogleAccount';
-import { getHederaAccountId } from './rpc/hedera/getHederaAccountId';
 import { togglePopups } from './rpc/snap/togglePopups';
 import { createVC } from './rpc/vc/createVC';
 import { createVP } from './rpc/vc/createVP';
@@ -104,6 +104,11 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
       return await getAccountInfo(identitySnapParams, hederaAccountId);
     }
 
+    case 'connectHederaAccount': {
+      isValidHederaAccountParams(request.params);
+      return await connectHederaAccount(state, request.params.accountId, false);
+    }
+
     case 'getDID': {
       return await getDid(identitySnapParams);
     }
@@ -183,10 +188,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
 
     case 'syncGoogleVCs': {
       return await syncGoogleVCs(identitySnapParams);
-    }
-
-    case 'getHederaAccountId': {
-      return await getHederaAccountId(identitySnapParams);
     }
 
     default: {

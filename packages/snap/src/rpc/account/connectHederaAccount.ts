@@ -1,18 +1,18 @@
 import { PrivateKey } from '@hashgraph/sdk';
 import { heading, panel, text } from '@metamask/snaps-ui';
 import { ethers, Wallet } from 'ethers';
-import { validHederaChainID } from '../hedera/config';
+import { validHederaChainID } from '../../hedera/config';
 import {
   Account,
   AccountViaPrivateKey,
   IdentitySnapState,
   SnapDialogParams,
-} from '../interfaces';
-import { HEDERACOINTYPE } from '../types/constants';
-import { getHederaAccountIfExists } from '../utils/params';
-import { importIdentitySnapAccount } from './account';
-import { snapDialog } from './dialog';
-import { getCurrentNetwork } from './network';
+} from '../../interfaces';
+import { HEDERACOINTYPE } from '../../types/constants';
+import { getHederaAccountIfExists } from '../../utils/params';
+import { importIdentitySnapAccount } from '../../snap/account';
+import { snapDialog } from '../../snap/dialog';
+import { getCurrentNetwork } from '../../snap/network';
 
 /**
  * Connect Hedera Account.

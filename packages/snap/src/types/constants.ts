@@ -14,9 +14,9 @@ export const isValidMethod = (x: string) => isIn(availableMethods, x);
 export const DEFAULTCOINTYPE = 60;
 export const HEDERACOINTYPE = 3030;
 
-export const validProofFormats = [
+export const availableProofFormats = [
   'jwt' as ProofFormat,
   'lds' as ProofFormat,
   'EthereumEip712Signature2021' as ProofFormat,
 ] as const;
-export const isValidProofFormat = (x: string) => isIn(validProofFormats, x);
+export const isValidProofFormat = (x: string) => isIn(availableProofFormats, x);

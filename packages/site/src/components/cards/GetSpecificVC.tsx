@@ -7,6 +7,7 @@ import {
   MetaMaskContext,
 } from '../../contexts/MetamaskContext';
 import { VcContext } from '../../contexts/VcContext';
+import useModal from '../../hooks/useModal';
 import {
   getCurrentNetwork,
   getVCs,
@@ -23,6 +24,7 @@ const GetSpecificVC: FC<Props> = ({ setCurrentChainId }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [selectedOptions, setSelectedOptions] = useState([storeOptions[0]]);
   const [loading, setLoading] = useState(false);
+  const { showModal } = useModal();
 
   const handleChange = (options: any) => {
     setSelectedOptions(options);
@@ -47,6 +49,10 @@ const GetSpecificVC: FC<Props> = ({ setCurrentChainId }) => {
         if (keys.length > 0) {
           setVc(vcs[keys.length - 1].data as IDataManagerQueryResult);
         }
+        showModal({
+          title: 'Your VCs',
+          content: JSON.stringify(vcs, null, 4),
+        });
       }
     } catch (e) {
       console.error(e);

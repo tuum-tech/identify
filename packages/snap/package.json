@@ -71,6 +71,7 @@
     "did-resolver": "^4.0.1",
     "ethers": "^5.7.2",
     "jsonpath": "^1.1.1",
+    "lodash": "^4.17.21",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

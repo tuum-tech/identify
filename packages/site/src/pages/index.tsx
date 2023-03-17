@@ -13,7 +13,6 @@ import {
   GetAllVCs,
   GetCurrentDIDMethod,
   GetDID,
-  GetHederaAccountId,
   GetSpecificVC,
   GetVP,
   ReconnectIdentitySnap,
@@ -134,9 +133,6 @@ const Index = () => {
         )}
         <ConnectIdentitySnap handleConnectClick={handleConnectClick} />
         <ReconnectIdentitySnap handleConnectClick={handleConnectClick} />
-        {isHederaNetwork && (
-          <GetHederaAccountId setCurrentChainId={setCurrentChainId} />
-        )}
 
         <SendHelloHessage setCurrentChainId={setCurrentChainId} />
         <ToggleMetamaskPopups setCurrentChainId={setCurrentChainId} />

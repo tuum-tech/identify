@@ -1,3 +1,4 @@
+import { CreateVCResponseResult } from '@tuum-tech/identity-snap/src/types/params';
 import { FC, useContext, useState } from 'react';
 import Select from 'react-select';
 import { storeOptions } from '../../config/constants';
@@ -19,6 +20,7 @@ type Props = {
 };
 
 const CreateVC: FC<Props> = ({ setCurrentChainId }) => {
+  const { vc, setVc } = useContext(VcContext);
   const { setVcId, setVcIdsToBeRemoved } = useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
   const [createVCName, setCreateVCName] = useState('Kiran Pachhai');
@@ -47,24 +49,21 @@ const CreateVC: FC<Props> = ({ setCurrentChainId }) => {
         returnStore: true,
       };
       const credTypes = ['ProfileNamesCredential'];
-      const saved = await createVC(vcKey, vcValue, options, credTypes);
-      const savedJson = JSON.parse(JSON.stringify(saved));
-      if (savedJson.length > 0) {
-        const vcIdsToAdd: any = [];
-        savedJson.forEach((data: any) => {
-          vcIdsToAdd.push(data.id);
-        });
+      const saved: CreateVCResponseResult = (await createVC(
+        vcKey,
+        vcValue,
+        options,
+        credTypes,
+      )) as CreateVCResponseResult;
+      if (saved) {
+        const vcIdsToAdd: any = [saved.metadata.id];
+        setVc(saved.data);
         setVcId(vcIdsToAdd.toString());
         setVcIdsToBeRemoved(vcIdsToAdd.toString());
         console.log('created and saved VC: ', saved);
         showModal({
           title: 'Create VC',
-          content: `Created and saved VC:
-          ${savedJson.map(
-            (data: any) => `${JSON.stringify(data)}
-          `,
-          )}
-          `,
+          content: `Created and saved VC: ${JSON.stringify(saved)}`,
         });
       }
     } catch (e) {

@@ -1,4 +1,4 @@
-import { validProofFormats } from '../../types/constants';
+import { availableProofFormats } from '../../types/constants';
 
 /**
  * Function to get supported proof formats.
@@ -6,5 +6,5 @@ import { validProofFormats } from '../../types/constants';
  * @returns Proof formats.
  */
 export function getSupportedProofFormats(): string[] {
-  return validProofFormats.map((key) => key);
+  return availableProofFormats.map((key) => key);
 }
