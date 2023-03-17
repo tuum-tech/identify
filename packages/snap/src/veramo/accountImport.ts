@@ -90,7 +90,6 @@ export async function veramoImportMetaMaskAccount(
   }
 
   if (validHederaChainID(chainId)) {
-    const coinType = (await getCurrentCoinType()).toString();
     if (!accountViaPrivateKey) {
       hederaAccountId = await getHederaAccountIfExists(
         state,
