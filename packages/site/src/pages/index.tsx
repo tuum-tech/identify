@@ -11,8 +11,6 @@ import {
   DeleteAllVCs,
   GetAccountInfo,
   GetAllVCs,
-  GetCurrentDIDMethod,
-  GetDID,
   GetSpecificVC,
   GetVP,
   ReconnectIdentitySnap,
@@ -67,7 +65,7 @@ const Index = () => {
         type: MetamaskActions.SetInstalled,
         payload: installedSnap,
       });
-      setAccountInfo({} as AccountInfo);
+      setAccountInfo({} as PublicAccountInfo);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -99,6 +97,7 @@ const Index = () => {
               ? accountInfo && (
                   <>
                     <dd>Hedera Account ID: {accountInfo.hederaAccountId}</dd>
+                    <dd>Did Method: {accountInfo?.method}</dd>
                     <dd>Did: {accountInfo?.did}</dd>
                     <dd>EVM Address: {accountInfo?.evmAddress}</dd>
                     <dd>Public Key: {accountInfo?.publicKey}</dd>
@@ -106,6 +105,7 @@ const Index = () => {
                 )
               : accountInfo && (
                   <>
+                    <dd>Did Method: {accountInfo?.method}</dd>
                     <dd>Did: {accountInfo?.did}</dd>
                     <dd>EVM Address: {accountInfo?.evmAddress}</dd>
                     <dd>Public Key: {accountInfo?.publicKey}</dd>
@@ -137,11 +137,10 @@ const Index = () => {
         <SendHelloHessage setCurrentChainId={setCurrentChainId} />
         <ToggleMetamaskPopups setCurrentChainId={setCurrentChainId} />
         <GetAccountInfo
+          currentChainId={currentChainId}
           setCurrentChainId={setCurrentChainId}
           setAccountInfo={setAccountInfo}
         />
-        <GetCurrentDIDMethod setCurrentChainId={setCurrentChainId} />
-        <GetDID setCurrentChainId={setCurrentChainId} />
         <ResolveDID setCurrentChainId={setCurrentChainId} />
         <GetSpecificVC setCurrentChainId={setCurrentChainId} />
         <GetAllVCs setCurrentChainId={setCurrentChainId} />

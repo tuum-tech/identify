@@ -14,11 +14,13 @@ export async function getAccountInfo(
   hederaAccountId?: string,
 ): Promise<PublicAccountInfo> {
   const { state, account } = identitySnapParams;
+
   const publicAccountInfo: PublicAccountInfo = {
     evmAddress: account.evmAddress,
     did: account.identifier.did,
     publicKey: account.publicKey,
     method: account.method,
+    hederaAccountId,
   };
   console.log('hederaAccountId: ', hederaAccountId);
   const chainId = await getCurrentNetwork(ethereum);
