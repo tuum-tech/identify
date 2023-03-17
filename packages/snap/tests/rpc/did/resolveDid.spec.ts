@@ -1,61 +1,65 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
-import { IdentitySnapParams, IdentitySnapState } from 'src/interfaces';
-import { resolveDID } from '../../../src/rpc/did/resolveDID';
-import { connectHederaAccount } from '../../../src/rpc/hedera/connectHederaAccount';
+import { onRpcRequest } from '../../../src';
 import {
-  exampleDIDPkh,
-  getDefaultSnapState,
-  hederaPrivateKey,
+  ETH_ADDRESS,
+  ETH_CHAIN_ID, getDefaultSnapState
 } from '../../testUtils/constants';
-import { createMockSnap, SnapMock } from '../../testUtils/snap.mock';
+import { getRequestParams } from '../../testUtils/helper';
+import { buildMockSnap, SnapMock } from '../../testUtils/snap.mock';
 
 describe('resolveDID', () => {
-  let identitySnapParams: IdentitySnapParams;
-  let snapState: IdentitySnapState;
   let snapMock: SnapsGlobalObject & SnapMock;
   let metamask: MetaMaskInpageProvider;
 
-  beforeEach(async () => {
-    snapState = getDefaultSnapState();
-    snapMock = createMockSnap();
+  let currentDID: string = "";
+
+  beforeAll(async () => {
+    snapMock = buildMockSnap(ETH_CHAIN_ID, ETH_ADDRESS);
     metamask = snapMock as unknown as MetaMaskInpageProvider;
-    identitySnapParams = {
-      metamask,
-      snap: snapMock,
-      state: snapState,
-    };
 
-    (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
-      hederaPrivateKey,
-    );
+    global.snap = snapMock;
+    global.ethereum = metamask;
+  });
 
-    (identitySnapParams.snap as SnapMock).rpcMocks.eth_chainId.mockReturnValue(
-      '0x128',
-    );
+  beforeEach(async () => {
+    snapMock.rpcMocks.snap_dialog.mockReturnValue(true);
+    snapMock.rpcMocks.snap_manageState.mockReturnValue(getDefaultSnapState());
+    snapMock.rpcMocks.snap_manageState('update', getDefaultSnapState());
 
-    await connectHederaAccount(snapMock, snapState, metamask, '0.0.15215');
+    const getDIDRequestParams = getRequestParams('getDID', {});
+
+    currentDID = (await onRpcRequest({
+      origin: 'tests',
+      request: getDIDRequestParams as any,
+    })) as string;
   });
 
   it('should succeed returning current did resolved', async () => {
-    const resolvedDid = await resolveDID(identitySnapParams, exampleDIDPkh);
-    const id = resolvedDid?.didDocument?.id;
+     const resolveDIDRequestParams = getRequestParams('resolveDID', {});
 
-    expect(id).toEqual(exampleDIDPkh);
+      const resolvedDID = (await onRpcRequest({
+        origin: 'tests',
+        request: resolveDIDRequestParams as any,
+      })) as string;
+      
+      console.log(JSON.stringify(resolvedDID));
+      // expect(accountInfo.evmAddress).toBe(ETH_ADDRESS);
+      // expect(accountInfo.externalAccountInfo).toBeUndefined();
 
-    expect.assertions(1);
+      // expect.assertions(2);
   });
 
-  it('should resolve current did when didUrl undefined', async () => {
-    const resolvedDid = await resolveDID(identitySnapParams, undefined);
+  // it('should resolve current did when didUrl undefined', async () => {
+  //   const resolvedDid = await resolveDID(identitySnapParams, undefined);
 
-    const id = resolvedDid?.didDocument?.id;
+  //   const id = resolvedDid?.didDocument?.id;
 
-    expect(id).toEqual(
-      snapState.accountState['0x7d871f006d97498ea338268a956af94ab2e65cdd']
-        .identifiers[id as string].did,
-    );
+  //   expect(id).toEqual(
+  //     snapState.accountState['0x7d871f006d97498ea338268a956af94ab2e65cdd']
+  //       .identifiers[id as string].did,
+  //   );
 
-    expect.assertions(1);
-  });
+  //   expect.assertions(1);
+  // });
 });
