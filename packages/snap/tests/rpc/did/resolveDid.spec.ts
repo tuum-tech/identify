@@ -1,9 +1,11 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
+import { DIDResolutionResult } from 'did-resolver';
 import { onRpcRequest } from '../../../src';
 import {
   ETH_ADDRESS,
-  ETH_CHAIN_ID, getDefaultSnapState
+  ETH_CHAIN_ID,
+  getDefaultSnapState,
 } from '../../testUtils/constants';
 import { getRequestParams } from '../../testUtils/helper';
 import { buildMockSnap, SnapMock } from '../../testUtils/snap.mock';
@@ -12,7 +14,7 @@ describe('resolveDID', () => {
   let snapMock: SnapsGlobalObject & SnapMock;
   let metamask: MetaMaskInpageProvider;
 
-  let currentDID: string = "";
+  let currentDID = '';
 
   beforeAll(async () => {
     snapMock = buildMockSnap(ETH_CHAIN_ID, ETH_ADDRESS);
@@ -36,18 +38,15 @@ describe('resolveDID', () => {
   });
 
   it('should succeed returning current did resolved', async () => {
-     const resolveDIDRequestParams = getRequestParams('resolveDID', {});
+    const resolveDIDRequestParams = getRequestParams('resolveDID', {});
 
-      const resolvedDID = (await onRpcRequest({
-        origin: 'tests',
-        request: resolveDIDRequestParams as any,
-      })) as string;
-      
-      console.log(JSON.stringify(resolvedDID));
-      // expect(accountInfo.evmAddress).toBe(ETH_ADDRESS);
-      // expect(accountInfo.externalAccountInfo).toBeUndefined();
+    const resolvedDID = (await onRpcRequest({
+      origin: 'tests',
+      request: resolveDIDRequestParams as any,
+    })) as DIDResolutionResult;
 
-      // expect.assertions(2);
+    expect(resolvedDID.didDocument?.id).toBe(currentDID);
+    expect.assertions(1);
   });
 
   // it('should resolve current did when didUrl undefined', async () => {

@@ -132,7 +132,7 @@ export function createMockSnap(): SnapsGlobalObject & SnapMock {
  *
  * @returns {SnapsGlobalObject & SnapMock} SnapMock
  */
-export function buildMockSnap(chainId: string, address: string): SnapsGlobalObject & SnapMock {
+export function buildMockSnap(chainId: number, address: string): SnapsGlobalObject & SnapMock {
   let snapMock = new SnapMock() as SnapsGlobalObject & SnapMock;
   snapMock.rpcMocks.eth_requestAccounts.mockResolvedValue([address]);
   snapMock.rpcMocks.eth_chainId.mockResolvedValue(chainId);

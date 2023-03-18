@@ -8,7 +8,7 @@ export const privateKey =
 export const mnemonic =
   'final runway match relax bamboo carry budget guilt dish weapon magnet alarm';
 export const ETH_ADDRESS = '0xf49d65c80c3d2d98231654513b2da4652f09c9fe';
-export const ETH_CHAIN_ID = '0x1';
+export const ETH_CHAIN_ID = 0x1;
 
 export const HEDERA_CHAIN_ID = {
   mainnet: '0x127',

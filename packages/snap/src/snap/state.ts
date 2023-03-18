@@ -128,8 +128,5 @@ export async function getAccountStateByCoinType(
   evmAddress: string,
 ): Promise<IdentityAccountState> {
   const coinType = await getCurrentCoinType();
-  console.log(`cointype ${coinType} evmAddress ${evmAddress}`);
-  console.log(`state ${JSON.stringify(state)}`);
-
   return state.accountState[coinType][evmAddress];
 }
