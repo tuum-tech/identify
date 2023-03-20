@@ -8,7 +8,7 @@ import { getRequestParams } from '../../testUtils/helper';
 import { createMockSnap, SnapMock } from '../../testUtils/snap.mock';
 
 describe('delete all VCs', () => {
-   let snapMock: SnapsGlobalObject & SnapMock;
+  let snapMock: SnapsGlobalObject & SnapMock;
   let metamask: MetaMaskInpageProvider;
 
   beforeAll(async () => {
@@ -25,7 +25,7 @@ describe('delete all VCs', () => {
     snapMock.rpcMocks.snap_manageState('update', getDefaultSnapState());
     snapMock.rpcMocks.eth_chainId.mockReturnValue('0x1');
 
-     const createVcRequest1 = getRequestParams('createVC', {
+    const createVcRequest1 = getRequestParams('createVC', {
       vcValue: { prop: 10 },
       credTypes: ['Login'],
     });
