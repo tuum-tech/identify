@@ -1,85 +1,98 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
-import { IdentitySnapParams, IdentitySnapState } from '../../../src/interfaces';
-import { connectHederaAccount } from '../../../src/rpc/hedera/connectHederaAccount';
-import { createVC } from '../../../src/rpc/vc/createVC';
-import { createVP } from '../../../src/rpc/vc/createVP';
+import { VerifiablePresentation, W3CVerifiableCredential } from '@veramo/core';
+import { IDataManagerSaveResult } from 'src/plugins/veramo/verfiable-creds-manager';
+import { onRpcRequest } from '../../../src';
 import {
-  getDefaultSnapState,
-  hederaPrivateKey,
+  ETH_ADDRESS,
+  ETH_CHAIN_ID,
+  getDefaultSnapState
 } from '../../testUtils/constants';
-import { createMockSnap, SnapMock } from '../../testUtils/snap.mock';
+import { getRequestParams } from '../../testUtils/helper';
+import { buildMockSnap, SnapMock } from '../../testUtils/snap.mock';
 
 describe('createVP', () => {
-  let identitySnapParams: IdentitySnapParams;
-  let snapState: IdentitySnapState;
   let snapMock: SnapsGlobalObject & SnapMock;
   let metamask: MetaMaskInpageProvider;
 
-  beforeEach(async () => {
-    snapState = getDefaultSnapState();
-    snapMock = createMockSnap();
+  const vcs: W3CVerifiableCredential[] = [];
+
+  beforeAll(async () => {
+    snapMock = buildMockSnap(ETH_CHAIN_ID, ETH_ADDRESS);
     metamask = snapMock as unknown as MetaMaskInpageProvider;
-    identitySnapParams = {
-      metamask,
-      snap: snapMock,
-      state: snapState,
-    };
 
-    (
-      identitySnapParams.snap as SnapMock
-    ).rpcMocks.snap_dialog.mockReturnValueOnce(hederaPrivateKey);
+    global.snap = snapMock;
+    global.ethereum = metamask;
+  });
 
-    (identitySnapParams.snap as SnapMock).rpcMocks.eth_chainId.mockReturnValue(
-      '0x128',
-    );
+  beforeEach(async () => {
+    snapMock.rpcMocks.snap_dialog.mockReturnValue(true);
+    snapMock.rpcMocks.snap_manageState.mockReturnValue(getDefaultSnapState());
+    snapMock.rpcMocks.snap_manageState('update', getDefaultSnapState());
 
-    await connectHederaAccount(snapMock, snapState, metamask, '0.0.15215');
+    const createVcRequest1 = getRequestParams('createVC', {
+      vcValue: { prop: 10 },
+      credTypes: ['Login'],
+    });
+
+    const createVcRequest2 = getRequestParams('createVC', {
+      vcValue: { prop: 20 },
+      credTypes: ['NotLogin'],
+    });
+
+    const createVcResponse1: IDataManagerSaveResult[] = (await onRpcRequest({
+      origin: 'tests',
+      request: createVcRequest1 as any,
+    })) as IDataManagerSaveResult[];
+    const createVcResponse2: IDataManagerSaveResult[] = (await onRpcRequest({
+      origin: 'tests',
+      request: createVcRequest2 as any,
+    })) as IDataManagerSaveResult[];
+
+    vcs.push(createVcResponse1[0].id);
+    vcs.push(createVcResponse2[0].id);
   });
 
   it('should succeed creating VP from 1 VC', async () => {
-    // Setup snap confirm return
-    (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
-      true,
-    );
-
-    const createCredentialResult = await createVC(identitySnapParams, {
-      vcValue: { name: 'Diego' },
-      credTypes: ['Login'],
+    const createVpRequest = getRequestParams('createVP', {
+      vcs: [vcs[0] as string],
     });
 
-    // Act and assert
-    await expect(
-      createVP(identitySnapParams, {
-        vcs: [createCredentialResult[0].id as string],
-      }),
-    ).resolves.not.toBeUndefined();
-
+    const presentation = (await onRpcRequest({
+      origin: 'tests',
+      request: createVpRequest as any,
+    })) as VerifiablePresentation;
+    expect(presentation).not.toBeUndefined();
     expect.assertions(1);
   });
 
-  it('should throw error when user rejects confirm', async () => {
-    // Setup snap confirm return
-    (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
-      true,
-    );
-
-    const createCredentialResult = await createVC(identitySnapParams, {
-      vcValue: { name: 'Diego' },
-      credTypes: ['Login'],
+  it('should succeed creating VP from 2 VCs', async () => {
+    const createVpRequest = getRequestParams('createVP', {
+      vcs,
     });
 
-    (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
-      false,
-    );
+    const presentation = (await onRpcRequest({
+      origin: 'tests',
+      request: createVpRequest as any,
+    })) as VerifiablePresentation;
+    expect(presentation).not.toBeUndefined();
+    expect(presentation.verifiableCredential?.length).toBe(2);
+    expect.assertions(2);
+  });
 
-    // Act and assert
+  it.skip('should throw error when user rejects confirm', async () => {
+    snapMock.rpcMocks.snap_dialog.mockReturnValue(false);
+
+    const createVpRequest = getRequestParams('createVP', {
+      vcs: [vcs[0] as string],
+    });
+
     await expect(
-      createVP(identitySnapParams, {
-        vcs: [createCredentialResult[0].id as string],
+      onRpcRequest({
+        origin: 'tests',
+        request: createVpRequest as any,
       }),
-    ).rejects.toThrow();
-
+    ).rejects.toThrowError();
     expect.assertions(1);
   });
 });

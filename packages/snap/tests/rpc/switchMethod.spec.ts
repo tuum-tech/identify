@@ -5,7 +5,7 @@ import { getAccountStateByCoinType } from '../../src/snap/state';
 import {
   ETH_ADDRESS,
   ETH_CHAIN_ID,
-  getDefaultSnapState
+  getDefaultSnapState,
 } from '../testUtils/constants';
 import { getRequestParams } from '../testUtils/helper';
 import { buildMockSnap, SnapMock } from '../testUtils/snap.mock';
@@ -38,10 +38,9 @@ describe('SwitchMethod', () => {
 
     snapMock.rpcMocks.snap_manageState.mockReturnValue(snapState);
 
-    const switchMethodRequestParams = getRequestParams(
-      'switchMethod',
-      { didMethod: 'did:pkh' },
-    );
+    const switchMethodRequestParams = getRequestParams('switchMethod', {
+      didMethod: 'did:pkh',
+    });
 
     const request = onRpcRequest({
       origin: 'tests',
@@ -51,11 +50,10 @@ describe('SwitchMethod', () => {
     expect.assertions(1);
   });
 
-   it('should do nothing when changing method to current did:pkh method', async () => {
-    const switchMethodRequestParams = getRequestParams(
-      'switchMethod',
-      { didMethod: 'did:pkh' },
-    );
+  it('should do nothing when changing method to current did:pkh method', async () => {
+    const switchMethodRequestParams = getRequestParams('switchMethod', {
+      didMethod: 'did:pkh',
+    });
 
     const request = onRpcRequest({
       origin: 'tests',
@@ -66,15 +64,16 @@ describe('SwitchMethod', () => {
   });
 
   it('should throw error when switch to invalid method', async () => {
-    const switchMethodRequestParams = getRequestParams(
-      'switchMethod',
-      { didMethod: 'did:inv' },
-    );
+    const switchMethodRequestParams = getRequestParams('switchMethod', {
+      didMethod: 'did:inv',
+    });
 
-    await expect(onRpcRequest({
-      origin: 'tests',
-      request: switchMethodRequestParams as any
-    })).rejects.toThrowError();
+    await expect(
+      onRpcRequest({
+        origin: 'tests',
+        request: switchMethodRequestParams as any,
+      }),
+    ).rejects.toThrowError();
 
     expect.assertions(1);
   });
@@ -82,15 +81,23 @@ describe('SwitchMethod', () => {
   it('should not switch method when user rejects', async () => {
     snapMock.rpcMocks.snap_dialog.mockReturnValue(false);
 
-    const switchMethodRequestParams = getRequestParams(
-      'switchMethod',
-      { didMethod: 'did:pkh' },
-    );
-    await expect(onRpcRequest({
+    const snapState = getDefaultSnapState();
+    const accountType = await getAccountStateByCoinType(snapState, ETH_ADDRESS);
+    accountType.accountConfig.identity.didMethod = 'did:key';
+
+    snapState.accountState['60'][ETH_ADDRESS] = accountType;
+
+    snapMock.rpcMocks.snap_manageState.mockReturnValue(snapState);
+
+    const switchMethodRequestParams = getRequestParams('switchMethod', {
+      didMethod: 'did:pkh',
+    });
+
+    const request = onRpcRequest({
       origin: 'tests',
       request: switchMethodRequestParams as any,
-    })).rejects.toThrowError();
-
+    });
+    await expect(request).rejects.toThrowError();
     expect.assertions(1);
   });
 });

@@ -26,6 +26,8 @@ export async function createVP(
   const { snap, state, account } = identitySnapParams;
 
   const vcsMetadata = vpRequestParams.vcs;
+
+  console.log(`vcs metadata ${JSON.stringify(vcsMetadata)}`);
   const proofFormat = vpRequestParams.proofInfo?.proofFormat
     ? vpRequestParams.proofInfo.proofFormat
     : ('jwt' as ProofFormat);
@@ -79,6 +81,7 @@ export async function createVP(
   }
 
   if (vcs.length === 0) {
+    console.log('here');
     return null;
   }
   const config = state.snapConfig;
