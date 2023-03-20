@@ -1,4 +1,4 @@
-import { AccountId } from '@hashgraph/sdk';
+import { HederaMirrorInfo } from '@tuum-tech/identity-snap/src/hedera/service';
 import { FC, useContext, useState } from 'react';
 import {
   MetamaskActions,
@@ -22,7 +22,7 @@ const CreateNewHederaAccount: FC<Props> = ({ setCurrentChainId }) => {
     '302d300706052b8104000a032200034920445ae433dbfa7b11da73305566f143bfdff959779ac8a005b13a875460f2',
   );
   const [newAccountEvmAddress, setNewAccountEvmAddress] = useState(
-    '0x7d871f006d97498ea338268a956af94ab2e65cdd',
+    '0x9dA3b1ACFec871e668B51828faedB607e37609F9',
   );
   const [hbarAmountToSend, setHbarAmountToSend] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -34,15 +34,30 @@ const CreateNewHederaAccount: FC<Props> = ({ setCurrentChainId }) => {
     try {
       setCurrentChainId(await getCurrentNetwork());
       if (hbarAmountToSend > 0) {
-        const newHederaAccountId = (await createNewHederaAccount({
+        // If you want to create a hbar account for a public key, just uncomment the line 'newAccountPublickey'
+        const newHederaAccountInfo = (await createNewHederaAccount({
           hbarAmountToSend,
           newAccountEvmAddress,
           // newAccountPublickey,
-        })) as AccountId;
-        console.log(`Your new hedera account Id: ${newHederaAccountId}`);
+        })) as HederaMirrorInfo;
+        console.log(
+          `Your hedera account info: ${JSON.stringify(
+            newHederaAccountInfo,
+            null,
+            4,
+          )}`,
+        );
+        let title = 'Hedera Account Info';
+        if (newHederaAccountInfo.newlyCreated) {
+          title = `Newly created ${title}`;
+        } else {
+          console.log(
+            "No hbars were sent to the new account because a hedera account already exists on the ledger. We're just returing the info by quering hedera mirror node",
+          );
+        }
         showModal({
-          title: 'New Hedera Account Id',
-          content: `Your accountId is: ${newHederaAccountId}`,
+          title,
+          content: JSON.stringify(newHederaAccountInfo, null, 4),
         });
       } else {
         showModal({
@@ -66,6 +81,8 @@ const CreateNewHederaAccount: FC<Props> = ({ setCurrentChainId }) => {
           'Create a new hedera account by sending some HBARs to a hedera publickey address',
         form: (
           <form>
+            {/* If you want to create a hbar account for a public key, just
+            uncomment the below lines */}
             {/* <label>
               Enter the publickey address to create a hedera account for
               <input
