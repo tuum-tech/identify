@@ -1,96 +1,106 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
-import { VerifiablePresentation } from '@veramo/core';
-import { IdentitySnapParams, IdentitySnapState } from '../../../src/interfaces';
-import { connectHederaAccount } from '../../../src/rpc/hedera/connectHederaAccount';
-import { createVC } from '../../../src/rpc/vc/createVC';
-import { createVP } from '../../../src/rpc/vc/createVP';
-import { verifyVP } from '../../../src/rpc/vc/verifyVP';
-import { createMockSnap, SnapMock } from '../../testUtils/snap.mock';
+import { VerifiablePresentation, W3CVerifiableCredential } from '@veramo/core';
+import { buildMockSnap, SnapMock } from '../../testUtils/snap.mock';
 
+import { IDataManagerSaveResult } from 'src/plugins/veramo/verfiable-creds-manager';
+import { onRpcRequest } from '../../../src';
 import {
-  getDefaultSnapState,
-  hederaPrivateKey,
+  ETH_ADDRESS,
+  ETH_CHAIN_ID,
+  getDefaultSnapState
 } from '../../testUtils/constants';
+import { getRequestParams } from '../../testUtils/helper';
 
 describe('VerifyVP', () => {
-  let identitySnapParams: IdentitySnapParams;
-  let snapState: IdentitySnapState;
-  let snapMock: SnapsGlobalObject & SnapMock;
+ let snapMock: SnapsGlobalObject & SnapMock;
   let metamask: MetaMaskInpageProvider;
 
-  beforeEach(async () => {
-    snapState = getDefaultSnapState();
-    snapMock = createMockSnap();
+  const vcs: W3CVerifiableCredential[] = [];
+  let presentation: VerifiablePresentation;
+
+  beforeAll(async () => {
+    snapMock = buildMockSnap(ETH_CHAIN_ID, ETH_ADDRESS);
     metamask = snapMock as unknown as MetaMaskInpageProvider;
-    identitySnapParams = {
-      metamask,
-      snap: snapMock,
-      state: snapState,
-    };
 
-    (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
-      hederaPrivateKey,
-    );
+    global.snap = snapMock;
+    global.ethereum = metamask;
+  });
 
-    (identitySnapParams.snap as SnapMock).rpcMocks.eth_chainId.mockReturnValue(
-      '0x128',
-    );
+  beforeEach(async () => {
+    snapMock.rpcMocks.snap_dialog.mockReturnValue(true);
+    snapMock.rpcMocks.snap_manageState.mockReturnValue(getDefaultSnapState());
+    snapMock.rpcMocks.snap_manageState('update', getDefaultSnapState());
 
-    await connectHederaAccount(snapMock, snapState, metamask, '0.0.15215');
+    const createVcRequest1 = getRequestParams('createVC', {
+      vcValue: { prop: 10 },
+      credTypes: ['Login'],
+    });
+
+    const createVcRequest2 = getRequestParams('createVC', {
+      vcValue: { prop: 20 },
+      credTypes: ['NotLogin'],
+    });
+
+    const createVcResponse1: IDataManagerSaveResult[] = (await onRpcRequest({
+      origin: 'tests',
+      request: createVcRequest1 as any,
+    })) as IDataManagerSaveResult[];
+    const createVcResponse2: IDataManagerSaveResult[] = (await onRpcRequest({
+      origin: 'tests',
+      request: createVcRequest2 as any,
+    })) as IDataManagerSaveResult[];
+
+    vcs.push(createVcResponse1[0].id);
+    vcs.push(createVcResponse2[0].id);
+
+    const createVpRequest = getRequestParams('createVP', {
+      vcs: vcs,
+    });
+
+    presentation = (await onRpcRequest({
+      origin: 'tests',
+      request: createVpRequest as any,
+    })) as VerifiablePresentation;
+  
   });
 
   it('should verify valid VP', async () => {
-    // Setup
-    (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
-      true,
-    );
-
-    // create VC
-    const vcCreatedResult = await createVC(identitySnapParams, {
-      vcValue: { prop: 10 },
+   
+    const verifyVPRequest = getRequestParams('verifyVP', 
+    {
+      verifiablePresentation: presentation
     });
 
-    // create VP
-    const verifiablePresentation = await createVP(identitySnapParams, {
-      vcs: [vcCreatedResult[0].id as string],
+    const verifyVPResponse = onRpcRequest({
+      origin: 'tests',
+      request: verifyVPRequest as any,
     });
-
-    await expect(
-      verifyVP(
-        identitySnapParams,
-        verifiablePresentation as VerifiablePresentation,
-      ),
-    ).resolves.toBe(true);
+    
+    await expect(verifyVPResponse).resolves.toBe(true);
     expect.assertions(1);
   });
 
   it('should refuse validation when VP is adultered', async () => {
     // Setup
-    (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
-      true,
-    );
+    snapMock.rpcMocks.snap_dialog.mockReturnValue(false);
 
-    // create VC
-    const vcCreatedResult = await createVC(identitySnapParams, {
-      vcValue: { prop: 10 },
-    });
-
-    // create VP
-    const verifiablePresentation = await createVP(identitySnapParams, {
-      vcs: [vcCreatedResult[0].id as string],
-    });
-
-    const adultered = JSON.parse(JSON.stringify(verifiablePresentation));
+    const adultered = JSON.parse(JSON.stringify(presentation));
 
     adultered.proof.jwt =
       '1.eyJhbGciOiJFUzI1NksiLCJ0eXAiOiJKV1QifQ.eyJ2cCI6eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSJdLCJ0eXBlIjpbIlZlcmlmaWFibGVQcmVzZW50YXRpb24iLCJDdXN0b20iXSwidmVyaWZpYWJsZUNyZWRlbnRpYWwiOlsiZXlKaGJHY2lPaUpGVXpJMU5rc2lMQ0owZVhBaU9pSktWMVFpZlEuZXlKbGVIQWlPakUzTURneU56a3lPRElzSW5aaklqcDdJa0JqYjI1MFpYaDBJanBiSW1oMGRIQnpPaTh2ZDNkM0xuY3pMbTl5Wnk4eU1ERTRMMk55WldSbGJuUnBZV3h6TDNZeElsMHNJblI1Y0dVaU9sc2lWbVZ5YVdacFlXSnNaVU55WldSbGJuUnBZV3dpWFN3aVkzSmxaR1Z1ZEdsaGJGTjFZbXBsWTNRaU9uc2lkbU5FWVhSaElqcDdJbkJ5YjNBaU9qRXdmU3dpYUdWa1pYSmhRV05qYjNWdWRFbGtJam9pTUM0d0xqRTFNakUxSW4xOUxDSnBjM04xWlhJaU9uc2lhR1ZrWlhKaFFXTmpiM1Z1ZEVsa0lqb2lNQzR3TGpFMU1qRTFJbjBzSW5OMVlpSTZJbVJwWkRwd2EyZzZaV2x3TVRVMU9qSTVOam93ZURka09EY3haakF3Tm1RNU56UTVPR1ZoTXpNNE1qWTRZVGsxTm1GbU9UUmhZakpsTmpWalpHUWlMQ0p1WW1ZaU9qRTJOelkzTkRNeU9ESXNJbWx6Y3lJNkltUnBaRHB3YTJnNlpXbHdNVFUxT2pJNU5qb3dlRGRrT0RjeFpqQXdObVE1TnpRNU9HVmhNek00TWpZNFlUazFObUZtT1RSaFlqSmxOalZqWkdRaWZRLmRySGdXTzhSM0lBaHZTbEJZTFNLNnlObnJkTjMwRDkwZFluSmUxN1FtclZ3cS1nU2psQ2REd1dnV1pzRFFxRXZlblRoSHpLeHZIRVVkbmN2Q0xyTkZnIl19LCJuYmYiOjE2NzY3NDMyODIsImlzcyI6ImRpZDpwa2g6ZWlwMTU1OjI5NjoweDdkODcxZjAwNmQ5NzQ5OGVhMzM4MjY4YTk1NmFmOTRhYjJlNjVjZGQifQ.3rRRKLtrTcsiAzXHgmQVjZOG2YZKBxomIwbZC6nFPaUNyaBTLOLEw8ZAmVpdWRXA-K7OjlPtcyaz4IMn-iaUlg';
 
-    // console.log("adultered Presentation " + JSON.stringify(adultered));
 
-    await expect(
-      verifyVP(identitySnapParams, adultered as VerifiablePresentation),
-    ).rejects.toThrowError();
-    expect.assertions(1);
+    const verifyVPRequest = getRequestParams('verifyVP', 
+    {
+      verifiablePresentation: adultered
+    });
+
+    const verifyVPResponse = onRpcRequest({
+      origin: 'tests',
+      request: verifyVPRequest as any,
+    });
+    
+    await expect(verifyVPResponse).rejects.toThrowError();
   });
 });
