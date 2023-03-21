@@ -6,9 +6,6 @@ import {
   TransactionReceipt,
 } from '@hashgraph/sdk';
 import { BigNumber } from 'bignumber.js';
-import { HederaServiceImpl } from '..';
-import { getCurrentNetwork } from '../../snap/network';
-import { getHederaNetwork } from '../config';
 import { HederaMirrorInfo } from '../service';
 
 /**
@@ -35,6 +32,8 @@ export async function createAccountForPublicKey(
     await tx.execute(client)
   ).getReceipt(client);
 
+  console.log('receipt: ', JSON.stringify(receipt, null, 4));
+
   const newAccountId = receipt.accountId ? receipt.accountId.toString() : '';
 
   console.log('newAccountId: ', newAccountId);
@@ -46,18 +45,8 @@ export async function createAccountForPublicKey(
     return null;
   }
 
-  try {
-    const hederaService = new HederaServiceImpl(
-      getHederaNetwork(await getCurrentNetwork(ethereum)),
-    );
-    return (await hederaService.getAccountFromPublicKey(
-      options.publicKey.toStringRaw(),
-    )) as HederaMirrorInfo;
-  } catch (error) {
-    console.log(
-      'Error while retrieving account info using public key: ',
-      error,
-    );
-    return null;
-  }
+  return {
+    account: newAccountId,
+    publicKey: options.publicKey.toStringRaw(),
+  } as HederaMirrorInfo;
 }

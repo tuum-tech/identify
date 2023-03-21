@@ -61,7 +61,7 @@ export type SimpleHederaClient = {
 export type HederaMirrorInfo = {
   account: string;
   evmAddress: string;
-  publicKey: string;
+  publicKey?: string;
   alias: string;
   balance: number;
   createdDate: string;

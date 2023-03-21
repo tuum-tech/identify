@@ -6,15 +6,11 @@ import {
   Hbar,
   PrivateKey,
   PublicKey,
-  Status,
   TransactionReceipt,
   TransactionReceiptQuery,
   TransferTransaction,
 } from '@hashgraph/sdk';
 import { BigNumber } from 'bignumber.js';
-import { HederaServiceImpl } from '..';
-import { getCurrentNetwork } from '../../snap/network';
-import { getHederaNetwork } from '../config';
 
 import {
   HederaAccountInfo,
@@ -99,6 +95,8 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
       .setIncludeChildren(true)
       .execute(this._client);
 
+    console.log('receipt: ', JSON.stringify(receipt, null, 4));
+
     const newAccountId =
       receipt.children.length > 0 && receipt.children[0].accountId
         ? receipt.children[0].accountId.toString()
@@ -107,27 +105,15 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
     console.log('newAccountId: ', newAccountId);
 
     if (!newAccountId) {
-      if (receipt.status !== Status.Success) {
-        console.log(
-          "The transaction didn't process successfully so a new accountId was not created",
-        );
-        return null;
-      }
-    }
-
-    try {
-      const hederaService = new HederaServiceImpl(
-        getHederaNetwork(await getCurrentNetwork(ethereum)),
-      );
-      return (await hederaService.getAccountFromEvmAddres(
-        options.evmAddress,
-      )) as HederaMirrorInfo;
-    } catch (error) {
       console.log(
-        'Error while retrieving account info using public key: ',
-        error,
+        "The transaction didn't process successfully so a new accountId was not created",
       );
       return null;
     }
+
+    return {
+      account: newAccountId,
+      evmAddress: options.evmAddress,
+    } as HederaMirrorInfo;
   }
 }

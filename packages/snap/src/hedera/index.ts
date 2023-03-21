@@ -64,11 +64,20 @@ export class HederaServiceImpl implements HederaService {
     const accountInfoUrl = `https://${network}.mirrornode.hedera.com/api/v1/accounts?account.publickey=${publicKey}&limit=1&order=asc`;
     const accountInfoResult = await mirrorNodeQuery(accountInfoUrl);
 
+    console.log(
+      'getAccountFromPublicKey - result: ',
+      JSON.stringify(accountInfoResult, null, 4),
+    );
+
     if (
-      !(accountInfoResult.accounts && accountInfoResult.accounts.length > 0)
+      !(
+        accountInfoResult.accounts &&
+        accountInfoResult.accounts.length > 0 &&
+        accountInfoResult.accounts[0].account
+      )
     ) {
       console.log(
-        `There are no known accountIds associated with this public key because this hbar account is not activited on the ledger yet. You need to send some HBAR to this account to activate it first. You can either do that manually or call the createNewHederaAccount identity snap API to do so`,
+        `Could not retrieve info about this evm address from hedera mirror node for some reason. Please try again later`,
       );
       return null;
     }
@@ -101,7 +110,7 @@ export class HederaServiceImpl implements HederaService {
     return {
       account: result.account,
       evmAddress: result.evm_address,
-      publicKey: result.key.key,
+      publicKey,
       alias: result.alias,
       balance: result.balance.balance / 100000000.0,
       createdDate,
@@ -119,9 +128,14 @@ export class HederaServiceImpl implements HederaService {
     const accountInfoUrl = `https://${network}.mirrornode.hedera.com/api/v1/accounts/${evmAddress}?limit=1&order=asc`;
     const result = await mirrorNodeQuery(accountInfoUrl);
 
-    if (result === null || _.isEmpty(result)) {
+    console.log(
+      'getAccountFromEvmAddres - result: ',
+      JSON.stringify(result, null, 4),
+    );
+
+    if (result === null || _.isEmpty(result) || !result.account) {
       console.log(
-        `There are no known accountIds associated with this evm address because this hbar account is not activited on the ledger yet. You need to send some HBAR to this account to activate it first. You can either do that manually or call the createNewHederaAccount identity snap API to do so`,
+        `Could not retrieve info about this evm address from hedera mirror node for some reason. Please try again later`,
       );
       return null;
     }
@@ -153,7 +167,6 @@ export class HederaServiceImpl implements HederaService {
     return {
       account: result.account,
       evmAddress: result.evm_address,
-      publicKey: result.key.key,
       alias: result.alias,
       balance: result.balance.balance / 100000000.0,
       createdDate,
