@@ -1,9 +1,7 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { onRpcRequest } from '../../../src';
-import {
-  getDefaultSnapState
-} from '../../testUtils/constants';
+import { getDefaultSnapState } from '../../testUtils/constants';
 import { getRequestParams } from '../../testUtils/helper';
 import { createMockSnap, SnapMock } from '../../testUtils/snap.mock';
 
@@ -39,26 +37,27 @@ describe('delete all VCs', () => {
     await onRpcRequest({ origin: 'tests', request: createVcRequest2 as any });
   });
 
-
   it('should delete all VC', async () => {
-    
-    const deleteAllVcsRequest = getRequestParams('deleteAllVCs', { options: {store: 'snap'} });
+    const deleteAllVcsRequest = getRequestParams('deleteAllVCs', {
+      options: { store: 'snap' },
+    });
 
     await expect(
-      onRpcRequest({ origin: 'tests', request: deleteAllVcsRequest as any })
+      onRpcRequest({ origin: 'tests', request: deleteAllVcsRequest as any }),
     ).resolves.not.toBeUndefined();
 
     expect.assertions(1);
   });
 
   it('should throw exception if user refused confirmation', async () => {
-
     snapMock.rpcMocks.snap_dialog.mockReturnValue(false);
 
-    const deleteAllVcsRequest = getRequestParams('deleteAllVCs', { options: {store: 'snap'}});
+    const deleteAllVcsRequest = getRequestParams('deleteAllVCs', {
+      options: { store: 'snap' },
+    });
 
     await expect(
-      onRpcRequest({ origin: 'tests', request: deleteAllVcsRequest as any })
+      onRpcRequest({ origin: 'tests', request: deleteAllVcsRequest as any }),
     ).rejects.toThrowError();
 
     expect.assertions(1);

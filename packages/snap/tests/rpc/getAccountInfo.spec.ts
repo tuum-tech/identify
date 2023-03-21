@@ -1,10 +1,15 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
-import { HederaAccountParams, PublicAccountInfo } from 'src/interfaces';
+import {
+  EvmAccountParams,
+  HederaAccountParams,
+  PublicAccountInfo,
+} from 'src/interfaces';
 import { onRpcRequest } from '../../src';
 import {
   ETH_ADDRESS,
   ETH_CHAIN_ID,
+  EVM_ACCOUNT,
   getDefaultSnapState,
   HEDERA_ACCOUNT,
   HEDERA_CHAIN_ID,
@@ -94,6 +99,45 @@ describe('getAccountInfo', () => {
       expect(
         (accountInfo.externalAccountInfo as HederaAccountParams).accountId,
       ).toBe(HEDERA_ACCOUNT.accountId);
+      expect.assertions(2);
+    });
+  });
+
+  describe('getAccountInfo polygon', () => {
+    beforeAll(async () => {
+      snapMock = buildMockSnap(EVM_ACCOUNT.chainId, EVM_ACCOUNT.address);
+      metamask = snapMock as unknown as MetaMaskInpageProvider;
+
+      global.snap = snapMock;
+      global.ethereum = metamask;
+    });
+
+    it('should set evm external account info', async () => {
+      snapMock.rpcMocks.snap_dialog.mockReturnValue(EVM_ACCOUNT.privatekey);
+
+      const externalEvmAccount = {
+        externalAccount: {
+          network: 'evm',
+          data: {
+            address: ETH_ADDRESS,
+          },
+        },
+      };
+
+      const accountInfoRequestParams = getRequestParams(
+        'getAccountInfo',
+        externalEvmAccount,
+      );
+
+      const accountInfo = (await onRpcRequest({
+        origin: 'tests',
+        request: accountInfoRequestParams as any,
+      })) as PublicAccountInfo;
+      expect(accountInfo.evmAddress).toBe(ETH_ADDRESS);
+      console.log(JSON.stringify(accountInfo));
+      expect(
+        (accountInfo.externalAccountInfo as EvmAccountParams).address,
+      ).toBe(ETH_ADDRESS);
       expect.assertions(2);
     });
   });

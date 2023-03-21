@@ -8,13 +8,20 @@ export const privateKey =
 export const mnemonic =
   'final runway match relax bamboo carry budget guilt dish weapon magnet alarm';
 export const ETH_ADDRESS = '0xf49d65c80c3d2d98231654513b2da4652f09c9fe';
-export const ETH_CHAIN_ID = 0x1;
+export const ETH_CHAIN_ID = '0x1';
 
 export const HEDERA_CHAIN_ID = {
   mainnet: '0x127',
   testnet: '0x128',
   previewnet: '0x129',
   localnet: '0x12a',
+};
+
+export const EVM_ACCOUNT = {
+  chainId: '137', // polygon
+  address: '0xf49d65c80c3d2d98231654513b2da4652f09c9fe',
+  privatekey:
+    'd787278d71bc9b50e814705ca48fcf652e08fb5eb73773e98146c48846bde456',
 };
 
 export const HEDERA_ACCOUNT = {

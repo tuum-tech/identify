@@ -1,10 +1,12 @@
 import { PrivateKey } from '@hashgraph/sdk';
 import { heading, panel, text } from '@metamask/snaps-ui';
 import { ethers, Wallet } from 'ethers';
-import { validHederaChainID } from '../hedera/config';
+import { validEVMChainID, validHederaChainID } from '../hedera/config';
 import {
   Account,
   AccountViaPrivateKey,
+  EvmAccountParams,
+  HederaAccountParams,
   IdentitySnapState,
   SnapDialogParams,
 } from '../interfaces';
@@ -18,15 +20,18 @@ import { getCurrentNetwork } from './network';
  * Connect Hedera Account.
  *
  * @param state - Identity state.
- * @param accountId - Account id.
+ * @param hederaAccount - Hedera Account Params.
  * @param getCompleteInfo - Whether to get the full account info or not.
  */
 export async function connectHederaAccount(
   state: IdentitySnapState,
-  accountId: string,
+  hederaAccount: HederaAccountParams,
   getCompleteInfo?: boolean,
 ): Promise<Account> {
   const chainId = await getCurrentNetwork(ethereum);
+  const { accountId } = hederaAccount;
+
+  console.log(chainId);
   if (validHederaChainID(chainId)) {
     let privateKey: string;
     const evmAddress = await getHederaAccountIfExists(
@@ -60,6 +65,63 @@ export async function connectHederaAccount(
       publicKey: wallet.publicKey,
       address: wallet.address,
       extraData: accountId,
+    };
+
+    const account = await importIdentitySnapAccount(
+      state,
+      '',
+      accountViaPrivateKey,
+    );
+    if (getCompleteInfo) {
+      return account;
+    }
+    return {
+      evmAddress: account.evmAddress,
+      method: account.method,
+      publicKey: account.publicKey,
+    } as Account;
+  }
+
+  console.error(
+    'Invalid Chain ID. Valid chainIDs for Hedera: [0x127: mainnet, 0x128: testnet, 0x129: previewnet, 0x12a: localnet]',
+  );
+  throw new Error(
+    'Non-Hedera network was selected on Metamask while trying to configure the Hedera network. Please switch the network to Hedera Network first',
+  );
+}
+
+/**
+ * Connect Hedera Account.
+ *
+ * @param state - Identity state.
+ * @param evmAccount - EVM Account Params.
+ * @param getCompleteInfo - Whether to get the full account info or not.
+ */
+export async function connectEVMAccount(
+  state: IdentitySnapState,
+  evmAccount: EvmAccountParams,
+  getCompleteInfo?: boolean,
+): Promise<Account> {
+  const chainId = await getCurrentNetwork(ethereum);
+
+  if (validEVMChainID(chainId)) {
+    const dialogParamsForPrivateKey: SnapDialogParams = {
+      type: 'Prompt',
+      content: panel([
+        heading('Connect to EVM Account'),
+        text('Enter your ECDSA private key for your EVM Account'),
+      ]),
+      placeholder: '787278d71bc9b50e8147...', // You can use 'd787278d71bc9b50e814705ca48fcf652e08fb5eb73773e98146c48846bde456'
+    };
+    const privateKey = PrivateKey.fromString(
+      (await snapDialog(snap, dialogParamsForPrivateKey)) as string,
+    ).toStringRaw();
+
+    const wallet: Wallet = new ethers.Wallet(privateKey);
+    const accountViaPrivateKey: AccountViaPrivateKey = {
+      privateKey,
+      publicKey: wallet.publicKey,
+      address: evmAccount.address,
     };
 
     const account = await importIdentitySnapAccount(

@@ -1,6 +1,6 @@
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
-import { HederaAccountParams, IdentitySnapParams } from './interfaces';
+import { ExternalAccount, IdentitySnapParams } from './interfaces';
 import { getAccountInfo } from './rpc/account/getAccountInfo';
 import { getAvailableMethods } from './rpc/did/getAvailableMethods';
 import { getCurrentDIDMethod } from './rpc/did/getCurrentDIDMethod';
@@ -29,6 +29,7 @@ import {
   isValidCreateVCRequest,
   isValidCreateVPRequest,
   isValidDeleteAllVCsRequest,
+  isValidEVMAccountParams,
   isValidGetVCsRequest,
   isValidHederaAccountParams,
   isValidRemoveVCRequest,
@@ -66,15 +67,18 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   }
   console.log('state:', JSON.stringify(state, null, 4));
 
-  let hederaAccountId = '';
-  if (isExternalAccountFlagSet(request.params)) {
-    isValidHederaAccountParams(request.params);
-    hederaAccountId = (
-      (request.params as any).externalAccount.data as HederaAccountParams
-    ).accountId;
+  const externalAccountData: ExternalAccount =
+    request.params as ExternalAccount;
+  if (isExternalAccountFlagSet(externalAccountData)) {
+    if (
+      !isValidHederaAccountParams(request.params) &&
+      !isValidEVMAccountParams(request.params)
+    ) {
+      throw new Error('External Account invalid');
+    }
   }
 
-  const account = await getCurrentAccount(state, hederaAccountId);
+  const account = await getCurrentAccount(state, externalAccountData);
   console.log(
     `Evm Address: ${account.evmAddress}, did: ${account.identifier.did}`,
   );
@@ -107,7 +111,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     }
 
     case 'getAccountInfo': {
-      return await getAccountInfo(identitySnapParams, hederaAccountId);
+      return await getAccountInfo(identitySnapParams, externalAccountData);
     }
 
     case 'getDID': {

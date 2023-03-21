@@ -1,29 +1,47 @@
 import {
   Account,
   AccountViaPrivateKey,
+  EvmAccountParams,
+  ExternalAccount,
+  HederaAccountParams,
   IdentitySnapState,
 } from '../interfaces';
 import { veramoImportMetaMaskAccount } from '../veramo/accountImport';
-import { connectHederaAccount } from './hedera';
+import { connectEVMAccount, connectHederaAccount } from './hedera';
 import { getCurrentCoinType, initAccountState } from './state';
 
 /**
  * Function that returns account info of the currently selected MetaMask account.
  *
  * @param state - IdentitySnapState.
- * @param hederaAccountId - Hedera Identifier.
+ * @param account - External Account.
  * @returns MetaMask address and did.
  */
 export async function getCurrentAccount(
   state: IdentitySnapState,
-  hederaAccountId?: string,
+  account: ExternalAccount,
 ): Promise<Account> {
   try {
     const accounts = (await ethereum.request({
       method: 'eth_requestAccounts',
     })) as string[];
-    if (hederaAccountId) {
-      return await connectHederaAccount(state, hederaAccountId, true);
+    if (
+      account.externalAccount &&
+      account.externalAccount.network === 'hedera'
+    ) {
+      return await connectHederaAccount(
+        state,
+        account.externalAccount.data as HederaAccountParams,
+        true,
+      );
+    }
+
+    if (account.externalAccount && account.externalAccount.network === 'evm') {
+      return await connectEVMAccount(
+        state,
+        account.externalAccount.data as EvmAccountParams,
+        true,
+      );
     }
     return await importIdentitySnapAccount(state, accounts[0]);
   } catch (e) {
@@ -47,8 +65,6 @@ export async function importIdentitySnapAccount(
   // Initialize if not there
   const coinType = (await getCurrentCoinType()).toString();
 
-  console.log(`cointype ${coinType}`);
-  console.log(`acc state ${JSON.stringify(state.accountState[coinType])}`);
   if (evmAddress && !(evmAddress in state.accountState[coinType])) {
     console.log(
       `The address ${evmAddress} has NOT yet been configured in the Identity Snap. Configuring now...`,

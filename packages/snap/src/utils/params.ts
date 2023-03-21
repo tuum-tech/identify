@@ -1,5 +1,6 @@
 import { VerifiablePresentation, W3CVerifiableCredential } from '@veramo/core';
 import {
+  EvmAccountParams,
   ExternalAccount,
   GoogleToken,
   HederaAccountParams,
@@ -42,14 +43,14 @@ export function isExternalAccountFlagSet(params: unknown): boolean {
  * Check validation of Hedera account.
  *
  * @param params - Request params.
+ * @returns Boolean.
  */
-export function isValidHederaAccountParams(
-  params: unknown,
-): asserts params is ExternalAccount {
+export function isValidHederaAccountParams(params: unknown): boolean {
   if (
     params !== null &&
     typeof params === 'object' &&
     'externalAccount' in params &&
+    'network' in (params as unknown as ExternalAccount).externalAccount &&
     (params as unknown as ExternalAccount).externalAccount.network ===
       'hedera' &&
     typeof (params as unknown as ExternalAccount).externalAccount.data ===
@@ -59,11 +60,40 @@ export function isValidHederaAccountParams(
         .data as HederaAccountParams
     ).accountId === 'string'
   ) {
-    return;
+    return true;
   }
 
   console.error('Invalid Hedera Params passed');
-  throw new Error('Invalid Hedera Params passed');
+  // throw new Error('Invalid Hedera Params passed');
+  return false;
+}
+
+/**
+ * Check validation of EVM account.
+ *
+ * @param params - Request params.
+ * @returns Boolean.
+ */
+export function isValidEVMAccountParams(params: unknown): boolean {
+  if (
+    params !== null &&
+    typeof params === 'object' &&
+    'externalAccount' in params &&
+    'network' in (params as unknown as ExternalAccount).externalAccount &&
+    (params as unknown as ExternalAccount).externalAccount.network === 'evm' &&
+    typeof (params as unknown as ExternalAccount).externalAccount.data ===
+      'object' &&
+    typeof (
+      (params as unknown as ExternalAccount).externalAccount
+        .data as EvmAccountParams
+    ).address === 'string'
+  ) {
+    return true;
+  }
+
+  console.error('Invalid EVM Params passed');
+  // throw new Error('Invalid Hedera Params passed');
+  return false;
 }
 
 /**

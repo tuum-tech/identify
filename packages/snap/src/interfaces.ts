@@ -106,3 +106,7 @@ export type ExternalAccount = {
 export type HederaAccountParams = {
   accountId: string;
 };
+
+export type EvmAccountParams = {
+  address: string;
+};

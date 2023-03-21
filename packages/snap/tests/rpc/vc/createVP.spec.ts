@@ -6,7 +6,7 @@ import { onRpcRequest } from '../../../src';
 import {
   ETH_ADDRESS,
   ETH_CHAIN_ID,
-  getDefaultSnapState
+  getDefaultSnapState,
 } from '../../testUtils/constants';
 import { getRequestParams } from '../../testUtils/helper';
 import { buildMockSnap, SnapMock } from '../../testUtils/snap.mock';
@@ -80,6 +80,7 @@ describe('createVP', () => {
     expect.assertions(2);
   });
 
+  // eslint-disable-next-line
   it.skip('should throw error when user rejects confirm', async () => {
     snapMock.rpcMocks.snap_dialog.mockReturnValue(false);
 

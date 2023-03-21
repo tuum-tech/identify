@@ -1,19 +1,19 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { VerifiablePresentation, W3CVerifiableCredential } from '@veramo/core';
+import { IDataManagerSaveResult } from 'src/plugins/veramo/verfiable-creds-manager';
 import { buildMockSnap, SnapMock } from '../../testUtils/snap.mock';
 
-import { IDataManagerSaveResult } from 'src/plugins/veramo/verfiable-creds-manager';
 import { onRpcRequest } from '../../../src';
 import {
   ETH_ADDRESS,
   ETH_CHAIN_ID,
-  getDefaultSnapState
+  getDefaultSnapState,
 } from '../../testUtils/constants';
 import { getRequestParams } from '../../testUtils/helper';
 
 describe('VerifyVP', () => {
- let snapMock: SnapsGlobalObject & SnapMock;
+  let snapMock: SnapsGlobalObject & SnapMock;
   let metamask: MetaMaskInpageProvider;
 
   const vcs: W3CVerifiableCredential[] = [];
@@ -55,28 +55,25 @@ describe('VerifyVP', () => {
     vcs.push(createVcResponse2[0].id);
 
     const createVpRequest = getRequestParams('createVP', {
-      vcs: vcs,
+      vcs,
     });
 
     presentation = (await onRpcRequest({
       origin: 'tests',
       request: createVpRequest as any,
     })) as VerifiablePresentation;
-  
   });
 
   it('should verify valid VP', async () => {
-   
-    const verifyVPRequest = getRequestParams('verifyVP', 
-    {
-      verifiablePresentation: presentation
+    const verifyVPRequest = getRequestParams('verifyVP', {
+      verifiablePresentation: presentation,
     });
 
     const verifyVPResponse = onRpcRequest({
       origin: 'tests',
       request: verifyVPRequest as any,
     });
-    
+
     await expect(verifyVPResponse).resolves.toBe(true);
     expect.assertions(1);
   });
@@ -90,17 +87,15 @@ describe('VerifyVP', () => {
     adultered.proof.jwt =
       '1.eyJhbGciOiJFUzI1NksiLCJ0eXAiOiJKV1QifQ.eyJ2cCI6eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSJdLCJ0eXBlIjpbIlZlcmlmaWFibGVQcmVzZW50YXRpb24iLCJDdXN0b20iXSwidmVyaWZpYWJsZUNyZWRlbnRpYWwiOlsiZXlKaGJHY2lPaUpGVXpJMU5rc2lMQ0owZVhBaU9pSktWMVFpZlEuZXlKbGVIQWlPakUzTURneU56a3lPRElzSW5aaklqcDdJa0JqYjI1MFpYaDBJanBiSW1oMGRIQnpPaTh2ZDNkM0xuY3pMbTl5Wnk4eU1ERTRMMk55WldSbGJuUnBZV3h6TDNZeElsMHNJblI1Y0dVaU9sc2lWbVZ5YVdacFlXSnNaVU55WldSbGJuUnBZV3dpWFN3aVkzSmxaR1Z1ZEdsaGJGTjFZbXBsWTNRaU9uc2lkbU5FWVhSaElqcDdJbkJ5YjNBaU9qRXdmU3dpYUdWa1pYSmhRV05qYjNWdWRFbGtJam9pTUM0d0xqRTFNakUxSW4xOUxDSnBjM04xWlhJaU9uc2lhR1ZrWlhKaFFXTmpiM1Z1ZEVsa0lqb2lNQzR3TGpFMU1qRTFJbjBzSW5OMVlpSTZJbVJwWkRwd2EyZzZaV2x3TVRVMU9qSTVOam93ZURka09EY3haakF3Tm1RNU56UTVPR1ZoTXpNNE1qWTRZVGsxTm1GbU9UUmhZakpsTmpWalpHUWlMQ0p1WW1ZaU9qRTJOelkzTkRNeU9ESXNJbWx6Y3lJNkltUnBaRHB3YTJnNlpXbHdNVFUxT2pJNU5qb3dlRGRrT0RjeFpqQXdObVE1TnpRNU9HVmhNek00TWpZNFlUazFObUZtT1RSaFlqSmxOalZqWkdRaWZRLmRySGdXTzhSM0lBaHZTbEJZTFNLNnlObnJkTjMwRDkwZFluSmUxN1FtclZ3cS1nU2psQ2REd1dnV1pzRFFxRXZlblRoSHpLeHZIRVVkbmN2Q0xyTkZnIl19LCJuYmYiOjE2NzY3NDMyODIsImlzcyI6ImRpZDpwa2g6ZWlwMTU1OjI5NjoweDdkODcxZjAwNmQ5NzQ5OGVhMzM4MjY4YTk1NmFmOTRhYjJlNjVjZGQifQ.3rRRKLtrTcsiAzXHgmQVjZOG2YZKBxomIwbZC6nFPaUNyaBTLOLEw8ZAmVpdWRXA-K7OjlPtcyaz4IMn-iaUlg';
 
-
-    const verifyVPRequest = getRequestParams('verifyVP', 
-    {
-      verifiablePresentation: adultered
+    const verifyVPRequest = getRequestParams('verifyVP', {
+      verifiablePresentation: adultered,
     });
 
     const verifyVPResponse = onRpcRequest({
       origin: 'tests',
       request: verifyVPRequest as any,
     });
-    
+
     await expect(verifyVPResponse).rejects.toThrowError();
   });
 });

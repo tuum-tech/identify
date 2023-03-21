@@ -1,12 +1,16 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { W3CVerifiableCredential } from '@veramo/core';
-import { IDataManagerDeleteResult, IDataManagerQueryResult, IDataManagerSaveResult } from 'src/plugins/veramo/verfiable-creds-manager';
+import {
+  IDataManagerDeleteResult,
+  IDataManagerQueryResult,
+  IDataManagerSaveResult,
+} from 'src/plugins/veramo/verfiable-creds-manager';
 import { onRpcRequest } from '../../../src';
 import {
   ETH_ADDRESS,
   ETH_CHAIN_ID,
-  getDefaultSnapState
+  getDefaultSnapState,
 } from '../../testUtils/constants';
 import { getRequestParams } from '../../testUtils/helper';
 import { buildMockSnap, SnapMock } from '../../testUtils/snap.mock';
@@ -30,7 +34,7 @@ describe('RemoveVC', () => {
     snapMock.rpcMocks.snap_manageState.mockReturnValue(getDefaultSnapState());
     snapMock.rpcMocks.snap_manageState('update', getDefaultSnapState());
 
-     const createVcRequest1 = getRequestParams('createVC', {
+    const createVcRequest1 = getRequestParams('createVC', {
       vcValue: { prop: 10 },
       credTypes: ['Login'],
     });
@@ -39,7 +43,7 @@ describe('RemoveVC', () => {
       vcValue: { prop: 20 },
       credTypes: ['NotLogin'],
     });
-    
+
     const createVcResponse1: IDataManagerSaveResult[] = (await onRpcRequest({
       origin: 'tests',
       request: createVcRequest1 as any,
@@ -54,7 +58,6 @@ describe('RemoveVC', () => {
   });
 
   it('should remove VC', async () => {
-
     const removeVcRequest = getRequestParams('removeVC', {
       id: vcs[0],
       options: {},
@@ -82,16 +85,17 @@ describe('RemoveVC', () => {
     // Setup
     snapMock.rpcMocks.snap_dialog.mockReturnValue(false);
 
-
     const removeVcRequest = getRequestParams('removeVC', {
       id: vcs[0],
       options: {},
     });
 
-    await expect(onRpcRequest({
-      origin: 'tests',
-      request: removeVcRequest as any,
-    })).rejects.toThrowError();
+    await expect(
+      onRpcRequest({
+        origin: 'tests',
+        request: removeVcRequest as any,
+      }),
+    ).rejects.toThrowError();
 
     expect.assertions(1);
   });

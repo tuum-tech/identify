@@ -1,5 +1,10 @@
-import { validHederaChainID } from '../../hedera/config';
-import { IdentitySnapParams, PublicAccountInfo } from '../../interfaces';
+import { validEVMChainID, validHederaChainID } from '../../hedera/config';
+import {
+  ExternalAccount,
+  HederaAccountParams,
+  IdentitySnapParams,
+  PublicAccountInfo,
+} from '../../interfaces';
 import { getCurrentNetwork } from '../../snap/network';
 import { getHederaAccountIfExists } from '../../utils/params';
 
@@ -7,13 +12,13 @@ import { getHederaAccountIfExists } from '../../utils/params';
  * Get did.
  *
  * @param identitySnapParams - Identity snap params.
- * @param hederaAccountId - Hedera Identifier.
+ * @param externalAccount - External Account.
+ * @returns Public Account Info.
  */
 export async function getAccountInfo(
   identitySnapParams: IdentitySnapParams,
-  hederaAccountId?: string,
+  externalAccount?: ExternalAccount,
 ): Promise<PublicAccountInfo> {
-  let accountId = hederaAccountId;
   const { state, account } = identitySnapParams;
   const publicAccountInfo: PublicAccountInfo = {
     evmAddress: account.evmAddress,
@@ -22,19 +27,28 @@ export async function getAccountInfo(
     method: account.method,
   };
   const chainId = await getCurrentNetwork(ethereum);
-  if (validHederaChainID(chainId) && !hederaAccountId) {
-    accountId = await getHederaAccountIfExists(
-      state,
-      undefined,
-      account.evmAddress,
-    );
+
+  if (validHederaChainID(chainId)) {
+    let { accountId } = externalAccount?.externalAccount
+      .data as HederaAccountParams;
+
+    if (!accountId) {
+      accountId = await getHederaAccountIfExists(
+        state,
+        undefined,
+        account.evmAddress,
+      );
+    }
+
+    if (accountId) {
+      publicAccountInfo.externalAccountInfo = {
+        accountId,
+      };
+    }
+  } else if (validEVMChainID(chainId)) {
+    publicAccountInfo.externalAccountInfo = externalAccount;
   }
 
-  if (accountId) {
-    publicAccountInfo.externalAccountInfo = {
-      accountId,
-    };
-  }
   console.log(JSON.stringify(publicAccountInfo, null, 4));
   return publicAccountInfo;
 }

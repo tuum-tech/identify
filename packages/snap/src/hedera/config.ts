@@ -7,6 +7,10 @@ const hederaChainIDs: Record<string, string> = {
   '0x12a': 'localnet',
 };
 
+const evmChainIDs: Record<string, string> = {
+  '137': 'polygon',
+};
+
 export const getHederaNetwork = (chainId: string): string => {
   const network = hederaChainIDs[chainId];
   return network || 'mainnet';
@@ -14,3 +18,6 @@ export const getHederaNetwork = (chainId: string): string => {
 
 export const validHederaChainID = (x: string) =>
   isIn(Object.keys(hederaChainIDs) as string[], x);
+
+export const validEVMChainID = (x: string) =>
+  isIn(Object.keys(evmChainIDs) as string[], x);
