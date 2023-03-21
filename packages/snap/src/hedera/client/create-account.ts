@@ -32,8 +32,6 @@ export async function createAccountForPublicKey(
     await tx.execute(client)
   ).getReceipt(client);
 
-  console.log('receipt: ', JSON.stringify(receipt, null, 4));
-
   const newAccountId = receipt.accountId ? receipt.accountId.toString() : '';
 
   console.log('newAccountId: ', newAccountId);

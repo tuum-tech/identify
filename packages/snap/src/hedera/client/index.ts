@@ -95,8 +95,6 @@ export class SimpleHederaClientImpl implements SimpleHederaClient {
       .setIncludeChildren(true)
       .execute(this._client);
 
-    console.log('receipt: ', JSON.stringify(receipt, null, 4));
-
     const newAccountId =
       receipt.children.length > 0 && receipt.children[0].accountId
         ? receipt.children[0].accountId.toString()
