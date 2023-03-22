@@ -112,6 +112,7 @@ describe('getAccountInfo', () => {
       global.ethereum = metamask;
     });
 
+    // eslint-disable-next-line
     it.skip('should set evm external account info', async () => {
       snapMock.rpcMocks.snap_dialog.mockReturnValue(EVM_ACCOUNT.privatekey);
 

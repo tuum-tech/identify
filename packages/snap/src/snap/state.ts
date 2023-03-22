@@ -20,12 +20,10 @@ export async function updateSnapState(
   snap: SnapsGlobalObject,
   snapState: IdentitySnapState,
 ) {
-  console.log('update snap state start');
   await snap.request({
     method: 'snap_manageState',
     params: { operation: 'update', newState: snapState },
   });
-  console.log('update snap state end');
 }
 
 /**

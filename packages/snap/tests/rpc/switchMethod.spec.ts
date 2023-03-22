@@ -29,6 +29,7 @@ describe('SwitchMethod', () => {
   });
 
   // enable test when there's more than a method
+  // eslint-disable-next-line
   it.skip('should change snap state when switch to did:pkh methods', async () => {
     const snapState = getDefaultSnapState();
     const accountType = await getAccountStateByCoinType(snapState, ETH_ADDRESS);

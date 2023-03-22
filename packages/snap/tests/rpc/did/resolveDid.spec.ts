@@ -48,17 +48,4 @@ describe('resolveDID', () => {
     expect(resolvedDID.didDocument?.id).toBe(currentDID);
     expect.assertions(1);
   });
-
-  // it('should resolve current did when didUrl undefined', async () => {
-  //   const resolvedDid = await resolveDID(identitySnapParams, undefined);
-
-  //   const id = resolvedDid?.didDocument?.id;
-
-  //   expect(id).toEqual(
-  //     snapState.accountState['0x7d871f006d97498ea338268a956af94ab2e65cdd']
-  //       .identifiers[id as string].did,
-  //   );
-
-  //   expect.assertions(1);
-  // });
 });
