@@ -130,10 +130,10 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     }
 
     const ids: string[] = [];
-    const newVCs = [...googleVCs];
+    let newVCs = { ...googleVCs };
     for (const vc of vcs) {
       const newId = vc.id || uuidv4();
-      newVCs.push({ [newId]: vc });
+      newVCs = { ...newVCs, [newId]: vc.vc };
       ids.push(newId);
     }
 
