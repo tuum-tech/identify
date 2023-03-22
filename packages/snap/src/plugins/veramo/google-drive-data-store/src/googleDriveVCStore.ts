@@ -1,7 +1,6 @@
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { VerifiableCredential } from '@veramo/core';
 import jsonpath from 'jsonpath';
-import { cloneDeep } from 'lodash';
 import { IdentitySnapState } from 'src/interfaces';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -157,15 +156,14 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     }
 
     const ids: string[] = [];
-    const newVCs = cloneDeep(googleVCs);
-
+    let newVCs = { ...googleVCs };
     for (const vc of vcs) {
       if (
         (vc.vc as VerifiableCredential).credentialSubject.id?.split(':')[4] ===
         account
       ) {
         const newId = vc.id || uuidv4();
-        newVCs[newId] = vc.vc;
+        newVCs = { ...newVCs, [newId]: vc.vc };
         ids.push(newId);
       }
     }

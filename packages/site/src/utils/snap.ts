@@ -97,18 +97,17 @@ export const createNewHederaAccount = async ({
         },
       },
     });
-  } else {
-    return await window.ethereum.request({
-      method: `wallet_snap_${defaultSnapOrigin}`,
-      params: {
-        method: 'createNewHederaAccount',
-        params: {
-          hbarAmountToSend,
-          newAccountEvmAddress,
-        },
-      },
-    });
   }
+  return await window.ethereum.request({
+    method: `wallet_snap_${defaultSnapOrigin}`,
+    params: {
+      method: 'createNewHederaAccount',
+      params: {
+        hbarAmountToSend,
+        newAccountEvmAddress,
+      },
+    },
+  });
 };
 
 /**
