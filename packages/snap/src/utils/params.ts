@@ -1,6 +1,5 @@
 import { VerifiablePresentation, W3CVerifiableCredential } from '@veramo/core';
 import _ from 'lodash';
-import { GoogleToken, IdentitySnapState } from '../interfaces';
 import {
   EvmAccountParams,
   ExternalAccount,
@@ -22,11 +21,7 @@ import {
   isValidProofFormat,
   isValidVCStore,
 } from '../types/constants';
-import {
-  CreateNewHederaAccountRequestParams,
-  CreateVCRequestParams,
-  CreateVPRequestParams,
-} from '../types/params';
+import { CreateVCRequestParams, CreateVPRequestParams } from '../types/params';
 
 /**
  * Check whether the the account was imported using private key(external account).
@@ -46,10 +41,6 @@ export function isExternalAccountFlagSet(params: unknown): boolean {
   }
   return false;
 }
-
-type HederaAccountParams = {
-  accountId: string;
-};
 
 /**
  * Check validation of Hedera account.
@@ -436,6 +427,8 @@ export function isValidCreateVCRequest(
 
   const parameter = params as CreateVCRequestParams;
 
+  console.log(`params ${JSON.stringify(parameter)}`);
+
   if (
     'vcValue' in parameter &&
     parameter.vcValue !== null &&
@@ -532,10 +525,10 @@ export function isValidCreateVCRequest(
   }
 
   console.error(
-    'Invalid saveVC Params passed. "data" must be passed as a parameter and it must be an object',
+    'Invalid createVC Params passed. "data" must be passed as a parameter and it must be an object',
   );
   throw new Error(
-    'Invalid saveVC Params passed. "data" must be passed as a parameter and it must be an object',
+    'Invalid createVC Params passed. "data" must be passed as a parameter and it must be an object',
   );
 }
 

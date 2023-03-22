@@ -1,3 +1,4 @@
+import { ethers } from 'ethers';
 import { validEVMChainID, validHederaChainID } from '../../hedera/config';
 import {
   ExternalAccount,
@@ -31,7 +32,7 @@ export async function getAccountInfo(
     did: account.identifier.did,
     publicKey,
     method: account.method,
-    hederaAccountId,
+    externalAccountInfo: externalAccount,
   };
   const chainId = await getCurrentNetwork(ethereum);
 

@@ -1,7 +1,7 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
+import { CreateVCResponseResult } from 'src/types/params';
 import { onRpcRequest } from '../../../src';
-import { IDataManagerSaveResult } from '../../../src/plugins/veramo/verfiable-creds-manager';
 import { getDefaultSnapState } from '../../testUtils/constants';
 import { getRequestParams } from '../../testUtils/helper';
 import { createMockSnap, SnapMock } from '../../testUtils/snap.mock';
@@ -34,8 +34,8 @@ describe('createVC', () => {
     const createVcResponse = (await onRpcRequest({
       origin: 'tests',
       request: createVcRequest as any,
-    })) as IDataManagerSaveResult[];
-    expect(createVcResponse.length).toBe(1);
+    })) as CreateVCResponseResult;
+    expect(createVcResponse.data).not.toBeUndefined();
     expect.assertions(1);
   });
 

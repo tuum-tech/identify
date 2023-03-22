@@ -5,11 +5,6 @@ import { IIdentifier, MinimalImportableKey } from '@veramo/core';
 import { isValidHederaAccountInfo } from '../hedera';
 import { getHederaNetwork, validHederaChainID } from '../hedera/config';
 import {
-  getHederaNetwork,
-  validEVMChainID,
-  validHederaChainID,
-} from '../hedera/config';
-import {
   Account,
   AccountViaPrivateKey,
   IdentitySnapState,

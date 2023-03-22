@@ -8,7 +8,7 @@ import {
   EvmAccountParams,
   HederaAccountParams,
   IdentitySnapState,
-  SnapDialogParams
+  SnapDialogParams,
 } from '../interfaces';
 import { HEDERACOINTYPE } from '../types/constants';
 import { getHederaAccountIfExists } from '../utils/params';
@@ -118,10 +118,10 @@ export async function connectEVMAccount(
       dialogParamsForPrivateKey,
     )) as string;
 
-    //const wallet: Wallet = new ethers.Wallet(privateKey);
+    // const wallet: Wallet = new ethers.Wallet(privateKey);
     const accountViaPrivateKey: AccountViaPrivateKey = {
       privateKey,
-      publicKey: "",
+      publicKey: '',
       address: evmAccount.address,
     };
 

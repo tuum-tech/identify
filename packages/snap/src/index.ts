@@ -1,6 +1,10 @@
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
-import { ExternalAccount, IdentitySnapParams } from './interfaces';
+import {
+  ExternalAccount,
+  HederaAccountParams,
+  IdentitySnapParams,
+} from './interfaces';
 import { getAccountInfo } from './rpc/account/getAccountInfo';
 import { getAvailableMethods } from './rpc/did/getAvailableMethods';
 import { getCurrentDIDMethod } from './rpc/did/getCurrentDIDMethod';
@@ -8,7 +12,6 @@ import { getDid } from './rpc/did/getDID';
 import { resolveDID } from './rpc/did/resolveDID';
 import { switchMethod } from './rpc/did/switchMethods';
 import { configureGoogleAccount } from './rpc/gdrive/configureGoogleAccount';
-import { createNewHederaAccount } from './rpc/hedera/createNewHederaAccount';
 import { togglePopups } from './rpc/snap/togglePopups';
 import { createVC } from './rpc/vc/createVC';
 import { createVP } from './rpc/vc/createVP';
@@ -21,12 +24,13 @@ import { syncGoogleVCs } from './rpc/vc/syncGoogleVCs';
 import { verifyVC } from './rpc/vc/verifyVC';
 import { verifyVP } from './rpc/vc/verifyVP';
 import { getCurrentAccount } from './snap/account';
+import { connectHederaAccount } from './snap/hedera';
 import { getSnapStateUnchecked } from './snap/state';
 import { init } from './utils/init';
 import {
   isExternalAccountFlagSet,
   isValidConfigueGoogleRequest,
-  isValidCreateNewHederaAccountParams,
+  // isValidCreateNewHederaAccountParams,
   isValidCreateVCRequest,
   isValidCreateVPRequest,
   isValidDeleteAllVCsRequest,
@@ -117,17 +121,22 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
     case 'connectHederaAccount': {
       isValidHederaAccountParams(request.params);
-      return await connectHederaAccount(state, request.params.accountId, false);
-    }
-
-    case 'createNewHederaAccount': {
-      isValidCreateNewHederaAccountParams(request.params);
-      return await createNewHederaAccount(
-        identitySnapParams,
-        request.params,
-        hederaAccountId,
+      return await connectHederaAccount(
+        state,
+        (request.params as ExternalAccount).externalAccount
+          .data as HederaAccountParams,
+        false,
       );
     }
+
+    // case 'createNewHederaAccount': {
+    //   isValidCreateNewHederaAccountParams(request.params);
+    //   return await createNewHederaAccount(
+    //     identitySnapParams,
+    //     request.params as CreateNewHederaAccountRequestParams,
+    //     hederaAccountId,
+    //   );
+    // }
 
     case 'getDID': {
       return await getDid(identitySnapParams);

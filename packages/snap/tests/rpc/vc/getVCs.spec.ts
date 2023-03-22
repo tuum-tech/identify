@@ -1,9 +1,7 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
-import {
-  IDataManagerQueryResult,
-  IDataManagerSaveResult,
-} from 'src/plugins/veramo/verfiable-creds-manager';
+import { IDataManagerQueryResult } from 'src/plugins/veramo/verfiable-creds-manager';
+import { CreateVCResponseResult } from 'src/types/params';
 import { onRpcRequest } from '../../../src';
 import { getRequestParams } from '../../testUtils/helper';
 // import { connectHederaAccount } from '../../../src/rpc/hedera/connectHederaAccount';
@@ -93,14 +91,14 @@ describe('getVCs', () => {
       vcValue: { prop: 30 },
     });
 
-    const createVcResponse: IDataManagerSaveResult[] = (await onRpcRequest({
+    const createVcResponse: CreateVCResponseResult = (await onRpcRequest({
       origin: 'tests',
       request: createVcRequest as any,
-    })) as IDataManagerSaveResult[];
+    })) as CreateVCResponseResult;
 
     const getVcRequest = getRequestParams('getVCs', {
       options: {},
-      filter: { type: 'id', filter: createVcResponse[0].id },
+      filter: { type: 'id', filter: createVcResponse.metadata.id },
     });
 
     const vcsReturned: IDataManagerQueryResult[] = (await onRpcRequest({

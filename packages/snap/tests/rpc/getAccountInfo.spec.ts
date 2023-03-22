@@ -44,7 +44,7 @@ describe('getAccountInfo', () => {
         request: accountInfoRequestParams as any,
       })) as PublicAccountInfo;
       expect(accountInfo.evmAddress).toBe(ETH_ADDRESS);
-      expect(accountInfo.externalAccountInfo).toBeUndefined();
+      expect(accountInfo.externalAccountInfo).toStrictEqual({});
 
       expect.assertions(2);
     });

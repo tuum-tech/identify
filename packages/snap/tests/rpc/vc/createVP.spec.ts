@@ -1,12 +1,12 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
-import { VerifiablePresentation, W3CVerifiableCredential } from '@veramo/core';
-import { IDataManagerSaveResult } from 'src/plugins/veramo/verfiable-creds-manager';
+import { VerifiablePresentation } from '@veramo/core';
+import { CreateVCResponseResult } from 'src/types/params';
 import { onRpcRequest } from '../../../src';
 import {
   ETH_ADDRESS,
   ETH_CHAIN_ID,
-  getDefaultSnapState,
+  getDefaultSnapState
 } from '../../testUtils/constants';
 import { getRequestParams } from '../../testUtils/helper';
 import { buildMockSnap, SnapMock } from '../../testUtils/snap.mock';
@@ -15,7 +15,7 @@ describe('createVP', () => {
   let snapMock: SnapsGlobalObject & SnapMock;
   let metamask: MetaMaskInpageProvider;
 
-  const vcs: W3CVerifiableCredential[] = [];
+  const vcIds: string[] = [];
 
   beforeAll(async () => {
     snapMock = buildMockSnap(ETH_CHAIN_ID, ETH_ADDRESS);
@@ -40,22 +40,22 @@ describe('createVP', () => {
       credTypes: ['NotLogin'],
     });
 
-    const createVcResponse1: IDataManagerSaveResult[] = (await onRpcRequest({
+    const createVcResponse1: CreateVCResponseResult = (await onRpcRequest({
       origin: 'tests',
       request: createVcRequest1 as any,
-    })) as IDataManagerSaveResult[];
-    const createVcResponse2: IDataManagerSaveResult[] = (await onRpcRequest({
+    })) as CreateVCResponseResult;
+    const createVcResponse2: CreateVCResponseResult = (await onRpcRequest({
       origin: 'tests',
       request: createVcRequest2 as any,
-    })) as IDataManagerSaveResult[];
+    })) as CreateVCResponseResult;
 
-    vcs.push(createVcResponse1[0].id);
-    vcs.push(createVcResponse2[0].id);
+    vcIds.push(createVcResponse1.metadata.id);
+    vcIds.push(createVcResponse2.metadata.id);
   });
 
   it('should succeed creating VP from 1 VC', async () => {
     const createVpRequest = getRequestParams('createVP', {
-      vcs: [vcs[0] as string],
+      vcsIds: [vcIds[0] as string],
     });
 
     const presentation = (await onRpcRequest({
@@ -68,7 +68,7 @@ describe('createVP', () => {
 
   it('should succeed creating VP from 2 VCs', async () => {
     const createVpRequest = getRequestParams('createVP', {
-      vcs,
+      vcIds
     });
 
     const presentation = (await onRpcRequest({
@@ -85,7 +85,7 @@ describe('createVP', () => {
     snapMock.rpcMocks.snap_dialog.mockReturnValue(false);
 
     const createVpRequest = getRequestParams('createVP', {
-      vcs: [vcs[0] as string],
+      vcs: [vcIds[0] as string],
     });
 
     await expect(
