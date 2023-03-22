@@ -16,8 +16,9 @@ export const getHederaNetwork = (chainId: string): string => {
   return network || 'mainnet';
 };
 
-export const validHederaChainID = (x: string) =>
-  isIn(Object.keys(hederaChainIDs) as string[], x);
+export const validHederaChainID = (x: string) => {
+  return isIn(Object.keys(hederaChainIDs) as string[], x);
+};
 
 export const validEVMChainID = (x: string) =>
   isIn(Object.keys(evmChainIDs) as string[], x);

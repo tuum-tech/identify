@@ -20,6 +20,7 @@ type Props = {
 
 const GetVP: FC<Props> = ({ setCurrentChainId }) => {
   const { vcId, setVcId, setVp } = useContext(VcContext);
+  const { vc, setVc } = useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
@@ -32,11 +33,13 @@ const GetVP: FC<Props> = ({ setCurrentChainId }) => {
         proofFormat: 'jwt',
         type: 'ProfileNamesPresentation',
       };
-      console.log('vcId: ', vcId);
-      const vp = (await createVP(
-        vcId.trim().split(','),
-        proofInfo,
-      )) as VerifiablePresentation;
+      console.log('vcIds: ', vcId);
+      // console.log('vc: ', vc);
+      const vp = (await createVP({
+        vcIds: vcId.trim().split(','),
+        // vcs: [vc as W3CVerifiableCredential],
+        proofInfo: proofInfo,
+      })) as VerifiablePresentation;
       setVp(vp);
       showModal({
         title: 'Get VP',

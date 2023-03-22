@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import {
+  CreateNewHederaAccountRequestParams,
+  CreateVPRequestParams,
   GetVCsOptions,
-  ProofInfo,
   RemoveVCOptions,
 } from '@tuum-tech/identity-snap/src/types/params';
 import { Filter } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
 import { VerifiableCredential, VerifiablePresentation } from '@veramo/core';
 import { defaultSnapOrigin } from '../config';
-import { GetSnapsResponse, Snap } from '../types';
+import { GetAccountInfoRequest, GetSnapsResponse, Snap } from '../types';
 
 /**
  * Get the installed snaps in MetaMask.
@@ -77,6 +78,40 @@ export const connectHederaAccount = async (accountId: string) => {
 };
 
 /**
+ * Invoke "createNewHederaAccount" method from the snap
+ */
+
+export const createNewHederaAccount = async ({
+  hbarAmountToSend,
+  newAccountPublickey = '',
+  newAccountEvmAddress = '',
+}: CreateNewHederaAccountRequestParams) => {
+  if (newAccountPublickey) {
+    return await window.ethereum.request({
+      method: `wallet_snap_${defaultSnapOrigin}`,
+      params: {
+        method: 'createNewHederaAccount',
+        params: {
+          hbarAmountToSend,
+          newAccountPublickey,
+        },
+      },
+    });
+  } else {
+    return await window.ethereum.request({
+      method: `wallet_snap_${defaultSnapOrigin}`,
+      params: {
+        method: 'createNewHederaAccount',
+        params: {
+          hbarAmountToSend,
+          newAccountEvmAddress,
+        },
+      },
+    });
+  }
+};
+
+/**
  * Invoke the "hello" method from the snap.
  */
 
@@ -130,12 +165,14 @@ export type PublicAccountInfo = {
  * Invoke the "getAccountInfo" method from the snap.
  */
 
-export const getAccountInfo = async () => {
+export const getAccountInfo = async (
+  params: GetAccountInfoRequest | undefined,
+) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
       method: 'getAccountInfo',
-      params: {},
+      params: params || {},
     },
   });
 };
@@ -149,7 +186,10 @@ export const getDID = async () => {
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
       method: 'getDID',
-      params: {},
+      params: {
+        externalAccount: true,
+        accountId: '0.0.3831609',
+      },
     },
   });
 };
@@ -307,12 +347,16 @@ export const deleteAllVCs = async (options: RemoveVCOptions) => {
  * Invoke the "createVP" method from the snap.
  */
 
-export const createVP = async (vcs: string[], proofInfo: ProofInfo) => {
+export const createVP = async ({
+  vcIds,
+  vcs,
+  proofInfo,
+}: CreateVPRequestParams) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
       method: 'createVP',
-      params: { vcs, proofInfo },
+      params: { vcIds, vcs, proofInfo },
     },
   });
 };
@@ -327,20 +371,6 @@ export const verifyVP = async (vp: VerifiablePresentation | {}) => {
     params: {
       method: 'verifyVP',
       params: { verifiablePresentation: vp },
-    },
-  });
-};
-
-/**
- * Invoke the "getHederaAccountId" method from the snap.
- */
-
-export const getHederaAccountId = async () => {
-  return await window.ethereum.request({
-    method: `wallet_snap_${defaultSnapOrigin}`,
-    params: {
-      method: 'getHederaAccountId',
-      params: {},
     },
   });
 };

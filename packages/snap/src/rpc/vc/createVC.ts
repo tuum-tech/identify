@@ -15,7 +15,10 @@ import {
 import { snapDialog } from '../../snap/dialog';
 import { getCurrentNetwork } from '../../snap/network';
 import { getAccountStateByCoinType } from '../../snap/state';
-import { CreateVCRequestParams } from '../../types/params';
+import {
+  CreateVCRequestParams,
+  CreateVCResponseResult,
+} from '../../types/params';
 import { getVeramoAgent } from '../../veramo/agent';
 
 /**
@@ -27,7 +30,7 @@ import { getVeramoAgent } from '../../veramo/agent';
 export async function createVC(
   identitySnapParams: IdentitySnapParams,
   vcRequestParams: CreateVCRequestParams,
-): Promise<IDataManagerSaveResult[]> {
+): Promise<CreateVCResponseResult> {
   const { snap, state, metamask, account } = identitySnapParams;
 
   // Get Veramo agent
@@ -114,21 +117,25 @@ export async function createVC(
         proofFormat: 'jwt' as ProofFormat,
       });
 
-    console.log(
-      'Created verifiableCredential: ',
-      JSON.stringify(verifiableCredential, null, 4),
-    );
-
     // Save the Verifiable Credential
     const optionsFiltered = { store } as SaveOptions;
-    const result: IDataManagerSaveResult[] = await agent.saveVC({
+    const saved: IDataManagerSaveResult[] = await agent.saveVC({
       data: [{ vc: verifiableCredential }] as ISaveVC[],
       options: optionsFiltered,
       accessToken: accountState.accountConfig.identity.googleAccessToken,
     });
 
+    // Retrieve the created Verifiable Credential
+    const result: CreateVCResponseResult = {
+      data: verifiableCredential,
+      metadata: {
+        id: saved[0].id,
+        store: saved[0].store,
+      },
+    };
+
     console.log(
-      'Saved verifiableCredential: ',
+      'Created and saved verifiableCredential: ',
       JSON.stringify(result, null, 4),
     );
     return result;

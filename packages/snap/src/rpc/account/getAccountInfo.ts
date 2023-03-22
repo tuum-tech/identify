@@ -20,11 +20,18 @@ export async function getAccountInfo(
   externalAccount?: ExternalAccount,
 ): Promise<PublicAccountInfo> {
   const { state, account } = identitySnapParams;
+
+  const publicKey = ethers.utils.computePublicKey(
+    ethers.utils.arrayify(account.publicKey),
+    true,
+  );
+
   const publicAccountInfo: PublicAccountInfo = {
     evmAddress: account.evmAddress,
     did: account.identifier.did,
-    publicKey: account.publicKey,
+    publicKey,
     method: account.method,
+    hederaAccountId,
   };
   const chainId = await getCurrentNetwork(ethereum);
 

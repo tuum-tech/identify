@@ -2,7 +2,8 @@ import { BIP44CoinTypeNode } from '@metamask/key-tree';
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { IIdentifier, MinimalImportableKey } from '@veramo/core';
-import { toHederaAccountInfo } from '../hedera';
+import { isValidHederaAccountInfo } from '../hedera';
+import { getHederaNetwork, validHederaChainID } from '../hedera/config';
 import {
   getHederaNetwork,
   validEVMChainID,
@@ -47,7 +48,7 @@ export async function veramoImportMetaMaskAccount(
 
   let privateKey: string;
   let publicKey: string;
-  let address: string = evmAddress;
+  let address: string = evmAddress.toLowerCase();
   let hederaAccountId = '';
 
   if (accountViaPrivateKey) {
@@ -78,15 +79,22 @@ export async function veramoImportMetaMaskAccount(
       throw new Error('Failed to get private keys from Metamask account');
     }
     privateKey = res.privateKey.split('0x')[1];
-    publicKey = res.publicKey.split('0x')[1];
+    publicKey = res.publicKey;
     address = res.address;
   }
 
   address = address.toLowerCase();
 
-  if (validHederaChainID(chainId) || validEVMChainID(chainId)) {
-    const coinType = (await getCurrentCoinType()).toString();
+  // Initialize if not there
+  const coinType = (await getCurrentCoinType()).toString();
+  if (address && !(address in state.accountState[coinType])) {
+    console.log(
+      `The address ${address} has NOT yet been configured in the Identity Snap. Configuring now...`,
+    );
+    await initAccountState(snap, state, coinType, address);
+  }
 
+  if (validHederaChainID(chainId)) {
     if (!accountViaPrivateKey) {
       hederaAccountId = await getHederaAccountIfExists(
         state,
@@ -97,31 +105,25 @@ export async function veramoImportMetaMaskAccount(
 
     if (!hederaAccountId) {
       hederaAccountId = await requestHederaAccountId(snap);
-      // Initialize accountstate since it doesn't exist
-      console.log(
-        `The address ${address} has NOT yet been configured in the Identity Snap. Configuring now...`,
-      );
-
-      // await initAccountState(snap, state, coinType, address);
     }
     // Attention: This line was inside of the
     await initAccountState(snap, state, coinType, address);
 
-    let hederaAccountInfo = await toHederaAccountInfo(
+    let hederaClient = await isValidHederaAccountInfo(
       privateKey,
       hederaAccountId,
       getHederaNetwork(chainId),
     );
-    if (hederaAccountInfo === null && hederaAccountId) {
+    if (hederaClient === null && hederaAccountId) {
       hederaAccountId = await requestHederaAccountId(snap, hederaAccountId);
-      hederaAccountInfo = await toHederaAccountInfo(
+      hederaClient = await isValidHederaAccountInfo(
         privateKey,
         hederaAccountId,
         getHederaNetwork(chainId),
       );
     }
 
-    if (hederaAccountInfo) {
+    if (hederaClient) {
       // eslint-disable-next-line
       state.accountState[coinType][address].extraData = hederaAccountId;
     } else {

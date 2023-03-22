@@ -1,12 +1,17 @@
 import type {
   AccountId,
   Hbar,
+  HbarAllowance,
+  Key,
   LedgerId,
+  LiveHash,
   PrivateKey,
   PublicKey,
   Timestamp,
+  TokenAllowance,
+  TokenNftAllowance,
 } from '@hashgraph/sdk';
-import TokenRelationship from '@hashgraph/sdk/lib/account/TokenRelationship';
+import TokenRelationshipMap from '@hashgraph/sdk/lib/account/TokenRelationshipMap';
 import Duration from '@hashgraph/sdk/lib/Duration';
 import StakingInfo from '@hashgraph/sdk/lib/StakingInfo';
 import { BigNumber } from 'bignumber.js';
@@ -38,34 +43,40 @@ export type SimpleHederaClient = {
 
   getAccountInfo(accountId: string): Promise<HederaAccountInfo>;
 
-  createAccount(options: {
+  createAccountForPublicKey(options: {
     publicKey: PublicKey;
     initialBalance: BigNumber;
-  }): Promise<AccountId | null>;
+  }): Promise<string | null>;
+
+  createAccountForEvmAddress(options: {
+    evmAddress: string;
+    initialBalance: BigNumber;
+  }): Promise<string | null>;
 };
 
 export type HederaAccountInfo = {
   accountId: AccountId;
-  aliasKey: PublicKey;
-  autoRenewPeriod: Duration;
-  balance: Hbar;
-  contractAccountId: string;
-  ethereumNonce: Long;
-  expirationTime: Timestamp;
-  hbarAllowances: object;
+  contractAccountId?: string;
   isDeleted: boolean;
-  isReceiverSignatureRequired: boolean;
-  key: PublicKey;
-  ledgerId: LedgerId;
-  liveHashes: object;
-  maxAutomaticTokenAssociations: Long;
-  nftAllowances: object;
-  ownedNfts: Long;
-  proxyAccountId: object;
+  proxyAccountId?: object;
   proxyReceived: Hbar;
-  receiveRecordThreshold: Hbar;
+  key: Key;
+  balance: Hbar;
   sendRecordThreshold: Hbar;
-  stakingInfo: StakingInfo;
-  tokenAllowances: object;
-  tokenRelationships: TokenRelationship;
+  receiveRecordThreshold: Hbar;
+  isReceiverSignatureRequired: boolean;
+  expirationTime: Timestamp;
+  autoRenewPeriod: Duration;
+  liveHashes: LiveHash[];
+  tokenRelationships: TokenRelationshipMap;
+  accountMemo: string;
+  ownedNfts: Long;
+  maxAutomaticTokenAssociations: Long;
+  aliasKey: PublicKey;
+  ledgerId: LedgerId;
+  hbarAllowances: HbarAllowance[];
+  tokenAllowances: TokenAllowance[];
+  nftAllowances: TokenNftAllowance[];
+  ethereumNonce?: Long;
+  stakingInfo?: StakingInfo;
 };

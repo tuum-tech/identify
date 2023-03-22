@@ -22,6 +22,9 @@ export async function getCurrentAccount(
   account: ExternalAccount,
 ): Promise<Account> {
   try {
+    if (hederaAccountId) {
+      return await connectHederaAccount(state, hederaAccountId, true);
+    }
     const accounts = (await ethereum.request({
       method: 'eth_requestAccounts',
     })) as string[];

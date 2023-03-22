@@ -1,11 +1,11 @@
-import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
 import {
   DeleteOptions,
   IDataManagerDeleteArgs,
   IDataManagerDeleteResult,
+  IDataManagerQueryResult,
 } from '../../plugins/veramo/verfiable-creds-manager';
-import { snapDialog } from '../../snap/dialog';
+import { generateVCPanel, snapDialog } from '../../snap/dialog';
 import { getAccountStateByCoinType } from '../../snap/state';
 import { getVeramoAgent } from '../../veramo/agent';
 
@@ -33,22 +33,35 @@ export async function removeVC(
     return null;
   }
 
+  const accountState = await getAccountStateByCoinType(
+    state,
+    account.evmAddress,
+  );
+  const vcsToBeRemoved: IDataManagerQueryResult[] = [];
+  for (const vcId of ids) {
+    const vcs = (await agent.queryVC({
+      filter: {
+        type: 'id',
+        filter: vcId,
+      },
+      options: optionsFiltered,
+      accessToken: accountState.accountConfig.identity.googleAccessToken,
+    })) as IDataManagerQueryResult[];
+    if (vcs.length > 0) {
+      vcsToBeRemoved.push(vcs[0]);
+    }
+  }
+
+  const header = 'Remove specific Verifiable Credentials';
+  const prompt = 'Are you sure you want to remove the following VCs?';
+  const description = `Note that this action cannot be reversed and you will need to recreate your VCs if you go through with it. Number of VCs to be removed is ${vcsToBeRemoved.length.toString()}`;
   const dialogParams: SnapDialogParams = {
     type: 'Confirmation',
-    content: panel([
-      heading('Remove specific Verifiable Credentials'),
-      text('Would you like to remove the following VC IDs?'),
-      divider(),
-      text(JSON.stringify(id)),
-    ]),
+    content: await generateVCPanel(header, prompt, description, vcsToBeRemoved),
   };
 
   if (await snapDialog(snap, dialogParams)) {
     // Remove the specified Verifiable Credentials from the store based on their IDs
-    const accountState = await getAccountStateByCoinType(
-      state,
-      account.evmAddress,
-    );
     return Promise.all(
       ids.map(async (_id: string) => {
         return await agent.deleteVC({

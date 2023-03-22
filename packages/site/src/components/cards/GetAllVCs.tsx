@@ -51,8 +51,11 @@ const GetAllVCs: FC<Props> = ({ setCurrentChainId }) => {
           setVcId(keys.toString());
           setVcIdsToBeRemoved(keys.toString());
           setVc(vcs[keys.length - 1].data as IDataManagerQueryResult);
-          showModal({ title: 'Your VC IDs', content: keys.toString() });
         }
+        showModal({
+          title: 'Your VCs',
+          content: JSON.stringify(vcs, null, 4),
+        });
       }
     } catch (e) {
       console.error(e);

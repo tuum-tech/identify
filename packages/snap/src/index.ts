@@ -8,7 +8,7 @@ import { getDid } from './rpc/did/getDID';
 import { resolveDID } from './rpc/did/resolveDID';
 import { switchMethod } from './rpc/did/switchMethods';
 import { configureGoogleAccount } from './rpc/gdrive/configureGoogleAccount';
-import { getHederaAccountId } from './rpc/hedera/getHederaAccountId';
+import { createNewHederaAccount } from './rpc/hedera/createNewHederaAccount';
 import { togglePopups } from './rpc/snap/togglePopups';
 import { createVC } from './rpc/vc/createVC';
 import { createVP } from './rpc/vc/createVP';
@@ -26,6 +26,7 @@ import { init } from './utils/init';
 import {
   isExternalAccountFlagSet,
   isValidConfigueGoogleRequest,
+  isValidCreateNewHederaAccountParams,
   isValidCreateVCRequest,
   isValidCreateVPRequest,
   isValidDeleteAllVCsRequest,
@@ -80,7 +81,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
   const account = await getCurrentAccount(state, externalAccountData);
   console.log(
-    `Evm Address: ${account.evmAddress}, did: ${account.identifier.did}`,
+    `Currently connected account: ${JSON.stringify(account, null, 4)}`,
   );
 
   const identitySnapParams: IdentitySnapParams = {
@@ -112,6 +113,20 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
     case 'getAccountInfo': {
       return await getAccountInfo(identitySnapParams, externalAccountData);
+    }
+
+    case 'connectHederaAccount': {
+      isValidHederaAccountParams(request.params);
+      return await connectHederaAccount(state, request.params.accountId, false);
+    }
+
+    case 'createNewHederaAccount': {
+      isValidCreateNewHederaAccountParams(request.params);
+      return await createNewHederaAccount(
+        identitySnapParams,
+        request.params,
+        hederaAccountId,
+      );
     }
 
     case 'getDID': {
@@ -193,10 +208,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
     case 'syncGoogleVCs': {
       return await syncGoogleVCs(identitySnapParams);
-    }
-
-    case 'getHederaAccountId': {
-      return await getHederaAccountId(identitySnapParams);
     }
 
     default: {

@@ -51,7 +51,7 @@ export type IDataManagerQueryArgs = {
 
 export type IDataManagerSaveArgs = {
   data: unknown;
-  options: SaveOptions;
+  options?: SaveOptions;
   accessToken?: string;
 };
 
