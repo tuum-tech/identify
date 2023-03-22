@@ -24,7 +24,6 @@ export async function getAccountIndex(
   console.log(`account state ${JSON.stringify(accountState)}`);
   console.log(`account state index ${accountState.index}`);
   if (typeof accountState.index !== 'undefined') {
-    console.log('here');
     return accountState.index;
   }
   return undefined;
@@ -155,11 +154,8 @@ export const snapGetKeysFromAddress = async (
   snap: SnapsGlobalObject,
   maxScan = 20,
 ): Promise<KeysType | null> => {
-  console.log(`account ${account}`);
-  console.log(`state ${JSON.stringify(state)}`);
   const addressIndex = await getAccountIndex(state, account);
 
-  console.log(`getKeysfromAddress ${addressIndex}`);
   if (typeof addressIndex !== 'undefined') {
     return await getKeysFromAddress(
       bip44CoinTypeNode,
