@@ -1,6 +1,7 @@
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { VerifiableCredential } from '@veramo/core';
 import jsonpath from 'jsonpath';
+import { cloneDeep } from 'lodash';
 import { IdentitySnapState } from 'src/interfaces';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -56,28 +57,24 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     }
 
     if (filter && filter.type === 'id') {
-      try {
-        if (googleVCs[filter.filter as string]) {
-          let vc = googleVCs[filter.filter as string] as unknown;
+      return Object.keys(googleVCs)
+        .map((k) => {
+          let vc = googleVCs[k] as unknown;
           if (typeof vc === 'string') {
             vc = decodeJWT(vc);
           }
-          const obj =
-            (vc as VerifiableCredential).credentialSubject.id?.split(':')[4] ===
-            account
-              ? [
-                  {
-                    metadata: { id: filter.filter as string },
-                    data: vc,
-                  },
-                ]
-              : [];
-          return obj;
-        }
-        return [];
-      } catch (e) {
-        throw new Error('Invalid id');
-      }
+
+          return {
+            metadata: { id: k },
+            data: vc,
+          };
+        })
+        .filter((item: any) => {
+          return (
+            item.metadata.id === (filter.filter as string) &&
+            item.data.credentialSubject.id?.split(':')[4] === account
+          );
+        });
     }
 
     if (filter && filter.type === 'vcType') {
@@ -160,14 +157,15 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     }
 
     const ids: string[] = [];
-    let newVCs = { ...googleVCs };
+    const newVCs = cloneDeep(googleVCs);
+
     for (const vc of vcs) {
       if (
         (vc.vc as VerifiableCredential).credentialSubject.id?.split(':')[4] ===
         account
       ) {
         const newId = vc.id || uuidv4();
-        newVCs = { ...newVCs, [newId]: vc.vc };
+        newVCs[newId] = vc.vc;
         ids.push(newId);
       }
     }
@@ -228,7 +226,7 @@ export class GoogleDriveVCStore extends AbstractDataStore {
       throw Error(`SnapVCStore - Cannot get current account: ${account}`);
     }
 
-    let googleVCs = await getGoogleVCs(
+    const googleVCs = await getGoogleVCs(
       this.accessToken,
       GOOGLE_DRIVE_VCS_FILE_NAME,
     );
@@ -241,13 +239,19 @@ export class GoogleDriveVCStore extends AbstractDataStore {
       return false;
     }
 
-    googleVCs = Object.keys(googleVCs).filter((vcId: any) => {
-      return googleVCs[vcId].credentialSubject.id?.split(':')[4] === account;
+    const newVCs: any = {};
+    Object.entries(googleVCs).forEach(([vcId, vc]) => {
+      if (
+        (vc as VerifiableCredential).credentialSubject.id?.split(':')[4] !==
+        account
+      ) {
+        newVCs[vcId] = vc;
+      }
     });
 
     const gdriveResponse = await uploadToGoogleDrive(this.accessToken, {
       fileName: GOOGLE_DRIVE_VCS_FILE_NAME,
-      content: JSON.stringify(googleVCs),
+      content: JSON.stringify(newVCs),
     });
     console.log({ gdriveResponse });
 
