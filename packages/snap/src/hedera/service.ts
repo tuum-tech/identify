@@ -29,6 +29,10 @@ export type HederaService = {
     // account ID we wish to associate with the wallet
     accountId: AccountId;
   }): Promise<SimpleHederaClient | null>;
+
+  getAccountFromPublicKey(publicKey: string): Promise<HederaMirrorInfo | null>;
+
+  getAccountFromEvmAddres(evmAddress: string): Promise<HederaMirrorInfo | null>;
 };
 
 export type SimpleHederaClient = {
@@ -46,12 +50,24 @@ export type SimpleHederaClient = {
   createAccountForPublicKey(options: {
     publicKey: PublicKey;
     initialBalance: BigNumber;
-  }): Promise<string | null>;
+  }): Promise<HederaMirrorInfo | null>;
 
   createAccountForEvmAddress(options: {
     evmAddress: string;
     initialBalance: BigNumber;
-  }): Promise<string | null>;
+  }): Promise<HederaMirrorInfo | null>;
+};
+
+export type HederaMirrorInfo = {
+  account: string;
+  evmAddress: string;
+  publicKey?: string;
+  alias: string;
+  balance: number;
+  createdDate: string;
+  expiryDate: string;
+  memo: string;
+  newlyCreated?: boolean;
 };
 
 export type HederaAccountInfo = {

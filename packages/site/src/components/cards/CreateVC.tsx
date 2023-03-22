@@ -20,7 +20,7 @@ type Props = {
 };
 
 const CreateVC: FC<Props> = ({ setCurrentChainId }) => {
-  const { vc, setVc } = useContext(VcContext);
+  const { setVc } = useContext(VcContext);
   const { setVcId, setVcIdsToBeRemoved } = useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
   const [createVCName, setCreateVCName] = useState('Kiran Pachhai');
@@ -42,10 +42,11 @@ const CreateVC: FC<Props> = ({ setCurrentChainId }) => {
         name: createVCName,
         nickname: createVCNickname,
       };
+      const selectedStore = selectedOptions.map((option) => option.value);
       const options = {
         // If you want to auto save the generated VCs to multiple stores, you can pass an array like so:
         // store: ['snap', 'googleDrive'],
-        store: selectedOptions.map((option) => option.value),
+        ...(selectedStore.length ? { store: selectedStore } : {}),
         returnStore: true,
       };
       const credTypes = ['ProfileNamesCredential'];
@@ -62,8 +63,8 @@ const CreateVC: FC<Props> = ({ setCurrentChainId }) => {
         setVcIdsToBeRemoved(vcIdsToAdd.toString());
         console.log('created and saved VC: ', saved);
         showModal({
-          title: 'Create VC',
-          content: `Created and saved VC: ${JSON.stringify(saved)}`,
+          title: 'Created and saved VC',
+          content: JSON.stringify(saved),
         });
       }
     } catch (e) {

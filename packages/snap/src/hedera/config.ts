@@ -4,7 +4,6 @@ const hederaChainIDs: Record<string, string> = {
   '0x127': 'mainnet',
   '0x128': 'testnet',
   '0x129': 'previewnet',
-  '0x12a': 'localnet',
 };
 
 const evmChainIDs: Record<string, string> = {

@@ -1,5 +1,10 @@
 import { SnapsGlobalObject } from '@metamask/snaps-types';
-import { IIdentifier, IKey, W3CVerifiableCredential } from '@veramo/core';
+import {
+  IIdentifier,
+  IKey,
+  VerifiableCredential,
+  W3CVerifiableCredential,
+} from '@veramo/core';
 import { AbstractDIDStore } from '@veramo/did-manager';
 import {
   AbstractKeyStore,
@@ -354,24 +359,23 @@ export class SnapVCStore extends AbstractDataStore {
 
     const accountState = await getAccountStateByCoinType(this.state, account);
     if (filter && filter.type === 'id') {
-      try {
-        if (accountState.vcs[filter.filter as string]) {
-          let vc = accountState.vcs[filter.filter as string] as unknown;
+      return Object.keys(accountState.vcs)
+        .map((k) => {
+          let vc = accountState.vcs[k] as unknown;
           if (typeof vc === 'string') {
             vc = decodeJWT(vc);
           }
-          const obj = [
-            {
-              metadata: { id: filter.filter as string },
-              data: vc,
-            },
-          ];
-          return obj;
-        }
-        return [];
-      } catch (e) {
-        throw new Error(`SnapVCStore - Invalid id for filter=${filter}`);
-      }
+          return {
+            metadata: { id: k },
+            data: vc,
+          };
+        })
+        .filter((item: any) => {
+          return (
+            item.metadata.id === (filter.filter as string) &&
+            item.data.credentialSubject.id?.split(':')[4] === account
+          );
+        });
     }
 
     if (filter && filter.type === 'vcType') {
@@ -387,34 +391,45 @@ export class SnapVCStore extends AbstractDataStore {
           };
         })
         .filter((item: any) => {
-          return item.data.type?.includes(filter.filter as string);
+          return (
+            item.data.type?.includes(filter.filter as string) &&
+            item.data.credentialSubject.id?.split(':')[4] === account
+          );
         });
     }
 
     if (filter === undefined || (filter && filter.type === 'none')) {
-      return Object.keys(accountState.vcs).map((k) => {
-        let vc = accountState.vcs[k] as unknown;
-        if (typeof vc === 'string') {
-          vc = decodeJWT(vc);
-        }
-        return {
-          metadata: { id: k },
-          data: vc,
-        };
-      });
+      return Object.keys(accountState.vcs)
+        .map((k) => {
+          let vc = accountState.vcs[k] as unknown;
+          if (typeof vc === 'string') {
+            vc = decodeJWT(vc);
+          }
+          return {
+            metadata: { id: k },
+            data: vc,
+          };
+        })
+        .filter((item: any) => {
+          return item.data.credentialSubject.id?.split(':')[4] === account;
+        });
     }
 
     if (filter && filter.type === 'JSONPath') {
-      const objects = Object.keys(accountState.vcs).map((k) => {
-        let vc = accountState.vcs[k] as unknown;
-        if (typeof vc === 'string') {
-          vc = decodeJWT(vc);
-        }
-        return {
-          metadata: { id: k },
-          data: vc,
-        };
-      });
+      const objects = Object.keys(accountState.vcs)
+        .map((k) => {
+          let vc = accountState.vcs[k] as unknown;
+          if (typeof vc === 'string') {
+            vc = decodeJWT(vc);
+          }
+          return {
+            metadata: { id: k },
+            data: vc,
+          };
+        })
+        .filter((item: any) => {
+          return item.data.credentialSubject.id?.split(':')[4] === account;
+        });
       const filteredObjects = jsonpath.query(objects, filter.filter as string);
       return filteredObjects as IQueryResult[];
     }
@@ -422,7 +437,6 @@ export class SnapVCStore extends AbstractDataStore {
   }
 
   async saveVC(args: { data: ISaveVC[] }): Promise<string[]> {
-    // TODO check if VC is correct type
     const { data: vcs } = args;
     const account = this.state.currentAccount.evmAddress;
     if (!account) {
@@ -432,10 +446,15 @@ export class SnapVCStore extends AbstractDataStore {
     const coinType = await getCurrentCoinType();
     const ids: string[] = [];
     for (const vc of vcs) {
-      const newId = vc.id || uuidv4();
-      ids.push(newId);
-      this.state.accountState[coinType][account].vcs[newId] =
-        vc.vc as W3CVerifiableCredential;
+      if (
+        (vc.vc as VerifiableCredential).credentialSubject.id?.split(':')[4] ===
+        account
+      ) {
+        const newId = vc.id || uuidv4();
+        ids.push(newId);
+        this.state.accountState[coinType][account].vcs[newId] =
+          vc.vc as W3CVerifiableCredential;
+      }
     }
     await updateSnapState(this.snap, this.state);
 
