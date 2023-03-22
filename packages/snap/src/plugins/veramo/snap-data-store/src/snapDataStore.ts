@@ -1,5 +1,10 @@
 import { SnapsGlobalObject } from '@metamask/snaps-types';
-import { IIdentifier, IKey, W3CVerifiableCredential } from '@veramo/core';
+import {
+  IIdentifier,
+  IKey,
+  VerifiableCredential,
+  W3CVerifiableCredential,
+} from '@veramo/core';
 import { AbstractDIDStore } from '@veramo/did-manager';
 import {
   AbstractKeyStore,
@@ -422,7 +427,6 @@ export class SnapVCStore extends AbstractDataStore {
   }
 
   async saveVC(args: { data: ISaveVC[] }): Promise<string[]> {
-    // TODO check if VC is correct type
     const { data: vcs } = args;
     const account = this.state.currentAccount.evmAddress;
     if (!account) {
@@ -432,10 +436,15 @@ export class SnapVCStore extends AbstractDataStore {
     const coinType = await getCurrentCoinType();
     const ids: string[] = [];
     for (const vc of vcs) {
-      const newId = vc.id || uuidv4();
-      ids.push(newId);
-      this.state.accountState[coinType][account].vcs[newId] =
-        vc.vc as W3CVerifiableCredential;
+      if (
+        (vc.vc as VerifiableCredential).credentialSubject.id?.split(':')[4] ===
+        account
+      ) {
+        const newId = vc.id || uuidv4();
+        ids.push(newId);
+        this.state.accountState[coinType][account].vcs[newId] =
+          vc.vc as W3CVerifiableCredential;
+      }
     }
     await updateSnapState(this.snap, this.state);
 
