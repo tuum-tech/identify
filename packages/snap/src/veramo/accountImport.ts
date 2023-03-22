@@ -3,11 +3,15 @@ import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { IIdentifier, MinimalImportableKey } from '@veramo/core';
 import { toHederaAccountInfo } from '../hedera';
-import { getHederaNetwork, validEVMChainID, validHederaChainID } from '../hedera/config';
+import {
+  getHederaNetwork,
+  validEVMChainID,
+  validHederaChainID,
+} from '../hedera/config';
 import {
   Account,
   AccountViaPrivateKey,
-  IdentitySnapState
+  IdentitySnapState,
 } from '../interfaces';
 import { requestHederaAccountId } from '../snap/dialog';
 import { getCurrentNetwork } from '../snap/network';
@@ -15,7 +19,7 @@ import {
   getAccountStateByCoinType,
   getCurrentCoinType,
   initAccountState,
-  updateSnapState
+  updateSnapState,
 } from '../snap/state';
 import { getAddressKeyDeriver, snapGetKeysFromAddress } from '../utils/keyPair';
 import { convertChainIdFromHex } from '../utils/network';
@@ -130,9 +134,8 @@ export async function veramoImportMetaMaskAccount(
     }
   }
 
-   console.log(`state ${JSON.stringify(state)} address ${address}`);
+  console.log(`state ${JSON.stringify(state)} address ${address}`);
   const accountState = await getAccountStateByCoinType(state, address);
-
 
   console.log(`Account state ${JSON.stringify(accountState)}`);
   const method = accountState.accountConfig.identity.didMethod;
