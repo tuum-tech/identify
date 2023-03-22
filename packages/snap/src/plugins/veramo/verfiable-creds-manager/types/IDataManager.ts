@@ -57,7 +57,7 @@ export type IDataManagerSaveArgs = {
 
 export type IDataManagerClearArgs = {
   filter?: Filter;
-  options: ClearOptions;
+  options?: ClearOptions;
   accessToken?: string;
 };
 
