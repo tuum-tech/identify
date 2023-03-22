@@ -32,10 +32,11 @@ const DeleteAllVCs: FC<Props> = ({ setCurrentChainId }) => {
     setLoading(true);
     try {
       setCurrentChainId(await getCurrentNetwork());
+      const selectedStore = selectedOptions.map((option) => option.value);
       const options = {
         // If you want to remove the VCs from multiple stores, you can pass an array like so:
         // store: ['snap', 'googleDrive'],
-        store: selectedOptions.map((option) => option.value),
+        ...(selectedStore.length ? { store: selectedStore } : {}),
       };
       const isRemoved = (await deleteAllVCs(
         options,
