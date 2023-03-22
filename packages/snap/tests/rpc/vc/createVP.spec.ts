@@ -6,7 +6,7 @@ import { onRpcRequest } from '../../../src';
 import {
   ETH_ADDRESS,
   ETH_CHAIN_ID,
-  getDefaultSnapState
+  getDefaultSnapState,
 } from '../../testUtils/constants';
 import { getRequestParams } from '../../testUtils/helper';
 import { buildMockSnap, SnapMock } from '../../testUtils/snap.mock';
@@ -68,7 +68,7 @@ describe('createVP', () => {
 
   it('should succeed creating VP from 2 VCs', async () => {
     const createVpRequest = getRequestParams('createVP', {
-      vcIds
+      vcIds,
     });
 
     const presentation = (await onRpcRequest({

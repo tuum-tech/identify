@@ -3,7 +3,7 @@ import { SnapsGlobalObject } from '@metamask/snaps-types';
 import {
   EvmAccountParams,
   HederaAccountParams,
-  PublicAccountInfo
+  PublicAccountInfo,
 } from 'src/interfaces';
 import { onRpcRequest } from '../../src';
 import {
@@ -12,7 +12,7 @@ import {
   EVM_ACCOUNT,
   getDefaultSnapState,
   HEDERA_ACCOUNT,
-  HEDERA_CHAIN_ID
+  HEDERA_CHAIN_ID,
 } from '../testUtils/constants';
 import { getRequestParams } from '../testUtils/helper';
 import { buildMockSnap, SnapMock } from '../testUtils/snap.mock';

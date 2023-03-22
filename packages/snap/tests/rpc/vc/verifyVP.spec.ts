@@ -1,14 +1,14 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { VerifiablePresentation } from '@veramo/core';
+import { CreateVCResponseResult } from 'src/types/params';
 import { buildMockSnap, SnapMock } from '../../testUtils/snap.mock';
 
-import { CreateVCResponseResult } from 'src/types/params';
 import { onRpcRequest } from '../../../src';
 import {
   ETH_ADDRESS,
   ETH_CHAIN_ID,
-  getDefaultSnapState
+  getDefaultSnapState,
 } from '../../testUtils/constants';
 import { getRequestParams } from '../../testUtils/helper';
 

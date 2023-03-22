@@ -141,9 +141,9 @@ export async function connectEVMAccount(
   }
 
   console.error(
-    'Invalid Chain ID. Valid chainIDs for Hedera: [0x127: mainnet, 0x128: testnet, 0x129: previewnet, 0x12a: localnet]',
+    'Invalid Chain ID. Valid chainIDs for EVM account: [137: polygon]',
   );
   throw new Error(
-    'Non-Hedera network was selected on Metamask while trying to configure the Hedera network. Please switch the network to Hedera Network first',
+    'Invalid Chain ID. Valid chainIDs for EVM account: [137: polygon]',
   );
 }

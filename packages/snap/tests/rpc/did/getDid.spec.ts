@@ -5,7 +5,7 @@ import { convertChainIdFromHex } from '../../../src/utils/network';
 import {
   ETH_ADDRESS,
   ETH_CHAIN_ID,
-  getDefaultSnapState
+  getDefaultSnapState,
 } from '../../testUtils/constants';
 import { getRequestParams } from '../../testUtils/helper';
 import { buildMockSnap, SnapMock } from '../../testUtils/snap.mock';
@@ -36,6 +36,9 @@ describe('getDID', () => {
       origin: 'tests',
       request: getDIDRequestParams as any,
     })) as string;
-    expect(currentDID).toBe(`did:pkh:eip155:${convertChainIdFromHex(ETH_CHAIN_ID)}:${ETH_ADDRESS}`);
+
+    expect(currentDID).toBe(
+      `did:pkh:eip155:${convertChainIdFromHex(ETH_CHAIN_ID)}:${ETH_ADDRESS}`,
+    );
   });
 });
