@@ -19,8 +19,9 @@ import {
   Subtitle,
 } from '../config/styles';
 import { MetamaskActions, MetaMaskContext } from '../contexts/MetamaskContext';
+import useModal from '../hooks/useModal';
 import { shouldDisplayReconnectButton } from '../utils';
-import { validHederaChainID } from '../utils/hedera';
+import { getNetwork, validHederaChainID } from '../utils/hedera';
 import {
   connectSnap,
   createVP,
@@ -39,6 +40,8 @@ function LoginPage() {
   // TODO: get did by calling getDid
   const [identifier, setIdentifier] = useState(''); // useState('did:pkh:eip155:296:0x7d871f006d97498ea338268a956af94ab2e65cdd');
   const [currentChainId, setCurrentChainId] = useState('');
+  const [currentNetwork, setCurrentNetwork] = useState('');
+
   const [presentation, setPresentation] = useState<
     VerifiablePresentation | undefined
   >(undefined);
@@ -47,13 +50,7 @@ function LoginPage() {
   const [vc, setVC] = useState('');
   const [vcList, setVcList] = useState([] as any);
   const [showVcsModal, setShowVcsModal] = useState(false);
-
-  const isHedera = validHederaChainID(currentChainId) && hederaAccountConnected;
-  const noHedera =
-    !validHederaChainID(currentChainId) && !hederaAccountConnected;
-  const isNonHedera = isHedera || noHedera;
-  const requireHedera =
-    validHederaChainID(currentChainId) && !hederaAccountConnected;
+  const { showModal } = useModal();
 
   const handleSaveVC = async () => {
     // Send a POST request
@@ -144,6 +141,7 @@ function LoginPage() {
   }, [identifier]);
 
   useEffect(() => {
+    setCurrentNetwork(getNetwork(currentChainId));
     if (!validHederaChainID(currentChainId)) {
       setHederaAccountConnected(false);
     }
@@ -205,7 +203,10 @@ function LoginPage() {
 
       if (ret.status === 200) {
         setChallenge(ret.data.challenge);
-        alert(`challenge ${ret.data.challenge}`);
+        showModal({
+          title: 'Sign in',
+          content: `challenge ${ret.data.challenge}`,
+        });
       }
     } catch (e) {
       console.error(e);
@@ -221,6 +222,10 @@ function LoginPage() {
         Check out how Signup and Login actions can be handled by utilizing VCs
         through the use of Identity Snap
       </Subtitle>
+      <dl>
+        <dt style={{ float: 'left' }}>Current Network:</dt>
+        <dd style={{ paddingLeft: 10 }}>{currentNetwork}</dd>
+      </dl>
       <Modal show={showVcsModal} onHide={() => setShowVcsModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Choose the credential to Sign in with</Modal.Title>
@@ -260,63 +265,59 @@ function LoginPage() {
         )}
         <ConnectIdentitySnap handleConnectClick={handleConnectClick} />
         <ReconnectIdentitySnap handleConnectClick={handleConnectClick} />
-        {isNonHedera ? (
-          <>
-            <Card
-              content={{
-                title: 'Sign Up',
-                description:
-                  'This will create a Login Verifiable Credential which you can use later to login',
-                form: (
-                  <form>
-                    <label>
-                      Enter your username
-                      <input
-                        type="text"
-                        value={loginName}
-                        onChange={(e) => setLoginName(e.target.value)}
-                      />
-                    </label>
-                  </form>
-                ),
-                button: (
-                  <SendHelloButton
-                    buttonText="Generate VC"
-                    onClick={handleCreateVC}
-                    disabled={false}
-                  />
-                ),
-              }}
-              disabled={!state.installedSnap}
-              fullWidth={
-                state.isFlask &&
-                Boolean(state.installedSnap) &&
-                !shouldDisplayReconnectButton(state.installedSnap)
-              }
-            />
-            <Card
-              content={{
-                title: 'Sign In',
-                description: 'Present VerifiableCredential so we could verify',
-                button: (
-                  <SendHelloButton
-                    buttonText="SignIn"
-                    onClick={handleChallenge}
-                    disabled={false}
-                  />
-                ),
-              }}
-              disabled={!state.installedSnap}
-              fullWidth={
-                state.isFlask &&
-                Boolean(state.installedSnap) &&
-                !shouldDisplayReconnectButton(state.installedSnap)
-              }
-            />
-          </>
-        ) : (
-          ''
-        )}
+        <>
+          <Card
+            content={{
+              title: 'Sign Up',
+              description:
+                'This will create a Login Verifiable Credential which you can use later to login',
+              form: (
+                <form>
+                  <label>
+                    Enter your username
+                    <input
+                      type="text"
+                      value={loginName}
+                      onChange={(e) => setLoginName(e.target.value)}
+                    />
+                  </label>
+                </form>
+              ),
+              button: (
+                <SendHelloButton
+                  buttonText="Generate VC"
+                  onClick={handleCreateVC}
+                  disabled={false}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+          <Card
+            content={{
+              title: 'Sign In',
+              description: 'Present VerifiableCredential so we could verify',
+              button: (
+                <SendHelloButton
+                  buttonText="SignIn"
+                  onClick={handleChallenge}
+                  disabled={false}
+                />
+              ),
+            }}
+            disabled={!state.installedSnap}
+            fullWidth={
+              state.isFlask &&
+              Boolean(state.installedSnap) &&
+              !shouldDisplayReconnectButton(state.installedSnap)
+            }
+          />
+        </>
       </CardContainer>
     </PageContainer>
   );
