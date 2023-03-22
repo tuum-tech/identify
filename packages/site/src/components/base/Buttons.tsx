@@ -1,4 +1,5 @@
 import { ComponentProps } from 'react';
+import BSButton from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner';
 import styled from 'styled-components';
 import { ReactComponent as FlaskFox } from '../../assets/flask_fox.svg';
@@ -75,6 +76,23 @@ export const InstallFlaskButton = () => (
     <FlaskFox />
     <ButtonText>Install MetaMask Flask</ButtonText>
   </Link>
+);
+
+export const LinkButton = ({
+  link,
+  title,
+}: {
+  link: string;
+  title: string;
+}) => (
+  <BSButton
+    href={link}
+    variant="link"
+    style={{ textDecoration: 'none', marginRight: 24 }}
+    size="lg"
+  >
+    {title}
+  </BSButton>
 );
 
 export const ConnectButton = (props: ComponentProps<typeof Button>) => {
