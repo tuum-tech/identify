@@ -1,5 +1,7 @@
 import { SnapsGlobalObject } from '@metamask/snaps-types';
+import { VerifiableCredential } from '@veramo/core';
 import jsonpath from 'jsonpath';
+import { IdentitySnapState } from 'src/interfaces';
 import { v4 as uuidv4 } from 'uuid';
 import {
   AbstractDataStore,
@@ -25,16 +27,24 @@ import { decodeJWT } from './jwt';
 export class GoogleDriveVCStore extends AbstractDataStore {
   snap: SnapsGlobalObject;
 
+  state: IdentitySnapState;
+
   accessToken: string;
 
-  constructor(snap: SnapsGlobalObject) {
+  constructor(snap: SnapsGlobalObject, state: IdentitySnapState) {
     super();
     this.snap = snap;
+    this.state = state;
     this.accessToken = '';
   }
 
   async queryVC(args: IFilterArgs): Promise<IQueryResult[]> {
     const { filter } = args;
+    const account = this.state.currentAccount.evmAddress;
+    if (!account) {
+      throw Error(`SnapVCStore - Cannot get current account: ${account}`);
+    }
+
     const googleVCs = await getGoogleVCs(
       this.accessToken,
       GOOGLE_DRIVE_VCS_FILE_NAME,
@@ -46,27 +56,48 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     }
 
     if (filter && filter.type === 'id') {
-      try {
-        if (googleVCs[filter.filter as string]) {
-          let vc = googleVCs[filter.filter as string] as unknown;
+      return Object.keys(googleVCs)
+        .map((k) => {
+          let vc = googleVCs[k] as unknown;
           if (typeof vc === 'string') {
             vc = decodeJWT(vc);
           }
-          const obj = [
-            {
-              metadata: { id: filter.filter as string },
-              data: vc,
-            },
-          ];
-          return obj;
-        }
-        return [];
-      } catch (e) {
-        throw new Error('Invalid id');
-      }
+
+          return {
+            metadata: { id: k },
+            data: vc,
+          };
+        })
+        .filter((item: any) => {
+          return (
+            item.metadata.id === (filter.filter as string) &&
+            item.data.credentialSubject.id?.split(':')[4] === account
+          );
+        });
     }
 
     if (filter && filter.type === 'vcType') {
+      return Object.keys(googleVCs)
+        .map((k) => {
+          let vc = googleVCs[k] as unknown;
+          if (typeof vc === 'string') {
+            vc = decodeJWT(vc);
+          }
+
+          return {
+            metadata: { id: k },
+            data: vc,
+          };
+        })
+        .filter((item: any) => {
+          return (
+            item.data.type?.includes(filter.filter as string) &&
+            item.data.credentialSubject.id?.split(':')[4] === account
+          );
+        });
+    }
+
+    if (filter === undefined || (filter && filter.type === 'none')) {
       return Object.keys(googleVCs)
         .map((k) => {
           let vc = googleVCs[k] as unknown;
@@ -79,34 +110,25 @@ export class GoogleDriveVCStore extends AbstractDataStore {
           };
         })
         .filter((item: any) => {
-          return item.data.type?.includes(filter.filter as string);
+          return item.data.credentialSubject.id?.split(':')[4] === account;
         });
     }
 
-    if (filter === undefined || (filter && filter.type === 'none')) {
-      return Object.keys(googleVCs).map((k) => {
-        let vc = googleVCs[k] as unknown;
-        if (typeof vc === 'string') {
-          vc = decodeJWT(vc);
-        }
-        return {
-          metadata: { id: k },
-          data: vc,
-        };
-      });
-    }
-
     if (filter && filter.type === 'JSONPath') {
-      const objects = Object.keys(googleVCs).map((k) => {
-        let vc = googleVCs[k] as unknown;
-        if (typeof vc === 'string') {
-          vc = decodeJWT(vc);
-        }
-        return {
-          metadata: { id: k },
-          data: vc,
-        };
-      });
+      const objects = Object.keys(googleVCs)
+        .map((k) => {
+          let vc = googleVCs[k] as unknown;
+          if (typeof vc === 'string') {
+            vc = decodeJWT(vc);
+          }
+          return {
+            metadata: { id: k },
+            data: vc,
+          };
+        })
+        .filter((item: any) => {
+          return item.data.credentialSubject.id?.split(':')[4] === account;
+        });
       const filteredObjects = jsonpath.query(objects, filter.filter as string);
       return filteredObjects as IQueryResult[];
     }
@@ -118,6 +140,10 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     options?: unknown;
   }): Promise<string[]> {
     const { data: vcs } = args;
+    const account = this.state.currentAccount.evmAddress;
+    if (!account) {
+      throw Error(`SnapVCStore - Cannot get current account: ${account}`);
+    }
 
     let googleVCs = await getGoogleVCs(
       this.accessToken,
@@ -130,11 +156,16 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     }
 
     const ids: string[] = [];
-    const newVCs = [...googleVCs];
+    let newVCs = { ...googleVCs };
     for (const vc of vcs) {
-      const newId = vc.id || uuidv4();
-      newVCs.push({ [newId]: vc });
-      ids.push(newId);
+      if (
+        (vc.vc as VerifiableCredential).credentialSubject.id?.split(':')[4] ===
+        account
+      ) {
+        const newId = vc.id || uuidv4();
+        newVCs = { ...newVCs, [newId]: vc.vc };
+        ids.push(newId);
+      }
     }
 
     await uploadToGoogleDrive(this.accessToken, {
@@ -146,6 +177,11 @@ export class GoogleDriveVCStore extends AbstractDataStore {
   }
 
   async deleteVC({ id }: { id: string }): Promise<boolean> {
+    const account = this.state.currentAccount.evmAddress;
+    if (!account) {
+      throw Error(`SnapVCStore - Cannot get current account: ${account}`);
+    }
+
     const googleVCs = await getGoogleVCs(
       this.accessToken,
       GOOGLE_DRIVE_VCS_FILE_NAME,
@@ -157,7 +193,19 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     }
 
     if (!googleVCs[id]) {
+      console.log(`VC ID '${id}' not found`);
       throw Error(`VC ID '${id}' not found`);
+    }
+
+    if (
+      (googleVCs[id] as VerifiableCredential).credentialSubject.id?.split(
+        ':',
+      )[4] !== account
+    ) {
+      console.log(
+        `VC ID '${id}' does not belong to the currently connected Metamask account. Skipping...`,
+      );
+      return false;
     }
 
     delete googleVCs[id];
@@ -171,9 +219,37 @@ export class GoogleDriveVCStore extends AbstractDataStore {
   }
 
   public async clearVCs(_args: IFilterArgs): Promise<boolean> {
+    const account = this.state.currentAccount.evmAddress;
+    if (!account) {
+      throw Error(`SnapVCStore - Cannot get current account: ${account}`);
+    }
+
+    const googleVCs = await getGoogleVCs(
+      this.accessToken,
+      GOOGLE_DRIVE_VCS_FILE_NAME,
+    );
+
+    if (!googleVCs) {
+      await createEmptyFile(this.accessToken, GOOGLE_DRIVE_VCS_FILE_NAME);
+      console.log(
+        'Google drive does not have any VCs associated with the currently connected Metamask account. Skipping...',
+      );
+      return false;
+    }
+
+    const newVCs: any = {};
+    Object.entries(googleVCs).forEach(([vcId, vc]) => {
+      if (
+        (vc as VerifiableCredential).credentialSubject.id?.split(':')[4] !==
+        account
+      ) {
+        newVCs[vcId] = vc;
+      }
+    });
+
     const gdriveResponse = await uploadToGoogleDrive(this.accessToken, {
       fileName: GOOGLE_DRIVE_VCS_FILE_NAME,
-      content: JSON.stringify({}),
+      content: JSON.stringify(newVCs),
     });
     console.log({ gdriveResponse });
 

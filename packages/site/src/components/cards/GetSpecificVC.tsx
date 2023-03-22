@@ -38,8 +38,9 @@ const GetSpecificVC: FC<Props> = ({ setCurrentChainId }) => {
         type: 'id',
         filter: vcId ? vcId.trim().split(',')[0] : undefined,
       };
+      const selectedStore = selectedOptions.map((option) => option.value);
       const options = {
-        store: selectedOptions.map((option) => option.value),
+        ...(selectedStore.length ? { store: selectedStore } : {}),
         returnStore: true,
       };
       const vcs = (await getVCs(filter, options)) as IDataManagerQueryResult[];
@@ -49,6 +50,7 @@ const GetSpecificVC: FC<Props> = ({ setCurrentChainId }) => {
         if (keys.length > 0) {
           setVc(vcs[keys.length - 1].data as IDataManagerQueryResult);
         }
+
         showModal({
           title: 'Your VCs',
           content: JSON.stringify(vcs, null, 4),

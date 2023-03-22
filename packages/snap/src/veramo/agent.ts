@@ -60,7 +60,7 @@ export async function getVeramoAgent(
 
   didProviders['did:pkh'] = new PkhDIDProvider({ defaultKms: 'snap' });
   vcStorePlugins.snap = new SnapVCStore(snap, state);
-  vcStorePlugins.googleDrive = new GoogleDriveVCStore(snap);
+  vcStorePlugins.googleDrive = new GoogleDriveVCStore(snap, state);
 
   const agent = createAgent<
     IKeyManager &

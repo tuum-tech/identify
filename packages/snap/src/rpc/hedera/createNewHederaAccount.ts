@@ -1,9 +1,9 @@
 import { PublicKey } from '@hashgraph/sdk';
 import { BigNumber } from 'bignumber.js';
 import _ from 'lodash';
-import { isValidHederaAccountInfo } from '../../hedera';
+import { HederaServiceImpl, isValidHederaAccountInfo } from '../../hedera';
 import { getHederaNetwork, validHederaChainID } from '../../hedera/config';
-import { SimpleHederaClient } from '../../hedera/service';
+import { HederaMirrorInfo, SimpleHederaClient } from '../../hedera/service';
 import { IdentitySnapParams } from '../../interfaces';
 import { getCurrentNetwork } from '../../snap/network';
 import { CreateNewHederaAccountRequestParams } from '../../types/params';
@@ -20,7 +20,7 @@ export async function createNewHederaAccount(
   identitySnapParams: IdentitySnapParams,
   newHederaAccountParams: CreateNewHederaAccountRequestParams,
   hederaAccountIdToFundFrom?: string,
-): Promise<string> {
+): Promise<HederaMirrorInfo> {
   const { state, account } = identitySnapParams;
   const {
     hbarAmountToSend,
@@ -31,7 +31,7 @@ export async function createNewHederaAccount(
   const chainId = await getCurrentNetwork(ethereum);
   if (!validHederaChainID(chainId)) {
     console.error(
-      'Invalid Chain ID. Valid chainIDs for Hedera: [0x127: mainnet, 0x128: testnet, 0x129: previewnet, 0x12a: localnet]',
+      'Invalid Chain ID. Valid chainIDs for Hedera: [0x127: mainnet, 0x128: testnet, 0x129: previewnet]',
     );
     throw new Error(
       'Non-Hedera network was selected on Metamask while trying to configure the Hedera network. Please switch the network to Hedera Network first',
@@ -50,24 +50,69 @@ export async function createNewHederaAccount(
     );
   }
 
+  const network = getHederaNetwork(chainId);
   const hederaClient = (await isValidHederaAccountInfo(
     account.privateKey,
     _accountId,
-    getHederaNetwork(chainId),
+    network,
   )) as SimpleHederaClient;
 
+  const hederaService = new HederaServiceImpl(network);
+  let newAccount = false;
   let result;
   if (newAccountPublickey) {
-    result = await hederaClient.createAccountForPublicKey({
-      publicKey: PublicKey.fromString(newAccountPublickey),
-      initialBalance: BigNumber(hbarAmountToSend),
-    });
+    const publicKey = PublicKey.fromString(newAccountPublickey).toStringRaw();
+    try {
+      result = (await hederaService.getAccountFromPublicKey(
+        publicKey,
+      )) as HederaMirrorInfo;
+
+      if (result === null || _.isEmpty(result)) {
+        newAccount = true;
+      }
+    } catch (error) {
+      console.log(
+        'Error while retrieving account info using public key from the mirror node so let us just try to fund this account. Error: ',
+        error,
+      );
+      newAccount = true;
+    }
+
+    if (newAccount) {
+      result = (await hederaClient.createAccountForPublicKey({
+        publicKey: PublicKey.fromString(publicKey),
+        initialBalance: BigNumber(hbarAmountToSend),
+      })) as HederaMirrorInfo;
+    }
   } else {
-    result = await hederaClient.createAccountForEvmAddress({
-      evmAddress: newAccountEvmAddress,
-      initialBalance: BigNumber(hbarAmountToSend),
-    });
+    try {
+      result = (await hederaService.getAccountFromEvmAddres(
+        newAccountEvmAddress,
+      )) as HederaMirrorInfo;
+
+      if (result === null || _.isEmpty(result)) {
+        newAccount = true;
+      }
+    } catch (error) {
+      console.log(
+        'Error while retrieving account info using evm address from the mirror node so let us just try to fund this account. Error: ',
+        error,
+      );
+      newAccount = true;
+    }
+
+    if (newAccount) {
+      result = (await hederaClient.createAccountForEvmAddress({
+        evmAddress: newAccountEvmAddress,
+        initialBalance: BigNumber(hbarAmountToSend),
+      })) as HederaMirrorInfo;
+    }
   }
+
+  console.log(
+    'Newly created Hedera Account info: ',
+    JSON.stringify(result, null, 4),
+  );
 
   if (result === null || _.isEmpty(result)) {
     console.error(
@@ -77,5 +122,7 @@ export async function createNewHederaAccount(
       'Could not create a new hedera account id for the given public key or evm address. Please try again',
     );
   }
-  return result.toString();
+  result.newlyCreated = newAccount;
+
+  return result;
 }

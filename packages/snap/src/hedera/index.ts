@@ -11,18 +11,23 @@ import {
 import _ from 'lodash';
 
 import { SimpleHederaClientImpl } from './client';
-import { HederaService, SimpleHederaClient } from './service';
+import { HederaMirrorInfo, HederaService, SimpleHederaClient } from './service';
 import { WalletHedera } from './wallet/abstract';
 import { PrivateKeySoftwareWallet } from './wallet/software-private-key';
 
 export class HederaServiceImpl implements HederaService {
+  private network: string;
+
+  constructor(network: string) {
+    this.network = network;
+  }
+
   async createClient(options: {
     walletHedera: WalletHedera;
-    network: string;
     keyIndex: number;
     accountId: AccountId;
   }): Promise<SimpleHederaClient | null> {
-    const client = Client.forNetwork(options.network as any);
+    const client = Client.forNetwork(this.network as any);
 
     const transactionSigner = await options.walletHedera.getTransactionSigner(
       options.keyIndex,
@@ -48,6 +53,126 @@ export class HederaServiceImpl implements HederaService {
     }
 
     return new SimpleHederaClientImpl(client, privateKey);
+  }
+
+  async getAccountFromPublicKey(
+    publicKey: string,
+  ): Promise<HederaMirrorInfo | null> {
+    // Returns all account information for the given public key
+    const network =
+      this.network === 'mainnet' ? 'mainnet-public' : this.network;
+    const accountInfoUrl = `https://${network}.mirrornode.hedera.com/api/v1/accounts?account.publickey=${publicKey}&limit=1&order=asc`;
+    const accountInfoResult = await mirrorNodeQuery(accountInfoUrl);
+
+    console.log(
+      'getAccountFromPublicKey - result: ',
+      JSON.stringify(accountInfoResult, null, 4),
+    );
+
+    if (
+      !(
+        accountInfoResult.accounts &&
+        accountInfoResult.accounts.length > 0 &&
+        accountInfoResult.accounts[0].account
+      )
+    ) {
+      console.log(
+        `Could not retrieve info about this evm address from hedera mirror node for some reason. Please try again later`,
+      );
+      return null;
+    }
+
+    const result = accountInfoResult.accounts[0];
+    const createdDate = new Date(
+      (result.created_timestamp.split('.')[0] as number) * 1000,
+    ).toLocaleString(undefined, {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      weekday: 'long',
+      hour: '2-digit',
+      hour12: false,
+      minute: '2-digit',
+      second: '2-digit',
+    });
+    const expiryDate = new Date(
+      (result.expiry_timestamp.split('.')[0] as number) * 1000,
+    ).toLocaleString(undefined, {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      weekday: 'long',
+      hour: '2-digit',
+      hour12: false,
+      minute: '2-digit',
+      second: '2-digit',
+    });
+    return {
+      account: result.account,
+      evmAddress: result.evm_address,
+      publicKey,
+      alias: result.alias,
+      balance: result.balance.balance / 100000000.0,
+      createdDate,
+      expiryDate,
+      memo: result.memo,
+    } as HederaMirrorInfo;
+  }
+
+  async getAccountFromEvmAddres(
+    evmAddress: string,
+  ): Promise<HederaMirrorInfo | null> {
+    // Returns all account information for the given evmAddress
+    const network =
+      this.network === 'mainnet' ? 'mainnet-public' : this.network;
+    const accountInfoUrl = `https://${network}.mirrornode.hedera.com/api/v1/accounts/${evmAddress}?limit=1&order=asc`;
+    const result = await mirrorNodeQuery(accountInfoUrl);
+
+    console.log(
+      'getAccountFromEvmAddres - result: ',
+      JSON.stringify(result, null, 4),
+    );
+
+    if (result === null || _.isEmpty(result) || !result.account) {
+      console.log(
+        `Could not retrieve info about this evm address from hedera mirror node for some reason. Please try again later`,
+      );
+      return null;
+    }
+
+    const createdDate = new Date(
+      (result.created_timestamp.split('.')[0] as number) * 1000,
+    ).toLocaleString(undefined, {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      weekday: 'long',
+      hour: '2-digit',
+      hour12: false,
+      minute: '2-digit',
+      second: '2-digit',
+    });
+    const expiryDate = new Date(
+      (result.expiry_timestamp.split('.')[0] as number) * 1000,
+    ).toLocaleString(undefined, {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      weekday: 'long',
+      hour: '2-digit',
+      hour12: false,
+      minute: '2-digit',
+      second: '2-digit',
+    });
+    return {
+      account: result.account,
+      evmAddress: result.evm_address,
+      alias: result.alias,
+      balance: result.balance.balance / 100000000.0,
+      createdDate,
+      expiryDate,
+      memo: result.memo,
+    } as HederaMirrorInfo;
   }
 }
 
@@ -101,6 +226,16 @@ export async function testClientOperatorMatch(client: Client) {
 }
 
 /**
+ * Retrieve results using hedera mirror node.
+ *
+ * @param url - The URL to use to query.
+ */
+export async function mirrorNodeQuery(url: RequestInfo | URL) {
+  const response = await fetch(url);
+  return await response.json();
+}
+
+/**
  * To HederaAccountInfo.
  *
  * @param _privateKey - Private Key.
@@ -115,13 +250,12 @@ export async function isValidHederaAccountInfo(
   const accountId = AccountId.fromString(_accountId);
   const privateKey = PrivateKey.fromStringECDSA(_privateKey);
   const walletHedera: WalletHedera = new PrivateKeySoftwareWallet(privateKey);
-  const hedera = new HederaServiceImpl();
+  const hederaService = new HederaServiceImpl(_network);
 
-  const client = await hedera.createClient({
+  const client = await hederaService.createClient({
     walletHedera,
     keyIndex: 0,
     accountId,
-    network: _network,
   });
 
   if (client === null || _.isEmpty(client)) {

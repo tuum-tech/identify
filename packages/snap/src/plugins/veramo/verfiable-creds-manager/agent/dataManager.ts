@@ -26,6 +26,33 @@ export class DataManager implements IAgentPlugin {
     this.stores = options.store;
   }
 
+  /**
+   * Check if any stores require token configuration.
+   *
+   * @param store - Input stores.
+   * @param accessToken - Access token.
+   * @returns The result to check token configuration.
+   */
+  private async checkTokenConfiguration(
+    store: string[],
+    accessToken: string | undefined,
+  ) {
+    for (const storeName of store) {
+      const storePlugin = this.stores[storeName];
+      if (!storePlugin) {
+        throw new Error(`Store plugin ${storeName} not found`);
+      }
+
+      if (storePlugin.configure) {
+        if (!accessToken) {
+          throw new Error('You need to configure google account.');
+        }
+        await storePlugin.configure({ accessToken });
+      }
+    }
+    return true;
+  }
+
   public async saveVC(
     args: IDataManagerSaveArgs,
   ): Promise<IDataManagerSaveResult[]> {
@@ -44,17 +71,14 @@ export class DataManager implements IAgentPlugin {
       store = [store];
     }
 
+    await this.checkTokenConfiguration(store, accessToken);
+
+    // Save VC for all stores
     let res: IDataManagerSaveResult[] = [];
     for (const storeName of store) {
       const storePlugin = this.stores[storeName];
-      if (!storePlugin) {
-        throw new Error(`Store plugin ${storeName} not found`);
-      }
 
       try {
-        if (accessToken && storePlugin.configure) {
-          await storePlugin.configure({ accessToken });
-        }
         const result = await storePlugin.saveVC({ data });
         const mappedResult = result.map((savedId) => {
           return { id: savedId, store: storeName };
@@ -96,17 +120,13 @@ export class DataManager implements IAgentPlugin {
       store = [store];
     }
 
+    await this.checkTokenConfiguration(store, accessToken);
+
     let res: IDataManagerQueryResult[] = [];
     for (const storeName of store) {
       const storePlugin = this.stores[storeName];
-      if (!storePlugin) {
-        throw new Error(`Store plugin ${storeName} not found`);
-      }
 
       try {
-        if (accessToken && storePlugin.configure) {
-          await storePlugin.configure({ accessToken });
-        }
         const result = await storePlugin.queryVC({ filter });
         const mappedResult = result.map((r) => {
           if (returnStore) {
@@ -142,17 +162,13 @@ export class DataManager implements IAgentPlugin {
       store = [store];
     }
 
+    await this.checkTokenConfiguration(store, accessToken);
+
     const res: IDataManagerDeleteResult[] = [];
     for (const storeName of store) {
       const storePlugin = this.stores[storeName];
-      if (!storePlugin) {
-        throw new Error(`Store plugin ${storeName} not found`);
-      }
 
       try {
-        if (accessToken && storePlugin.configure) {
-          await storePlugin.configure({ accessToken });
-        }
         const result = await storePlugin.deleteVC({ id });
         res.push({ id, removed: result, store: storeName });
       } catch (e) {
@@ -182,17 +198,14 @@ export class DataManager implements IAgentPlugin {
     if (typeof store === 'string') {
       store = [store];
     }
+
+    await this.checkTokenConfiguration(store, accessToken);
+
     const res: IDataManagerClearResult[] = [];
     for (const storeName of store) {
       const storePlugin = this.stores[storeName];
-      if (!storePlugin) {
-        throw new Error(`Store plugin ${storeName} not found`);
-      }
 
       try {
-        if (accessToken && storePlugin.configure) {
-          await storePlugin.configure({ accessToken });
-        }
         const result = await storePlugin.clearVCs({ filter });
         res.push({ removed: result, store: storeName });
       } catch (e) {

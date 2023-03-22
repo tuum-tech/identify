@@ -48,6 +48,11 @@ export async function syncGoogleVCs(
     options,
     accessToken: accountState.accountConfig.identity.googleAccessToken,
   })) as IDataManagerQueryResult[];
+  /* googleVCs = googleVCs.filter(
+    (vc) =>
+      (vc.data as VerifiableCredential).credentialSubject.id?.split(':')[4] ===
+      account.evmAddress, // Note that we're only doing this because this is a did:pkh VC. We need to handle other VCs differently
+  ); */
 
   const snapVCIds = snapVCs.map((vc) => vc.metadata.id);
   const googleVCIds = googleVCs.map((vc) => vc.metadata.id);
@@ -73,9 +78,10 @@ export async function syncGoogleVCs(
       'Would you like to sync VCs in Google drive with Metamask snap?',
       'This action will import the VCs that are in Google drive to the Metamask snap',
       vcsNotInSnap,
+      'snap',
     );
   }
-  let vcsNotInGDriveSync = false;
+  let vcsNotInGDriveSync = true;
   if (vcsNotInGDrive.length > 0) {
     vcsNotInGDriveSync = await handleSync(
       state,
@@ -85,6 +91,7 @@ export async function syncGoogleVCs(
       'Would you like to sync VCs in Metamask snap with Google drive?',
       'This action will export the VCs that are in Metamask snap to Google drive',
       vcsNotInGDrive,
+      'googleDrive',
     );
   }
 
@@ -110,6 +117,7 @@ export async function syncGoogleVCs(
  * @param prompt - Prompt text of the metamask dialog box(eg. 'Are you sure you want to send VCs to the dApp?').
  * @param description - Description text of the metamask dialog box(eg. 'Some dApps are less secure than others and could save data from VCs against your will. Be careful where you send your private VCs! Number of VCs submitted is 2').
  * @param vcs - The Verifiable Credentials to show on the metamask dialog box.
+ * @param store - The snap store to use(snap or googleDrive).
  */
 async function handleSync(
   state: IdentitySnapState,
@@ -119,6 +127,7 @@ async function handleSync(
   prompt: string,
   description: string,
   vcs: IDataManagerQueryResult[],
+  store: string,
 ): Promise<boolean> {
   const dialogParams: SnapDialogParams = {
     type: 'Confirmation',
@@ -126,7 +135,7 @@ async function handleSync(
   };
   if (await snapDialog(snap, dialogParams)) {
     const options = {
-      store: 'snap',
+      store,
     } as SaveOptions;
     const accountState = await getAccountStateByCoinType(
       state,

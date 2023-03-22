@@ -3,8 +3,10 @@ import {
   Client,
   Hbar,
   PublicKey,
+  TransactionReceipt,
 } from '@hashgraph/sdk';
 import { BigNumber } from 'bignumber.js';
+import { HederaMirrorInfo } from '../service';
 
 /**
  * Create Hedera™ crypto-currency account.
@@ -20,24 +22,29 @@ export async function createAccountForPublicKey(
     publicKey: PublicKey;
     initialBalance: BigNumber;
   },
-): Promise<string | null> {
+): Promise<HederaMirrorInfo | null> {
   const tx = new AccountCreateTransaction()
     .setInitialBalance(Hbar.fromTinybars(options.initialBalance))
     .setMaxTransactionFee(new Hbar(1))
     .setKey(options.publicKey);
 
-  const receipt = await (await tx.execute(client)).getReceipt(client);
+  const receipt: TransactionReceipt = await (
+    await tx.execute(client)
+  ).getReceipt(client);
 
   const newAccountId = receipt.accountId ? receipt.accountId.toString() : '';
 
+  console.log('newAccountId: ', newAccountId);
+
   if (!newAccountId) {
     console.log(
-      "The transaction didn't process so a new accountId was not created",
+      "The transaction didn't process successfully so a new accountId was not created",
     );
     return null;
   }
 
-  console.log(`Account ID of the newly created account: ${newAccountId}`);
-
-  return newAccountId;
+  return {
+    account: newAccountId,
+    publicKey: options.publicKey.toStringRaw(),
+  } as HederaMirrorInfo;
 }
