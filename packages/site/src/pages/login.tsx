@@ -178,7 +178,10 @@ function LoginPage() {
         challenge,
       };
       console.log('vcId: ', vcId);
-      const vp = (await createVP([vcId], proofInfo)) as VerifiablePresentation;
+      const vp = (await createVP({
+        vcIds: [vcId],
+        proofInfo,
+      })) as VerifiablePresentation;
       setPresentation(vp);
       console.log(`Your VP is: ${JSON.stringify(vp, null, 4)}`);
       setShowVcsModal(false);
