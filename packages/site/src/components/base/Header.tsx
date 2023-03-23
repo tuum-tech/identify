@@ -47,7 +47,8 @@ export const Header = ({
 }) => {
   const theme = useTheme();
   const [state, dispatch] = useContext(MetaMaskContext);
-  const url = window.location.href;
+  // eslint-disable-next-line no-negated-condition
+  const url = typeof window !== 'undefined' ? window.location.href : '';
 
   const handleConnectClick = async () => {
     try {
