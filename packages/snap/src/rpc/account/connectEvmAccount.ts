@@ -1,15 +1,15 @@
 import { heading, panel, text } from '@metamask/snaps-ui';
+import { getCurrentNetwork } from '../../snap/network';
 import {
   Account,
   AccountViaPrivateKey,
   EvmAccountParams,
   IdentitySnapState,
   SnapDialogParams,
-} from '../interfaces';
-import { validEVMChainID } from '../utils/config';
-import { importIdentitySnapAccount } from './account';
-import { snapDialog } from './dialog';
-import { getCurrentNetwork } from './network';
+} from '../../interfaces';
+import { importIdentitySnapAccount } from '../../snap/account';
+import { snapDialog } from '../../snap/dialog';
+import { validEVMChainID } from '../../utils/config';
 
 /**
  * Connect EVM Account.

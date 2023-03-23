@@ -5,6 +5,7 @@ import {
   HederaAccountParams,
   IdentitySnapParams,
 } from './interfaces';
+import { connectHederaAccount } from './rpc/account/connectHederaAccount';
 import { getAccountInfo } from './rpc/account/getAccountInfo';
 import { getAvailableMethods } from './rpc/did/getAvailableMethods';
 import { getCurrentDIDMethod } from './rpc/did/getCurrentDIDMethod';
@@ -25,7 +26,6 @@ import { syncGoogleVCs } from './rpc/vc/syncGoogleVCs';
 import { verifyVC } from './rpc/vc/verifyVC';
 import { verifyVP } from './rpc/vc/verifyVP';
 import { getCurrentAccount } from './snap/account';
-import { connectHederaAccount } from './snap/hedera';
 import { getSnapStateUnchecked } from './snap/state';
 import { CreateNewHederaAccountRequestParams } from './types/params';
 import { init } from './utils/init';
@@ -125,8 +125,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       isValidHederaAccountParams(request.params);
       return await connectHederaAccount(
         state,
-        (request.params as ExternalAccount).externalAccount
-          .data as HederaAccountParams,
+        (
+          (request.params as ExternalAccount).externalAccount
+            .data as HederaAccountParams
+        ).accountId,
         false,
       );
     }

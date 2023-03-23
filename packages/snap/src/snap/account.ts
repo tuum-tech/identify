@@ -6,9 +6,9 @@ import {
   HederaAccountParams,
   IdentitySnapState,
 } from '../interfaces';
+import { connectEVMAccount } from '../rpc/account/connectEvmAccount';
+import { connectHederaAccount } from '../rpc/account/connectHederaAccount';
 import { veramoImportMetaMaskAccount } from '../veramo/accountImport';
-import { connectEVMAccount } from './evm';
-import { connectHederaAccount } from './hedera';
 import { getCurrentCoinType, initAccountState } from './state';
 
 /**
@@ -29,7 +29,7 @@ export async function getCurrentAccount(
     ) {
       return await connectHederaAccount(
         state,
-        account.externalAccount.data as HederaAccountParams,
+        (account.externalAccount.data as HederaAccountParams).accountId,
         true,
       );
     }
