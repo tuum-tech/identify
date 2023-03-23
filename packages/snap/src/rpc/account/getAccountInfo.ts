@@ -1,5 +1,6 @@
 import { ethers } from 'ethers';
-import { validEVMChainID, validHederaChainID } from '../../hedera/config';
+import { validEVMChainID } from '../../utils/config';
+import { validHederaChainID } from '../../hedera/config';
 import {
   ExternalAccount,
   HederaAccountParams,

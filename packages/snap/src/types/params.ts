@@ -1,4 +1,5 @@
 import { ProofFormat, W3CVerifiableCredential } from '@veramo/core';
+import { ExternalAccount } from 'src/interfaces';
 import {
   QueryMetadata,
   SaveOptions,
@@ -34,4 +35,5 @@ export type CreateNewHederaAccountRequestParams = {
   hbarAmountToSend: number;
   newAccountPublickey?: string;
   newAccountEvmAddress?: string;
+  externalAccount?: ExternalAccount;
 };

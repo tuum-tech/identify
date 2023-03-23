@@ -12,6 +12,7 @@ import { getDid } from './rpc/did/getDID';
 import { resolveDID } from './rpc/did/resolveDID';
 import { switchMethod } from './rpc/did/switchMethods';
 import { configureGoogleAccount } from './rpc/gdrive/configureGoogleAccount';
+import { createNewHederaAccount } from './rpc/hedera/createNewHederaAccount';
 import { togglePopups } from './rpc/snap/togglePopups';
 import { createVC } from './rpc/vc/createVC';
 import { createVP } from './rpc/vc/createVP';
@@ -26,11 +27,12 @@ import { verifyVP } from './rpc/vc/verifyVP';
 import { getCurrentAccount } from './snap/account';
 import { connectHederaAccount } from './snap/hedera';
 import { getSnapStateUnchecked } from './snap/state';
+import { CreateNewHederaAccountRequestParams } from './types/params';
 import { init } from './utils/init';
 import {
   isExternalAccountFlagSet,
   isValidConfigueGoogleRequest,
-  // isValidCreateNewHederaAccountParams,
+  isValidCreateNewHederaAccountParams,
   isValidCreateVCRequest,
   isValidCreateVPRequest,
   isValidDeleteAllVCsRequest,
@@ -129,14 +131,17 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       );
     }
 
-    // case 'createNewHederaAccount': {
-    //   isValidCreateNewHederaAccountParams(request.params);
-    //   return await createNewHederaAccount(
-    //     identitySnapParams,
-    //     request.params as CreateNewHederaAccountRequestParams,
-    //     hederaAccountId,
-    //   );
-    // }
+    case 'createNewHederaAccount': {
+      isValidCreateNewHederaAccountParams(request.params);
+      return await createNewHederaAccount(
+        identitySnapParams,
+        request.params as CreateNewHederaAccountRequestParams,
+        (
+          (request.params as unknown as ExternalAccount).externalAccount
+            .data as HederaAccountParams
+        ).accountId,
+      );
+    }
 
     case 'getDID': {
       return await getDid(identitySnapParams);

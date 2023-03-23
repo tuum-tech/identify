@@ -7,7 +7,8 @@ import {
   IdentitySnapState,
 } from '../interfaces';
 import { veramoImportMetaMaskAccount } from '../veramo/accountImport';
-import { connectEVMAccount, connectHederaAccount } from './hedera';
+import { connectEVMAccount } from './evm';
+import { connectHederaAccount } from './hedera';
 import { getCurrentCoinType, initAccountState } from './state';
 
 /**

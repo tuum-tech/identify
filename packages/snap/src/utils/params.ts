@@ -21,7 +21,11 @@ import {
   isValidProofFormat,
   isValidVCStore,
 } from '../types/constants';
-import { CreateVCRequestParams, CreateVPRequestParams } from '../types/params';
+import {
+  CreateNewHederaAccountRequestParams,
+  CreateVCRequestParams,
+  CreateVPRequestParams,
+} from '../types/params';
 
 /**
  * Check whether the the account was imported using private key(external account).
@@ -406,6 +410,100 @@ export function isValidSaveVCRequest(
   throw new Error(
     'Invalid saveVC Params passed. "data" must be passed as a parameter and it must be an object',
   );
+}
+
+/**
+ * Check validation of when trying to create a new Hedera account.
+ *
+ * @param params - Request params.
+ */
+export function isValidCreateNewHederaAccountParams(
+  params: unknown,
+): asserts params is CreateNewHederaAccountRequestParams {
+  if (params === null || _.isEmpty(params)) {
+    console.error(
+      'Invalid createNewHederaAccount Params passed. "newAccountPublickey/newAccountEvmAddress" and "hbarAmountToSend" must be passed as parameters',
+    );
+    throw new Error(
+      'Invalid createNewHederaAccount Params passed. "newAccountPublickey/newAccountEvmAddress" and "hbarAmountToSend" must be passed as parameters',
+    );
+  }
+  const parameter = params as CreateNewHederaAccountRequestParams;
+
+  // Check if hbarAmountToSend is valid
+  if (
+    !(
+      'hbarAmountToSend' in parameter &&
+      parameter.hbarAmountToSend !== null &&
+      typeof parameter.hbarAmountToSend === 'number'
+    )
+  ) {
+    console.error(
+      'Invalid createNewHederaAccount Params passed. "hbarAmountToSend" is either missing or is not a number',
+    );
+    throw new Error(
+      'Invalid createNewHederaAccount Params passed. "hbarAmountToSend" is either missing or is not a number',
+    );
+  }
+
+  // Ensure that both newAccountPublickey and newAccountEvmAddress are not passed in any circumstance
+  if (
+    'newAccountPublickey' in parameter &&
+    'newAccountEvmAddress' in parameter
+  ) {
+    console.error(
+      'Invalid createNewHederaAccount Params passed. Please pass either "newAccountPublickey" or "newAccountEvmAddress" but not both',
+    );
+    throw new Error(
+      'Invalid createNewHederaAccount Params passed. Please pass either "newAccountPublickey" or "newAccountEvmAddress" but not both',
+    );
+  }
+
+  // Ensure that either newAccountPublickey or newAccountEvmAddress is passed
+  if (
+    !('newAccountPublickey' in parameter || 'newAccountEvmAddress' in parameter)
+  ) {
+    console.error(
+      'Invalid createNewHederaAccount Params passed. Either "newAccountPublickey" or "newAccountEvmAddress" must be passed as parameters',
+    );
+    throw new Error(
+      'Invalid createNewHederaAccount Params passed. Either "newAccountPublickey" or "newAccountEvmAddress" must be passed as parameters',
+    );
+  }
+
+  // Check if newAccountPublickey is valid
+  if ('newAccountPublickey' in parameter) {
+    if (
+      !(
+        parameter.newAccountPublickey !== null &&
+        typeof parameter.newAccountPublickey === 'string'
+      )
+    ) {
+      console.error(
+        'Invalid createNewHederaAccount Params passed. "newAccountPublickey" is not in a valid format. It must be a string',
+      );
+      throw new Error(
+        'Invalid createNewHederaAccount Params passed. "newAccountPublickey" is not in a valid format. It must be a string',
+      );
+    }
+  }
+
+  // Check if newAccountEvmAddress is valid
+  if ('newAccountEvmAddress' in parameter) {
+    if (
+      !(
+        parameter.newAccountEvmAddress !== null &&
+        typeof parameter.newAccountEvmAddress === 'string'
+      )
+    ) {
+      console.error(
+        'Invalid createNewHederaAccount Params passed. "newAccountEvmAddress" is not in a valid format. It must be a string',
+      );
+      throw new Error(
+        'Invalid createNewHederaAccount Params passed. "newAccountEvmAddress" is not in a valid format. It must be a string',
+      );
+    }
+  }
 }
 
 /**
