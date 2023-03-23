@@ -90,7 +90,6 @@ export async function getAddressKey(
   const { privateKey, chainCode } = derivedKey;
   const addressKey = `${privateKey as string}${chainCode.split('0x')[1]}`;
   if (privateKey === undefined) {
-    console.log(`privatekey undefined`);
     return null;
   }
   return {
