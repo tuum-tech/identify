@@ -185,10 +185,7 @@ export const getDID = async () => {
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
       method: 'getDID',
-      params: {
-        externalAccount: true,
-        accountId: '0.0.3831609',
-      },
+      params: {},
     },
   });
 };

@@ -5,7 +5,7 @@ import {
   MetaMaskContext,
 } from '../../contexts/MetamaskContext';
 import { connectSnap, getSnap, getThemePreference } from '../../utils';
-import { HeaderButtons } from './Buttons';
+import { HeaderButtons, LinkButton } from './Buttons';
 import { SnapLogo } from './SnapLogo';
 import { Toggle } from './Toggle';
 
@@ -47,6 +47,8 @@ export const Header = ({
 }) => {
   const theme = useTheme();
   const [state, dispatch] = useContext(MetaMaskContext);
+  // eslint-disable-next-line no-negated-condition
+  const url = typeof window !== 'undefined' ? window.location.href : '';
 
   const handleConnectClick = async () => {
     try {
@@ -72,6 +74,10 @@ export const Header = ({
         <Toggle
           onToggle={handleToggleClick}
           defaultChecked={getThemePreference()}
+        />
+        <LinkButton
+          link={url.includes('/login') ? '/' : '/login'}
+          title={url.includes('/login') ? 'Main Page' : 'DID Auth Login'}
         />
         <HeaderButtons state={state} onConnectClick={handleConnectClick} />
       </RightContainer>
