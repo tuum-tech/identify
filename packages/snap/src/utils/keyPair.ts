@@ -21,8 +21,6 @@ export async function getAccountIndex(
 ): Promise<number | undefined> {
   const accountState = await getAccountStateByCoinType(state, account);
 
-  console.log(`account state ${JSON.stringify(accountState)}`);
-  console.log(`account state index ${accountState.index}`);
   if (typeof accountState.index !== 'undefined') {
     return accountState.index;
   }
