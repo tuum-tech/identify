@@ -101,8 +101,6 @@ export async function veramoImportMetaMaskAccount(
     if (!hederaAccountId) {
       hederaAccountId = await requestHederaAccountId(snap);
     }
-    // Attention: This line was inside of the
-    await initAccountState(snap, state, coinType, address);
 
     let hederaClient = await isValidHederaAccountInfo(
       privateKey,
@@ -131,10 +129,7 @@ export async function veramoImportMetaMaskAccount(
     }
   }
 
-  console.log(`state ${JSON.stringify(state)} address ${address}`);
   const accountState = await getAccountStateByCoinType(state, address);
-
-  console.log(`Account state ${JSON.stringify(accountState)}`);
   const method = accountState.accountConfig.identity.didMethod;
 
   let did = '';
