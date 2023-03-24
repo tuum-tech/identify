@@ -1,5 +1,4 @@
-import { FC, useContext, useMemo, useState } from 'react';
-import Form from 'react-bootstrap/esm/Form';
+import { FC, useContext, useRef, useState } from 'react';
 import {
   MetamaskActions,
   MetaMaskContext,
@@ -13,6 +12,9 @@ import {
 } from '../../utils';
 import { validHederaChainID } from '../../utils/hedera';
 import { Card, SendHelloButton } from '../base';
+import ExternalAccount, {
+  GetExternalAccountRef,
+} from '../sections/ExternalAccount';
 
 type Props = {
   currentChainId: string;
@@ -27,22 +29,21 @@ const GetAccountInfo: FC<Props> = ({
 }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
-  const [externalAccount, setExternalAccount] = useState(false);
-  const [accountId, setAccountId] = useState('');
   const { showModal } = useModal();
 
-  const isHederaNetwork = useMemo(
-    () => validHederaChainID(currentChainId),
-    [currentChainId],
-  );
+  const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
   const handleGetAccountInfoClick = async () => {
     setLoading(true);
     try {
       const newChainId = await getCurrentNetwork();
       setCurrentChainId(newChainId);
+
+      const externalAccountData =
+        externalAccountRef.current?.handleGetAccountData();
+
       const params = validHederaChainID(newChainId)
-        ? { externalAccount, accountId }
+        ? externalAccountData
         : undefined;
       const accountInfo = await getAccountInfo(params);
       console.log(`Your account info:`, accountInfo);
@@ -64,27 +65,10 @@ const GetAccountInfo: FC<Props> = ({
         title: 'getAccountInfo',
         description: 'Get the current account information',
         form: (
-          <>
-            {isHederaNetwork ? (
-              <Form>
-                <Form.Check
-                  type="checkbox"
-                  id="external-account-checkbox"
-                  label="External Account"
-                  onChange={(e) => {
-                    setExternalAccount(e.target.checked);
-                  }}
-                />
-                <Form.Label>Account Id</Form.Label>
-                <Form.Control
-                  size="lg"
-                  type="text"
-                  placeholder="Account Id"
-                  onChange={(e) => setAccountId(e.target.value)}
-                />
-              </Form>
-            ) : null}
-          </>
+          <ExternalAccount
+            currentChainId={currentChainId}
+            ref={externalAccountRef}
+          />
         ),
         button: (
           <SendHelloButton
