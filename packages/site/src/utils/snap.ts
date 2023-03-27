@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-types */
+import { Filter } from '@tuum-tech/identity-snap/src/plugins/veramo/verfiable-creds-manager';
 import {
   CreateNewHederaAccountRequestParams,
-  CreateVPRequestParams,
-  GetVCsOptions,
-  RemoveVCOptions,
+  CreateVPRequestParams
 } from '@tuum-tech/identity-snap/src/types/params';
-import { Filter } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
+
 import { VerifiableCredential, VerifiablePresentation } from '@veramo/core';
 import { defaultSnapOrigin } from '../config';
 import { GetAccountInfoRequest, GetSnapsResponse, Snap } from '../types';
@@ -185,10 +184,7 @@ export const getDID = async () => {
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
       method: 'getDID',
-      params: {
-        externalAccount: true,
-        accountId: '0.0.3831609',
-      },
+      params: {}
     },
   });
 };
@@ -213,7 +209,7 @@ export const resolveDID = async (did?: string) => {
 
 export const getVCs = async (
   filter: Filter | undefined,
-  options: GetVCsOptions,
+  options: any,
 ) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
@@ -228,12 +224,12 @@ export const getVCs = async (
  * Invoke the "saveVC" method from the snap.
  */
 
-export const saveVC = async (vc: VerifiableCredential | {}) => {
+export const saveVC = async (params: any) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
       method: 'saveVC',
-      params: { verifiableCredential: vc },
+      params,
     },
   });
 };
@@ -250,7 +246,7 @@ export type ExampleVCValue = {
 export const createVC = async (
   vcKey: string,
   vcValue: object,
-  options: GetVCsOptions,
+  options: any,
   credTypes?: string[],
 ) => {
   return await window.ethereum.request({

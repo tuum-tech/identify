@@ -1,22 +1,19 @@
 /* eslint-disable no-alert */
-import { ProofInfo } from '@tuum-tech/identity-snap/src/types/params';
-import { IDataManagerQueryResult } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
-import { VerifiableCredential, VerifiablePresentation } from '@veramo/core';
+import { IDataManagerQueryResult, ISaveVC } from '@tuum-tech/identity-snap/src/plugins/veramo/verfiable-creds-manager';
+import { CreateVPRequestParams, ProofInfo } from '@tuum-tech/identity-snap/src/types/params';
+import { VerifiablePresentation, W3CVerifiableCredential } from '@veramo/core';
 import axios from 'axios';
 import { useContext, useEffect, useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { Card, InstallFlaskButton, SendHelloButton } from '../components/base';
-import {
-  ConnectIdentitySnap,
-  ReconnectIdentitySnap,
-} from '../components/cards';
+import { ConnectIdentitySnap, ReconnectIdentitySnap } from '../components/cards';
 import {
   CardContainer,
   ErrorMessage,
   Heading,
   PageContainer,
   Span,
-  Subtitle,
+  Subtitle
 } from '../config/styles';
 import { MetamaskActions, MetaMaskContext } from '../contexts/MetamaskContext';
 import { shouldDisplayReconnectButton } from '../utils';
@@ -28,7 +25,7 @@ import {
   getDID,
   getSnap,
   getVCs,
-  saveVC,
+  saveVC
 } from '../utils/snap';
 
 function LoginPage() {
@@ -58,10 +55,16 @@ function LoginPage() {
   const handleSaveVC = async () => {
     // Send a POST request
     if (vc !== '') {
-      const parsedVC: VerifiableCredential = JSON.parse(
+      const parsedVC: W3CVerifiableCredential = JSON.parse(
         vc,
-      ) as VerifiableCredential;
-      await saveVC(parsedVC);
+      ) as W3CVerifiableCredential;
+
+
+      let data: ISaveVC[];
+      let params = {
+        data: [{ vc: parsedVC }]
+      };
+      await saveVC(params);
     }
   };
 
@@ -101,7 +104,8 @@ function LoginPage() {
 
   useEffect(() => {
     (async () => {
-      await handleSignIn();
+      if (challenge !== '')
+        await handleSignIn();
     })();
   }, [challenge]);
 
@@ -180,7 +184,13 @@ function LoginPage() {
         challenge,
       };
       console.log('vcId: ', vcId);
-      const vp = (await createVP([vcId], proofInfo)) as VerifiablePresentation;
+
+      let createVpRequestParameters: CreateVPRequestParams = {
+        vcIds: [vcId],
+        vcs: [],
+        proofInfo: proofInfo
+      }
+      const vp = await createVP(createVpRequestParameters) as VerifiablePresentation;
       setPresentation(vp);
       console.log(`Your VP is: ${JSON.stringify(vp, null, 4)}`);
       setShowVcsModal(false);

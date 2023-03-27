@@ -1,6 +1,8 @@
 /* eslint-disable */
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
+import { onRpcRequest } from 'src';
+import { getRequestParams } from 'tests/testUtils/helper';
 import { getDefaultSnapState } from '../../testUtils/constants';
 import { createMockSnap, SnapMock } from '../../testUtils/snap.mock';
 
@@ -100,4 +102,21 @@ describe('saveVC', () => {
     // expect(result.length).toBe(1);
     // expect.assertions(1);
   });
+
+  it('should not save VCs when params invalid', async () => {
+   
+   //let data: ISaveVC = [ vc: {} as VerifiedCredential 
+    const createVcRequest = getRequestParams('saveVC', {
+      data: {
+        verifiableCredentials: []
+      }
+    });
+
+    await expect(onRpcRequest({
+      origin: 'tests',
+      request: createVcRequest as any,
+    })).rejects.toThrowError();
+   
+    expect.assertions(1);
+  }); 
 });
