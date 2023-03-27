@@ -1,88 +1,86 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { W3CVerifiableCredential } from '@veramo/core';
-import { IdentitySnapParams, IdentitySnapState } from '../../../src/interfaces';
-import { connectHederaAccount } from '../../../src/rpc/hedera/connectHederaAccount';
-import { createVC } from '../../../src/rpc/vc/createVC';
-import { getVCs } from '../../../src/rpc/vc/getVCs';
-import { verifyVC } from '../../../src/rpc/vc/verifyVC';
-import {
-  getDefaultSnapState,
-  hederaPrivateKey,
-} from '../../testUtils/constants';
+import { IDataManagerQueryResult } from 'src/plugins/veramo/verfiable-creds-manager';
+import { onRpcRequest } from '../../../src';
+import { getDefaultSnapState } from '../../testUtils/constants';
+import { getRequestParams } from '../../testUtils/helper';
 import { createMockSnap, SnapMock } from '../../testUtils/snap.mock';
 
 describe('VerifyVC', () => {
-  let identitySnapParams: IdentitySnapParams;
-  let snapState: IdentitySnapState;
   let snapMock: SnapsGlobalObject & SnapMock;
   let metamask: MetaMaskInpageProvider;
 
-  beforeEach(async () => {
-    snapState = getDefaultSnapState();
+  let credentials: W3CVerifiableCredential[];
+
+  beforeAll(async () => {
     snapMock = createMockSnap();
     metamask = snapMock as unknown as MetaMaskInpageProvider;
-    identitySnapParams = {
-      metamask,
-      snap: snapMock,
-      state: snapState,
-    };
 
-    (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
-      hederaPrivateKey,
-    );
+    global.snap = snapMock;
+    global.ethereum = metamask;
+  });
 
-    (identitySnapParams.snap as SnapMock).rpcMocks.eth_chainId.mockReturnValue(
-      '0x128',
-    );
+  beforeEach(async () => {
+    snapMock.rpcMocks.snap_dialog.mockReturnValue(true);
+    snapMock.rpcMocks.snap_manageState.mockReturnValue(getDefaultSnapState());
+    snapMock.rpcMocks.snap_manageState('update', getDefaultSnapState());
+    snapMock.rpcMocks.eth_chainId.mockReturnValue('0x1');
 
-    await connectHederaAccount(snapMock, snapState, metamask, '0.0.15215');
+    const createVcRequest1 = getRequestParams('createVC', {
+      vcValue: { prop: 10 },
+      credTypes: ['Login'],
+    });
+
+    const createVcRequest2 = getRequestParams('createVC', {
+      vcValue: { prop: 20 },
+      credTypes: ['NotLogin'],
+    });
+
+    await onRpcRequest({ origin: 'tests', request: createVcRequest1 as any });
+    await onRpcRequest({ origin: 'tests', request: createVcRequest2 as any });
+
+    const getVcRequest = getRequestParams('getVCs', {});
+    const vcsReturned: IDataManagerQueryResult[] = (await onRpcRequest({
+      origin: 'tests',
+      request: getVcRequest as any,
+    })) as IDataManagerQueryResult[];
+
+    credentials = vcsReturned.map((vc) => vc.data as W3CVerifiableCredential);
   });
 
   it('should verify VC', async () => {
-    // Setup
-    (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
-      true,
-    );
-
-    // create VC to verify
-    const vcCreatedResult = await createVC(identitySnapParams, {
-      vcValue: { prop: 10 },
+    const verifyVCRequest = getRequestParams('verifyVC', {
+      verifiableCredential: credentials[0],
     });
-    console.log(`vcRes${JSON.stringify(vcCreatedResult)}`);
-    const vc = await getVCs(identitySnapParams, {
-      filter: { type: 'id', filter: vcCreatedResult[0].id },
-    });
-
     await expect(
-      verifyVC(identitySnapParams, vc[0].data as W3CVerifiableCredential),
+      onRpcRequest({ origin: 'tests', request: verifyVCRequest as any }),
     ).resolves.toBe(true);
     expect.assertions(1);
   });
 
   it('should reject if VC is tampered', async () => {
-    // Setup
-    (identitySnapParams.snap as SnapMock).rpcMocks.snap_dialog.mockReturnValue(
-      true,
-    );
+    const tamperedVC = JSON.parse(JSON.stringify(credentials[0]));
 
-    // create VC to verify
-    const vcCreatedResult = await createVC(identitySnapParams, {
-      vcValue: { prop: 10 },
-    });
-    const vc = await getVCs(identitySnapParams, {
-      filter: { type: 'id', filter: vcCreatedResult[0].id },
-    });
-
-    const tamperedVc = JSON.parse(JSON.stringify(vc[0].data));
-
-    tamperedVc.issuer.id =
+    tamperedVC.issuer.id =
       'did:pkh:eip155:296:0x7d871f006d97498ea338268a956af94ab2e65cde';
-    console.log(`tamp VC ${JSON.stringify(tamperedVc)}`);
 
+    const verifyVCRequest = getRequestParams('verifyVC', {
+      verifiableCredential: tamperedVC,
+    });
     await expect(
-      verifyVC(identitySnapParams, tamperedVc as W3CVerifiableCredential),
+      onRpcRequest({ origin: 'tests', request: verifyVCRequest as any }),
     ).resolves.toBe(false);
+    expect.assertions(1);
+  });
+
+  it('should reject if request invalid', async () => {
+    const verifyVCRequest = getRequestParams('verifyVC', {
+      credential: credentials[0],
+    });
+    await expect(
+      onRpcRequest({ origin: 'tests', request: verifyVCRequest as any }),
+    ).rejects.toThrowError();
     expect.assertions(1);
   });
 });

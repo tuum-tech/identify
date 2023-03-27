@@ -1,4 +1,11 @@
-import { Account, IdentitySnapState } from '../interfaces';
+import {
+  Account,
+  EvmAccountParams,
+  ExternalAccount,
+  HederaAccountParams,
+  IdentitySnapState,
+} from '../interfaces';
+import { connectEVMAccount } from '../rpc/account/connectEvmAccount';
 import { connectHederaAccount } from '../rpc/account/connectHederaAccount';
 import { veramoImportMetaMaskAccount } from '../veramo/accountImport';
 import { getCurrentCoinType, initAccountState } from './state';
@@ -7,16 +14,33 @@ import { getCurrentCoinType, initAccountState } from './state';
  * Function that returns account info of the currently selected MetaMask account.
  *
  * @param state - IdentitySnapState.
- * @param hederaAccountId - Hedera Identifier.
+ * @param account - External Account info.
  * @returns MetaMask address and did.
  */
 export async function getCurrentAccount(
   state: IdentitySnapState,
-  hederaAccountId?: string,
+  account: ExternalAccount,
 ): Promise<Account> {
   try {
-    if (hederaAccountId) {
-      return await connectHederaAccount(state, hederaAccountId, true);
+    if (
+      account.externalAccount &&
+      account.externalAccount.network === 'hedera'
+    ) {
+      return await connectHederaAccount(
+        state,
+        (account.externalAccount.data as HederaAccountParams).accountId,
+        true,
+      );
+    }
+
+    if (account.externalAccount && account.externalAccount.network === 'evm') {
+      return await connectEVMAccount(
+        state,
+        (
+          account.externalAccount.data as EvmAccountParams
+        ).address.toLowerCase(),
+        true,
+      );
     }
     const accounts = (await ethereum.request({
       method: 'eth_requestAccounts',

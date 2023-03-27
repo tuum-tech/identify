@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 

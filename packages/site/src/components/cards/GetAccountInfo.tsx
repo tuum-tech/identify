@@ -28,7 +28,7 @@ const GetAccountInfo: FC<Props> = ({
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
   const [externalAccount, setExternalAccount] = useState(false);
-  const [accountId, setAccountId] = useState('');
+  const [extraData, setExtraData] = useState('');
   const { showModal } = useModal();
 
   const isHederaNetwork = useMemo(
@@ -41,9 +41,20 @@ const GetAccountInfo: FC<Props> = ({
     try {
       const newChainId = await getCurrentNetwork();
       setCurrentChainId(newChainId);
-      const params = validHederaChainID(newChainId)
-        ? { externalAccount, accountId }
-        : undefined;
+      const network = isHederaNetwork ? 'hedera' : 'evm';
+      const data =
+        network === 'hedera'
+          ? { accountId: extraData }
+          : { address: extraData };
+      let params = undefined;
+      if (externalAccount) {
+        params = {
+          externalAccount: {
+            network,
+            data,
+          },
+        };
+      }
       const accountInfo = await getAccountInfo(params);
       console.log(`Your account info:`, accountInfo);
       setAccountInfo(accountInfo as PublicAccountInfo);
@@ -64,27 +75,25 @@ const GetAccountInfo: FC<Props> = ({
         title: 'getAccountInfo',
         description: 'Get the current account information',
         form: (
-          <>
-            {isHederaNetwork ? (
-              <Form>
-                <Form.Check
-                  type="checkbox"
-                  id="external-account-checkbox"
-                  label="External Account"
-                  onChange={(e) => {
-                    setExternalAccount(e.target.checked);
-                  }}
-                />
-                <Form.Label>Account Id</Form.Label>
-                <Form.Control
-                  size="lg"
-                  type="text"
-                  placeholder="Account Id"
-                  onChange={(e) => setAccountId(e.target.value)}
-                />
-              </Form>
-            ) : null}
-          </>
+          <Form>
+            <Form.Check
+              type="checkbox"
+              id="external-account-checkbox"
+              label="External Account"
+              onChange={(e) => {
+                setExternalAccount(e.target.checked);
+              }}
+            />
+            <Form.Label>
+              {isHederaNetwork ? 'Account Id' : 'Address'}
+            </Form.Label>
+            <Form.Control
+              size="lg"
+              type="text"
+              placeholder={isHederaNetwork ? 'Account Id' : 'Address'}
+              onChange={(e) => setExtraData(e.target.value)}
+            />
+          </Form>
         ),
         button: (
           <SendHelloButton
