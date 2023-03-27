@@ -353,16 +353,15 @@ export const deleteAllVCs = async (
  * Invoke the "createVP" method from the snap.
  */
 
-export const createVP = async ({
-  vcIds,
-  vcs,
-  proofInfo,
-}: CreateVPRequestParams) => {
+export const createVP = async (
+  { vcIds, vcs, proofInfo }: CreateVPRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
       method: 'createVP',
-      params: { vcIds, vcs, proofInfo },
+      params: { vcIds, vcs, proofInfo, ...externalAccountparams },
     },
   });
 };

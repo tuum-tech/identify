@@ -174,7 +174,10 @@ const Index = () => {
           currentChainId={currentChainId}
           setCurrentChainId={setCurrentChainId}
         />
-        <GetVP setCurrentChainId={setCurrentChainId} />
+        <GetVP
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+        />
         <VerifyVP setCurrentChainId={setCurrentChainId} />
         <ConfigureGoogleAccount />
         <SyncGoogleVCs />
