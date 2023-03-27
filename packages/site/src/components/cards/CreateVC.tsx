@@ -1,5 +1,5 @@
 import { CreateVCResponseResult } from '@tuum-tech/identity-snap/src/types/params';
-import { FC, useContext, useState } from 'react';
+import { FC, useContext, useRef, useState } from 'react';
 import Select from 'react-select';
 import { storeOptions } from '../../config/constants';
 import {
@@ -14,12 +14,16 @@ import {
   shouldDisplayReconnectButton,
 } from '../../utils';
 import { Card, SendHelloButton } from '../base';
+import ExternalAccount, {
+  GetExternalAccountRef,
+} from '../sections/ExternalAccount';
 
 type Props = {
+  currentChainId: string;
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const CreateVC: FC<Props> = ({ setCurrentChainId }) => {
+const CreateVC: FC<Props> = ({ currentChainId, setCurrentChainId }) => {
   const { setVc } = useContext(VcContext);
   const { setVcId, setVcIdsToBeRemoved } = useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
@@ -29,6 +33,8 @@ const CreateVC: FC<Props> = ({ setCurrentChainId }) => {
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
 
+  const externalAccountRef = useRef<GetExternalAccountRef>(null);
+
   const handleChange = (options: any) => {
     setSelectedOptions(options);
   };
@@ -37,6 +43,10 @@ const CreateVC: FC<Props> = ({ setCurrentChainId }) => {
     setLoading(true);
     try {
       setCurrentChainId(await getCurrentNetwork());
+
+      const externalAccountParams =
+        externalAccountRef.current?.handleGetAccountParams();
+
       const vcKey = 'profile';
       const vcValue = {
         name: createVCName,
@@ -55,6 +65,7 @@ const CreateVC: FC<Props> = ({ setCurrentChainId }) => {
         vcValue,
         options,
         credTypes,
+        externalAccountParams,
       )) as CreateVCResponseResult;
       if (saved) {
         const vcIdsToAdd: any = [saved.metadata.id];
@@ -81,6 +92,10 @@ const CreateVC: FC<Props> = ({ setCurrentChainId }) => {
         description: 'Create and Save VerifiableCredential',
         form: (
           <form>
+            <ExternalAccount
+              currentChainId={currentChainId}
+              ref={externalAccountRef}
+            />
             <label>
               Enter your name
               <input

@@ -153,9 +153,18 @@ const Index = () => {
           currentChainId={currentChainId}
           setCurrentChainId={setCurrentChainId}
         />
-        <GetSpecificVC setCurrentChainId={setCurrentChainId} />
-        <GetAllVCs setCurrentChainId={setCurrentChainId} />
-        <CreateVC setCurrentChainId={setCurrentChainId} />
+        <GetSpecificVC
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+        />
+        <GetAllVCs
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+        />
+        <CreateVC
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+        />
         <VerifyVC setCurrentChainId={setCurrentChainId} />
         <RemoveVC setCurrentChainId={setCurrentChainId} />
         <DeleteAllVCs setCurrentChainId={setCurrentChainId} />

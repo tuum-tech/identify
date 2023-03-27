@@ -1,5 +1,5 @@
 import { IDataManagerQueryResult } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
-import { FC, useContext, useState } from 'react';
+import { FC, useContext, useRef, useState } from 'react';
 import Select from 'react-select';
 import { storeOptions } from '../../config/constants';
 import {
@@ -14,17 +14,23 @@ import {
   shouldDisplayReconnectButton,
 } from '../../utils';
 import { Card, SendHelloButton } from '../base';
+import ExternalAccount, {
+  GetExternalAccountRef,
+} from '../sections/ExternalAccount';
 
 type Props = {
+  currentChainId: string;
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const GetAllVCs: FC<Props> = ({ setCurrentChainId }) => {
+const GetAllVCs: FC<Props> = ({ currentChainId, setCurrentChainId }) => {
   const { setVcId, setVc, setVcIdsToBeRemoved } = useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
   const [selectedOptions, setSelectedOptions] = useState([storeOptions[0]]);
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
+
+  const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
   const handleChange = (options: any) => {
     setSelectedOptions(options);
@@ -34,6 +40,10 @@ const GetAllVCs: FC<Props> = ({ setCurrentChainId }) => {
     setLoading(true);
     try {
       setCurrentChainId(await getCurrentNetwork());
+
+      const externalAccountParams =
+        externalAccountRef.current?.handleGetAccountParams();
+
       const selectedStore = selectedOptions.map((option) => option.value);
       const options = {
         // If you want to retrieve VCs from multiple stores, you can pass an array like so:
@@ -44,6 +54,7 @@ const GetAllVCs: FC<Props> = ({ setCurrentChainId }) => {
       const vcs = (await getVCs(
         undefined,
         options,
+        externalAccountParams,
       )) as IDataManagerQueryResult[];
       console.log(`Your VCs are: ${JSON.stringify(vcs, null, 4)}`);
       if (vcs.length > 0) {
@@ -73,6 +84,10 @@ const GetAllVCs: FC<Props> = ({ setCurrentChainId }) => {
         description: 'Get all the VCs of the user',
         form: (
           <form>
+            <ExternalAccount
+              currentChainId={currentChainId}
+              ref={externalAccountRef}
+            />
             <label>Select store</label>
             <Select
               closeMenuOnSelect

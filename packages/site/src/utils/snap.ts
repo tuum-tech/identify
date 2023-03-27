@@ -214,12 +214,13 @@ export const resolveDID = async (
 export const getVCs = async (
   filter: Filter | undefined,
   options: GetVCsOptions,
+  externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
       method: 'getVCs',
-      params: { filter, options },
+      params: { filter, options, ...externalAccountparams },
     },
   });
 };
@@ -252,6 +253,7 @@ export const createVC = async (
   vcValue: object,
   options: GetVCsOptions,
   credTypes?: string[],
+  externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
@@ -262,6 +264,7 @@ export const createVC = async (
         vcValue,
         options,
         credTypes,
+        ...externalAccountparams,
       },
     },
   });
