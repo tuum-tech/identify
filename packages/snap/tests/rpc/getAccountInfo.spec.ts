@@ -44,7 +44,7 @@ describe('getAccountInfo', () => {
         request: accountInfoRequestParams as any,
       })) as PublicAccountInfo;
       expect(accountInfo.evmAddress).toBe(ETH_ADDRESS);
-      expect(accountInfo.externalAccountInfo).toStrictEqual({});
+      expect(accountInfo.extraData).toBeUndefined();
 
       expect.assertions(2);
     });
@@ -96,9 +96,9 @@ describe('getAccountInfo', () => {
       })) as PublicAccountInfo;
       expect(accountInfo.evmAddress).toBe(HEDERA_ACCOUNT.address);
       console.log(JSON.stringify(accountInfo));
-      expect(
-        (accountInfo.externalAccountInfo as HederaAccountParams).accountId,
-      ).toBe(HEDERA_ACCOUNT.accountId);
+      expect((accountInfo.extraData as HederaAccountParams).accountId).toBe(
+        HEDERA_ACCOUNT.accountId,
+      );
       expect.assertions(2);
     });
   });
