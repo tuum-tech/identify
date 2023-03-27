@@ -75,6 +75,7 @@ export async function veramoImportMetaMaskAccount(
         undefined,
         address,
       );
+
       if (!hederaAccountId) {
         hederaAccountId = await requestHederaAccountId(snap);
       }
@@ -91,7 +92,7 @@ export async function veramoImportMetaMaskAccount(
   }
 
   if (validHederaChainID(chainId)) {
-    let hederaClient = await isValidHederaAccountInfo(
+    const hederaClient = await isValidHederaAccountInfo(
       privateKey,
       hederaAccountId,
       getHederaNetwork(chainId),
