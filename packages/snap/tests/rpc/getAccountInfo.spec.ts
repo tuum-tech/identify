@@ -3,7 +3,7 @@ import { SnapsGlobalObject } from '@metamask/snaps-types';
 import {
   EvmAccountParams,
   HederaAccountParams,
-  PublicAccountInfo
+  PublicAccountInfo,
 } from 'src/interfaces';
 import { onRpcRequest } from '../../src';
 import {
@@ -12,7 +12,7 @@ import {
   EVM_ACCOUNT,
   getDefaultSnapState,
   HEDERA_ACCOUNT,
-  HEDERA_CHAIN_ID
+  HEDERA_CHAIN_ID,
 } from '../testUtils/constants';
 import { getRequestParams } from '../testUtils/helper';
 import { buildMockSnap, SnapMock } from '../testUtils/snap.mock';
@@ -96,9 +96,9 @@ describe('getAccountInfo', () => {
       })) as PublicAccountInfo;
       expect(accountInfo.evmAddress).toBe(HEDERA_ACCOUNT.address);
       console.log(JSON.stringify(accountInfo));
-      expect(
-        (accountInfo.extraData as HederaAccountParams).accountId,
-      ).toBe(HEDERA_ACCOUNT.accountId);
+      expect((accountInfo.extraData as HederaAccountParams).accountId).toBe(
+        HEDERA_ACCOUNT.accountId,
+      );
       expect.assertions(2);
     });
   });
