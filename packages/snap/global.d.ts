@@ -1,9 +1,9 @@
 /* eslint-disable */
 
 import { MetaMaskInpageProvider } from '@metamask/providers';
-import { SnapsGlobalObject } from '@metamask/snaps-utils';
+import { SnapsGlobalObject } from '@metamask/snaps-types';
 
 declare global {
-  var ethereum: MetaMaskInpageProvider;
-  var snap: SnapsGlobalObject;
+  let ethereum: MetaMaskInpageProvider;
+  let snap: SnapsGlobalObject;
 }
