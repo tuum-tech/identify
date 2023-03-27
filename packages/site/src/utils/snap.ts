@@ -321,12 +321,13 @@ export const verifyVC = async (vc: VerifiableCredential | {}) => {
 export const removeVC = async (
   id: string | string[],
   options: RemoveVCOptions,
+  externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
       method: 'removeVC',
-      params: { id, options },
+      params: { id, options, ...externalAccountparams },
     },
   });
 };
@@ -335,12 +336,15 @@ export const removeVC = async (
  * Invoke the "deleteAllVCs" method from the snap.
  */
 
-export const deleteAllVCs = async (options: RemoveVCOptions) => {
+export const deleteAllVCs = async (
+  options: RemoveVCOptions,
+  externalAccountparams?: ExternalAccountParams,
+) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
       method: 'deleteAllVCs',
-      params: { options },
+      params: { options, ...externalAccountparams },
     },
   });
 };

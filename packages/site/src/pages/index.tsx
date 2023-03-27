@@ -166,8 +166,14 @@ const Index = () => {
           setCurrentChainId={setCurrentChainId}
         />
         <VerifyVC setCurrentChainId={setCurrentChainId} />
-        <RemoveVC setCurrentChainId={setCurrentChainId} />
-        <DeleteAllVCs setCurrentChainId={setCurrentChainId} />
+        <RemoveVC
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+        />
+        <DeleteAllVCs
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+        />
         <GetVP setCurrentChainId={setCurrentChainId} />
         <VerifyVP setCurrentChainId={setCurrentChainId} />
         <ConfigureGoogleAccount />
