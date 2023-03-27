@@ -1,14 +1,10 @@
 import { forwardRef, Ref, useImperativeHandle, useMemo, useState } from 'react';
 import Form from 'react-bootstrap/Form';
+import { ExternalAccountParams } from '../../types';
 import { validHederaChainID } from '../../utils/hedera';
 
 export type GetExternalAccountRef = {
-  handleGetAccountData: () =>
-    | {
-        externalAccount: boolean;
-        accountId: string;
-      }
-    | undefined;
+  handleGetAccountParams: () => ExternalAccountParams | undefined;
 };
 
 type Props = {
@@ -26,7 +22,7 @@ const ExternalAccount = forwardRef(
     );
 
     useImperativeHandle(ref, () => ({
-      handleGetAccountData() {
+      handleGetAccountParams() {
         return { externalAccount, accountId };
       },
     }));
@@ -48,6 +44,7 @@ const ExternalAccount = forwardRef(
               size="lg"
               type="text"
               placeholder="Account Id"
+              style={{ marginBottom: 8 }}
               onChange={(e) => setAccountId(e.target.value)}
             />
           </Form>

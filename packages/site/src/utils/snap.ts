@@ -8,7 +8,7 @@ import {
 import { Filter } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
 import { VerifiableCredential, VerifiablePresentation } from '@veramo/core';
 import { defaultSnapOrigin } from '../config';
-import { GetAccountInfoRequest, GetSnapsResponse, Snap } from '../types';
+import { ExternalAccountParams, GetSnapsResponse, Snap } from '../types';
 
 /**
  * Get the installed snaps in MetaMask.
@@ -165,7 +165,7 @@ export type PublicAccountInfo = {
  */
 
 export const getAccountInfo = async (
-  params: GetAccountInfoRequest | undefined,
+  params: ExternalAccountParams | undefined,
 ) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
@@ -194,12 +194,15 @@ export const getDID = async () => {
  * Invoke the "resolveDID" method from the snap.
  */
 
-export const resolveDID = async (did?: string) => {
+export const resolveDID = async (
+  did?: string,
+  externalAccountparams?: ExternalAccountParams,
+) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
       method: 'resolveDID',
-      params: { did },
+      params: { did, ...externalAccountparams },
     },
   });
 };

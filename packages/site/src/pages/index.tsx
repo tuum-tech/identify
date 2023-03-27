@@ -149,7 +149,10 @@ const Index = () => {
           setCurrentChainId={setCurrentChainId}
           setAccountInfo={setAccountInfo}
         />
-        <ResolveDID setCurrentChainId={setCurrentChainId} />
+        <ResolveDID
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+        />
         <GetSpecificVC setCurrentChainId={setCurrentChainId} />
         <GetAllVCs setCurrentChainId={setCurrentChainId} />
         <CreateVC setCurrentChainId={setCurrentChainId} />

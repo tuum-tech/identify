@@ -7,7 +7,7 @@ export type Snap = {
   initialPermissions: Record<string, unknown>;
 };
 
-export type GetAccountInfoRequest = {
+export type ExternalAccountParams = {
   externalAccount: boolean;
   accountId: string;
 };

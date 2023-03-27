@@ -40,7 +40,7 @@ const GetAccountInfo: FC<Props> = ({
       setCurrentChainId(newChainId);
 
       const externalAccountData =
-        externalAccountRef.current?.handleGetAccountData();
+        externalAccountRef.current?.handleGetAccountParams();
 
       const params = validHederaChainID(newChainId)
         ? externalAccountData
