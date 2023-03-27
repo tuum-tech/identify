@@ -63,7 +63,6 @@ export async function getAddressKeyDeriver(
     ct = DEFAULTCOINTYPE;
   }
 
-  console.log('getBip44');
   const bip44CoinTypeNode = (await snap.request({
     method: 'snap_getBip44Entropy',
     params: {

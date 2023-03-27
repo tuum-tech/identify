@@ -1,10 +1,12 @@
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import {
+  EvmAccountParams,
   ExternalAccount,
   HederaAccountParams,
   IdentitySnapParams,
 } from './interfaces';
+import { connectEVMAccount } from './rpc/account/connectEvmAccount';
 import { connectHederaAccount } from './rpc/account/connectHederaAccount';
 import { getAccountInfo } from './rpc/account/getAccountInfo';
 import { getAvailableMethods } from './rpc/did/getAvailableMethods';
@@ -74,18 +76,25 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   }
   console.log('state:', JSON.stringify(state, null, 4));
 
-  const externalAccountData: ExternalAccount =
-    request.params as ExternalAccount;
-  if (isExternalAccountFlagSet(externalAccountData)) {
+  let extraData: unknown;
+  if (isExternalAccountFlagSet(request.params)) {
     if (
-      !isValidHederaAccountParams(request.params) &&
-      !isValidEVMAccountParams(request.params)
+      !(
+        isValidHederaAccountParams(request.params) ||
+        isValidEVMAccountParams(request.params)
+      )
     ) {
-      throw new Error('External Account invalid');
+      throw new Error('External Account parameter is invalid');
     }
+    extraData = (request.params as ExternalAccount).externalAccount.data;
   }
 
-  const account = await getCurrentAccount(state, externalAccountData);
+  const account = await getCurrentAccount(
+    state,
+    request.params as ExternalAccount,
+  );
+  account.extraData = extraData;
+
   console.log(
     `Currently connected account: ${JSON.stringify(account, null, 4)}`,
   );
@@ -118,17 +127,27 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     }
 
     case 'getAccountInfo': {
-      return await getAccountInfo(identitySnapParams, externalAccountData);
+      return await getAccountInfo(identitySnapParams);
+    }
+
+    case 'connectEVMAccount': {
+      if (!isValidEVMAccountParams(request.params)) {
+        throw new Error('External Account parameter is invalid');
+      }
+      return await connectEVMAccount(
+        state,
+        (extraData as EvmAccountParams).address,
+        false,
+      );
     }
 
     case 'connectHederaAccount': {
-      isValidHederaAccountParams(request.params);
+      if (!isValidHederaAccountParams(request.params)) {
+        throw new Error('External Account parameter is invalid');
+      }
       return await connectHederaAccount(
         state,
-        (
-          (request.params as ExternalAccount).externalAccount
-            .data as HederaAccountParams
-        ).accountId,
+        (extraData as HederaAccountParams).accountId,
         false,
       );
     }
@@ -138,10 +157,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return await createNewHederaAccount(
         identitySnapParams,
         request.params as CreateNewHederaAccountRequestParams,
-        (
-          (request.params as unknown as ExternalAccount).externalAccount
-            .data as HederaAccountParams
-        ).accountId,
       );
     }
 

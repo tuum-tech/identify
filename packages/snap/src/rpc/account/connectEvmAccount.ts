@@ -1,70 +1,79 @@
-import { heading, panel, text } from '@metamask/snaps-ui';
-import { getCurrentNetwork } from '../../snap/network';
+import { PrivateKey } from '@hashgraph/sdk';
+import { divider, heading, panel, text } from '@metamask/snaps-ui';
+import { ethers, Wallet } from 'ethers';
 import {
   Account,
   AccountViaPrivateKey,
-  EvmAccountParams,
   IdentitySnapState,
   SnapDialogParams,
 } from '../../interfaces';
-import { importIdentitySnapAccount } from '../../snap/account';
 import { snapDialog } from '../../snap/dialog';
-import { validEVMChainID } from '../../utils/config';
+import { DEFAULTCOINTYPE } from '../../types/constants';
+import { veramoImportMetaMaskAccount } from '../../veramo/accountImport';
 
 /**
  * Connect EVM Account.
  *
  * @param state - Identity state.
- * @param evmAccount - EVM Account Params.
+ * @param evmAddress - EVM Account address.
  * @param getCompleteInfo - Whether to get the full account info or not.
  */
 export async function connectEVMAccount(
   state: IdentitySnapState,
-  evmAccount: EvmAccountParams,
+  evmAddress: string,
   getCompleteInfo?: boolean,
 ): Promise<Account> {
-  const chainId = await getCurrentNetwork(ethereum);
+  let accountExists = false;
+  for (const address of Object.keys(state.accountState[DEFAULTCOINTYPE])) {
+    if (evmAddress === address) {
+      accountExists = true;
+      break;
+    }
+  }
 
-  if (validEVMChainID(chainId)) {
+  let privateKey: string;
+  if (accountExists) {
+    const controllerKeyId = `metamask-${evmAddress}`;
+    privateKey =
+      state.accountState[DEFAULTCOINTYPE][evmAddress].snapPrivateKeyStore[
+        controllerKeyId
+      ].privateKeyHex;
+  } else {
     const dialogParamsForPrivateKey: SnapDialogParams = {
       type: 'Prompt',
       content: panel([
         heading('Connect to EVM Account'),
-        text('Enter your ECDSA private key for your EVM Account'),
+        text('Enter your ECDSA private key for the following Account'),
+        divider(),
+        text(`EVM Address: ${evmAddress}`),
       ]),
-      placeholder: '787278d71bc9b50e8147...', // You can use 'd787278d71bc9b50e814705ca48fcf652e08fb5eb73773e98146c48846bde456'
+      placeholder: '2386d1d21644dc65d...', // You can use '2386d1d21644dc65d4e4b9e2242c5f155cab174916cbc46ad85622cdaeac835c' for testing purposes
     };
-    const privateKey: string = (await snapDialog(
-      snap,
-      dialogParamsForPrivateKey,
-    )) as string;
-
-    // const wallet: Wallet = new ethers.Wallet(privateKey);
-    const accountViaPrivateKey: AccountViaPrivateKey = {
-      privateKey,
-      publicKey: '',
-      address: evmAccount.address,
-    };
-
-    const account = await importIdentitySnapAccount(
-      state,
-      '',
-      accountViaPrivateKey,
-    );
-    if (getCompleteInfo) {
-      return account;
-    }
-    return {
-      evmAddress: account.evmAddress,
-      method: account.method,
-      publicKey: account.publicKey,
-    } as Account;
+    privateKey = PrivateKey.fromString(
+      (await snapDialog(snap, dialogParamsForPrivateKey)) as string,
+    ).toStringRaw();
   }
 
-  console.error(
-    'Invalid Chain ID. Valid chainIDs for EVM account: [137: polygon]',
+  const wallet: Wallet = new ethers.Wallet(privateKey);
+  const accountViaPrivateKey: AccountViaPrivateKey = {
+    privateKey,
+    publicKey: wallet.publicKey,
+    address: wallet.address,
+  };
+
+  const account: Account = await veramoImportMetaMaskAccount(
+    snap,
+    state,
+    ethereum,
+    '',
+    accountViaPrivateKey,
   );
-  throw new Error(
-    'Invalid Chain ID. Valid chainIDs for EVM account: [137: polygon]',
-  );
+  if (getCompleteInfo) {
+    return account;
+  }
+  return {
+    evmAddress: account.evmAddress,
+    method: account.method,
+    publicKey: account.publicKey,
+  } as Account;
 }

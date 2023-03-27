@@ -1,13 +1,18 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { Filter } from '@tuum-tech/identity-snap/src/plugins/veramo/verfiable-creds-manager';
+import { ExternalAccount } from '@tuum-tech/identity-snap/src/interfaces';
+import {
+  Filter,
+  IDataManagerClearArgs,
+  IDataManagerDeleteArgs,
+} from '@tuum-tech/identity-snap/src/plugins/veramo/verfiable-creds-manager';
 import {
   CreateNewHederaAccountRequestParams,
-  CreateVPRequestParams
+  CreateVPRequestParams,
 } from '@tuum-tech/identity-snap/src/types/params';
 
 import { VerifiableCredential, VerifiablePresentation } from '@veramo/core';
 import { defaultSnapOrigin } from '../config';
-import { GetAccountInfoRequest, GetSnapsResponse, Snap } from '../types';
+import { GetSnapsResponse, Snap } from '../types';
 
 /**
  * Get the installed snaps in MetaMask.
@@ -163,9 +168,7 @@ export type PublicAccountInfo = {
  * Invoke the "getAccountInfo" method from the snap.
  */
 
-export const getAccountInfo = async (
-  params: GetAccountInfoRequest | undefined,
-) => {
+export const getAccountInfo = async (params: ExternalAccount | undefined) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
@@ -184,7 +187,7 @@ export const getDID = async () => {
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
       method: 'getDID',
-      params: {}
+      params: {},
     },
   });
 };
@@ -207,10 +210,7 @@ export const resolveDID = async (did?: string) => {
  * Invoke the "getVCs" method from the snap.
  */
 
-export const getVCs = async (
-  filter: Filter | undefined,
-  options: any,
-) => {
+export const getVCs = async (filter: Filter | undefined, options: any) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
@@ -313,7 +313,7 @@ export const verifyVC = async (vc: VerifiableCredential | {}) => {
 
 export const removeVC = async (
   id: string | string[],
-  options: RemoveVCOptions,
+  options: IDataManagerDeleteArgs,
 ) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
@@ -328,7 +328,7 @@ export const removeVC = async (
  * Invoke the "deleteAllVCs" method from the snap.
  */
 
-export const deleteAllVCs = async (options: RemoveVCOptions) => {
+export const deleteAllVCs = async (options: IDataManagerClearArgs) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {

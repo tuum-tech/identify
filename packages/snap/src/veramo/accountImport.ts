@@ -47,18 +47,11 @@ export async function veramoImportMetaMaskAccount(
   let hederaAccountId = '';
 
   if (accountViaPrivateKey) {
-    try {
-      privateKey = accountViaPrivateKey.privateKey;
-      publicKey = accountViaPrivateKey.publicKey;
-      address = accountViaPrivateKey.address;
+    privateKey = accountViaPrivateKey.privateKey;
+    publicKey = accountViaPrivateKey.publicKey;
+    address = accountViaPrivateKey.address.toLowerCase();
+    if (validHederaChainID(chainId)) {
       hederaAccountId = accountViaPrivateKey.extraData as string;
-    } catch (error) {
-      console.log(
-        `Private key was passed but it is not a valid private key: ${error}`,
-      );
-      throw new Error(
-        `Private key was passed but it is not a valid private key: ${error}`,
-      );
     }
   } else {
     const bip44CoinTypeNode = await getAddressKeyDeriver(snap);
@@ -75,10 +68,18 @@ export async function veramoImportMetaMaskAccount(
     }
     privateKey = res.privateKey.split('0x')[1];
     publicKey = res.publicKey;
-    address = res.address;
+    address = res.address.toLowerCase();
+    if (validHederaChainID(chainId)) {
+      hederaAccountId = await getHederaAccountIfExists(
+        state,
+        undefined,
+        address,
+      );
+      if (!hederaAccountId) {
+        hederaAccountId = await requestHederaAccountId(snap);
+      }
+    }
   }
-
-  address = address.toLowerCase();
 
   // Initialize if not there
   const coinType = (await getCurrentCoinType()).toString();
@@ -90,36 +91,13 @@ export async function veramoImportMetaMaskAccount(
   }
 
   if (validHederaChainID(chainId)) {
-    if (!accountViaPrivateKey) {
-      hederaAccountId = await getHederaAccountIfExists(
-        state,
-        undefined,
-        address,
-      );
-    }
-
-    if (!hederaAccountId) {
-      hederaAccountId = await requestHederaAccountId(snap);
-    }
-
     let hederaClient = await isValidHederaAccountInfo(
       privateKey,
       hederaAccountId,
       getHederaNetwork(chainId),
     );
-    if (hederaClient === null && hederaAccountId) {
-      hederaAccountId = await requestHederaAccountId(snap, hederaAccountId);
-      hederaClient = await isValidHederaAccountInfo(
-        privateKey,
-        hederaAccountId,
-        getHederaNetwork(chainId),
-      );
-    }
 
-    if (hederaClient) {
-      // eslint-disable-next-line
-      state.accountState[coinType][address].extraData = hederaAccountId;
-    } else {
+    if (hederaClient === null) {
       console.error(
         `Could not retrieve hedera account info using the accountId '${hederaAccountId}'`,
       );
@@ -127,6 +105,9 @@ export async function veramoImportMetaMaskAccount(
         `Could not retrieve hedera account info using the accountId '${hederaAccountId}'`,
       );
     }
+
+    // eslint-disable-next-line
+    state.accountState[coinType][address].extraData = hederaAccountId;
   }
 
   const accountState = await getAccountStateByCoinType(state, address);

@@ -5,7 +5,7 @@ import {
   IdentityAccountState,
   IdentitySnapState,
 } from '../interfaces';
-import { DEFAULTCOINTYPE, HEDERACOINTYPE, isIn } from '../types/constants';
+import { DEFAULTCOINTYPE, HEDERACOINTYPE } from '../types/constants';
 
 const emptyAccountState = {
   snapPrivateKeyStore: {},
@@ -45,10 +45,3 @@ const initialSnapState: IdentitySnapState = {
 export const getInitialSnapState = () => {
   return cloneDeep(initialSnapState);
 };
-
-const evmChainIDs: Record<string, string> = {
-  '137': 'polygon',
-};
-
-export const validEVMChainID = (x: string) =>
-  isIn(Object.keys(evmChainIDs) as string[], x);

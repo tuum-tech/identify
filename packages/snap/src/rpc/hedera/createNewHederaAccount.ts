@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { HederaServiceImpl, isValidHederaAccountInfo } from '../../hedera';
 import { getHederaNetwork, validHederaChainID } from '../../hedera/config';
 import { HederaMirrorInfo, SimpleHederaClient } from '../../hedera/service';
-import { IdentitySnapParams } from '../../interfaces';
+import { HederaAccountParams, IdentitySnapParams } from '../../interfaces';
 import { getCurrentNetwork } from '../../snap/network';
 import { CreateNewHederaAccountRequestParams } from '../../types/params';
 import { getHederaAccountIfExists } from '../../utils/params';
@@ -14,12 +14,10 @@ import { getHederaAccountIfExists } from '../../utils/params';
  *
  * @param identitySnapParams - Identity snap params.
  * @param newHederaAccountParams - Parameters for creating a new hedera account.
- * @param hederaAccountIdToFundFrom - Hedera account identifier.
  */
 export async function createNewHederaAccount(
   identitySnapParams: IdentitySnapParams,
   newHederaAccountParams: CreateNewHederaAccountRequestParams,
-  hederaAccountIdToFundFrom?: string,
 ): Promise<HederaMirrorInfo> {
   const { state, account } = identitySnapParams;
   const {
@@ -39,15 +37,14 @@ export async function createNewHederaAccount(
   }
 
   let _accountId = '';
-  if (
-    hederaAccountIdToFundFrom === null ||
-    _.isEmpty(hederaAccountIdToFundFrom)
-  ) {
+  if (account.extraData === null || _.isEmpty(account.extraData)) {
     _accountId = await getHederaAccountIfExists(
       state,
       undefined,
       account.evmAddress,
     );
+  } else {
+    _accountId = (account.extraData as HederaAccountParams).accountId;
   }
 
   const network = getHederaNetwork(chainId);

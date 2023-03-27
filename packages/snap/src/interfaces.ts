@@ -10,6 +10,7 @@ export type Account = {
   identifier: IIdentifier;
   privateKey: string;
   publicKey: string;
+  extraData?: unknown;
 };
 
 export type PublicAccountInfo = {
@@ -17,7 +18,7 @@ export type PublicAccountInfo = {
   did: string;
   publicKey: string;
   method: string;
-  externalAccountInfo?: unknown;
+  extraData?: unknown;
 };
 
 export type IdentitySnapState = {

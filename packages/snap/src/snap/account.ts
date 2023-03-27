@@ -1,6 +1,5 @@
 import {
   Account,
-  AccountViaPrivateKey,
   EvmAccountParams,
   ExternalAccount,
   HederaAccountParams,
@@ -37,7 +36,9 @@ export async function getCurrentAccount(
     if (account.externalAccount && account.externalAccount.network === 'evm') {
       return await connectEVMAccount(
         state,
-        account.externalAccount.data as EvmAccountParams,
+        (
+          account.externalAccount.data as EvmAccountParams
+        ).address.toLowerCase(),
         true,
       );
     }
@@ -58,38 +59,4 @@ export async function getCurrentAccount(
     console.error(`Error while trying to get the account: ${e}`);
     throw new Error(`Error while trying to get the account: ${e}`);
   }
-}
-
-/**
- * Helper function to import metamask account using the private key.
- *
- * @param state - IdentitySnapState.
- * @param evmAddress - Ethereum address.
- * @param accountViaPrivateKey - Account to import using private key.
- */
-export async function importIdentitySnapAccount(
-  state: IdentitySnapState,
-  evmAddress: string,
-  accountViaPrivateKey?: AccountViaPrivateKey,
-): Promise<Account> {
-  // Initialize if not there
-  const coinType = (await getCurrentCoinType()).toString();
-
-  if (evmAddress && !(evmAddress in state.accountState[coinType])) {
-    console.log(
-      `The address ${evmAddress} has NOT yet been configured in the Identity Snap. Configuring now...`,
-    );
-    await initAccountState(snap, state, coinType, evmAddress);
-  }
-  console.log('veramo import metamask acc');
-
-  // Initialize Identity Snap account
-  const account: Account = await veramoImportMetaMaskAccount(
-    snap,
-    state,
-    ethereum,
-    evmAddress,
-    accountViaPrivateKey,
-  );
-  return account;
 }

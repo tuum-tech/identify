@@ -53,25 +53,24 @@ export function isExternalAccountFlagSet(params: unknown): boolean {
  * @returns Boolean.
  */
 export function isValidHederaAccountParams(params: unknown): boolean {
+  if (params === null || _.isEmpty(params)) {
+    console.error(
+      'Invalid Hedera Params passed for externalAccount. "externalAccount" must be passed as a parameter',
+    );
+    return false;
+  }
+  const parameter = params as ExternalAccount;
+
   if (
-    params !== null &&
-    typeof params === 'object' &&
-    'externalAccount' in params &&
-    'network' in (params as unknown as ExternalAccount).externalAccount &&
-    (params as unknown as ExternalAccount).externalAccount.network ===
-      'hedera' &&
-    typeof (params as unknown as ExternalAccount).externalAccount.data ===
-      'object' &&
-    typeof (
-      (params as unknown as ExternalAccount).externalAccount
-        .data as HederaAccountParams
-    ).accountId === 'string'
+    'network' in parameter.externalAccount &&
+    parameter.externalAccount.network === 'hedera' &&
+    typeof parameter.externalAccount.data === 'object' &&
+    typeof (parameter.externalAccount.data as HederaAccountParams).accountId ===
+      'string'
   ) {
     return true;
   }
 
-  console.error('Invalid Hedera Params passed');
-  // throw new Error('Invalid Hedera Params passed');
   return false;
 }
 
@@ -82,24 +81,24 @@ export function isValidHederaAccountParams(params: unknown): boolean {
  * @returns Boolean.
  */
 export function isValidEVMAccountParams(params: unknown): boolean {
+  if (params === null || _.isEmpty(params)) {
+    console.error(
+      'Invalid EVM Params passed for externalAccount. "externalAccount" must be passed as a parameter',
+    );
+    return false;
+  }
+  const parameter = params as ExternalAccount;
+
   if (
-    params !== null &&
-    typeof params === 'object' &&
-    'externalAccount' in params &&
-    'network' in (params as unknown as ExternalAccount).externalAccount &&
-    (params as unknown as ExternalAccount).externalAccount.network === 'evm' &&
-    typeof (params as unknown as ExternalAccount).externalAccount.data ===
-      'object' &&
-    typeof (
-      (params as unknown as ExternalAccount).externalAccount
-        .data as EvmAccountParams
-    ).address === 'string'
+    'network' in parameter.externalAccount &&
+    parameter.externalAccount.network === 'evm' &&
+    typeof parameter.externalAccount.data === 'object' &&
+    typeof (parameter.externalAccount.data as EvmAccountParams).address ===
+      'string'
   ) {
     return true;
   }
 
-  console.error('Invalid EVM Params passed');
-  // throw new Error('Invalid Hedera Params passed');
   return false;
 }
 
