@@ -3,7 +3,7 @@ import { Container } from 'react-bootstrap';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 
-import { Card, ConnectButton, InstallFlaskButton } from '../components/base';
+import { Card, InstallFlaskButton } from '../components/base';
 import {
   ConfigureGoogleAccount,
   ConnectIdentitySnap,
@@ -85,12 +85,6 @@ const Index = () => {
           <Col>
             <dt>Status:</dt>
             <dd>{currentNetwork ? 'Connected' : 'Disconnected'}</dd>
-            {!currentNetwork && (
-              <ConnectButton
-                style={{ height: 20, minHeight: '3.2rem' }}
-                onClick={handleConnectClick}
-              />
-            )}
             <dt>Current Network:</dt>
             <dd>{currentNetwork}</dd>
           </Col>
