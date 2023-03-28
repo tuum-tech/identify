@@ -20,7 +20,8 @@ export async function getAccountIndex(
   account: string,
 ): Promise<number | undefined> {
   const accountState = await getAccountStateByCoinType(state, account);
-  if (accountState.index) {
+
+  if (typeof accountState.index !== 'undefined') {
     return accountState.index;
   }
   return undefined;
@@ -61,6 +62,7 @@ export async function getAddressKeyDeriver(
   if (ct === undefined) {
     ct = DEFAULTCOINTYPE;
   }
+
   const bip44CoinTypeNode = (await snap.request({
     method: 'snap_getBip44Entropy',
     params: {
@@ -149,8 +151,9 @@ export const snapGetKeysFromAddress = async (
   maxScan = 20,
 ): Promise<KeysType | null> => {
   const addressIndex = await getAccountIndex(state, account);
-  if (addressIndex) {
-    return getKeysFromAddress(
+
+  if (typeof addressIndex !== 'undefined') {
+    return await getKeysFromAddress(
       bip44CoinTypeNode,
       account,
       maxScan,

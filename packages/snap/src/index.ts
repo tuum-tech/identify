@@ -1,6 +1,12 @@
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
-import { IdentitySnapParams } from './interfaces';
+import {
+  EvmAccountParams,
+  ExternalAccount,
+  HederaAccountParams,
+  IdentitySnapParams,
+} from './interfaces';
+import { connectEVMAccount } from './rpc/account/connectEvmAccount';
 import { connectHederaAccount } from './rpc/account/connectHederaAccount';
 import { getAccountInfo } from './rpc/account/getAccountInfo';
 import { getAvailableMethods } from './rpc/did/getAvailableMethods';
@@ -23,6 +29,7 @@ import { verifyVC } from './rpc/vc/verifyVC';
 import { verifyVP } from './rpc/vc/verifyVP';
 import { getCurrentAccount } from './snap/account';
 import { getSnapStateUnchecked } from './snap/state';
+import { CreateNewHederaAccountRequestParams } from './types/params';
 import { init } from './utils/init';
 import {
   isExternalAccountFlagSet,
@@ -31,6 +38,7 @@ import {
   isValidCreateVCRequest,
   isValidCreateVPRequest,
   isValidDeleteAllVCsRequest,
+  isValidEVMAccountParams,
   isValidGetVCsRequest,
   isValidHederaAccountParams,
   isValidRemoveVCRequest,
@@ -46,10 +54,14 @@ import {
  *
  * @param args - The request handler args as object.
  * @param args.request - A validated JSON-RPC request object.
+ * @param args.origin - Origin of the request.
  * @returns `null` if the request succeeded.
  * @throws If the request method is not valid for this snap.
  */
-export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
+export const onRpcRequest: OnRpcRequestHandler = async ({
+  origin,
+  request,
+}) => {
   console.log('Request:', JSON.stringify(request, null, 4));
   console.log('Origin:', origin);
   console.log('-------------------------------------------------------------');
@@ -64,13 +76,25 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
   }
   console.log('state:', JSON.stringify(state, null, 4));
 
-  let hederaAccountId = '';
+  let extraData: unknown;
   if (isExternalAccountFlagSet(request.params)) {
-    isValidHederaAccountParams(request.params);
-    hederaAccountId = request.params.accountId;
+    if (
+      !(
+        isValidHederaAccountParams(request.params) ||
+        isValidEVMAccountParams(request.params)
+      )
+    ) {
+      throw new Error('External Account parameter is invalid');
+    }
+    extraData = (request.params as ExternalAccount).externalAccount.data;
   }
 
-  const account = await getCurrentAccount(state, hederaAccountId);
+  const account = await getCurrentAccount(
+    state,
+    request.params as ExternalAccount,
+  );
+  account.extraData = extraData;
+
   console.log(
     `Currently connected account: ${JSON.stringify(account, null, 4)}`,
   );
@@ -103,20 +127,36 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ request }) => {
     }
 
     case 'getAccountInfo': {
-      return await getAccountInfo(identitySnapParams, hederaAccountId);
+      return await getAccountInfo(identitySnapParams);
+    }
+
+    case 'connectEVMAccount': {
+      if (!isValidEVMAccountParams(request.params)) {
+        throw new Error('External Account parameter is invalid');
+      }
+      return await connectEVMAccount(
+        state,
+        (extraData as EvmAccountParams).address,
+        false,
+      );
     }
 
     case 'connectHederaAccount': {
-      isValidHederaAccountParams(request.params);
-      return await connectHederaAccount(state, request.params.accountId, false);
+      if (!isValidHederaAccountParams(request.params)) {
+        throw new Error('External Account parameter is invalid');
+      }
+      return await connectHederaAccount(
+        state,
+        (extraData as HederaAccountParams).accountId,
+        false,
+      );
     }
 
     case 'createNewHederaAccount': {
       isValidCreateNewHederaAccountParams(request.params);
       return await createNewHederaAccount(
         identitySnapParams,
-        request.params,
-        hederaAccountId,
+        request.params as CreateNewHederaAccountRequestParams,
       );
     }
 

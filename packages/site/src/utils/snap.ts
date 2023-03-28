@@ -1,11 +1,15 @@
 /* eslint-disable @typescript-eslint/ban-types */
+import { ExternalAccount } from '@tuum-tech/identity-snap/src/interfaces';
+import {
+  Filter,
+  IDataManagerClearArgs,
+  IDataManagerDeleteArgs,
+} from '@tuum-tech/identity-snap/src/plugins/veramo/verfiable-creds-manager';
 import {
   CreateNewHederaAccountRequestParams,
   CreateVPRequestParams,
-  GetVCsOptions,
-  RemoveVCOptions,
 } from '@tuum-tech/identity-snap/src/types/params';
-import { Filter } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
+
 import { VerifiableCredential, VerifiablePresentation } from '@veramo/core';
 import { defaultSnapOrigin } from '../config';
 import { ExternalAccountParams, GetSnapsResponse, Snap } from '../types';
@@ -213,7 +217,7 @@ export const resolveDID = async (
 
 export const getVCs = async (
   filter: Filter | undefined,
-  options: GetVCsOptions,
+  options: any,
   externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
@@ -229,12 +233,12 @@ export const getVCs = async (
  * Invoke the "saveVC" method from the snap.
  */
 
-export const saveVC = async (vc: VerifiableCredential | {}) => {
+export const saveVC = async (params: any) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
       method: 'saveVC',
-      params: { verifiableCredential: vc },
+      params,
     },
   });
 };
@@ -251,7 +255,7 @@ export type ExampleVCValue = {
 export const createVC = async (
   vcKey: string,
   vcValue: object,
-  options: GetVCsOptions,
+  options: any,
   credTypes?: string[],
   externalAccountparams?: ExternalAccountParams,
 ) => {
@@ -320,7 +324,7 @@ export const verifyVC = async (vc: VerifiableCredential | {}) => {
 
 export const removeVC = async (
   id: string | string[],
-  options: RemoveVCOptions,
+  options: IDataManagerDeleteArgs,
   externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
@@ -337,7 +341,7 @@ export const removeVC = async (
  */
 
 export const deleteAllVCs = async (
-  options: RemoveVCOptions,
+  options: IDataManagerClearArgs,
   externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({

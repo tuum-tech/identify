@@ -26,13 +26,15 @@ import {
 import { CredentialPlugin, W3cMessageHandler } from '@veramo/credential-w3c';
 import {
   DataStoreJson,
+  DIDStoreJson,
   KeyStoreJson,
   PrivateKeyStoreJson
 } from '@veramo/data-store-json';
 import { DIDComm, DIDCommMessageHandler, IDIDComm } from '@veramo/did-comm';
 import { JwtMessageHandler } from '@veramo/did-jwt';
-import { getDidKeyResolver } from '@veramo/did-provider-key';
-import { getDidPkhResolver } from '@veramo/did-provider-pkh';
+import { DIDManager } from '@veramo/did-manager';
+import { getDidKeyResolver, KeyDIDProvider } from '@veramo/did-provider-key';
+import { getDidPkhResolver, PkhDIDProvider } from '@veramo/did-provider-pkh';
 import { DIDResolverPlugin } from '@veramo/did-resolver';
 import { KeyManager } from '@veramo/key-manager';
 import { KeyManagementSystem, SecretBox } from '@veramo/kms-local';
@@ -52,8 +54,8 @@ const secretKey =
   '29739248cad1bd1a0fc4d9b75cd4d2990de535baf5caadfdf8d8f86664aa830c';
 
 let agent: TAgent<
-  // IDIDManager &
-  IKeyManager &
+    IDIDManager &
+    IKeyManager &
     IDataStore &
     IResolver &
     IMessageHandler &
@@ -90,7 +92,7 @@ if (!fs.existsSync(localStorageFolder)){
   const jsonFileStore = await JsonFileStore.fromFile(databaseFile)
 
   agent = createAgent<
-    IDIDManager &
+      IDIDManager &
       IKeyManager &
       IDataStore &
       IResolver &
@@ -113,18 +115,18 @@ if (!fs.existsSync(localStorageFolder)){
           web3: new Web3KeyManagementSystem({}),
         },
       }),
-      // new DIDManager({
-      //   store: new DIDStoreJson(jsonFileStore),
-      //   defaultProvider: 'did:ethr:goerli',
-      //   providers: {
-      //     'did:key': new KeyDIDProvider({
-      //       defaultKms: 'local',
-      //     }),
-      //     'did:pkh': new PkhDIDProvider({
-      //       defaultKms: 'local',
-      //     })
-      //   },
-      // }),
+      new DIDManager({
+        store: new DIDStoreJson(jsonFileStore),
+        defaultProvider: 'did:ethr:goerli',
+        providers: {
+          'did:key': new KeyDIDProvider({
+            defaultKms: 'local',
+          }),
+          'did:pkh': new PkhDIDProvider({
+            defaultKms: 'local',
+          })
+        },
+      }),
       new DIDResolverPlugin({
         resolver: new Resolver({
           ...getDidKeyResolver(),

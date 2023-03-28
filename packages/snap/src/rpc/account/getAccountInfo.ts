@@ -1,18 +1,21 @@
 import { ethers } from 'ethers';
 import { validHederaChainID } from '../../hedera/config';
-import { IdentitySnapParams, PublicAccountInfo } from '../../interfaces';
+import {
+  HederaAccountParams,
+  IdentitySnapParams,
+  PublicAccountInfo,
+} from '../../interfaces';
 import { getCurrentNetwork } from '../../snap/network';
 import { getHederaAccountIfExists } from '../../utils/params';
 
 /**
- * Get did.
+ * Get account info such as address, did, public key, etc.
  *
  * @param identitySnapParams - Identity snap params.
- * @param hederaAccountId - Hedera Identifier.
+ * @returns Public Account Info.
  */
 export async function getAccountInfo(
   identitySnapParams: IdentitySnapParams,
-  hederaAccountId?: string,
 ): Promise<PublicAccountInfo> {
   const { state, account } = identitySnapParams;
 
@@ -26,17 +29,30 @@ export async function getAccountInfo(
     did: account.identifier.did,
     publicKey,
     method: account.method,
-    hederaAccountId,
   };
-  console.log('hederaAccountId: ', hederaAccountId);
   const chainId = await getCurrentNetwork(ethereum);
-  if (validHederaChainID(chainId) && !hederaAccountId) {
-    publicAccountInfo.hederaAccountId = await getHederaAccountIfExists(
-      state,
-      undefined,
-      account.evmAddress,
-    );
+
+  if (validHederaChainID(chainId)) {
+    let accountId = '';
+    if (account.extraData) {
+      accountId = (account.extraData as HederaAccountParams).accountId;
+    }
+
+    if (!accountId) {
+      accountId = await getHederaAccountIfExists(
+        state,
+        undefined,
+        account.evmAddress,
+      );
+    }
+
+    if (accountId) {
+      publicAccountInfo.extraData = {
+        accountId,
+      } as HederaAccountParams;
+    }
   }
+
   console.log(JSON.stringify(publicAccountInfo, null, 4));
   return publicAccountInfo;
 }

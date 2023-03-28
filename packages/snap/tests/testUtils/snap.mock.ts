@@ -1,12 +1,13 @@
 /* eslint-disable */
 
+import { BIP44CoinTypeNode } from '@metamask/key-tree';
 import { RequestArguments } from '@metamask/providers/dist/BaseProvider';
 import { Maybe } from '@metamask/providers/dist/utils';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 
 import { providers, Wallet } from 'ethers';
 import { IdentitySnapState } from '../../src/interfaces';
-import { address, privateKey } from './constants';
+import { ETH_ADDRESS, mnemonic, privateKey } from './constants';
 
 type ISnapMock = {
   request<T>(args: RequestArguments): Promise<Maybe<T>>;
@@ -63,20 +64,20 @@ export class SnapMock implements ISnapMock {
 
   readonly rpcMocks = {
     snap_dialog: jest.fn(),
-    eth_requestAccounts: jest.fn().mockResolvedValue([address]),
+    eth_requestAccounts: jest.fn().mockResolvedValue([ETH_ADDRESS]),
     eth_chainId: jest.fn().mockResolvedValue('0x5'),
     net_version: jest.fn().mockResolvedValue('5'),
-    // snap_getBip44Entropy: jest
-    //   .fn()
-    //   .mockImplementation(async (params: { coinType: number }) => {
-    //     const node = await BIP44CoinTypeNode.fromDerivationPath([
-    //       `bip39:${mnemonic}`,
-    //       `bip32:44'`,
-    //       `bip32:${params.coinType}'`,
-    //     ]);
+   snap_getBip44Entropy: jest
+      .fn()
+      .mockImplementation(async (params: { coinType: number }) => {
+        const node = await BIP44CoinTypeNode.fromDerivationPath([
+          `bip39:${mnemonic}`,
+          `bip32:44'`,
+          `bip32:${params.coinType}'`,
+        ]);
 
-    //     return node.toJSON();
-    //   }),
+        return node.toJSON();
+      }),
     snap_manageState: jest
       .fn()
       .mockImplementation((params: unknown) =>
@@ -124,4 +125,16 @@ export class SnapMock implements ISnapMock {
  */
 export function createMockSnap(): SnapsGlobalObject & SnapMock {
   return new SnapMock() as SnapsGlobalObject & SnapMock;
+}
+
+/**
+ * Creates and returns a Mock Snap
+ *
+ * @returns {SnapsGlobalObject & SnapMock} SnapMock
+ */
+export function buildMockSnap(chainId: string, address: string): SnapsGlobalObject & SnapMock {
+  let snapMock = new SnapMock() as SnapsGlobalObject & SnapMock;
+  snapMock.rpcMocks.eth_requestAccounts.mockResolvedValue([address]);
+  snapMock.rpcMocks.eth_chainId.mockResolvedValue(chainId);
+  return snapMock;
 }

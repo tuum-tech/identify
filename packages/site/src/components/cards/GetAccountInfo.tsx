@@ -29,6 +29,8 @@ const GetAccountInfo: FC<Props> = ({
 }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
+  const [externalAccount, setExternalAccount] = useState(false);
+  const [extraData, setExtraData] = useState('');
   const { showModal } = useModal();
 
   const externalAccountRef = useRef<GetExternalAccountRef>(null);
@@ -39,12 +41,27 @@ const GetAccountInfo: FC<Props> = ({
       const newChainId = await getCurrentNetwork();
       setCurrentChainId(newChainId);
 
-      const externalAccountData =
-        externalAccountRef.current?.handleGetAccountParams();
+	  const externalAccountData =
+      externalAccountRef.current?.handleGetAccountParams();
 
       const params = validHederaChainID(newChainId)
         ? externalAccountData
         : undefined;
+
+      const network = isHederaNetwork ? 'hedera' : 'evm';
+      const data =
+        network === 'hedera'
+          ? { accountId: extraData }
+          : { address: extraData };
+      let params = undefined;
+      if (externalAccount) {
+        params = {
+          externalAccount: {
+            network,
+            data,
+          },
+        };
+      }
       const accountInfo = await getAccountInfo(params);
       console.log(`Your account info:`, accountInfo);
       setAccountInfo(accountInfo as PublicAccountInfo);

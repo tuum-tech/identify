@@ -1,7 +1,13 @@
 /* eslint-disable no-alert */
-import { ProofInfo } from '@tuum-tech/identity-snap/src/types/params';
-import { IDataManagerQueryResult } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
-import { VerifiableCredential, VerifiablePresentation } from '@veramo/core';
+import {
+  IDataManagerQueryResult,
+  ISaveVC,
+} from '@tuum-tech/identity-snap/src/plugins/veramo/verfiable-creds-manager';
+import {
+  CreateVPRequestParams,
+  ProofInfo,
+} from '@tuum-tech/identity-snap/src/types/params';
+import { VerifiablePresentation, W3CVerifiableCredential } from '@veramo/core';
 import axios from 'axios';
 import { useContext, useEffect, useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
@@ -55,10 +61,15 @@ function LoginPage() {
   const handleSaveVC = async () => {
     // Send a POST request
     if (vc !== '') {
-      const parsedVC: VerifiableCredential = JSON.parse(
+      const parsedVC: W3CVerifiableCredential = JSON.parse(
         vc,
-      ) as VerifiableCredential;
-      await saveVC(parsedVC);
+      ) as W3CVerifiableCredential;
+
+      let data: ISaveVC[];
+      let params = {
+        data: [{ vc: parsedVC }],
+      };
+      await saveVC(params);
     }
   };
 
@@ -98,7 +109,7 @@ function LoginPage() {
 
   useEffect(() => {
     (async () => {
-      await handleSignIn();
+      if (challenge !== '') await handleSignIn();
     })();
   }, [challenge]);
 
@@ -178,10 +189,15 @@ function LoginPage() {
         challenge,
       };
       console.log('vcId: ', vcId);
-      const vp = (await createVP({
+
+      let createVpRequestParameters: CreateVPRequestParams = {
         vcIds: [vcId],
+        vcs: [],
         proofInfo,
-      })) as VerifiablePresentation;
+      };
+      const vp = (await createVP(
+        createVpRequestParameters,
+      )) as VerifiablePresentation;
       setPresentation(vp);
       console.log(`Your VP is: ${JSON.stringify(vp, null, 4)}`);
       setShowVcsModal(false);
