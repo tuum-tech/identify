@@ -14,7 +14,7 @@ type Props = {
 const ExternalAccount = forwardRef(
   ({ currentChainId }: Props, ref: Ref<GetExternalAccountRef>) => {
     const [externalAccount, setExternalAccount] = useState(false);
-    const [accountId, setAccountId] = useState('');
+    const [extraData, setExtraData] = useState('');
 
     const isHederaNetwork = useMemo(
       () => validHederaChainID(currentChainId),
@@ -23,7 +23,21 @@ const ExternalAccount = forwardRef(
 
     useImperativeHandle(ref, () => ({
       handleGetAccountParams() {
-        return { externalAccount, accountId };
+        const network = isHederaNetwork ? 'hedera' : 'evm';
+        const data =
+          network === 'hedera'
+            ? { accountId: extraData }
+            : { address: extraData };
+        let params;
+        if (externalAccount) {
+          params = {
+            externalAccount: {
+              network,
+              data,
+            },
+          };
+        }
+        return params;
       },
     }));
 
@@ -45,7 +59,7 @@ const ExternalAccount = forwardRef(
               type="text"
               placeholder="Account Id"
               style={{ marginBottom: 8 }}
-              onChange={(e) => setAccountId(e.target.value)}
+              onChange={(e) => setExtraData(e.target.value)}
             />
           </Form>
         ) : null}

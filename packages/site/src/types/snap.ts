@@ -8,6 +8,11 @@ export type Snap = {
 };
 
 export type ExternalAccountParams = {
-  externalAccount: boolean;
-  accountId: string;
+  externalAccount: {
+    network: string;
+    data: {
+      accountId?: string;
+      address?: string;
+    };
+  };
 };
