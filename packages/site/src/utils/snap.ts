@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
-import { ExternalAccount } from '@tuum-tech/identity-snap/src/interfaces';
 import {
   Filter,
   IDataManagerClearArgs,
