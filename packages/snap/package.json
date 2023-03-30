@@ -1,6 +1,6 @@
 {
   "name": "@tuum-tech/identity-snap",
-  "version": "0.5.0",
+  "version": "1.0.0",
   "description": "A snap for managing Decentralized Identifiers(DIDs)",
   "keywords": [
     "MetaMask",
