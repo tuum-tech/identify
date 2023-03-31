@@ -52,11 +52,13 @@ const ExternalAccount = forwardRef(
               setExternalAccount(e.target.checked);
             }}
           />
-          <Form.Label>Account Id</Form.Label>
+          <Form.Label>
+            {isHederaNetwork ? 'Account Id' : 'EVM Address'}
+          </Form.Label>
           <Form.Control
             size="lg"
             type="text"
-            placeholder="Account Id"
+            placeholder={isHederaNetwork ? 'Account Id' : 'EVM Address'}
             style={{ marginBottom: 8 }}
             onChange={(e) => setExtraData(e.target.value)}
           />
