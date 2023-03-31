@@ -361,7 +361,7 @@ export class SnapVCStore extends AbstractDataStore {
     if (filter && filter.type === 'id') {
       return Object.keys(accountState.vcs)
         .map((k) => {
-          let vc = accountState.vcs[k] as unknown;
+          let vc = (accountState.vcs[k] as any).vc as unknown;
           if (typeof vc === 'string') {
             vc = decodeJWT(vc);
           }
@@ -401,7 +401,7 @@ export class SnapVCStore extends AbstractDataStore {
     if (filter === undefined || (filter && filter.type === 'none')) {
       return Object.keys(accountState.vcs)
         .map((k) => {
-          let vc = accountState.vcs[k] as unknown;
+          let vc = (accountState.vcs[k] as any).vc as unknown;
           if (typeof vc === 'string') {
             vc = decodeJWT(vc);
           }
@@ -418,7 +418,7 @@ export class SnapVCStore extends AbstractDataStore {
     if (filter && filter.type === 'JSONPath') {
       const objects = Object.keys(accountState.vcs)
         .map((k) => {
-          let vc = accountState.vcs[k] as unknown;
+            let vc = (accountState.vcs[k] as any).vc as unknown;
           if (typeof vc === 'string') {
             vc = decodeJWT(vc);
           }
