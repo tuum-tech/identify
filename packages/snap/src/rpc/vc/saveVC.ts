@@ -52,15 +52,12 @@ export async function saveVC(
       account.evmAddress,
     );
 
-  
-
     const filteredCredentials: W3CVerifiableCredential[] = (
       verifiableCredentials as W3CVerifiableCredential[]
     ).filter((x: W3CVerifiableCredential) => {
       const vcObj = JSON.parse(JSON.stringify(x));
 
-    
-      const subjectDid: string = vcObj.vc.credentialSubject.id;
+      const subjectDid: string = vcObj.credentialSubject.id;
       const subjectAccount = subjectDid.split(':')[4];
       return account.evmAddress === subjectAccount;
     });

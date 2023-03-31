@@ -3,14 +3,14 @@ import {
   IIdentifier,
   IKey,
   VerifiableCredential,
-  W3CVerifiableCredential
+  W3CVerifiableCredential,
 } from '@veramo/core';
 import { AbstractDIDStore } from '@veramo/did-manager';
 import {
   AbstractKeyStore,
   AbstractPrivateKeyStore,
   ImportablePrivateKey,
-  ManagedPrivateKey
+  ManagedPrivateKey,
 } from '@veramo/key-manager';
 import jsonpath from 'jsonpath';
 import { v4 as uuidv4 } from 'uuid';
@@ -18,14 +18,14 @@ import { IdentitySnapState } from '../../../../interfaces';
 import {
   getAccountStateByCoinType,
   getCurrentCoinType,
-  updateSnapState
+  updateSnapState,
 } from '../../../../snap/state';
 import { decodeJWT } from '../../../../utils/jwt';
 import {
   AbstractDataStore,
   IFilterArgs,
   IQueryResult,
-  ISaveVC
+  ISaveVC,
 } from '../../verfiable-creds-manager';
 
 /**
@@ -361,7 +361,7 @@ export class SnapVCStore extends AbstractDataStore {
     if (filter && filter.type === 'id') {
       return Object.keys(accountState.vcs)
         .map((k) => {
-          let vc = (accountState.vcs[k] as any).vc as unknown;
+          let vc = accountState.vcs[k] as unknown;
           if (typeof vc === 'string') {
             vc = decodeJWT(vc);
           }
@@ -381,7 +381,7 @@ export class SnapVCStore extends AbstractDataStore {
     if (filter && filter.type === 'vcType') {
       return Object.keys(accountState.vcs)
         .map((k) => {
-          let vc = (accountState.vcs[k] as any).vc as unknown;
+          let vc = accountState.vcs[k] as unknown;
           if (typeof vc === 'string') {
             vc = decodeJWT(vc);
           }
@@ -401,7 +401,7 @@ export class SnapVCStore extends AbstractDataStore {
     if (filter === undefined || (filter && filter.type === 'none')) {
       return Object.keys(accountState.vcs)
         .map((k) => {
-          let vc = (accountState.vcs[k] as any).vc as unknown;
+          let vc = accountState.vcs[k] as unknown;
           if (typeof vc === 'string') {
             vc = decodeJWT(vc);
           }
@@ -418,7 +418,7 @@ export class SnapVCStore extends AbstractDataStore {
     if (filter && filter.type === 'JSONPath') {
       const objects = Object.keys(accountState.vcs)
         .map((k) => {
-            let vc = (accountState.vcs[k] as any).vc as unknown;
+          let vc = accountState.vcs[k] as unknown;
           if (typeof vc === 'string') {
             vc = decodeJWT(vc);
           }
@@ -448,9 +448,8 @@ export class SnapVCStore extends AbstractDataStore {
     const ids: string[] = [];
     for (const vc of vcs) {
       if (
-        ((vc.vc as any).vc as VerifiableCredential).credentialSubject.id?.split(
-          ':',
-        )[4] === account
+        (vc.vc as VerifiableCredential).credentialSubject.id?.split(':')[4] ===
+        account
       ) {
         const newId = vc.id || uuidv4();
         ids.push(newId);

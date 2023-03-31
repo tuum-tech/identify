@@ -1,11 +1,10 @@
 /* eslint-disable no-alert */
 import {
-  IDataManagerQueryResult,
-  ISaveVC,
+  IDataManagerQueryResult
 } from '@tuum-tech/identity-snap/src/plugins/veramo/verfiable-creds-manager';
 import {
   CreateVPRequestParams,
-  ProofInfo,
+  ProofInfo
 } from '@tuum-tech/identity-snap/src/types/params';
 import { VerifiablePresentation, W3CVerifiableCredential } from '@veramo/core';
 import axios from 'axios';
@@ -14,7 +13,7 @@ import { Button, Modal } from 'react-bootstrap';
 import { Card, InstallFlaskButton, SendHelloButton } from '../components/base';
 import {
   ConnectIdentitySnap,
-  ReconnectIdentitySnap,
+  ReconnectIdentitySnap
 } from '../components/cards';
 import {
   CardContainer,
@@ -22,7 +21,7 @@ import {
   Heading,
   PageContainer,
   Span,
-  Subtitle,
+  Subtitle
 } from '../config/styles';
 import { MetamaskActions, MetaMaskContext } from '../contexts/MetamaskContext';
 import useModal from '../hooks/useModal';
@@ -35,7 +34,7 @@ import {
   getDID,
   getSnap,
   getVCs,
-  saveVC,
+  saveVC
 } from '../utils/snap';
 
 function LoginPage() {
@@ -65,9 +64,9 @@ function LoginPage() {
         vc,
       ) as W3CVerifiableCredential;
 
-      let data: ISaveVC[];
+    
       let params = {
-        data: [{ vc: parsedVC }],
+        data: [parsedVC],
       };
       await saveVC(params);
     }
