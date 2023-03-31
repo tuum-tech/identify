@@ -5279,7 +5279,7 @@ __metadata:
     "@testing-library/jest-dom": ^5.16.4
     "@testing-library/react": ^13.3.0
     "@testing-library/user-event": ^13.5.0
-    "@tuum-tech/identity-snap": 1.0.0
+    "@tuum-tech/identity-snap": 1.0.1
     "@types/jest": ^27.5.2
     "@types/react": ^18.0.15
     "@types/react-dom": ^18.0.6
@@ -5337,7 +5337,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@tuum-tech/identity-snap@1.0.0, @tuum-tech/identity-snap@workspace:packages/snap":
+"@tuum-tech/identity-snap@1.0.1, @tuum-tech/identity-snap@workspace:packages/snap":
   version: 0.0.0-use.local
   resolution: "@tuum-tech/identity-snap@workspace:packages/snap"
   dependencies:
