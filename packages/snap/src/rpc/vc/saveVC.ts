@@ -52,18 +52,24 @@ export async function saveVC(
       account.evmAddress,
     );
 
+  
+
     const filteredCredentials: W3CVerifiableCredential[] = (
       verifiableCredentials as W3CVerifiableCredential[]
     ).filter((x: W3CVerifiableCredential) => {
       const vcObj = JSON.parse(JSON.stringify(x));
-      const subjectDid: string = vcObj.credentialSubject.id;
+
+    
+      const subjectDid: string = vcObj.vc.credentialSubject.id;
       const subjectAccount = subjectDid.split(':')[4];
       return account.evmAddress === subjectAccount;
     });
     return await agent.saveVC({
-      data: filteredCredentials.map((x: W3CVerifiableCredential) => {
-        return { vc: x } as ISaveVC;
-      }) as ISaveVC[],
+      data: (filteredCredentials as W3CVerifiableCredential[]).map(
+        (x: W3CVerifiableCredential) => {
+          return { vc: x } as ISaveVC;
+        },
+      ) as ISaveVC[],
       options: optionsFiltered,
       accessToken: accountState.accountConfig.identity.googleAccessToken,
     });
