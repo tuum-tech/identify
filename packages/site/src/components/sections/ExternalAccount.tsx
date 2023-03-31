@@ -43,26 +43,26 @@ const ExternalAccount = forwardRef(
 
     return (
       <>
-        {isHederaNetwork ? (
-          <Form>
-            <Form.Check
-              type="checkbox"
-              id="external-account-checkbox"
-              label="External Account"
-              onChange={(e) => {
-                setExternalAccount(e.target.checked);
-              }}
-            />
-            <Form.Label>Account Id</Form.Label>
-            <Form.Control
-              size="lg"
-              type="text"
-              placeholder="Account Id"
-              style={{ marginBottom: 8 }}
-              onChange={(e) => setExtraData(e.target.value)}
-            />
-          </Form>
-        ) : null}
+        <Form>
+          <Form.Check
+            type="checkbox"
+            id="external-account-checkbox"
+            label="External Account"
+            onChange={(e) => {
+              setExternalAccount(e.target.checked);
+            }}
+          />
+          <Form.Label>
+            {isHederaNetwork ? 'Account Id' : 'EVM Address'}
+          </Form.Label>
+          <Form.Control
+            size="lg"
+            type="text"
+            placeholder={isHederaNetwork ? 'Account Id' : 'EVM Address'}
+            style={{ marginBottom: 8 }}
+            onChange={(e) => setExtraData(e.target.value)}
+          />
+        </Form>
       </>
     );
   },
