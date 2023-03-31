@@ -1,4 +1,5 @@
-import { FC, useContext, useState } from 'react';
+import { FC, useContext, useRef, useState } from 'react';
+import Form from 'react-bootstrap/esm/Form';
 import {
   MetamaskActions,
   MetaMaskContext,
@@ -10,21 +11,32 @@ import {
   shouldDisplayReconnectButton,
 } from '../../utils';
 import { Card, SendHelloButton } from '../base';
+import ExternalAccount, {
+  GetExternalAccountRef,
+} from '../sections/ExternalAccount';
 
 type Props = {
+  currentChainId: string;
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const ResolveDID: FC<Props> = ({ setCurrentChainId }) => {
+const ResolveDID: FC<Props> = ({ currentChainId, setCurrentChainId }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
+  const [did, setDid] = useState('');
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
+
+  const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
   const handleResolveDIDClick = async () => {
     setLoading(true);
     try {
       setCurrentChainId(await getCurrentNetwork());
-      const doc = await resolveDID();
+
+      const externalAccountParams =
+        externalAccountRef.current?.handleGetAccountParams();
+
+      const doc = await resolveDID(did, externalAccountParams);
       console.log(`Your DID document is : ${JSON.stringify(doc, null, 4)}`);
       showModal({
         title: 'Resolve DID',
@@ -42,6 +54,21 @@ const ResolveDID: FC<Props> = ({ setCurrentChainId }) => {
       content={{
         title: 'resolveDID',
         description: 'Resolve the DID and return a DID document',
+        form: (
+          <>
+            <Form.Control
+              size="lg"
+              type="text"
+              placeholder="DID"
+              style={{ marginBottom: 8 }}
+              onChange={(e) => setDid(e.target.value)}
+            />
+            <ExternalAccount
+              currentChainId={currentChainId}
+              ref={externalAccountRef}
+            />
+          </>
+        ),
         button: (
           <SendHelloButton
             buttonText="Resolve DID"

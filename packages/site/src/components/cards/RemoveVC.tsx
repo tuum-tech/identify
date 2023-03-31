@@ -1,5 +1,5 @@
 import { IDataManagerDeleteResult } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
-import { FC, useContext, useState } from 'react';
+import { FC, useContext, useRef, useState } from 'react';
 import Select from 'react-select';
 import { storeOptions } from '../../config/constants';
 import {
@@ -7,23 +7,31 @@ import {
   MetaMaskContext,
 } from '../../contexts/MetamaskContext';
 import { VcContext } from '../../contexts/VcContext';
+import useModal from '../../hooks/useModal';
 import {
   getCurrentNetwork,
   removeVC,
   shouldDisplayReconnectButton,
 } from '../../utils';
 import { Card, SendHelloButton, TextInput } from '../base';
+import ExternalAccount, {
+  GetExternalAccountRef,
+} from '../sections/ExternalAccount';
 
 type Props = {
+  currentChainId: string;
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const RemoveVC: FC<Props> = ({ setCurrentChainId }) => {
+const RemoveVC: FC<Props> = ({ currentChainId, setCurrentChainId }) => {
   const { setVcId, vcIdsToBeRemoved, setVcIdsToBeRemoved } =
     useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
   const [selectedOptions, setSelectedOptions] = useState([storeOptions[0]]);
   const [loading, setLoading] = useState(false);
+  const { showModal } = useModal();
+
+  const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
   const handleChange = (options: any) => {
     setSelectedOptions(options);
@@ -33,6 +41,10 @@ const RemoveVC: FC<Props> = ({ setCurrentChainId }) => {
     setLoading(true);
     try {
       setCurrentChainId(await getCurrentNetwork());
+
+      const externalAccountParams =
+        externalAccountRef.current?.handleGetAccountParams();
+
       const id = vcIdsToBeRemoved ? vcIdsToBeRemoved.trim().split(',')[0] : '';
       const selectedStore = selectedOptions.map((option) => option.value);
       const options = {
@@ -44,8 +56,13 @@ const RemoveVC: FC<Props> = ({ setCurrentChainId }) => {
       const isRemoved = (await removeVC(
         id,
         options,
+        externalAccountParams,
       )) as IDataManagerDeleteResult[];
       console.log(`Remove VC Result: ${JSON.stringify(isRemoved, null, 4)}`);
+      showModal({
+        title: 'Remove VC Result',
+        content: JSON.stringify(isRemoved, null, 4),
+      });
       setVcId('');
       setVcIdsToBeRemoved('');
     } catch (e) {
@@ -62,6 +79,10 @@ const RemoveVC: FC<Props> = ({ setCurrentChainId }) => {
         description: 'Remove one or more VCs from the snap',
         form: (
           <form>
+            <ExternalAccount
+              currentChainId={currentChainId}
+              ref={externalAccountRef}
+            />
             <label>
               Enter your VC IDs to be removed separated by a comma
               <TextInput

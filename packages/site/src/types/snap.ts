@@ -6,3 +6,13 @@ export type Snap = {
   version: string;
   initialPermissions: Record<string, unknown>;
 };
+
+export type ExternalAccountParams = {
+  externalAccount: {
+    network: string;
+    data: {
+      accountId?: string;
+      address?: string;
+    };
+  };
+};

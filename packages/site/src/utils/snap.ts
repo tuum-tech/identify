@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { ExternalAccount } from '@tuum-tech/identity-snap/src/interfaces';
 import {
   Filter,
   IDataManagerClearArgs,
@@ -12,7 +11,7 @@ import {
 
 import { VerifiableCredential, VerifiablePresentation } from '@veramo/core';
 import { defaultSnapOrigin } from '../config';
-import { GetSnapsResponse, Snap } from '../types';
+import { ExternalAccountParams, GetSnapsResponse, Snap } from '../types';
 
 /**
  * Get the installed snaps in MetaMask.
@@ -168,7 +167,9 @@ export type PublicAccountInfo = {
  * Invoke the "getAccountInfo" method from the snap.
  */
 
-export const getAccountInfo = async (params: ExternalAccount | undefined) => {
+export const getAccountInfo = async (
+  params: ExternalAccountParams | undefined,
+) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
@@ -196,12 +197,15 @@ export const getDID = async () => {
  * Invoke the "resolveDID" method from the snap.
  */
 
-export const resolveDID = async (did?: string) => {
+export const resolveDID = async (
+  did?: string,
+  externalAccountparams?: ExternalAccountParams,
+) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
       method: 'resolveDID',
-      params: { did },
+      params: { did, ...externalAccountparams },
     },
   });
 };
@@ -210,12 +214,16 @@ export const resolveDID = async (did?: string) => {
  * Invoke the "getVCs" method from the snap.
  */
 
-export const getVCs = async (filter: Filter | undefined, options: any) => {
+export const getVCs = async (
+  filter: Filter | undefined,
+  options: any,
+  externalAccountparams?: ExternalAccountParams,
+) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
       method: 'getVCs',
-      params: { filter, options },
+      params: { filter, options, ...externalAccountparams },
     },
   });
 };
@@ -248,6 +256,7 @@ export const createVC = async (
   vcValue: object,
   options: any,
   credTypes?: string[],
+  externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
@@ -258,6 +267,7 @@ export const createVC = async (
         vcValue,
         options,
         credTypes,
+        ...externalAccountparams,
       },
     },
   });
@@ -314,12 +324,13 @@ export const verifyVC = async (vc: VerifiableCredential | {}) => {
 export const removeVC = async (
   id: string | string[],
   options: IDataManagerDeleteArgs,
+  externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
       method: 'removeVC',
-      params: { id, options },
+      params: { id, options, ...externalAccountparams },
     },
   });
 };
@@ -328,12 +339,15 @@ export const removeVC = async (
  * Invoke the "deleteAllVCs" method from the snap.
  */
 
-export const deleteAllVCs = async (options: IDataManagerClearArgs) => {
+export const deleteAllVCs = async (
+  options: IDataManagerClearArgs,
+  externalAccountparams?: ExternalAccountParams,
+) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
       method: 'deleteAllVCs',
-      params: { options },
+      params: { options, ...externalAccountparams },
     },
   });
 };
@@ -342,16 +356,15 @@ export const deleteAllVCs = async (options: IDataManagerClearArgs) => {
  * Invoke the "createVP" method from the snap.
  */
 
-export const createVP = async ({
-  vcIds,
-  vcs,
-  proofInfo,
-}: CreateVPRequestParams) => {
+export const createVP = async (
+  { vcIds, vcs, proofInfo }: CreateVPRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
   return await window.ethereum.request({
     method: `wallet_snap_${defaultSnapOrigin}`,
     params: {
       method: 'createVP',
-      params: { vcIds, vcs, proofInfo },
+      params: { vcIds, vcs, proofInfo, ...externalAccountparams },
     },
   });
 };

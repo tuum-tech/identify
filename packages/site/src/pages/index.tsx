@@ -3,7 +3,7 @@ import { Container } from 'react-bootstrap';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 
-import { Card, ConnectButton, InstallFlaskButton } from '../components/base';
+import { Card, InstallFlaskButton } from '../components/base';
 import {
   ConfigureGoogleAccount,
   ConnectIdentitySnap,
@@ -85,12 +85,6 @@ const Index = () => {
           <Col>
             <dt>Status:</dt>
             <dd>{currentNetwork ? 'Connected' : 'Disconnected'}</dd>
-            {!currentNetwork && (
-              <ConnectButton
-                style={{ height: 20, minHeight: '3.2rem' }}
-                onClick={handleConnectClick}
-              />
-            )}
             <dt>Current Network:</dt>
             <dd>{currentNetwork}</dd>
           </Col>
@@ -149,14 +143,35 @@ const Index = () => {
           setCurrentChainId={setCurrentChainId}
           setAccountInfo={setAccountInfo}
         />
-        <ResolveDID setCurrentChainId={setCurrentChainId} />
-        <GetSpecificVC setCurrentChainId={setCurrentChainId} />
-        <GetAllVCs setCurrentChainId={setCurrentChainId} />
-        <CreateVC setCurrentChainId={setCurrentChainId} />
+        <ResolveDID
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+        />
+        <GetSpecificVC
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+        />
+        <GetAllVCs
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+        />
+        <CreateVC
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+        />
         <VerifyVC setCurrentChainId={setCurrentChainId} />
-        <RemoveVC setCurrentChainId={setCurrentChainId} />
-        <DeleteAllVCs setCurrentChainId={setCurrentChainId} />
-        <GetVP setCurrentChainId={setCurrentChainId} />
+        <RemoveVC
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+        />
+        <DeleteAllVCs
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+        />
+        <GetVP
+          currentChainId={currentChainId}
+          setCurrentChainId={setCurrentChainId}
+        />
         <VerifyVP setCurrentChainId={setCurrentChainId} />
         <ConfigureGoogleAccount />
         <SyncGoogleVCs />

@@ -1,6 +1,6 @@
 import { ProofInfo } from '@tuum-tech/identity-snap/src/types/params';
 import { VerifiablePresentation } from '@veramo/core';
-import { FC, useContext, useState } from 'react';
+import { FC, useContext, useRef, useState } from 'react';
 import {
   MetamaskActions,
   MetaMaskContext,
@@ -13,33 +13,45 @@ import {
   shouldDisplayReconnectButton,
 } from '../../utils';
 import { Card, SendHelloButton, TextInput } from '../base';
+import ExternalAccount, {
+  GetExternalAccountRef,
+} from '../sections/ExternalAccount';
 
 type Props = {
+  currentChainId: string;
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const GetVP: FC<Props> = ({ setCurrentChainId }) => {
+const GetVP: FC<Props> = ({ currentChainId, setCurrentChainId }) => {
   const { vcId, setVcId, setVp } = useContext(VcContext);
-  const { vc, setVc } = useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
   const { showModal } = useModal();
+
+  const externalAccountRef = useRef<GetExternalAccountRef>(null);
 
   const handleCreateVPClick = async () => {
     setLoading(true);
     try {
       setCurrentChainId(await getCurrentNetwork());
+
+      const externalAccountParams =
+        externalAccountRef.current?.handleGetAccountParams();
+
       const proofInfo: ProofInfo = {
         proofFormat: 'jwt',
         type: 'ProfileNamesPresentation',
       };
       console.log('vcIds: ', vcId);
       // console.log('vc: ', vc);
-      const vp = (await createVP({
-        vcIds: vcId.trim().split(','),
-        // vcs: [vc as W3CVerifiableCredential],
-        proofInfo: proofInfo,
-      })) as VerifiablePresentation;
+      const vp = (await createVP(
+        {
+          vcIds: vcId.trim().split(','),
+          // vcs: [vc as W3CVerifiableCredential],
+          proofInfo,
+        },
+        externalAccountParams,
+      )) as VerifiablePresentation;
       setVp(vp);
       showModal({
         title: 'Get VP',
@@ -59,6 +71,10 @@ const GetVP: FC<Props> = ({ setCurrentChainId }) => {
         description: 'Generate Verifiable Presentation from your VC',
         form: (
           <form>
+            <ExternalAccount
+              currentChainId={currentChainId}
+              ref={externalAccountRef}
+            />
             <label>
               Enter the Verifiable Credential ID
               <TextInput
