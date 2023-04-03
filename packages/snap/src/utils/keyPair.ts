@@ -21,7 +21,7 @@ export async function getAccountIndex(
 ): Promise<number | undefined> {
   const accountState = await getAccountStateByCoinType(state, account);
 
-  if (typeof accountState.index !== 'undefined') {
+  if (accountState.index) {
     return accountState.index;
   }
   return undefined;
@@ -152,7 +152,7 @@ export const snapGetKeysFromAddress = async (
 ): Promise<KeysType | null> => {
   const addressIndex = await getAccountIndex(state, account);
 
-  if (typeof addressIndex !== 'undefined') {
+  if (addressIndex) {
     return await getKeysFromAddress(
       bip44CoinTypeNode,
       account,
