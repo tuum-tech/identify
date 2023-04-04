@@ -1,13 +1,6 @@
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
-import {
-  EvmAccountParams,
-  ExternalAccount,
-  HederaAccountParams,
-  IdentitySnapParams,
-} from './interfaces';
-import { connectEVMAccount } from './rpc/account/connectEvmAccount';
-import { connectHederaAccount } from './rpc/account/connectHederaAccount';
+import { ExternalAccount, IdentitySnapParams } from './interfaces';
 import { getAccountInfo } from './rpc/account/getAccountInfo';
 import { getAvailableMethods } from './rpc/did/getAvailableMethods';
 import { getCurrentDIDMethod } from './rpc/did/getCurrentDIDMethod';
@@ -134,22 +127,14 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       if (!isValidEVMAccountParams(request.params)) {
         throw new Error('External Account parameter is invalid');
       }
-      return await connectEVMAccount(
-        state,
-        (extraData as EvmAccountParams).address,
-        false,
-      );
+      return await getAccountInfo(identitySnapParams);
     }
 
     case 'connectHederaAccount': {
       if (!isValidHederaAccountParams(request.params)) {
         throw new Error('External Account parameter is invalid');
       }
-      return await connectHederaAccount(
-        state,
-        (extraData as HederaAccountParams).accountId,
-        false,
-      );
+      return await getAccountInfo(identitySnapParams);
     }
 
     case 'createNewHederaAccount': {
