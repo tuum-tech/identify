@@ -37,7 +37,7 @@ export type ClearOptions = {
 
 export type QueryMetadata = {
   id: string;
-  store?: string;
+  store?: string | string[];
 };
 
 /**

@@ -1,6 +1,7 @@
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import { ProofFormat, W3CVerifiableCredential } from '@veramo/core';
 import cloneDeep from 'lodash.clonedeep';
+import { v4 as uuidv4 } from 'uuid';
 import { validHederaChainID } from '../../hedera/config';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
 import {
@@ -99,9 +100,9 @@ export async function createVC(
         proofFormat: 'jwt' as ProofFormat,
       });
 
-    // Save the Verifiable Credential
+    // Save the Verifiable Credential to all the stores the user requested for
     const saved: IDataManagerSaveResult[] = await agent.saveVC({
-      data: [{ vc: verifiableCredential }] as ISaveVC[],
+      data: [{ vc: verifiableCredential, id: uuidv4() }] as ISaveVC[],
       options: optionsFiltered,
       accessToken: accountState.accountConfig.identity.googleAccessToken,
     });
@@ -111,7 +112,7 @@ export async function createVC(
       data: verifiableCredential,
       metadata: {
         id: saved[0].id,
-        store: saved[0].store,
+        store: saved.map((res) => res.store),
       },
     };
 

@@ -31,12 +31,12 @@ import {
   PageContainer,
   Span,
 } from '../config/styles';
-import { MetamaskActions, MetaMaskContext } from '../contexts/MetamaskContext';
+import { MetaMaskContext, MetamaskActions } from '../contexts/MetamaskContext';
 import {
+  PublicAccountInfo,
   connectSnap,
   getCurrentNetwork,
   getSnap,
-  PublicAccountInfo,
 } from '../utils';
 import { getNetwork, validHederaChainID } from '../utils/hedera';
 
@@ -175,8 +175,6 @@ const Index = () => {
         <VerifyVP setCurrentChainId={setCurrentChainId} />
         <ConfigureGoogleAccount />
         <SyncGoogleVCs />
-        <Todo />
-        <Todo />
         <Todo />
       </CardContainer>
     </PageContainer>
