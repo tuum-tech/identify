@@ -5,6 +5,6 @@ import { availableMethods } from '../../types/constants';
  *
  * @returns Available methods.
  */
-export function getAvailableMethods(): string[] {
+export function getAvailableDIDMethods(): string[] {
   return availableMethods.map((key) => key);
 }

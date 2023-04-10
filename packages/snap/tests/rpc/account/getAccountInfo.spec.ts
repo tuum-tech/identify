@@ -5,7 +5,7 @@ import {
   HederaAccountParams,
   PublicAccountInfo,
 } from 'src/interfaces';
-import { onRpcRequest } from '../../src';
+import { onRpcRequest } from '../../../src';
 import {
   ETH_ADDRESS,
   ETH_CHAIN_ID,
@@ -13,9 +13,9 @@ import {
   getDefaultSnapState,
   HEDERA_ACCOUNT,
   HEDERA_CHAIN_ID,
-} from '../testUtils/constants';
-import { getRequestParams } from '../testUtils/helper';
-import { buildMockSnap, SnapMock } from '../testUtils/snap.mock';
+} from '../../testUtils/constants';
+import { getRequestParams } from '../../testUtils/helper';
+import { buildMockSnap, SnapMock } from '../../testUtils/snap.mock';
 
 describe('getAccountInfo', () => {
   let snapMock: SnapsGlobalObject & SnapMock;

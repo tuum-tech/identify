@@ -15,9 +15,9 @@ import {
 } from '../plugins/veramo/verfiable-creds-manager';
 import { getAccountStateByCoinType } from '../snap/state';
 import {
+  HEDERACOINTYPE,
   availableProofFormats,
   availableVCStores,
-  HEDERACOINTYPE,
   isValidProofFormat,
   isValidVCStore,
 } from '../types/constants';
@@ -888,6 +888,16 @@ export function isValidCreateVPRequest(
 
   const parameter = params as CreateVPRequestParams;
 
+  // Ensure that either vcIds or vcs is passed
+  if (!('vcIds' in parameter || 'vcs' in parameter)) {
+    console.error(
+      'Invalid createVP Params passed. Either "vcIds" or "vcs" must be passed as parameters',
+    );
+    throw new Error(
+      'Invalid createVP Params passed. Either "vcIds" or "vcs" must be passed as parameters',
+    );
+  }
+
   // Check if vcIds is valid
   if (
     'vcIds' in parameter &&
@@ -905,11 +915,52 @@ export function isValidCreateVPRequest(
         );
       }
     });
+
+    // Check if options is valid
+    if (
+      'options' in parameter &&
+      parameter.options !== null &&
+      typeof parameter.options === 'object'
+    ) {
+      if ('store' in parameter.options && parameter.options?.store !== null) {
+        if (typeof parameter.options?.store === 'string') {
+          if (!isValidVCStore(parameter.options?.store)) {
+            console.error(
+              `Invalid createVP Params passed. "options.store" is not a valid store. The valid store is one of the following: ${availableVCStores}`,
+            );
+            throw new Error(
+              `Invalid createVP Params passed. "options.store" is not a valid store. The valid store is one of the following: ${availableVCStores}`,
+            );
+          }
+        } else if (
+          Array.isArray(parameter.options?.store) &&
+          parameter.options?.store.length > 0
+        ) {
+          (parameter.options?.store as [string]).forEach((store) => {
+            if (!isValidVCStore(store)) {
+              console.error(
+                `Invalid createVP Params passed. "options.store" is not a valid store. The valid store is one of the following: ${availableVCStores}`,
+              );
+              throw new Error(
+                `Invalid createVP Params passed. "options.store" is not a valid store. The valid store is one of the following: ${availableVCStores}`,
+              );
+            }
+          });
+        } else {
+          console.error(
+            'Invalid createVP Params passed. "options.store" is not in a valid format. It must either be a string or an array of strings',
+          );
+          throw new Error(
+            'Invalid createVP Params passed. "options.store" is not in a valid format. It must either be a string or an array of strings',
+          );
+        }
+      }
+    }
   }
 
   // Check if vcs is valid
   if (
-    'vcIds' in parameter &&
+    'vcs' in parameter &&
     parameter.vcs !== null &&
     Array.isArray(parameter.vcs)
   ) {

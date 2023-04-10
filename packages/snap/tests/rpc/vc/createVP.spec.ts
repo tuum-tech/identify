@@ -9,7 +9,7 @@ import {
   getDefaultSnapState,
 } from '../../testUtils/constants';
 import { getRequestParams } from '../../testUtils/helper';
-import { buildMockSnap, SnapMock } from '../../testUtils/snap.mock';
+import { SnapMock, buildMockSnap } from '../../testUtils/snap.mock';
 
 describe('createVP', () => {
   let snapMock: SnapsGlobalObject & SnapMock;
@@ -55,7 +55,7 @@ describe('createVP', () => {
 
   it('should succeed creating VP from 1 VC', async () => {
     const createVpRequest = getRequestParams('createVP', {
-      vcsIds: [vcIds[0] as string],
+      vcIds: [vcIds[0] as string],
     });
 
     const presentation = (await onRpcRequest({

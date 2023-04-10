@@ -10,7 +10,7 @@ import { availableMethods, isValidMethod } from '../../types/constants';
  * @param identitySnapParams - Identity snap params.
  * @param didMethod - DID method.
  */
-export async function switchMethod(
+export async function switchDIDMethod(
   identitySnapParams: IdentitySnapParams,
   didMethod: string,
 ): Promise<boolean> {
@@ -49,5 +49,5 @@ export async function switchMethod(
 
     return false;
   }
-  return false;
+  return true;
 }

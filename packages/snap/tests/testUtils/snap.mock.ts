@@ -67,7 +67,7 @@ export class SnapMock implements ISnapMock {
     eth_requestAccounts: jest.fn().mockResolvedValue([ETH_ADDRESS]),
     eth_chainId: jest.fn().mockResolvedValue('0x5'),
     net_version: jest.fn().mockResolvedValue('5'),
-   snap_getBip44Entropy: jest
+    snap_getBip44Entropy: jest
       .fn()
       .mockImplementation(async (params: { coinType: number }) => {
         const node = await BIP44CoinTypeNode.fromDerivationPath([
@@ -132,7 +132,10 @@ export function createMockSnap(): SnapsGlobalObject & SnapMock {
  *
  * @returns {SnapsGlobalObject & SnapMock} SnapMock
  */
-export function buildMockSnap(chainId: string, address: string): SnapsGlobalObject & SnapMock {
+export function buildMockSnap(
+  chainId: string,
+  address: string,
+): SnapsGlobalObject & SnapMock {
   let snapMock = new SnapMock() as SnapsGlobalObject & SnapMock;
   snapMock.rpcMocks.eth_requestAccounts.mockResolvedValue([address]);
   snapMock.rpcMocks.eth_chainId.mockResolvedValue(chainId);

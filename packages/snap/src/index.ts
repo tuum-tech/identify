@@ -2,11 +2,10 @@ import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import { ExternalAccount, IdentitySnapParams } from './interfaces';
 import { getAccountInfo } from './rpc/account/getAccountInfo';
-import { getAvailableMethods } from './rpc/did/getAvailableMethods';
+import { getAvailableDIDMethods } from './rpc/did/getAvailableDIDMethods';
 import { getCurrentDIDMethod } from './rpc/did/getCurrentDIDMethod';
-import { getDid } from './rpc/did/getDID';
 import { resolveDID } from './rpc/did/resolveDID';
-import { switchMethod } from './rpc/did/switchMethods';
+import { switchDIDMethod } from './rpc/did/switchDIDMethod';
 import { configureGoogleAccount } from './rpc/gdrive/configureGoogleAccount';
 import { createNewHederaAccount } from './rpc/hedera/createNewHederaAccount';
 import { togglePopups } from './rpc/snap/togglePopups';
@@ -145,10 +144,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       );
     }
 
-    case 'getDID': {
-      return await getDid(identitySnapParams);
-    }
-
     case 'resolveDID': {
       isValidResolveDIDRequest(request.params);
       return await resolveDID(identitySnapParams, request.params.did);
@@ -201,16 +196,19 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     }
 
     case 'getAvailableMethods': {
-      return getAvailableMethods();
+      return getAvailableDIDMethods();
     }
 
     case 'getCurrentDIDMethod': {
       return getCurrentDIDMethod(identitySnapParams);
     }
 
-    case 'switchMethod': {
+    case 'switchDIDMethod': {
       isValidSwitchMethodRequest(request.params);
-      return await switchMethod(identitySnapParams, request.params.didMethod);
+      return await switchDIDMethod(
+        identitySnapParams,
+        request.params.didMethod,
+      );
     }
 
     case 'getSupportedProofFormats': {

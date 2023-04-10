@@ -1,13 +1,13 @@
-import { divider, heading, panel, text } from '@metamask/snaps-ui';
 import { W3CVerifiableCredential } from '@veramo/core';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
 import {
+  IDataManagerQueryResult,
   IDataManagerSaveArgs,
   IDataManagerSaveResult,
   ISaveVC,
   SaveOptions,
 } from '../../plugins/veramo/verfiable-creds-manager';
-import { snapDialog } from '../../snap/dialog';
+import { generateVCPanel, snapDialog } from '../../snap/dialog';
 import { getAccountStateByCoinType } from '../../snap/state';
 import { getVeramoAgent } from '../../veramo/agent';
 
@@ -31,18 +31,36 @@ export async function saveVC(
   // Get Veramo agent
   const agent = await getVeramoAgent(snap, state);
 
+  const header = 'Save Verifiable Credentials';
+  const prompt = `Are you sure you want to save the following VCs in ${
+    typeof store === 'string' ? store : store.join(', ')
+  }?`;
+  const description = `Number of VCs submitted is ${(
+    verifiableCredentials as W3CVerifiableCredential[]
+  ).length.toString()}`;
+
+  const vcsWithMetadata: IDataManagerQueryResult[] = [];
+  // Iterate through vcs
+  (verifiableCredentials as W3CVerifiableCredential[]).forEach(function (
+    vc,
+    index,
+  ) {
+    vcsWithMetadata.push({
+      data: vc,
+      metadata: {
+        id: `External VC #${(index + 1).toString()}`,
+        store: 'snap',
+      },
+    });
+  });
   const dialogParams: SnapDialogParams = {
     type: 'Confirmation',
-    content: panel([
-      heading('Save Verifiable Credential'),
-      text(
-        `Would you like to save the following VCs in ${
-          typeof store === 'string' ? store : store.join(', ')
-        }?`,
-      ),
-      divider(),
-      text(JSON.stringify(verifiableCredentials)),
-    ]),
+    content: await generateVCPanel(
+      header,
+      prompt,
+      description,
+      vcsWithMetadata,
+    ),
   };
 
   if (await snapDialog(snap, dialogParams)) {
@@ -71,5 +89,6 @@ export async function saveVC(
       accessToken: accountState.accountConfig.identity.googleAccessToken,
     });
   }
+
   throw new Error('User rejected');
 }

@@ -1,20 +1,17 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { onRpcRequest } from '../../../src';
-import { convertChainIdFromHex } from '../../../src/utils/network';
 import {
   ETH_ADDRESS,
   ETH_CHAIN_ID,
   getDefaultSnapState,
 } from '../../testUtils/constants';
 import { getRequestParams } from '../../testUtils/helper';
-import { buildMockSnap, SnapMock } from '../../testUtils/snap.mock';
+import { SnapMock, buildMockSnap } from '../../testUtils/snap.mock';
 
-describe('getDID', () => {
+describe('GetCurrentDIDMethod', () => {
   let snapMock: SnapsGlobalObject & SnapMock;
   let metamask: MetaMaskInpageProvider;
-
-  let currentDID = '';
 
   beforeAll(async () => {
     snapMock = buildMockSnap(ETH_CHAIN_ID, ETH_ADDRESS);
@@ -30,15 +27,17 @@ describe('getDID', () => {
     snapMock.rpcMocks.snap_manageState('update', getDefaultSnapState());
   });
 
-  it('should return did:pkh', async () => {
-    const getDIDRequestParams = getRequestParams('getDID', {});
-    currentDID = (await onRpcRequest({
-      origin: 'tests',
-      request: getDIDRequestParams as any,
-    })) as string;
-
-    expect(currentDID).toBe(
-      `did:pkh:eip155:${convertChainIdFromHex(ETH_CHAIN_ID)}:${ETH_ADDRESS}`,
+  it('should return the current did method that the account is using', async () => {
+    const getCurrentDIDMethodRequestParams = getRequestParams(
+      'getCurrentDIDMethod',
+      {},
     );
+
+    const request = onRpcRequest({
+      origin: 'tests',
+      request: getCurrentDIDMethodRequestParams as any,
+    });
+    await expect(request).resolves.toBe('did:pkh');
+    expect.assertions(1);
   });
 });

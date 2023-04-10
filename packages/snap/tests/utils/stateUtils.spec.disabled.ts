@@ -5,11 +5,12 @@ import {
   getSnapStateUnchecked,
   initAccountState,
   initSnapState,
-  updateSnapState
+  updateSnapState,
 } from '../../src/snap/state';
 import { getInitialSnapState } from '../../src/utils/config';
-import { address, getDefaultSnapState } from '../testUtils/constants';
-import { createMockWallet, WalletMock } from '../testUtils/wallet.mock';
+import { ETH_ADDRESS, getDefaultSnapState } from '../testUtils/constants';
+import { WalletMock, createMockWallet } from '../testUtils/wallet.mock';
+import { DEFAULTCOINTYPE } from 'src/types/constants';
 
 describe.skip('Utils [state]', () => {
   let walletMock: SnapsGlobalObject & WalletMock;
@@ -92,7 +93,12 @@ describe.skip('Utils [state]', () => {
       //  defaultState.accountState[address].publicKey = publicKey;
 
       await expect(
-        initAccountState(walletMock, initialState, address),
+        initAccountState(
+          walletMock,
+          initialState,
+          DEFAULTCOINTYPE.toString(),
+          ETH_ADDRESS,
+        ),
       ).resolves.not.toThrow();
 
       expect(walletMock.rpcMocks.snap_manageState).toHaveBeenCalledWith(

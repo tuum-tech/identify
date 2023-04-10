@@ -1,20 +1,22 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { DIDResolutionResult } from 'did-resolver';
+import { PublicAccountInfo } from 'src/interfaces';
 import { onRpcRequest } from '../../../src';
 import {
   ETH_ADDRESS,
   ETH_CHAIN_ID,
+  exampleDIDPkh,
   getDefaultSnapState,
 } from '../../testUtils/constants';
 import { getRequestParams } from '../../testUtils/helper';
-import { buildMockSnap, SnapMock } from '../../testUtils/snap.mock';
+import { SnapMock, buildMockSnap } from '../../testUtils/snap.mock';
 
 describe('resolveDID', () => {
   let snapMock: SnapsGlobalObject & SnapMock;
   let metamask: MetaMaskInpageProvider;
 
-  let currentDID = '';
+  let currentDID = exampleDIDPkh;
 
   beforeAll(async () => {
     snapMock = buildMockSnap(ETH_CHAIN_ID, ETH_ADDRESS);
@@ -29,12 +31,14 @@ describe('resolveDID', () => {
     snapMock.rpcMocks.snap_manageState.mockReturnValue(getDefaultSnapState());
     snapMock.rpcMocks.snap_manageState('update', getDefaultSnapState());
 
-    const getDIDRequestParams = getRequestParams('getDID', {});
+    const getAccountInfoRequestParams = getRequestParams('getAccountInfo', {});
 
-    currentDID = (await onRpcRequest({
+    const accountInfo = (await onRpcRequest({
       origin: 'tests',
-      request: getDIDRequestParams as any,
-    })) as string;
+      request: getAccountInfoRequestParams as any,
+    })) as PublicAccountInfo;
+
+    currentDID = accountInfo.did;
   });
 
   it('should succeed returning current did resolved', async () => {

@@ -24,9 +24,14 @@ export type ProofInfo = {
   challenge?: string;
 };
 
+export type CreateVPOptions = {
+  store: string | string[];
+};
+
 export type CreateVPRequestParams = {
   vcIds?: string[];
   vcs?: W3CVerifiableCredential[];
+  options?: CreateVPOptions;
   proofInfo?: ProofInfo;
 };
 

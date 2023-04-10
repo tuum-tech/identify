@@ -3,7 +3,7 @@ import { Maybe } from '@metamask/providers/dist/utils';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { Wallet } from 'ethers';
 import { IdentitySnapState } from '../../src/interfaces';
-import { address, privateKey, signedMsg } from './constants';
+import { ETH_ADDRESS, privateKey, signedMsg } from './constants';
 
 type IWalletMock = {
   request<T>(args: RequestArguments): Promise<Maybe<T>>;
@@ -33,7 +33,7 @@ export class WalletMock implements IWalletMock {
 
   readonly rpcMocks = {
     snap_confirm: jest.fn(),
-    eth_requestAccounts: jest.fn().mockResolvedValue([address]),
+    eth_requestAccounts: jest.fn().mockResolvedValue([ETH_ADDRESS]),
     eth_chainId: jest.fn().mockResolvedValue('4'),
     snap_manageState: jest
       .fn()

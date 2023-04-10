@@ -1,9 +1,5 @@
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
-import {
-  MinimalImportableKey,
-  ProofFormat,
-  W3CVerifiableCredential,
-} from '@veramo/core';
+import { ProofFormat, W3CVerifiableCredential } from '@veramo/core';
 import cloneDeep from 'lodash.clonedeep';
 import { validHederaChainID } from '../../hedera/config';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
@@ -36,23 +32,8 @@ export async function createVC(
   // Get Veramo agent
   const agent = await getVeramoAgent(snap, state);
 
-  const identifier = await agent.didManagerImport({
-    did: account.identifier.did,
-    provider: account.method,
-    controllerKeyId: account.identifier.controllerKeyId,
-    keys: [
-      {
-        kid: account.identifier.controllerKeyId,
-        type: 'Secp256k1',
-        kms: 'snap',
-        privateKeyHex: account.privateKey,
-        publicKeyHex: account.publicKey,
-      } as MinimalImportableKey,
-    ],
-  });
-
   // GET DID
-  const { did } = identifier;
+  const { did } = account.identifier;
 
   const {
     vcKey = 'vcData',
@@ -61,6 +42,7 @@ export async function createVC(
     options,
   } = vcRequestParams || {};
   const { store = 'snap' } = options || {};
+  const optionsFiltered = { store } as SaveOptions;
 
   const dialogParams: SnapDialogParams = {
     type: 'Confirmation',
@@ -118,7 +100,6 @@ export async function createVC(
       });
 
     // Save the Verifiable Credential
-    const optionsFiltered = { store } as SaveOptions;
     const saved: IDataManagerSaveResult[] = await agent.saveVC({
       data: [{ vc: verifiableCredential }] as ISaveVC[],
       options: optionsFiltered,

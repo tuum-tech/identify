@@ -1,9 +1,7 @@
 import {
-  MinimalImportableKey,
   ProofFormat,
   VerifiableCredential,
   VerifiablePresentation,
-  W3CVerifiableCredential,
 } from '@veramo/core';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
 import {
@@ -11,7 +9,11 @@ import {
   QueryOptions,
 } from '../../plugins/veramo/verfiable-creds-manager';
 import { generateVCPanel, snapDialog } from '../../snap/dialog';
-import { CreateVPRequestParams } from '../../types/params';
+import {
+  CreateVPOptions,
+  CreateVPRequestParams,
+  ProofInfo,
+} from '../../types/params';
 import { getVeramoAgent } from '../../veramo/agent';
 
 /**
@@ -26,39 +28,27 @@ export async function createVP(
 ): Promise<VerifiablePresentation | null> {
   const { snap, state, account } = identitySnapParams;
 
-  const vcIds: string[] = vpRequestParams.vcIds ? vpRequestParams.vcIds : [];
-  const vcs: W3CVerifiableCredential[] = vpRequestParams.vcs
-    ? vpRequestParams.vcs
-    : [];
-  const proofFormat = vpRequestParams.proofInfo?.proofFormat
-    ? vpRequestParams.proofInfo.proofFormat
+  const {
+    vcIds = [],
+    vcs = [],
+    proofInfo = {} as ProofInfo,
+    options,
+  } = vpRequestParams || {};
+  const { store = 'snap' } = options || {};
+  const optionsFiltered = { store } as CreateVPOptions;
+
+  const proofFormat = proofInfo?.proofFormat
+    ? proofInfo.proofFormat
     : ('jwt' as ProofFormat);
-  const type = vpRequestParams.proofInfo?.type
-    ? vpRequestParams.proofInfo.type
-    : 'Custom';
-  const domain = vpRequestParams.proofInfo?.domain;
-  const challenge = vpRequestParams.proofInfo?.challenge;
+  const type = proofInfo?.type ? proofInfo.type : 'Custom';
+  const domain = proofInfo?.domain;
+  const challenge = proofInfo?.challenge;
 
   // Get Veramo agent
   const agent = await getVeramoAgent(snap, state);
 
-  const identifier = await agent.didManagerImport({
-    did: account.identifier.did,
-    provider: account.method,
-    controllerKeyId: account.identifier.controllerKeyId,
-    keys: [
-      {
-        kid: account.identifier.controllerKeyId,
-        type: 'Secp256k1',
-        kms: 'snap',
-        privateKeyHex: account.privateKey,
-        publicKeyHex: account.publicKey,
-      } as MinimalImportableKey,
-    ],
-  });
-
   // GET DID
-  const { did } = identifier;
+  const { did } = account.identifier;
 
   const vcsRes: VerifiableCredential[] = [];
   const vcsWithMetadata: IDataManagerQueryResult[] = [];
@@ -70,15 +60,15 @@ export async function createVP(
         type: 'id',
         filter: vcId,
       },
-      options: { store: 'snap' } as QueryOptions,
+      options: optionsFiltered as QueryOptions,
     })) as IDataManagerQueryResult[];
 
     if (vcObj.length > 0) {
-      const vc: VerifiableCredential = vcObj[0].data as VerifiableCredential;
-      vcsRes.push(vc);
+      const { data, metadata } = vcObj[0];
+      vcsRes.push(data as VerifiableCredential);
       vcsWithMetadata.push({
-        data: vc,
-        metadata: { id: vcId, store: 'snap' },
+        data,
+        metadata,
       });
     }
   }
