@@ -115,7 +115,7 @@ export const getKeysFromAddressIndex = async (
 
   return {
     privateKey,
-    publicKey: wallet.publicKey,
+    publicKey: wallet.signingKey.publicKey,
     address: wallet.address,
     addressIndex,
     derivationPath,

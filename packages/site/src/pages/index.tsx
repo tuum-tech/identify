@@ -3,6 +3,10 @@ import { Container } from 'react-bootstrap';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 
+import {
+  HederaAccountParams,
+  PublicAccountInfo,
+} from '@tuum-tech/identity-snap/src/interfaces';
 import { Card, InstallFlaskButton } from '../components/base';
 import {
   ConfigureGoogleAccount,
@@ -32,12 +36,7 @@ import {
   Span,
 } from '../config/styles';
 import { MetaMaskContext, MetamaskActions } from '../contexts/MetamaskContext';
-import {
-  PublicAccountInfo,
-  connectSnap,
-  getCurrentNetwork,
-  getSnap,
-} from '../utils';
+import { connectSnap, getCurrentNetwork, getSnap } from '../utils';
 import { getNetwork, validHederaChainID } from '../utils/hedera';
 
 const Index = () => {
@@ -93,7 +92,13 @@ const Index = () => {
             {isHederaNetwork
               ? accountInfo && (
                   <>
-                    <dd>Hedera Account ID: {accountInfo.hederaAccountId}</dd>
+                    <dd>
+                      Hedera Account ID:{' '}
+                      {
+                        (accountInfo?.extraData as HederaAccountParams)
+                          ?.accountId
+                      }
+                    </dd>
                     <dd>Did Method: {accountInfo?.method}</dd>
                     <dd>Did: {accountInfo?.did}</dd>
                     <dd>EVM Address: {accountInfo?.evmAddress}</dd>
@@ -134,7 +139,10 @@ const Index = () => {
         <SendHelloHessage setCurrentChainId={setCurrentChainId} />
 
         {isHederaNetwork && (
-          <CreateNewHederaAccount setCurrentChainId={setCurrentChainId} />
+          <CreateNewHederaAccount
+            currentChainId={currentChainId}
+            setCurrentChainId={setCurrentChainId}
+          />
         )}
 
         <ToggleMetamaskPopups setCurrentChainId={setCurrentChainId} />

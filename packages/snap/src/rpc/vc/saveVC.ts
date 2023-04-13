@@ -6,7 +6,7 @@ import {
   IDataManagerSaveResult,
   ISaveVC,
   SaveOptions,
-} from '../../plugins/veramo/verfiable-creds-manager';
+} from '../../plugins/veramo/verifiable-creds-manager';
 import { generateVCPanel, snapDialog } from '../../snap/dialog';
 import { getAccountStateByCoinType } from '../../snap/state';
 import { getVeramoAgent } from '../../veramo/agent';
@@ -54,7 +54,7 @@ export async function saveVC(
     });
   });
   const dialogParams: SnapDialogParams = {
-    type: 'Confirmation',
+    type: 'confirmation',
     content: await generateVCPanel(
       header,
       prompt,

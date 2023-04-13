@@ -1,5 +1,5 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
-import { SnapsGlobalObject } from '@metamask/snaps-types';
+import { Json, SnapsGlobalObject } from '@metamask/snaps-types';
 import { Panel } from '@metamask/snaps-ui';
 import { IIdentifier, IKey, W3CVerifiableCredential } from '@veramo/core';
 import { ManagedPrivateKey } from '@veramo/key-manager';
@@ -76,7 +76,7 @@ export type IdentitySnapParams = {
 };
 
 export type SnapDialogParams = {
-  type: string;
+  type: 'alert' | 'confirmation' | 'prompt';
   content: Panel;
   placeholder?: string;
 };

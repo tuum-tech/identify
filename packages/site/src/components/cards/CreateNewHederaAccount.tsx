@@ -1,8 +1,8 @@
 import { HederaMirrorInfo } from '@tuum-tech/identity-snap/src/hedera/service';
-import { FC, useContext, useState } from 'react';
+import { FC, useContext, useRef, useState } from 'react';
 import {
-  MetamaskActions,
   MetaMaskContext,
+  MetamaskActions,
 } from '../../contexts/MetamaskContext';
 import useModal from '../../hooks/useModal';
 import {
@@ -11,12 +11,19 @@ import {
   shouldDisplayReconnectButton,
 } from '../../utils';
 import { Card, SendHelloButton } from '../base';
+import ExternalAccount, {
+  GetExternalAccountRef,
+} from '../sections/ExternalAccount';
 
 type Props = {
+  currentChainId: string;
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const CreateNewHederaAccount: FC<Props> = ({ setCurrentChainId }) => {
+const CreateNewHederaAccount: FC<Props> = ({
+  currentChainId,
+  setCurrentChainId,
+}) => {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [newAccountPublickey, setNewAccountPublickey] = useState(
     '302d300706052b8104000a032200034920445ae433dbfa7b11da73305566f143bfdff959779ac8a005b13a875460f2',
@@ -29,17 +36,26 @@ const CreateNewHederaAccount: FC<Props> = ({ setCurrentChainId }) => {
 
   const { showModal } = useModal();
 
+  const externalAccountRef = useRef<GetExternalAccountRef>(null);
+
   const handleCreateNewHederaAccount = async () => {
     setLoading(true);
     try {
       setCurrentChainId(await getCurrentNetwork());
+
+      const externalAccountParams =
+        externalAccountRef.current?.handleGetAccountParams();
+
       if (hbarAmountToSend > 0) {
         // If you want to create a hbar account for a public key, just uncomment the line 'newAccountPublickey'
-        const newHederaAccountInfo = (await createNewHederaAccount({
-          hbarAmountToSend,
-          newAccountEvmAddress,
-          // newAccountPublickey,
-        })) as HederaMirrorInfo;
+        const newHederaAccountInfo = (await createNewHederaAccount(
+          {
+            hbarAmountToSend,
+            newAccountEvmAddress,
+            // newAccountPublickey,
+          },
+          externalAccountParams,
+        )) as HederaMirrorInfo;
         console.log(
           `Your hedera account info: ${JSON.stringify(
             newHederaAccountInfo,
@@ -81,6 +97,10 @@ const CreateNewHederaAccount: FC<Props> = ({ setCurrentChainId }) => {
           'Create a new hedera account by sending some HBARs to a hedera publickey address',
         form: (
           <form>
+            <ExternalAccount
+              currentChainId={currentChainId}
+              ref={externalAccountRef}
+            />
             {/* If you want to create a hbar account for a public key, just
             uncomment the below lines */}
             {/* <label>

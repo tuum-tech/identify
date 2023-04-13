@@ -12,7 +12,7 @@ import {
   IDataManagerDeleteArgs,
   IDataManagerQueryArgs,
   IDataManagerSaveArgs,
-} from '../plugins/veramo/verfiable-creds-manager';
+} from '../plugins/veramo/verifiable-creds-manager';
 import { getAccountStateByCoinType } from '../snap/state';
 import {
   HEDERACOINTYPE,

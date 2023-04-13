@@ -4,7 +4,7 @@ import { W3CVerifiableCredential } from '@veramo/core';
 import {
   IDataManagerDeleteResult,
   IDataManagerQueryResult,
-} from 'src/plugins/veramo/verfiable-creds-manager';
+} from 'src/plugins/veramo/verifiable-creds-manager';
 import { CreateVCResponseResult } from 'src/types/params';
 import { onRpcRequest } from '../../../src';
 import {
@@ -13,7 +13,7 @@ import {
   getDefaultSnapState,
 } from '../../testUtils/constants';
 import { getRequestParams } from '../../testUtils/helper';
-import { buildMockSnap, SnapMock } from '../../testUtils/snap.mock';
+import { SnapMock, buildMockSnap } from '../../testUtils/snap.mock';
 
 describe('RemoveVC', () => {
   let snapMock: SnapsGlobalObject & SnapMock;

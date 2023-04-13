@@ -1,10 +1,9 @@
 /* eslint-disable no-alert */
-import {
-  IDataManagerQueryResult
-} from '@tuum-tech/identity-snap/src/plugins/veramo/verfiable-creds-manager';
+import { PublicAccountInfo } from '@tuum-tech/identity-snap/src/interfaces';
+import { IDataManagerQueryResult } from '@tuum-tech/identity-snap/src/plugins/veramo/verifiable-creds-manager';
 import {
   CreateVPRequestParams,
-  ProofInfo
+  ProofInfo,
 } from '@tuum-tech/identity-snap/src/types/params';
 import { VerifiablePresentation, W3CVerifiableCredential } from '@veramo/core';
 import axios from 'axios';
@@ -13,7 +12,7 @@ import { Button, Modal } from 'react-bootstrap';
 import { Card, InstallFlaskButton, SendHelloButton } from '../components/base';
 import {
   ConnectIdentitySnap,
-  ReconnectIdentitySnap
+  ReconnectIdentitySnap,
 } from '../components/cards';
 import {
   CardContainer,
@@ -21,20 +20,20 @@ import {
   Heading,
   PageContainer,
   Span,
-  Subtitle
+  Subtitle,
 } from '../config/styles';
-import { MetamaskActions, MetaMaskContext } from '../contexts/MetamaskContext';
+import { MetaMaskContext, MetamaskActions } from '../contexts/MetamaskContext';
 import useModal from '../hooks/useModal';
 import { shouldDisplayReconnectButton } from '../utils';
 import { getNetwork, validHederaChainID } from '../utils/hedera';
 import {
   connectSnap,
   createVP,
+  getAccountInfo,
   getCurrentNetwork,
-  getDID,
   getSnap,
   getVCs,
-  saveVC
+  saveVC,
 } from '../utils/snap';
 
 function LoginPage() {
@@ -64,7 +63,6 @@ function LoginPage() {
         vc,
       ) as W3CVerifiableCredential;
 
-    
       let params = {
         data: [parsedVC],
       };
@@ -209,13 +207,15 @@ function LoginPage() {
   const handleChallenge = async () => {
     try {
       setCurrentChainId(await getCurrentNetwork());
-      const did = (await getDID()) as string;
+      const accountInfo: PublicAccountInfo = (await getAccountInfo(
+        undefined,
+      )) as PublicAccountInfo;
       const backendUrl = process.env.GATSBY_BACKEND_URL;
       const ret = await axios({
         method: 'post',
         url: `${backendUrl}api/v1/credential/challenge`,
         data: {
-          did,
+          did: accountInfo.did,
         },
       });
 

@@ -3,7 +3,7 @@ import {
   IDataManagerQueryArgs,
   IDataManagerQueryResult,
   QueryOptions,
-} from '../../plugins/veramo/verfiable-creds-manager';
+} from '../../plugins/veramo/verifiable-creds-manager';
 import { generateVCPanel, snapDialog } from '../../snap/dialog';
 import { getAccountStateByCoinType } from '../../snap/state';
 import { getVeramoAgent } from '../../veramo/agent';
@@ -43,7 +43,7 @@ export async function getVCs(
   const prompt = 'Are you sure you want to send VCs to the dApp?';
   const description = `Some dApps are less secure than others and could save data from VCs against your will. Be careful where you send your private VCs! Number of VCs submitted is ${vcs.length.toString()}`;
   const dialogParams: SnapDialogParams = {
-    type: 'Confirmation',
+    type: 'confirmation',
     content: await generateVCPanel(header, prompt, description, vcs),
   };
 

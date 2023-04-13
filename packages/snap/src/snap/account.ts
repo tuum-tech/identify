@@ -1,6 +1,6 @@
 import { PrivateKey } from '@hashgraph/sdk';
 import { divider, heading, panel, text } from '@metamask/snaps-ui';
-import { ethers, Wallet } from 'ethers';
+import { Wallet, ethers } from 'ethers';
 import _ from 'lodash';
 import { validHederaChainID } from '../hedera/config';
 import {
@@ -95,7 +95,7 @@ export async function connectEVMAccount(
       ].privateKeyHex;
   } else {
     const dialogParamsForPrivateKey: SnapDialogParams = {
-      type: 'Prompt',
+      type: 'prompt',
       content: panel([
         heading('Connect to EVM Account'),
         text('Enter your ECDSA private key for the following Account'),
@@ -112,7 +112,7 @@ export async function connectEVMAccount(
   const wallet: Wallet = new ethers.Wallet(privateKey);
   const accountViaPrivateKey: AccountViaPrivateKey = {
     privateKey,
-    publicKey: wallet.publicKey,
+    publicKey: wallet.signingKey.publicKey,
     address: wallet.address,
   };
 
@@ -153,7 +153,7 @@ export async function connectHederaAccount(
   );
   if (evmAddress === null || _.isEmpty(evmAddress)) {
     const dialogParamsForPrivateKey: SnapDialogParams = {
-      type: 'Prompt',
+      type: 'prompt',
       content: panel([
         heading('Connect to Hedera Account'),
         text('Enter your ECDSA private key for the following Account'),
@@ -176,7 +176,7 @@ export async function connectHederaAccount(
   const wallet: Wallet = new ethers.Wallet(privateKey);
   const accountViaPrivateKey: AccountViaPrivateKey = {
     privateKey,
-    publicKey: wallet.publicKey,
+    publicKey: wallet.signingKey.publicKey,
     address: wallet.address,
     extraData: accountId,
   };

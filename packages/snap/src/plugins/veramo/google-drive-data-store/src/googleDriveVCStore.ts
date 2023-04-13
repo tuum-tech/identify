@@ -9,11 +9,11 @@ import {
   IFilterArgs,
   IQueryResult,
   ISaveVC,
-} from '../../verfiable-creds-manager';
+} from '../../verifiable-creds-manager';
 import {
+  GOOGLE_DRIVE_VCS_FILE_NAME,
   createEmptyFile,
   getGoogleVCs,
-  GOOGLE_DRIVE_VCS_FILE_NAME,
   uploadToGoogleDrive,
   verifyToken,
 } from './googleUtils';

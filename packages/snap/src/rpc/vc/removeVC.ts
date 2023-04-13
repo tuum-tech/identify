@@ -4,7 +4,7 @@ import {
   IDataManagerDeleteArgs,
   IDataManagerDeleteResult,
   IDataManagerQueryResult,
-} from '../../plugins/veramo/verfiable-creds-manager';
+} from '../../plugins/veramo/verifiable-creds-manager';
 import { generateVCPanel, snapDialog } from '../../snap/dialog';
 import { getAccountStateByCoinType } from '../../snap/state';
 import { getVeramoAgent } from '../../veramo/agent';
@@ -56,7 +56,7 @@ export async function removeVC(
   const prompt = 'Are you sure you want to remove the following VCs?';
   const description = `Note that this action cannot be reversed and you will need to recreate your VCs if you go through with it. Number of VCs to be removed is ${vcsToBeRemoved.length.toString()}`;
   const dialogParams: SnapDialogParams = {
-    type: 'Confirmation',
+    type: 'confirmation',
     content: await generateVCPanel(header, prompt, description, vcsToBeRemoved),
   };
 

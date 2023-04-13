@@ -22,7 +22,10 @@ export async function updateSnapState(
 ) {
   await snap.request({
     method: 'snap_manageState',
-    params: { operation: 'update', newState: snapState },
+    params: {
+      operation: 'update',
+      newState: JSON.parse(JSON.stringify(snapState)),
+    },
   });
 }
 

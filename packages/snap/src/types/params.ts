@@ -2,7 +2,7 @@ import { ProofFormat, W3CVerifiableCredential } from '@veramo/core';
 import {
   QueryMetadata,
   SaveOptions,
-} from '../plugins/veramo/verfiable-creds-manager';
+} from '../plugins/veramo/verifiable-creds-manager';
 
 export type CreateVCRequestParams = {
   vcValue: object;

@@ -1,7 +1,7 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { W3CVerifiableCredential } from '@veramo/core';
-import { IDataManagerQueryResult } from 'src/plugins/veramo/verfiable-creds-manager';
+import { IDataManagerQueryResult } from 'src/plugins/veramo/verifiable-creds-manager';
 import { onRpcRequest } from '../../../src';
 import { getDefaultSnapState } from '../../testUtils/constants';
 import { getRequestParams } from '../../testUtils/helper';

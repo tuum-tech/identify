@@ -32,7 +32,7 @@ export async function switchDIDMethod(
 
   if (method !== didMethod) {
     const dialogParams: SnapDialogParams = {
-      type: 'Confirmation',
+      type: 'confirmation',
       content: panel([
         heading('Switch to a different DID method to use'),
         text('Would you like to change did method to the following?'),

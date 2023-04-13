@@ -3,7 +3,7 @@ import { divider, heading, panel, Panel, text } from '@metamask/snaps-ui';
 import { VerifiableCredential } from '@veramo/core';
 import cloneDeep from 'lodash.clonedeep';
 import { IdentitySnapState, SnapDialogParams } from '../interfaces';
-import { IDataManagerQueryResult } from '../plugins/veramo/verfiable-creds-manager';
+import { IDataManagerQueryResult } from '../plugins/veramo/verifiable-creds-manager';
 import { updateSnapState } from './state';
 
 /**
@@ -116,7 +116,7 @@ export async function requestHederaAccountId(
   prevHederaAccountId?: string,
 ): Promise<string> {
   const dialogParamsForHederaAccountId: SnapDialogParams = {
-    type: 'Prompt',
+    type: 'prompt',
     content: panel([
       heading('Connect to Hedera Account'),
       prevHederaAccountId

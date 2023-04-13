@@ -15,7 +15,7 @@ export async function togglePopups(
 
   const toggleTextToShow = disablePopups ? 'enable' : 'disable';
   const dialogParams: SnapDialogParams = {
-    type: 'Confirmation',
+    type: 'confirmation',
     content: panel([
       heading('Toggle Popups'),
       text(`Would you like to ${toggleTextToShow} the popups?`),

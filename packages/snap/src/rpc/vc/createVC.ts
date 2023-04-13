@@ -8,7 +8,7 @@ import {
   IDataManagerSaveResult,
   ISaveVC,
   SaveOptions,
-} from '../../plugins/veramo/verfiable-creds-manager';
+} from '../../plugins/veramo/verifiable-creds-manager';
 import { snapDialog } from '../../snap/dialog';
 import { getCurrentNetwork } from '../../snap/network';
 import { getAccountStateByCoinType } from '../../snap/state';
@@ -46,7 +46,7 @@ export async function createVC(
   const optionsFiltered = { store } as SaveOptions;
 
   const dialogParams: SnapDialogParams = {
-    type: 'Confirmation',
+    type: 'confirmation',
     content: panel([
       heading('Create Verifiable Credential'),
       text('Would you like to create and save the following VC in the snap?'),

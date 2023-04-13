@@ -11,7 +11,7 @@ import {
   ISaveVC,
   QueryOptions,
   SaveOptions,
-} from '../../plugins/veramo/verfiable-creds-manager';
+} from '../../plugins/veramo/verifiable-creds-manager';
 import { generateVCPanel, snapDialog } from '../../snap/dialog';
 import { getAccountStateByCoinType } from '../../snap/state';
 import { Agent, getVeramoAgent } from '../../veramo/agent';
@@ -130,7 +130,7 @@ async function handleSync(
   store: string,
 ): Promise<boolean> {
   const dialogParams: SnapDialogParams = {
-    type: 'Confirmation',
+    type: 'confirmation',
     content: await generateVCPanel(header, prompt, description, vcs),
   };
   if (await snapDialog(snap, dialogParams)) {

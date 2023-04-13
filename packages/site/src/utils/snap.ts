@@ -3,16 +3,15 @@ import {
   Filter,
   IDataManagerClearArgs,
   IDataManagerDeleteArgs,
-} from '@tuum-tech/identity-snap/src/plugins/veramo/verfiable-creds-manager';
+} from '@tuum-tech/identity-snap/src/plugins/veramo/verifiable-creds-manager';
 import {
   CreateNewHederaAccountRequestParams,
   CreateVPRequestParams,
 } from '@tuum-tech/identity-snap/src/types/params';
 
 import { VerifiableCredential, VerifiablePresentation } from '@veramo/core';
-import { defaultSnapOrigin } from '../config';
+import { defaultSnapId } from '../config/snap';
 import { ExternalAccountParams, GetSnapsResponse, Snap } from '../types';
-
 /**
  * Get the installed snaps in MetaMask.
  *
@@ -29,7 +28,7 @@ export const getSnaps = async (): Promise<GetSnapsResponse> => {
  *
  * @param snapId - The ID of the snap, params - The params to pass with the snap to connect.
  */
-export const connectSnap = async (snapId: string = defaultSnapOrigin) => {
+export const connectSnap = async (snapId: string = defaultSnapId) => {
   await window.ethereum.request({
     method: 'wallet_requestSnaps',
     params: {
@@ -50,7 +49,7 @@ export const getSnap = async (version?: string): Promise<Snap | undefined> => {
 
     return Object.values(snaps).find(
       (snap) =>
-        snap.id === defaultSnapOrigin && (!version || snap.version === version),
+        snap.id === defaultSnapId && (!version || snap.version === version),
     );
   } catch (e) {
     console.log('Failed to obtain installed snap', e);
@@ -65,64 +64,15 @@ export const getCurrentNetwork = async (): Promise<string> => {
 };
 
 /**
- * Invoke "connectHederaAccount" method from the snap
- */
-
-export const connectHederaAccount = async (accountId: string) => {
-  return await window.ethereum.request({
-    method: `wallet_snap_${defaultSnapOrigin}`,
-    params: {
-      method: 'connectHederaAccount',
-      params: {
-        accountId,
-      },
-    },
-  });
-};
-
-/**
- * Invoke "createNewHederaAccount" method from the snap
- */
-
-export const createNewHederaAccount = async ({
-  hbarAmountToSend,
-  newAccountPublickey = '',
-  newAccountEvmAddress = '',
-}: CreateNewHederaAccountRequestParams) => {
-  if (newAccountPublickey) {
-    return await window.ethereum.request({
-      method: `wallet_snap_${defaultSnapOrigin}`,
-      params: {
-        method: 'createNewHederaAccount',
-        params: {
-          hbarAmountToSend,
-          newAccountPublickey,
-        },
-      },
-    });
-  }
-  return await window.ethereum.request({
-    method: `wallet_snap_${defaultSnapOrigin}`,
-    params: {
-      method: 'createNewHederaAccount',
-      params: {
-        hbarAmountToSend,
-        newAccountEvmAddress,
-      },
-    },
-  });
-};
-
-/**
  * Invoke the "hello" method from the snap.
  */
 
 export const sendHello = async () => {
-  await window.ethereum.request({
-    method: `wallet_snap_${defaultSnapOrigin}`,
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
     params: {
-      method: 'hello',
-      params: {},
+      snapId: defaultSnapId,
+      request: { method: 'hello', params: {} },
     },
   });
 };
@@ -132,35 +82,13 @@ export const sendHello = async () => {
  */
 
 export const togglePopups = async () => {
-  await window.ethereum.request({
-    method: `wallet_snap_${defaultSnapOrigin}`,
-    params: {
-      method: 'togglePopups',
-      params: {},
-    },
-  });
-};
-
-/**
- * Invoke the "getCurrentDIDMethod" method from the snap.
- */
-
-export const getCurrentDIDMethod = async () => {
   return await window.ethereum.request({
-    method: `wallet_snap_${defaultSnapOrigin}`,
+    method: 'wallet_invokeSnap',
     params: {
-      method: 'getCurrentDIDMethod',
-      params: {},
+      snapId: defaultSnapId,
+      request: { method: 'togglePopups', params: {} },
     },
   });
-};
-
-export type PublicAccountInfo = {
-  evmAddress: string;
-  did: string;
-  publicKey: string;
-  method: string;
-  hederaAccountId?: string;
 };
 
 /**
@@ -171,24 +99,54 @@ export const getAccountInfo = async (
   params: ExternalAccountParams | undefined,
 ) => {
   return await window.ethereum.request({
-    method: `wallet_snap_${defaultSnapOrigin}`,
+    method: 'wallet_invokeSnap',
     params: {
-      method: 'getAccountInfo',
-      params: params || {},
+      snapId: defaultSnapId,
+      request: { method: 'getAccountInfo', params: params || {} },
     },
   });
 };
 
 /**
- * Invoke the "getDID" method from the snap.
+ * Invoke "createNewHederaAccount" method from the snap
  */
 
-export const getDID = async () => {
+export const createNewHederaAccount = async (
+  {
+    hbarAmountToSend,
+    newAccountPublickey = '',
+    newAccountEvmAddress = '',
+  }: CreateNewHederaAccountRequestParams,
+  externalAccountparams?: ExternalAccountParams,
+) => {
+  if (newAccountPublickey) {
+    return await window.ethereum.request({
+      method: 'wallet_invokeSnap',
+      params: {
+        snapId: defaultSnapId,
+        request: {
+          method: 'createNewHederaAccount',
+          params: {
+            hbarAmountToSend,
+            newAccountPublickey,
+            ...externalAccountparams,
+          },
+        },
+      },
+    });
+  }
   return await window.ethereum.request({
-    method: `wallet_snap_${defaultSnapOrigin}`,
+    method: 'wallet_invokeSnap',
     params: {
-      method: 'getDID',
-      params: {},
+      snapId: defaultSnapId,
+      request: {
+        method: 'createNewHederaAccount',
+        params: {
+          hbarAmountToSend,
+          newAccountEvmAddress,
+          ...externalAccountparams,
+        },
+      },
     },
   });
 };
@@ -202,10 +160,13 @@ export const resolveDID = async (
   externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
-    method: `wallet_snap_${defaultSnapOrigin}`,
+    method: 'wallet_invokeSnap',
     params: {
-      method: 'resolveDID',
-      params: { did, ...externalAccountparams },
+      snapId: defaultSnapId,
+      request: {
+        method: 'resolveDID',
+        params: { did, ...externalAccountparams },
+      },
     },
   });
 };
@@ -220,10 +181,13 @@ export const getVCs = async (
   externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
-    method: `wallet_snap_${defaultSnapOrigin}`,
+    method: 'wallet_invokeSnap',
     params: {
-      method: 'getVCs',
-      params: { filter, options, ...externalAccountparams },
+      snapId: defaultSnapId,
+      request: {
+        method: 'getVCs',
+        params: { filter, options, ...externalAccountparams },
+      },
     },
   });
 };
@@ -234,10 +198,13 @@ export const getVCs = async (
 
 export const saveVC = async (params: any) => {
   return await window.ethereum.request({
-    method: `wallet_snap_${defaultSnapOrigin}`,
+    method: 'wallet_invokeSnap',
     params: {
-      method: 'saveVC',
-      params,
+      snapId: defaultSnapId,
+      request: {
+        method: 'saveVC',
+        params,
+      },
     },
   });
 };
@@ -259,46 +226,19 @@ export const createVC = async (
   externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
-    method: `wallet_snap_${defaultSnapOrigin}`,
+    method: 'wallet_invokeSnap',
     params: {
-      method: 'createVC',
-      params: {
-        vcKey,
-        vcValue,
-        options,
-        credTypes,
-        ...externalAccountparams,
+      snapId: defaultSnapId,
+      request: {
+        method: 'createVC',
+        params: {
+          vcKey,
+          vcValue,
+          options,
+          credTypes,
+          ...externalAccountparams,
+        },
       },
-    },
-  });
-};
-
-/**
- * Invoke the "configureGoogleAccount" method from the snap.
- */
-
-export const configureGoogleAccount = async (accessToken: string) => {
-  return await window.ethereum.request({
-    method: `wallet_snap_${defaultSnapOrigin}`,
-    params: {
-      method: 'configureGoogleAccount',
-      params: {
-        accessToken,
-      },
-    },
-  });
-};
-
-/**
- * Invoke the "syncGoogleVCs" method from the snap.
- */
-
-export const syncGoogleVCs = async () => {
-  return await window.ethereum.request({
-    method: `wallet_snap_${defaultSnapOrigin}`,
-    params: {
-      method: 'syncGoogleVCs',
-      params: {},
     },
   });
 };
@@ -309,10 +249,13 @@ export const syncGoogleVCs = async () => {
 
 export const verifyVC = async (vc: VerifiableCredential | {}) => {
   return await window.ethereum.request({
-    method: `wallet_snap_${defaultSnapOrigin}`,
+    method: 'wallet_invokeSnap',
     params: {
-      method: 'verifyVC',
-      params: { verifiableCredential: vc },
+      snapId: defaultSnapId,
+      request: {
+        method: 'verifyVC',
+        params: { verifiableCredential: vc },
+      },
     },
   });
 };
@@ -327,10 +270,13 @@ export const removeVC = async (
   externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
-    method: `wallet_snap_${defaultSnapOrigin}`,
+    method: 'wallet_invokeSnap',
     params: {
-      method: 'removeVC',
-      params: { id, options, ...externalAccountparams },
+      snapId: defaultSnapId,
+      request: {
+        method: 'removeVC',
+        params: { id, options, ...externalAccountparams },
+      },
     },
   });
 };
@@ -344,10 +290,13 @@ export const deleteAllVCs = async (
   externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
-    method: `wallet_snap_${defaultSnapOrigin}`,
+    method: 'wallet_invokeSnap',
     params: {
-      method: 'deleteAllVCs',
-      params: { options, ...externalAccountparams },
+      snapId: defaultSnapId,
+      request: {
+        method: 'deleteAllVCs',
+        params: { options, ...externalAccountparams },
+      },
     },
   });
 };
@@ -361,10 +310,13 @@ export const createVP = async (
   externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
-    method: `wallet_snap_${defaultSnapOrigin}`,
+    method: 'wallet_invokeSnap',
     params: {
-      method: 'createVP',
-      params: { vcIds, vcs, proofInfo, ...externalAccountparams },
+      snapId: defaultSnapId,
+      request: {
+        method: 'createVP',
+        params: { vcIds, vcs, proofInfo, ...externalAccountparams },
+      },
     },
   });
 };
@@ -375,10 +327,64 @@ export const createVP = async (
 
 export const verifyVP = async (vp: VerifiablePresentation | {}) => {
   return await window.ethereum.request({
-    method: `wallet_snap_${defaultSnapOrigin}`,
+    method: 'wallet_invokeSnap',
     params: {
-      method: 'verifyVP',
-      params: { verifiablePresentation: vp },
+      snapId: defaultSnapId,
+      request: {
+        method: 'verifyVP',
+        params: { verifiablePresentation: vp },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "getCurrentDIDMethod" method from the snap.
+ */
+
+export const getCurrentDIDMethod = async () => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapId,
+      request: {
+        method: 'getCurrentDIDMethod',
+        params: {},
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "configureGoogleAccount" method from the snap.
+ */
+
+export const configureGoogleAccount = async (accessToken: string) => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapId,
+      request: {
+        method: 'configureGoogleAccount',
+        params: { accessToken },
+      },
+    },
+  });
+};
+
+/**
+ * Invoke the "syncGoogleVCs" method from the snap.
+ */
+
+export const syncGoogleVCs = async () => {
+  return await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapId,
+      request: {
+        method: 'syncGoogleVCs',
+        params: {},
+      },
     },
   });
 };

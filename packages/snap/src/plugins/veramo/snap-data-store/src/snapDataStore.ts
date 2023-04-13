@@ -26,7 +26,7 @@ import {
   IFilterArgs,
   IQueryResult,
   ISaveVC,
-} from '../../verfiable-creds-manager';
+} from '../../verifiable-creds-manager';
 
 /**
  * An implementation of {@link AbstractKeyStore} that holds everything in snap state.

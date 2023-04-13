@@ -7,7 +7,7 @@ import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
 import {
   IDataManagerQueryResult,
   QueryOptions,
-} from '../../plugins/veramo/verfiable-creds-manager';
+} from '../../plugins/veramo/verifiable-creds-manager';
 import { generateVCPanel, snapDialog } from '../../snap/dialog';
 import {
   CreateVPOptions,
@@ -92,7 +92,7 @@ export async function createVP(
   const description =
     'A Verifiable Presentation is a secure way for someone to present information about themselves or their identity to someone else while ensuring that the information is accureate and trustworthy';
   const dialogParams: SnapDialogParams = {
-    type: 'Confirmation',
+    type: 'confirmation',
     content: await generateVCPanel(
       header,
       prompt,

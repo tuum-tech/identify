@@ -24,7 +24,7 @@ import {
   AbstractDataStore,
   DataManager,
   IDataManager,
-} from '../plugins/veramo/verfiable-creds-manager';
+} from '../plugins/veramo/verifiable-creds-manager';
 
 import { IdentitySnapState } from '../interfaces';
 import { GoogleDriveVCStore } from '../plugins/veramo/google-drive-data-store';

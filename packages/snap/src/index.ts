@@ -103,7 +103,13 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return snap.request({
         method: 'snap_dialog',
         params: {
-          type: 'Alert', // Type can be 'Alert', 'Confirmation' or 'Prompt'
+          /* 
+            Type can be one of the following:
+            - 'alert': for displaying information.
+            - 'confirmation': for accepting or rejecting some action.
+            - 'prompt': for inputting some information.
+          */
+          type: 'alert',
           content: panel([
             heading('This is what the header looks like'),
             text('This is what text area looks like before the divider'),
@@ -119,20 +125,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     }
 
     case 'getAccountInfo': {
-      return await getAccountInfo(identitySnapParams);
-    }
-
-    case 'connectEVMAccount': {
-      if (!isValidEVMAccountParams(request.params)) {
-        throw new Error('External Account parameter is invalid');
-      }
-      return await getAccountInfo(identitySnapParams);
-    }
-
-    case 'connectHederaAccount': {
-      if (!isValidHederaAccountParams(request.params)) {
-        throw new Error('External Account parameter is invalid');
-      }
       return await getAccountInfo(identitySnapParams);
     }
 

@@ -1,10 +1,10 @@
-import { IDataManagerQueryResult } from '@tuum-tech/identity-snap/src/veramo/plugins/verfiable-creds-manager';
+import { IDataManagerQueryResult } from '@tuum-tech/identity-snap/src/veramo/plugins/verifiable-creds-manager';
 import { FC, useContext, useRef, useState } from 'react';
 import Select from 'react-select';
 import { storeOptions } from '../../config/constants';
 import {
-  MetamaskActions,
   MetaMaskContext,
+  MetamaskActions,
 } from '../../contexts/MetamaskContext';
 import { VcContext } from '../../contexts/VcContext';
 import useModal from '../../hooks/useModal';
