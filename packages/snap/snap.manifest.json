@@ -1,5 +1,5 @@
 {
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A snap for managing Decentralized Identifiers(DIDs)",
   "proposedName": "Identity Snap",
   "repository": {
@@ -7,7 +7,7 @@
     "url": "https://github.com/tuum-tech/identity-snap.git"
   },
   "source": {
-    "shasum": "Kf/Iz3VCaZjMVJTtF0jpXhpsfnW09ynGGA6rdIoPwKs=",
+    "shasum": "HrgoueXylwmx249u8RMCQ9vKp4SVXFLl6p9pfzNTX3U=",
     "location": {
       "npm": {
         "filePath": "dist/snap.js",
