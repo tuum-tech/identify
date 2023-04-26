@@ -1,5 +1,5 @@
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
-import { divider, heading, panel, text } from '@metamask/snaps-ui';
+import { heading, panel, text } from '@metamask/snaps-ui';
 import { ExternalAccount, IdentitySnapParams } from './interfaces';
 import { getAccountInfo } from './rpc/account/getAccountInfo';
 import { getAvailableDIDMethods } from './rpc/did/getAvailableDIDMethods';
@@ -111,10 +111,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           */
           type: 'alert',
           content: panel([
-            heading('This is what the header looks like'),
-            text('This is what text area looks like before the divider'),
-            divider(),
-            text('This is what text area looks like after the divider'),
+            heading(`Hello, **${origin}**!`),
+            text('This custom alert is jsut for display purposes.'),
           ]),
         },
       });
