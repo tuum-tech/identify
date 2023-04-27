@@ -6,6 +6,7 @@ import {
   GoogleToken,
   HederaAccountParams,
   IdentitySnapState,
+  MetamaskAccountParams,
 } from '../interfaces';
 import {
   IDataManagerClearArgs,
@@ -41,65 +42,48 @@ export function isExternalAccountFlagSet(params: unknown): boolean {
     params.externalAccount !== null &&
     typeof params.externalAccount === 'object'
   ) {
-    return true;
+    const parameter = params as ExternalAccount;
+    if ('blockchainType' in parameter.externalAccount) {
+      if (
+        (parameter.externalAccount.blockchainType === 'hedera' &&
+          typeof parameter.externalAccount.data === 'object' &&
+          typeof (parameter.externalAccount.data as HederaAccountParams)
+            .accountId === 'string') ||
+        (parameter.externalAccount.blockchainType === 'evm' &&
+          typeof parameter.externalAccount.data === 'object' &&
+          typeof (parameter.externalAccount.data as EvmAccountParams)
+            .address === 'string')
+      ) {
+        return true;
+      }
+    }
   }
   return false;
 }
 
 /**
- * Check validation of Hedera account.
+ * Check validation of Metamask account.
  *
  * @param params - Request params.
- * @returns Boolean.
  */
-export function isValidHederaAccountParams(params: unknown): boolean {
-  if (params === null || _.isEmpty(params)) {
-    console.error(
-      'Invalid Hedera Params passed for externalAccount. "externalAccount" must be passed as a parameter',
-    );
-    return false;
-  }
-  const parameter = params as ExternalAccount;
-
+export function isValidMetamaskAccountParams(
+  params: unknown,
+): asserts params is MetamaskAccountParams {
   if (
-    'network' in parameter.externalAccount &&
-    parameter.externalAccount.network === 'hedera' &&
-    typeof parameter.externalAccount.data === 'object' &&
-    typeof (parameter.externalAccount.data as HederaAccountParams).accountId ===
-      'string'
+    !(
+      params !== null &&
+      typeof params === 'object' &&
+      'metamaskAddress' in params &&
+      typeof params.metamaskAddress === 'string'
+    )
   ) {
-    return true;
-  }
-
-  return false;
-}
-
-/**
- * Check validation of EVM account.
- *
- * @param params - Request params.
- * @returns Boolean.
- */
-export function isValidEVMAccountParams(params: unknown): boolean {
-  if (params === null || _.isEmpty(params)) {
     console.error(
-      'Invalid EVM Params passed for externalAccount. "externalAccount" must be passed as a parameter',
+      'Invalid Metamask Account Params passed. "metamaskAddress" must be passed as a parameter',
     );
-    return false;
+    throw new Error(
+      'Invalid Metamask Account Params passed. "metamaskAddress" must be passed as a parameter',
+    );
   }
-  const parameter = params as ExternalAccount;
-
-  if (
-    'network' in parameter.externalAccount &&
-    parameter.externalAccount.network === 'evm' &&
-    typeof parameter.externalAccount.data === 'object' &&
-    typeof (parameter.externalAccount.data as EvmAccountParams).address ===
-      'string'
-  ) {
-    return true;
-  }
-
-  return false;
 }
 
 /**

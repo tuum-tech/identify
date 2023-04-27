@@ -9,7 +9,7 @@ export type Snap = {
 
 export type ExternalAccountParams = {
   externalAccount: {
-    network: string;
+    blockchainType: string;
     data: {
       accountId?: string;
       address?: string;

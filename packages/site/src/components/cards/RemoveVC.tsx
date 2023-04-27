@@ -9,6 +9,7 @@ import {
 import { VcContext } from '../../contexts/VcContext';
 import useModal from '../../hooks/useModal';
 import {
+  getCurrentMetamaskAccount,
   getCurrentNetwork,
   removeVC,
   shouldDisplayReconnectButton,
@@ -19,11 +20,11 @@ import ExternalAccount, {
 } from '../sections/ExternalAccount';
 
 type Props = {
-  currentChainId: string;
+  setMetamaskAddress: React.Dispatch<React.SetStateAction<string>>;
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const RemoveVC: FC<Props> = ({ currentChainId, setCurrentChainId }) => {
+const RemoveVC: FC<Props> = ({ setMetamaskAddress, setCurrentChainId }) => {
   const { setVcId, vcIdsToBeRemoved, setVcIdsToBeRemoved } =
     useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
@@ -40,6 +41,8 @@ const RemoveVC: FC<Props> = ({ currentChainId, setCurrentChainId }) => {
   const handleRemoveVCClick = async () => {
     setLoading(true);
     try {
+      const metamaskAddress = await getCurrentMetamaskAccount();
+      setMetamaskAddress(metamaskAddress);
       setCurrentChainId(await getCurrentNetwork());
 
       const externalAccountParams =
@@ -54,6 +57,7 @@ const RemoveVC: FC<Props> = ({ currentChainId, setCurrentChainId }) => {
       };
       console.log('vcIdsToBeRemoved: ', vcIdsToBeRemoved);
       const isRemoved = (await removeVC(
+        metamaskAddress,
         id,
         options,
         externalAccountParams,
@@ -79,10 +83,7 @@ const RemoveVC: FC<Props> = ({ currentChainId, setCurrentChainId }) => {
         description: 'Remove one or more VCs from the snap',
         form: (
           <form>
-            <ExternalAccount
-              currentChainId={currentChainId}
-              ref={externalAccountRef}
-            />
+            <ExternalAccount ref={externalAccountRef} />
             <label>
               Enter your VC IDs to be removed separated by a comma
               <TextInput

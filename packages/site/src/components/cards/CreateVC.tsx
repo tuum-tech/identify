@@ -3,13 +3,14 @@ import { FC, useContext, useRef, useState } from 'react';
 import Select from 'react-select';
 import { storeOptions } from '../../config/constants';
 import {
-  MetamaskActions,
   MetaMaskContext,
+  MetamaskActions,
 } from '../../contexts/MetamaskContext';
 import { VcContext } from '../../contexts/VcContext';
 import useModal from '../../hooks/useModal';
 import {
   createVC,
+  getCurrentMetamaskAccount,
   getCurrentNetwork,
   shouldDisplayReconnectButton,
 } from '../../utils';
@@ -19,11 +20,11 @@ import ExternalAccount, {
 } from '../sections/ExternalAccount';
 
 type Props = {
-  currentChainId: string;
+  setMetamaskAddress: React.Dispatch<React.SetStateAction<string>>;
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const CreateVC: FC<Props> = ({ currentChainId, setCurrentChainId }) => {
+const CreateVC: FC<Props> = ({ setMetamaskAddress, setCurrentChainId }) => {
   const { setVc } = useContext(VcContext);
   const { setVcId, setVcIdsToBeRemoved } = useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
@@ -42,6 +43,8 @@ const CreateVC: FC<Props> = ({ currentChainId, setCurrentChainId }) => {
   const handleCreateVCClick = async () => {
     setLoading(true);
     try {
+      const metamaskAddress = await getCurrentMetamaskAccount();
+      setMetamaskAddress(metamaskAddress);
       setCurrentChainId(await getCurrentNetwork());
 
       const externalAccountParams =
@@ -61,6 +64,7 @@ const CreateVC: FC<Props> = ({ currentChainId, setCurrentChainId }) => {
       };
       const credTypes = ['ProfileNamesCredential'];
       const saved: CreateVCResponseResult = (await createVC(
+        metamaskAddress,
         vcKey,
         vcValue,
         options,
@@ -92,10 +96,7 @@ const CreateVC: FC<Props> = ({ currentChainId, setCurrentChainId }) => {
         description: 'Create and Save VerifiableCredential',
         form: (
           <form>
-            <ExternalAccount
-              currentChainId={currentChainId}
-              ref={externalAccountRef}
-            />
+            <ExternalAccount ref={externalAccountRef} />
             <label>
               Enter your name
               <input

@@ -1,11 +1,12 @@
 import { FC, useContext, useState } from 'react';
 import {
-  MetamaskActions,
   MetaMaskContext,
+  MetamaskActions,
 } from '../../contexts/MetamaskContext';
 import { VcContext } from '../../contexts/VcContext';
 import useModal from '../../hooks/useModal';
 import {
+  getCurrentMetamaskAccount,
   getCurrentNetwork,
   shouldDisplayReconnectButton,
   verifyVC,
@@ -13,10 +14,11 @@ import {
 import { Card, SendHelloButton, TextInput } from '../base';
 
 type Props = {
+  setMetamaskAddress: React.Dispatch<React.SetStateAction<string>>;
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const VerifyVC: FC<Props> = ({ setCurrentChainId }) => {
+const VerifyVC: FC<Props> = ({ setMetamaskAddress, setCurrentChainId }) => {
   const { vc, setVc } = useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
   const [loading, setLoading] = useState(false);
@@ -25,8 +27,11 @@ const VerifyVC: FC<Props> = ({ setCurrentChainId }) => {
   const handleVerifyVCClick = async () => {
     setLoading(true);
     try {
+      const metamaskAddress = await getCurrentMetamaskAccount();
+      setMetamaskAddress(metamaskAddress);
       setCurrentChainId(await getCurrentNetwork());
-      const verified = await verifyVC(vc);
+
+      const verified = await verifyVC(metamaskAddress, vc);
       console.log('VC Verified: ', verified);
       showModal({ title: 'Verify VC', content: `VC Verified: ${verified}` });
     } catch (e) {

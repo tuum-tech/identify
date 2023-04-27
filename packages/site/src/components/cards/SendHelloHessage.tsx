@@ -1,9 +1,10 @@
 import { FC, useContext } from 'react';
 import {
-  MetamaskActions,
   MetaMaskContext,
+  MetamaskActions,
 } from '../../contexts/MetamaskContext';
 import {
+  getCurrentMetamaskAccount,
   getCurrentNetwork,
   sendHello,
   shouldDisplayReconnectButton,
@@ -11,16 +12,23 @@ import {
 import { Card, SendHelloButton } from '../base';
 
 type Props = {
+  setMetamaskAddress: React.Dispatch<React.SetStateAction<string>>;
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const SendHelloHessage: FC<Props> = ({ setCurrentChainId }) => {
+const SendHelloHessage: FC<Props> = ({
+  setMetamaskAddress,
+  setCurrentChainId,
+}) => {
   const [state, dispatch] = useContext(MetaMaskContext);
 
   const handleSendHelloClick = async () => {
     try {
+      const metamaskAddress = await getCurrentMetamaskAccount();
+      setMetamaskAddress(metamaskAddress);
       setCurrentChainId(await getCurrentNetwork());
-      await sendHello();
+
+      await sendHello(metamaskAddress);
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });

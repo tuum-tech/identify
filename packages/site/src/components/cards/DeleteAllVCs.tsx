@@ -10,6 +10,7 @@ import { VcContext } from '../../contexts/VcContext';
 import useModal from '../../hooks/useModal';
 import {
   deleteAllVCs,
+  getCurrentMetamaskAccount,
   getCurrentNetwork,
   shouldDisplayReconnectButton,
 } from '../../utils';
@@ -19,11 +20,11 @@ import ExternalAccount, {
 } from '../sections/ExternalAccount';
 
 type Props = {
-  currentChainId: string;
+  setMetamaskAddress: React.Dispatch<React.SetStateAction<string>>;
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const DeleteAllVCs: FC<Props> = ({ currentChainId, setCurrentChainId }) => {
+const DeleteAllVCs: FC<Props> = ({ setMetamaskAddress, setCurrentChainId }) => {
   const { setVcId, setVcIdsToBeRemoved } = useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
   const [selectedOptions, setSelectedOptions] = useState([storeOptions[0]]);
@@ -39,6 +40,8 @@ const DeleteAllVCs: FC<Props> = ({ currentChainId, setCurrentChainId }) => {
   const handleDeleteAllVCsClick = async () => {
     setLoading(true);
     try {
+      const metamaskAddress = await getCurrentMetamaskAccount();
+      setMetamaskAddress(metamaskAddress);
       setCurrentChainId(await getCurrentNetwork());
 
       const externalAccountParams =
@@ -51,6 +54,7 @@ const DeleteAllVCs: FC<Props> = ({ currentChainId, setCurrentChainId }) => {
         ...(selectedStore.length ? { store: selectedStore } : {}),
       };
       const isRemoved = (await deleteAllVCs(
+        metamaskAddress,
         options,
         externalAccountParams,
       )) as IDataManagerClearResult[];
@@ -75,10 +79,7 @@ const DeleteAllVCs: FC<Props> = ({ currentChainId, setCurrentChainId }) => {
         description: 'Delete all the VCs from the snap',
         form: (
           <form>
-            <ExternalAccount
-              currentChainId={currentChainId}
-              ref={externalAccountRef}
-            />
+            <ExternalAccount ref={externalAccountRef} />
             <label>Select store</label>
             <Select
               closeMenuOnSelect

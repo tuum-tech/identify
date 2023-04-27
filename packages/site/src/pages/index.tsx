@@ -41,6 +41,7 @@ import { getNetwork, validHederaChainID } from '../utils/hedera';
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
+  const [metamaskAddress, setMetamaskAddress] = useState('');
   const [currentChainId, setCurrentChainId] = useState('');
   const [isHederaNetwork, setIsHederaNetwork] = useState(false);
   const [currentNetwork, setCurrentNetwork] = useState('');
@@ -54,12 +55,13 @@ const Index = () => {
     } else {
       setIsHederaNetwork(false);
     }
+    setMetamaskAddress(metamaskAddress);
     setCurrentNetwork(getNetwork(currentChainId));
-  }, [currentChainId]);
+  }, [metamaskAddress, currentChainId]);
 
   const handleConnectClick = async () => {
     try {
-      await connectSnap();
+      setMetamaskAddress(await connectSnap());
       setCurrentChainId(await getCurrentNetwork());
       const installedSnap = await getSnap();
 
@@ -86,6 +88,8 @@ const Index = () => {
             <dd>{currentNetwork ? 'Connected' : 'Disconnected'}</dd>
             <dt>Current Network:</dt>
             <dd>{currentNetwork}</dd>
+            <dt>Currently Connected Metamask Account: </dt>
+            <dd>{metamaskAddress}</dd>
           </Col>
           <Col sm="12" md="8">
             <dt>Account Info</dt>
@@ -136,53 +140,71 @@ const Index = () => {
         <ConnectIdentitySnap handleConnectClick={handleConnectClick} />
         <ReconnectIdentitySnap handleConnectClick={handleConnectClick} />
 
-        <SendHelloHessage setCurrentChainId={setCurrentChainId} />
+        <SendHelloHessage
+          setMetamaskAddress={setMetamaskAddress}
+          setCurrentChainId={setCurrentChainId}
+        />
 
         {isHederaNetwork && (
           <CreateNewHederaAccount
-            currentChainId={currentChainId}
+            setMetamaskAddress={setMetamaskAddress}
             setCurrentChainId={setCurrentChainId}
           />
         )}
 
-        <ToggleMetamaskPopups setCurrentChainId={setCurrentChainId} />
+        <ToggleMetamaskPopups
+          setMetamaskAddress={setMetamaskAddress}
+          setCurrentChainId={setCurrentChainId}
+        />
         <GetAccountInfo
-          currentChainId={currentChainId}
+          setMetamaskAddress={setMetamaskAddress}
           setCurrentChainId={setCurrentChainId}
           setAccountInfo={setAccountInfo}
         />
         <ResolveDID
-          currentChainId={currentChainId}
+          setMetamaskAddress={setMetamaskAddress}
           setCurrentChainId={setCurrentChainId}
         />
         <GetSpecificVC
-          currentChainId={currentChainId}
+          setMetamaskAddress={setMetamaskAddress}
           setCurrentChainId={setCurrentChainId}
         />
         <GetAllVCs
-          currentChainId={currentChainId}
+          setMetamaskAddress={setMetamaskAddress}
           setCurrentChainId={setCurrentChainId}
         />
         <CreateVC
-          currentChainId={currentChainId}
+          setMetamaskAddress={setMetamaskAddress}
           setCurrentChainId={setCurrentChainId}
         />
-        <VerifyVC setCurrentChainId={setCurrentChainId} />
+        <VerifyVC
+          setMetamaskAddress={setMetamaskAddress}
+          setCurrentChainId={setCurrentChainId}
+        />
         <RemoveVC
-          currentChainId={currentChainId}
+          setMetamaskAddress={setMetamaskAddress}
           setCurrentChainId={setCurrentChainId}
         />
         <DeleteAllVCs
-          currentChainId={currentChainId}
+          setMetamaskAddress={setMetamaskAddress}
           setCurrentChainId={setCurrentChainId}
         />
         <GetVP
-          currentChainId={currentChainId}
+          setMetamaskAddress={setMetamaskAddress}
           setCurrentChainId={setCurrentChainId}
         />
-        <VerifyVP setCurrentChainId={setCurrentChainId} />
-        <ConfigureGoogleAccount />
-        <SyncGoogleVCs />
+        <VerifyVP
+          setMetamaskAddress={setMetamaskAddress}
+          setCurrentChainId={setCurrentChainId}
+        />
+        <ConfigureGoogleAccount
+          setMetamaskAddress={setMetamaskAddress}
+          setCurrentChainId={setCurrentChainId}
+        />
+        <SyncGoogleVCs
+          setMetamaskAddress={setMetamaskAddress}
+          setCurrentChainId={setCurrentChainId}
+        />
         <Todo />
       </CardContainer>
     </PageContainer>

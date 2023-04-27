@@ -29,12 +29,16 @@ export const getSnaps = async (): Promise<GetSnapsResponse> => {
  * @param snapId - The ID of the snap, params - The params to pass with the snap to connect.
  */
 export const connectSnap = async (snapId: string = defaultSnapId) => {
-  await window.ethereum.request({
+  const identitySnap = await window.ethereum.request({
     method: 'wallet_requestSnaps',
     params: {
       [snapId]: { version: 'latest' },
     },
   });
+  console.log('Identity Snap Details: ', JSON.stringify(identitySnap, null, 4));
+  const account = await getCurrentMetamaskAccount();
+  console.log('Metamask account: ', account);
+  return account;
 };
 
 /**
@@ -57,6 +61,13 @@ export const getSnap = async (version?: string): Promise<Snap | undefined> => {
   }
 };
 
+export const getCurrentMetamaskAccount = async (): Promise<string> => {
+  const accounts = (await window.ethereum.request({
+    method: 'eth_requestAccounts',
+  })) as string[];
+  return accounts[0];
+};
+
 export const getCurrentNetwork = async (): Promise<string> => {
   return (await window.ethereum.request({
     method: 'eth_chainId',
@@ -67,12 +78,15 @@ export const getCurrentNetwork = async (): Promise<string> => {
  * Invoke the "hello" method from the snap.
  */
 
-export const sendHello = async () => {
+export const sendHello = async (metamaskAddress: string) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
       snapId: defaultSnapId,
-      request: { method: 'hello', params: {} },
+      request: {
+        method: 'hello',
+        params: { metamaskAddress },
+      },
     },
   });
 };
@@ -81,12 +95,12 @@ export const sendHello = async () => {
  * Invoke the "togglePopups" method from the snap.
  */
 
-export const togglePopups = async () => {
+export const togglePopups = async (metamaskAddress: string) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
       snapId: defaultSnapId,
-      request: { method: 'togglePopups', params: {} },
+      request: { method: 'togglePopups', params: { metamaskAddress } },
     },
   });
 };
@@ -96,13 +110,17 @@ export const togglePopups = async () => {
  */
 
 export const getAccountInfo = async (
-  params: ExternalAccountParams | undefined,
+  metamaskAddress: string,
+  externalAccountparams?: ExternalAccountParams,
 ) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
       snapId: defaultSnapId,
-      request: { method: 'getAccountInfo', params: params || {} },
+      request: {
+        method: 'getAccountInfo',
+        params: { metamaskAddress, ...externalAccountparams },
+      },
     },
   });
 };
@@ -112,6 +130,7 @@ export const getAccountInfo = async (
  */
 
 export const createNewHederaAccount = async (
+  metamaskAddress: string,
   {
     hbarAmountToSend,
     newAccountPublickey = '',
@@ -127,6 +146,7 @@ export const createNewHederaAccount = async (
         request: {
           method: 'createNewHederaAccount',
           params: {
+            metamaskAddress,
             hbarAmountToSend,
             newAccountPublickey,
             ...externalAccountparams,
@@ -142,6 +162,7 @@ export const createNewHederaAccount = async (
       request: {
         method: 'createNewHederaAccount',
         params: {
+          metamaskAddress,
           hbarAmountToSend,
           newAccountEvmAddress,
           ...externalAccountparams,
@@ -156,6 +177,7 @@ export const createNewHederaAccount = async (
  */
 
 export const resolveDID = async (
+  metamaskAddress: string,
   did?: string,
   externalAccountparams?: ExternalAccountParams,
 ) => {
@@ -165,7 +187,7 @@ export const resolveDID = async (
       snapId: defaultSnapId,
       request: {
         method: 'resolveDID',
-        params: { did, ...externalAccountparams },
+        params: { metamaskAddress, did, ...externalAccountparams },
       },
     },
   });
@@ -176,6 +198,7 @@ export const resolveDID = async (
  */
 
 export const getVCs = async (
+  metamaskAddress: string,
   filter: Filter | undefined,
   options: any,
   externalAccountparams?: ExternalAccountParams,
@@ -186,7 +209,7 @@ export const getVCs = async (
       snapId: defaultSnapId,
       request: {
         method: 'getVCs',
-        params: { filter, options, ...externalAccountparams },
+        params: { metamaskAddress, filter, options, ...externalAccountparams },
       },
     },
   });
@@ -196,14 +219,22 @@ export const getVCs = async (
  * Invoke the "saveVC" method from the snap.
  */
 
-export const saveVC = async (params: any) => {
+export const saveVC = async (
+  metamaskAddress: string,
+  data: unknown,
+  externalAccountparams?: ExternalAccountParams,
+) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
       snapId: defaultSnapId,
       request: {
         method: 'saveVC',
-        params,
+        params: {
+          metamaskAddress,
+          data,
+          ...externalAccountparams,
+        },
       },
     },
   });
@@ -219,6 +250,7 @@ export type ExampleVCValue = {
  */
 
 export const createVC = async (
+  metamaskAddress: string,
   vcKey: string,
   vcValue: object,
   options: any,
@@ -232,6 +264,7 @@ export const createVC = async (
       request: {
         method: 'createVC',
         params: {
+          metamaskAddress,
           vcKey,
           vcValue,
           options,
@@ -247,14 +280,17 @@ export const createVC = async (
  * Invoke the "verifyVC" method from the snap.
  */
 
-export const verifyVC = async (vc: VerifiableCredential | {}) => {
+export const verifyVC = async (
+  metamaskAddress: string,
+  vc: VerifiableCredential | {},
+) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
       snapId: defaultSnapId,
       request: {
         method: 'verifyVC',
-        params: { verifiableCredential: vc },
+        params: { metamaskAddress, verifiableCredential: vc },
       },
     },
   });
@@ -265,6 +301,7 @@ export const verifyVC = async (vc: VerifiableCredential | {}) => {
  */
 
 export const removeVC = async (
+  metamaskAddress: string,
   id: string | string[],
   options: IDataManagerDeleteArgs,
   externalAccountparams?: ExternalAccountParams,
@@ -275,7 +312,7 @@ export const removeVC = async (
       snapId: defaultSnapId,
       request: {
         method: 'removeVC',
-        params: { id, options, ...externalAccountparams },
+        params: { metamaskAddress, id, options, ...externalAccountparams },
       },
     },
   });
@@ -286,6 +323,7 @@ export const removeVC = async (
  */
 
 export const deleteAllVCs = async (
+  metamaskAddress: string,
   options: IDataManagerClearArgs,
   externalAccountparams?: ExternalAccountParams,
 ) => {
@@ -295,7 +333,7 @@ export const deleteAllVCs = async (
       snapId: defaultSnapId,
       request: {
         method: 'deleteAllVCs',
-        params: { options, ...externalAccountparams },
+        params: { metamaskAddress, options, ...externalAccountparams },
       },
     },
   });
@@ -306,6 +344,7 @@ export const deleteAllVCs = async (
  */
 
 export const createVP = async (
+  metamaskAddress: string,
   { vcIds, vcs, proofInfo }: CreateVPRequestParams,
   externalAccountparams?: ExternalAccountParams,
 ) => {
@@ -315,7 +354,13 @@ export const createVP = async (
       snapId: defaultSnapId,
       request: {
         method: 'createVP',
-        params: { vcIds, vcs, proofInfo, ...externalAccountparams },
+        params: {
+          metamaskAddress,
+          vcIds,
+          vcs,
+          proofInfo,
+          ...externalAccountparams,
+        },
       },
     },
   });
@@ -325,14 +370,17 @@ export const createVP = async (
  * Invoke the "verifyVP" method from the snap.
  */
 
-export const verifyVP = async (vp: VerifiablePresentation | {}) => {
+export const verifyVP = async (
+  metamaskAddress: string,
+  vp: VerifiablePresentation | {},
+) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
       snapId: defaultSnapId,
       request: {
         method: 'verifyVP',
-        params: { verifiablePresentation: vp },
+        params: { metamaskAddress, verifiablePresentation: vp },
       },
     },
   });
@@ -342,14 +390,17 @@ export const verifyVP = async (vp: VerifiablePresentation | {}) => {
  * Invoke the "getCurrentDIDMethod" method from the snap.
  */
 
-export const getCurrentDIDMethod = async () => {
+export const getCurrentDIDMethod = async (
+  metamaskAddress: string,
+  externalAccountparams?: ExternalAccountParams,
+) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
       snapId: defaultSnapId,
       request: {
         method: 'getCurrentDIDMethod',
-        params: {},
+        params: { metamaskAddress, ...externalAccountparams },
       },
     },
   });
@@ -359,14 +410,18 @@ export const getCurrentDIDMethod = async () => {
  * Invoke the "configureGoogleAccount" method from the snap.
  */
 
-export const configureGoogleAccount = async (accessToken: string) => {
+export const configureGoogleAccount = async (
+  metamaskAddress: string,
+  accessToken: string,
+  externalAccountparams?: ExternalAccountParams,
+) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
       snapId: defaultSnapId,
       request: {
         method: 'configureGoogleAccount',
-        params: { accessToken },
+        params: { metamaskAddress, accessToken, ...externalAccountparams },
       },
     },
   });
@@ -376,14 +431,17 @@ export const configureGoogleAccount = async (accessToken: string) => {
  * Invoke the "syncGoogleVCs" method from the snap.
  */
 
-export const syncGoogleVCs = async () => {
+export const syncGoogleVCs = async (
+  metamaskAddress: string,
+  externalAccountparams?: ExternalAccountParams,
+) => {
   return await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
       snapId: defaultSnapId,
       request: {
         method: 'syncGoogleVCs',
-        params: {},
+        params: { metamaskAddress, ...externalAccountparams },
       },
     },
   });

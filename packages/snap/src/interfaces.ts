@@ -1,5 +1,5 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
-import { Json, SnapsGlobalObject } from '@metamask/snaps-types';
+import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { Panel } from '@metamask/snaps-ui';
 import { IIdentifier, IKey, W3CVerifiableCredential } from '@veramo/core';
 import { ManagedPrivateKey } from '@veramo/key-manager';
@@ -99,7 +99,7 @@ export type AccountViaPrivateKey = {
 
 export type ExternalAccount = {
   externalAccount: {
-    network: string;
+    blockchainType: string;
     data: unknown;
   };
 };
@@ -110,4 +110,8 @@ export type HederaAccountParams = {
 
 export type EvmAccountParams = {
   address: string;
+};
+
+export type MetamaskAccountParams = {
+  metamaskAddress: string;
 };

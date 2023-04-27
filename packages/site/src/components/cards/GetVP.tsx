@@ -9,6 +9,7 @@ import { VcContext } from '../../contexts/VcContext';
 import useModal from '../../hooks/useModal';
 import {
   createVP,
+  getCurrentMetamaskAccount,
   getCurrentNetwork,
   shouldDisplayReconnectButton,
 } from '../../utils';
@@ -18,11 +19,11 @@ import ExternalAccount, {
 } from '../sections/ExternalAccount';
 
 type Props = {
-  currentChainId: string;
+  setMetamaskAddress: React.Dispatch<React.SetStateAction<string>>;
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const GetVP: FC<Props> = ({ currentChainId, setCurrentChainId }) => {
+const GetVP: FC<Props> = ({ setMetamaskAddress, setCurrentChainId }) => {
   const { vcId, setVcId, setVp } = useContext(VcContext);
   const { vc, setVc } = useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
@@ -34,6 +35,8 @@ const GetVP: FC<Props> = ({ currentChainId, setCurrentChainId }) => {
   const handleCreateVPClick = async () => {
     setLoading(true);
     try {
+      const metamaskAddress = await getCurrentMetamaskAccount();
+      setMetamaskAddress(metamaskAddress);
       setCurrentChainId(await getCurrentNetwork());
 
       const externalAccountParams =
@@ -46,6 +49,7 @@ const GetVP: FC<Props> = ({ currentChainId, setCurrentChainId }) => {
       console.log('vcIds: ', vcId);
       // console.log('vc: ', vc);
       const vp = (await createVP(
+        metamaskAddress,
         {
           // vcIds: vcId.trim().split(','),
           vcs: [vc as W3CVerifiableCredential],
@@ -73,10 +77,7 @@ const GetVP: FC<Props> = ({ currentChainId, setCurrentChainId }) => {
         description: 'Generate Verifiable Presentation from your VC',
         form: (
           <form>
-            <ExternalAccount
-              currentChainId={currentChainId}
-              ref={externalAccountRef}
-            />
+            <ExternalAccount ref={externalAccountRef} />
             {/* <label>
               Enter the Verifiable Credential ID
               <TextInput

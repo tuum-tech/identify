@@ -10,6 +10,7 @@ import {
   ExternalAccount,
   HederaAccountParams,
   IdentitySnapState,
+  MetamaskAccountParams,
   SnapDialogParams,
 } from '../interfaces';
 import { DEFAULTCOINTYPE, HEDERACOINTYPE } from '../types/constants';
@@ -23,45 +24,62 @@ import { getCurrentCoinType, initAccountState } from './state';
  * Function that returns account info of the currently selected MetaMask account.
  *
  * @param state - IdentitySnapState.
- * @param account - External Account info.
+ * @param params - Parameters passed.
+ * @param isExternalAccount - Whether this is a metamask or a non-metamask account.
  * @returns MetaMask address and did.
  */
 export async function getCurrentAccount(
   state: IdentitySnapState,
-  account: ExternalAccount,
+  params: unknown,
+  isExternalAccount: boolean,
 ): Promise<Account> {
   try {
-    if (
-      account.externalAccount &&
-      account.externalAccount.network === 'hedera'
-    ) {
-      return await connectHederaAccount(
-        state,
-        (account.externalAccount.data as HederaAccountParams).accountId,
-      );
+    // Handle external account(non-metamask account)
+    if (isExternalAccount) {
+      const nonMetamaskAccount = params as ExternalAccount;
+      if (nonMetamaskAccount.externalAccount) {
+        if (nonMetamaskAccount.externalAccount.blockchainType === 'hedera') {
+          return await connectHederaAccount(
+            state,
+            (nonMetamaskAccount.externalAccount.data as HederaAccountParams)
+              .accountId,
+          );
+        } else if (
+          nonMetamaskAccount.externalAccount.blockchainType === 'evm'
+        ) {
+          return await connectEVMAccount(
+            state,
+            (
+              nonMetamaskAccount.externalAccount.data as EvmAccountParams
+            ).address.toLowerCase(),
+          );
+        }
+
+        console.error(
+          `Invalid blockchainType '${nonMetamaskAccount.externalAccount.blockchainType}'. The valid blockchain types are ['hedera', 'evm']`,
+        );
+        throw new Error(
+          `Invalid blockchainType '${nonMetamaskAccount.externalAccount.blockchainType}'. The valid blockchain types are ['hedera', 'evm']`,
+        );
+      }
     }
 
-    if (account.externalAccount && account.externalAccount.network === 'evm') {
-      return await connectEVMAccount(
-        state,
-        (
-          account.externalAccount.data as EvmAccountParams
-        ).address.toLowerCase(),
-      );
-    }
-    const accounts = (await ethereum.request({
-      method: 'eth_requestAccounts',
-    })) as string[];
-    const address = accounts[0];
+    // Handle metamask account
+    const { metamaskAddress } = params as MetamaskAccountParams;
     // Initialize if not there
     const coinType = (await getCurrentCoinType()).toString();
-    if (address && !(address in state.accountState[coinType])) {
+    if (metamaskAddress && !(metamaskAddress in state.accountState[coinType])) {
       console.log(
-        `The address ${address} has NOT yet been configured in the Identity Snap. Configuring now...`,
+        `The address ${metamaskAddress} has NOT yet been configured in the Identity Snap. Configuring now...`,
       );
-      await initAccountState(snap, state, coinType, address);
+      await initAccountState(snap, state, coinType, metamaskAddress);
     }
-    return await veramoImportMetaMaskAccount(snap, state, ethereum, address);
+    return await veramoImportMetaMaskAccount(
+      snap,
+      state,
+      ethereum,
+      metamaskAddress,
+    );
   } catch (e) {
     console.error(`Error while trying to get the account: ${e}`);
     throw new Error(`Error while trying to get the account: ${e}`);
@@ -74,7 +92,7 @@ export async function getCurrentAccount(
  * @param state - Identity state.
  * @param evmAddress - EVM Account address.
  */
-export async function connectEVMAccount(
+async function connectEVMAccount(
   state: IdentitySnapState,
   evmAddress: string,
 ): Promise<Account> {
@@ -131,7 +149,7 @@ export async function connectEVMAccount(
  * @param state - Identity state.
  * @param accountId - Account id.
  */
-export async function connectHederaAccount(
+async function connectHederaAccount(
   state: IdentitySnapState,
   accountId: string,
 ): Promise<Account> {

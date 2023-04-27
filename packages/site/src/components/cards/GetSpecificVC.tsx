@@ -9,6 +9,7 @@ import {
 import { VcContext } from '../../contexts/VcContext';
 import useModal from '../../hooks/useModal';
 import {
+  getCurrentMetamaskAccount,
   getCurrentNetwork,
   getVCs,
   shouldDisplayReconnectButton,
@@ -19,11 +20,14 @@ import ExternalAccount, {
 } from '../sections/ExternalAccount';
 
 type Props = {
-  currentChainId: string;
+  setMetamaskAddress: React.Dispatch<React.SetStateAction<string>>;
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const GetSpecificVC: FC<Props> = ({ currentChainId, setCurrentChainId }) => {
+const GetSpecificVC: FC<Props> = ({
+  setMetamaskAddress,
+  setCurrentChainId,
+}) => {
   const { vcId, setVcId, setVc } = useContext(VcContext);
   const [state, dispatch] = useContext(MetaMaskContext);
   const [selectedOptions, setSelectedOptions] = useState([storeOptions[0]]);
@@ -39,6 +43,8 @@ const GetSpecificVC: FC<Props> = ({ currentChainId, setCurrentChainId }) => {
   const handleGetSpecificVCClick = async () => {
     setLoading(true);
     try {
+      const metamaskAddress = await getCurrentMetamaskAccount();
+      setMetamaskAddress(metamaskAddress);
       setCurrentChainId(await getCurrentNetwork());
 
       const externalAccountParams =
@@ -54,6 +60,7 @@ const GetSpecificVC: FC<Props> = ({ currentChainId, setCurrentChainId }) => {
         returnStore: true,
       };
       const vcs = (await getVCs(
+        metamaskAddress,
         filter,
         options,
         externalAccountParams,
@@ -84,10 +91,7 @@ const GetSpecificVC: FC<Props> = ({ currentChainId, setCurrentChainId }) => {
         description: 'Get specific VC of the user',
         form: (
           <form>
-            <ExternalAccount
-              currentChainId={currentChainId}
-              ref={externalAccountRef}
-            />
+            <ExternalAccount ref={externalAccountRef} />
             <label>
               Enter your VC Id
               <TextInput

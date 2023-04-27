@@ -7,6 +7,7 @@ import {
 import useModal from '../../hooks/useModal';
 import {
   createNewHederaAccount,
+  getCurrentMetamaskAccount,
   getCurrentNetwork,
   shouldDisplayReconnectButton,
 } from '../../utils';
@@ -16,12 +17,12 @@ import ExternalAccount, {
 } from '../sections/ExternalAccount';
 
 type Props = {
-  currentChainId: string;
+  setMetamaskAddress: React.Dispatch<React.SetStateAction<string>>;
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const CreateNewHederaAccount: FC<Props> = ({
-  currentChainId,
+  setMetamaskAddress,
   setCurrentChainId,
 }) => {
   const [state, dispatch] = useContext(MetaMaskContext);
@@ -41,6 +42,8 @@ const CreateNewHederaAccount: FC<Props> = ({
   const handleCreateNewHederaAccount = async () => {
     setLoading(true);
     try {
+      const metamaskAddress = await getCurrentMetamaskAccount();
+      setMetamaskAddress(metamaskAddress);
       setCurrentChainId(await getCurrentNetwork());
 
       const externalAccountParams =
@@ -49,6 +52,7 @@ const CreateNewHederaAccount: FC<Props> = ({
       if (hbarAmountToSend > 0) {
         // If you want to create a hbar account for a public key, just uncomment the line 'newAccountPublickey'
         const newHederaAccountInfo = (await createNewHederaAccount(
+          metamaskAddress,
           {
             hbarAmountToSend,
             newAccountEvmAddress,
@@ -97,10 +101,7 @@ const CreateNewHederaAccount: FC<Props> = ({
           'Create a new hedera account by sending some HBARs to a hedera publickey address',
         form: (
           <form>
-            <ExternalAccount
-              currentChainId={currentChainId}
-              ref={externalAccountRef}
-            />
+            <ExternalAccount ref={externalAccountRef} />
             {/* If you want to create a hbar account for a public key, just
             uncomment the below lines */}
             {/* <label>

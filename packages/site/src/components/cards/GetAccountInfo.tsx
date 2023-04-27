@@ -1,13 +1,14 @@
 import { FC, useContext, useRef, useState } from 'react';
 import {
-  MetamaskActions,
   MetaMaskContext,
+  MetamaskActions,
 } from '../../contexts/MetamaskContext';
 import useModal from '../../hooks/useModal';
 import {
-  getAccountInfo,
-  getCurrentNetwork,
   PublicAccountInfo,
+  getAccountInfo,
+  getCurrentMetamaskAccount,
+  getCurrentNetwork,
   shouldDisplayReconnectButton,
 } from '../../utils';
 import { Card, SendHelloButton } from '../base';
@@ -16,13 +17,13 @@ import ExternalAccount, {
 } from '../sections/ExternalAccount';
 
 type Props = {
-  currentChainId: string;
+  setMetamaskAddress: React.Dispatch<React.SetStateAction<string>>;
   setCurrentChainId: React.Dispatch<React.SetStateAction<string>>;
   setAccountInfo: React.Dispatch<React.SetStateAction<PublicAccountInfo>>;
 };
 
 const GetAccountInfo: FC<Props> = ({
-  currentChainId,
+  setMetamaskAddress,
   setCurrentChainId,
   setAccountInfo,
 }) => {
@@ -35,12 +36,17 @@ const GetAccountInfo: FC<Props> = ({
   const handleGetAccountInfoClick = async () => {
     setLoading(true);
     try {
-      const newChainId = await getCurrentNetwork();
-      setCurrentChainId(newChainId);
+      const metamaskAddress = await getCurrentMetamaskAccount();
+      setMetamaskAddress(metamaskAddress);
+      setCurrentChainId(await getCurrentNetwork());
 
-      const params = externalAccountRef.current?.handleGetAccountParams();
+      const externalAccountParams =
+        externalAccountRef.current?.handleGetAccountParams();
 
-      const accountInfo = await getAccountInfo(params);
+      const accountInfo = await getAccountInfo(
+        metamaskAddress,
+        externalAccountParams,
+      );
       console.log(`Your account info:`, accountInfo);
       setAccountInfo(accountInfo as PublicAccountInfo);
       showModal({
@@ -59,12 +65,7 @@ const GetAccountInfo: FC<Props> = ({
       content={{
         title: 'getAccountInfo',
         description: 'Get the current account information',
-        form: (
-          <ExternalAccount
-            currentChainId={currentChainId}
-            ref={externalAccountRef}
-          />
-        ),
+        form: <ExternalAccount ref={externalAccountRef} />,
         button: (
           <SendHelloButton
             buttonText="Get Account Info"

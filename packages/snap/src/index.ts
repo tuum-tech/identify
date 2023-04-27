@@ -1,6 +1,6 @@
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { heading, panel, text } from '@metamask/snaps-ui';
-import { ExternalAccount, IdentitySnapParams } from './interfaces';
+import { Account, ExternalAccount, IdentitySnapParams } from './interfaces';
 import { getAccountInfo } from './rpc/account/getAccountInfo';
 import { getAvailableDIDMethods } from './rpc/did/getAvailableDIDMethods';
 import { getCurrentDIDMethod } from './rpc/did/getCurrentDIDMethod';
@@ -30,9 +30,8 @@ import {
   isValidCreateVCRequest,
   isValidCreateVPRequest,
   isValidDeleteAllVCsRequest,
-  isValidEVMAccountParams,
   isValidGetVCsRequest,
-  isValidHederaAccountParams,
+  isValidMetamaskAccountParams,
   isValidRemoveVCRequest,
   isValidResolveDIDRequest,
   isValidSaveVCRequest,
@@ -68,22 +67,20 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   }
   console.log('state:', JSON.stringify(state, null, 4));
 
+  let isExternalAccount: boolean;
   let extraData: unknown;
   if (isExternalAccountFlagSet(request.params)) {
-    if (
-      !(
-        isValidHederaAccountParams(request.params) ||
-        isValidEVMAccountParams(request.params)
-      )
-    ) {
-      throw new Error('External Account parameter is invalid');
-    }
+    isExternalAccount = true;
     extraData = (request.params as ExternalAccount).externalAccount.data;
+  } else {
+    isExternalAccount = false;
+    isValidMetamaskAccountParams(request.params);
   }
 
-  const account = await getCurrentAccount(
+  const account: Account = await getCurrentAccount(
     state,
-    request.params as ExternalAccount,
+    request.params,
+    isExternalAccount,
   );
   account.extraData = extraData;
 
@@ -111,8 +108,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           */
           type: 'alert',
           content: panel([
-            heading(`Hello, **${origin}**!`),
-            text('This custom alert is jsut for display purposes.'),
+            heading(`Hello, ${origin}!`),
+            text('This custom alert is just for display purposes.'),
           ]),
         },
       });
