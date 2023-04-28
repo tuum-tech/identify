@@ -100,7 +100,7 @@ const CreateNewHederaAccount: FC<Props> = ({
         description:
           'Create a new hedera account by sending some HBARs to a hedera publickey address',
         form: (
-          <form>
+          <>
             <ExternalAccount ref={externalAccountRef} />
             {/* If you want to create a hbar account for a public key, just
             uncomment the below lines */}
@@ -134,7 +134,7 @@ const CreateNewHederaAccount: FC<Props> = ({
                 }
               />
             </label>
-          </form>
+          </>
         ),
         button: (
           <SendHelloButton

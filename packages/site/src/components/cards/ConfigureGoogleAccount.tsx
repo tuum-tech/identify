@@ -64,11 +64,7 @@ const ConfigureGoogleAccount: FC<Props> = ({
       content={{
         title: 'configureGoogleAccount',
         description: 'Configure Google Account',
-        form: (
-          <form>
-            <ExternalAccount ref={externalAccountRef} />
-          </form>
-        ),
+        form: <ExternalAccount ref={externalAccountRef} />,
         button: (
           <SendHelloButton
             buttonText="Configure Google Account"

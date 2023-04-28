@@ -95,7 +95,7 @@ const CreateVC: FC<Props> = ({ setMetamaskAddress, setCurrentChainId }) => {
         title: 'createVC',
         description: 'Create and Save VerifiableCredential',
         form: (
-          <form>
+          <>
             <ExternalAccount ref={externalAccountRef} />
             <label>
               Enter your name
@@ -133,7 +133,7 @@ const CreateVC: FC<Props> = ({ setMetamaskAddress, setCurrentChainId }) => {
                 }),
               }}
             />
-          </form>
+          </>
         ),
         button: (
           <SendHelloButton

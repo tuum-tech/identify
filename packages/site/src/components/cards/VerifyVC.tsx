@@ -47,17 +47,15 @@ const VerifyVC: FC<Props> = ({ setMetamaskAddress, setCurrentChainId }) => {
         title: 'verifyVC',
         description: 'Verify a VC JWT, LDS format or EIP712',
         form: (
-          <form>
-            <label>
-              Enter your Verifiable Credential
-              <TextInput
-                rows={3}
-                value={JSON.stringify(vc)}
-                onChange={(e) => setVc(e.target.value)}
-                fullWidth
-              />
-            </label>
-          </form>
+          <label>
+            Enter your Verifiable Credential
+            <TextInput
+              rows={3}
+              value={JSON.stringify(vc)}
+              onChange={(e) => setVc(e.target.value)}
+              fullWidth
+            />
+          </label>
         ),
         button: (
           <SendHelloButton

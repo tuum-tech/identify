@@ -78,7 +78,7 @@ const DeleteAllVCs: FC<Props> = ({ setMetamaskAddress, setCurrentChainId }) => {
         title: 'deleteAllVCs',
         description: 'Delete all the VCs from the snap',
         form: (
-          <form>
+          <>
             <ExternalAccount ref={externalAccountRef} />
             <label>Select store</label>
             <Select
@@ -97,7 +97,7 @@ const DeleteAllVCs: FC<Props> = ({ setMetamaskAddress, setCurrentChainId }) => {
                 }),
               }}
             />
-          </form>
+          </>
         ),
         button: (
           <SendHelloButton

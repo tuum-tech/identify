@@ -76,7 +76,7 @@ const GetVP: FC<Props> = ({ setMetamaskAddress, setCurrentChainId }) => {
         title: 'getVP',
         description: 'Generate Verifiable Presentation from your VC',
         form: (
-          <form>
+          <>
             <ExternalAccount ref={externalAccountRef} />
             {/* <label>
               Enter the Verifiable Credential ID
@@ -96,7 +96,7 @@ const GetVP: FC<Props> = ({ setMetamaskAddress, setCurrentChainId }) => {
                 fullWidth
               />
             </label>
-          </form>
+          </>
         ),
         button: (
           <SendHelloButton

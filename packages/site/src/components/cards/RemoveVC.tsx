@@ -82,7 +82,7 @@ const RemoveVC: FC<Props> = ({ setMetamaskAddress, setCurrentChainId }) => {
         title: 'removeVC',
         description: 'Remove one or more VCs from the snap',
         form: (
-          <form>
+          <>
             <ExternalAccount ref={externalAccountRef} />
             <label>
               Enter your VC IDs to be removed separated by a comma
@@ -112,7 +112,7 @@ const RemoveVC: FC<Props> = ({ setMetamaskAddress, setCurrentChainId }) => {
                 }),
               }}
             />
-          </form>
+          </>
         ),
         button: (
           <SendHelloButton

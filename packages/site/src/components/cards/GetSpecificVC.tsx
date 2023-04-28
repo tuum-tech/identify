@@ -90,7 +90,7 @@ const GetSpecificVC: FC<Props> = ({
         title: 'getSpecificVC',
         description: 'Get specific VC of the user',
         form: (
-          <form>
+          <>
             <ExternalAccount ref={externalAccountRef} />
             <label>
               Enter your VC Id
@@ -118,7 +118,7 @@ const GetSpecificVC: FC<Props> = ({
                 }),
               }}
             />
-          </form>
+          </>
         ),
         button: (
           <SendHelloButton

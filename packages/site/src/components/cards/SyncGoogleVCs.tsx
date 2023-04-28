@@ -52,11 +52,7 @@ const SyncGoogleVCs: FC<Props> = ({
       content={{
         title: 'syncGoogleVCs',
         description: 'Sync VCs with google drive',
-        form: (
-          <form>
-            <ExternalAccount ref={externalAccountRef} />
-          </form>
-        ),
+        form: <ExternalAccount ref={externalAccountRef} />,
         button: (
           <SendHelloButton
             buttonText="Sync Google VCs"

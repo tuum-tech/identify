@@ -87,7 +87,7 @@ const GetAllVCs: FC<Props> = ({ setMetamaskAddress, setCurrentChainId }) => {
         title: 'getAllVCs',
         description: 'Get all the VCs of the user',
         form: (
-          <form>
+          <>
             <ExternalAccount ref={externalAccountRef} />
             <label>Select store</label>
             <Select
@@ -106,7 +106,7 @@ const GetAllVCs: FC<Props> = ({ setMetamaskAddress, setCurrentChainId }) => {
                 }),
               }}
             />
-          </form>
+          </>
         ),
         button: (
           <SendHelloButton
