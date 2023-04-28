@@ -1,6 +1,7 @@
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { divider, heading, panel, Panel, text } from '@metamask/snaps-ui';
 import { VerifiableCredential } from '@veramo/core';
+import _ from 'lodash';
 import cloneDeep from 'lodash.clonedeep';
 import { IdentitySnapState, SnapDialogParams } from '../interfaces';
 import { IDataManagerQueryResult } from '../plugins/veramo/verifiable-creds-manager';
@@ -62,16 +63,25 @@ export async function generateVCPanel(
     delete vcData.credentialSubject.id;
     delete vcData.credentialSubject.hederaAccountId;
     panelToShow.push(divider());
-    panelToShow.push(text(`Credential #${index + 1}`));
+
+    const credentialNumber = (index + 1).toString();
+    panelToShow.push(text(`Credential #${credentialNumber}`));
     panelToShow.push(divider());
+
     panelToShow.push(text('ID: '));
-    panelToShow.push(text(vc.metadata.id));
+    panelToShow.push(
+      text(_.isEmpty(vc.metadata.id) ? credentialNumber : vc.metadata.id),
+    );
+
     panelToShow.push(text('STORAGE: '));
     panelToShow.push(text(vc.metadata.store as string));
+
     panelToShow.push(text('TYPE:'));
     panelToShow.push(text(JSON.stringify(vcData.type)));
+
     panelToShow.push(text('SUBJECT:'));
     panelToShow.push(text(JSON.stringify(vcData.credentialSubject)));
+
     panelToShow.push(text('ISSUANCE DATE:'));
     const issuanceDate = new Date(vcData.issuanceDate as string).toLocaleString(
       undefined,
@@ -87,19 +97,24 @@ export async function generateVCPanel(
       },
     );
     panelToShow.push(text(issuanceDate));
+
     panelToShow.push(text('EXPIRATION DATE:'));
-    const expirationDate = new Date(
-      vcData.expirationDate as string,
-    ).toLocaleString(undefined, {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      weekday: 'long',
-      hour: '2-digit',
-      hour12: false,
-      minute: '2-digit',
-      second: '2-digit',
-    });
+    let expirationDate = 'Does not expire';
+    if (vcData.expirationDate) {
+      expirationDate = new Date(vcData.expirationDate as string).toLocaleString(
+        undefined,
+        {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          weekday: 'long',
+          hour: '2-digit',
+          hour12: false,
+          minute: '2-digit',
+          second: '2-digit',
+        },
+      );
+    }
     panelToShow.push(text(expirationDate));
   });
   return panel(panelToShow);

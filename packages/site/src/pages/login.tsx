@@ -30,6 +30,7 @@ import {
   connectSnap,
   createVP,
   getAccountInfo,
+  getCurrentMetamaskAccount,
   getCurrentNetwork,
   getSnap,
   getVCs,
@@ -38,6 +39,7 @@ import {
 
 function LoginPage() {
   const [state, dispatch] = useContext(MetaMaskContext);
+  const [metamaskAddress, setMetamaskAddress] = useState('');
   const [hederaAccountConnected, setHederaAccountConnected] = useState(false);
   const [loginName, setLoginName] = useState('exampleUsername');
 
@@ -57,27 +59,34 @@ function LoginPage() {
   const { showModal } = useModal();
 
   const handleSaveVC = async () => {
-    // Send a POST request
-    if (vc !== '') {
-      const parsedVC: W3CVerifiableCredential = JSON.parse(
-        vc,
-      ) as W3CVerifiableCredential;
+    try {
+      setMetamaskAddress(await getCurrentMetamaskAccount());
+      setCurrentChainId(await getCurrentNetwork());
+      // Send a POST request
+      if (vc !== '') {
+        const data: W3CVerifiableCredential = JSON.parse(
+          vc,
+        ) as W3CVerifiableCredential;
 
-      let params = {
-        data: [parsedVC],
-      };
-      await saveVC(params);
+        await saveVC(metamaskAddress, [data]);
+      }
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
     }
   };
 
   const handleSignIn = async () => {
     try {
+      setMetamaskAddress(await getCurrentMetamaskAccount());
       setCurrentChainId(await getCurrentNetwork());
+
       const options = {
         store: 'snap',
         returnStore: true,
       };
       const vcs = (await getVCs(
+        metamaskAddress,
         {
           type: 'vcType',
           filter: 'SiteLoginCredential',
@@ -94,7 +103,7 @@ function LoginPage() {
       }
     } catch (e) {
       console.error(e);
-      // dispatch({ type: MetamaskActions.SetError, payload: e });
+      dispatch({ type: MetamaskActions.SetError, payload: e });
     }
   };
 
@@ -149,15 +158,16 @@ function LoginPage() {
   }, [identifier]);
 
   useEffect(() => {
+    setMetamaskAddress(metamaskAddress);
     setCurrentNetwork(getNetwork(currentChainId));
     if (!validHederaChainID(currentChainId)) {
       setHederaAccountConnected(false);
     }
-  }, [currentChainId]);
+  }, [metamaskAddress, currentChainId]);
 
   const handleConnectClick = async () => {
     try {
-      await connectSnap();
+      setMetamaskAddress(await connectSnap());
       setCurrentChainId(await getCurrentNetwork());
       const installedSnap = await getSnap();
 
@@ -173,12 +183,17 @@ function LoginPage() {
 
   const handleCreateVC = async () => {
     // Get the current did
+    const accountInfo: PublicAccountInfo = (await getAccountInfo(
+      metamaskAddress,
+      undefined,
+    )) as PublicAccountInfo;
 
-    setIdentifier((await getDID()) as string);
+    setIdentifier(accountInfo.did);
   };
 
   const handleVCClicked = async (vcId: string) => {
     try {
+      setMetamaskAddress(await getCurrentMetamaskAccount());
       setCurrentChainId(await getCurrentNetwork());
       const proofInfo: ProofInfo = {
         proofFormat: 'jwt',
@@ -193,6 +208,7 @@ function LoginPage() {
         proofInfo,
       };
       const vp = (await createVP(
+        metamaskAddress,
         createVpRequestParameters,
       )) as VerifiablePresentation;
       setPresentation(vp);
@@ -206,8 +222,10 @@ function LoginPage() {
 
   const handleChallenge = async () => {
     try {
+      setMetamaskAddress(await getCurrentMetamaskAccount());
       setCurrentChainId(await getCurrentNetwork());
       const accountInfo: PublicAccountInfo = (await getAccountInfo(
+        metamaskAddress,
         undefined,
       )) as PublicAccountInfo;
       const backendUrl = process.env.GATSBY_BACKEND_URL;
