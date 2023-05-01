@@ -162,26 +162,15 @@ type ResolveDIDRequestParams = { did?: string };
 export function isValidResolveDIDRequest(
   params: unknown,
 ): asserts params is ResolveDIDRequestParams {
-  if (params === null || _.isEmpty(params)) {
-    return;
-  }
-
   const parameter = params as ResolveDIDRequestParams;
 
   if (
     'did' in parameter &&
-    parameter.did !== null &&
-    typeof parameter.did === 'string'
+    (parameter.did === null || typeof parameter.did !== 'string')
   ) {
-    return;
+    console.error('Invalid resolveDID Params passed. "did" must be a string');
+    throw new Error('Invalid resolveDID Params passed. "did" must be a string');
   }
-
-  console.error(
-    'Invalid resolveDID Params passed. "did" must be passed as a parameter and it must be a string',
-  );
-  throw new Error(
-    'Invalid resolveDID Params passed. "did" must be passed as a parameter and it must be a string',
-  );
 }
 
 /**
@@ -192,9 +181,6 @@ export function isValidResolveDIDRequest(
 export function isValidGetVCsRequest(
   params: unknown,
 ): asserts params is IDataManagerQueryArgs {
-  if (params === null || _.isEmpty(params)) {
-    return;
-  }
   const parameter = params as IDataManagerQueryArgs;
 
   // Check if filter is valid
@@ -311,7 +297,7 @@ export function isValidGetVCsRequest(
 export function isValidSaveVCRequest(
   params: unknown,
 ): asserts params is IDataManagerSaveArgs {
-  if (params === null || _.isEmpty(params)) {
+  if (params === null || _.isEmpty(params) || !('data' in params)) {
     console.error(
       'Invalid saveVC Params passed. "data" must be passed as a parameter',
     );
@@ -384,15 +370,7 @@ export function isValidSaveVCRequest(
         );
       }
     }
-    return;
   }
-
-  console.error(
-    'Invalid saveVC Params passed. "data" must be passed as a parameter and it must be an object',
-  );
-  throw new Error(
-    'Invalid saveVC Params passed. "data" must be passed as a parameter and it must be an object',
-  );
 }
 
 /**
@@ -429,11 +407,23 @@ export function isValidCreateNewHederaAccountParams(
     );
   }
 
-  // Ensure that both newAccountPublickey and newAccountEvmAddress are not passed in any circumstance
+  // Ensure that either newAccountPublickey or newAccountEvmAddress is passed
+  if (
+    !('newAccountPublickey' in parameter || 'newAccountEvmAddress' in parameter)
+  ) {
+    console.error(
+      'Invalid createNewHederaAccount Params passed. Either "newAccountPublickey" or "newAccountEvmAddress" must be passed as a parameter',
+    );
+    throw new Error(
+      'Invalid createNewHederaAccount Params passed. Either "newAccountPublickey" or "newAccountEvmAddress" must be passed as a parameter',
+    );
+  }
+
   if (
     'newAccountPublickey' in parameter &&
     'newAccountEvmAddress' in parameter
   ) {
+    // Ensure that both newAccountPublickey and newAccountEvmAddress are not passed in any circumstance
     console.error(
       'Invalid createNewHederaAccount Params passed. Please pass either "newAccountPublickey" or "newAccountEvmAddress" but not both',
     );
@@ -497,7 +487,7 @@ export function isValidCreateNewHederaAccountParams(
 export function isValidCreateVCRequest(
   params: unknown,
 ): asserts params is CreateVCRequestParams {
-  if (params === null || _.isEmpty(params)) {
+  if (params === null || _.isEmpty(params) || !('vcValue' in params)) {
     console.error(
       'Invalid createVC Params passed. "vcValue" must be passed as a parameter',
     );
@@ -507,8 +497,6 @@ export function isValidCreateVCRequest(
   }
 
   const parameter = params as CreateVCRequestParams;
-
-  console.log(`params ${JSON.stringify(parameter)}`);
 
   if (
     'vcValue' in parameter &&
@@ -602,15 +590,7 @@ export function isValidCreateVCRequest(
         );
       }
     }
-    return;
   }
-
-  console.error(
-    'Invalid createVC Params passed. "data" must be passed as a parameter and it must be an object',
-  );
-  throw new Error(
-    'Invalid createVC Params passed. "data" must be passed as a parameter and it must be an object',
-  );
 }
 
 type VerifyVCRequestParams = { verifiableCredential: W3CVerifiableCredential };
@@ -623,7 +603,11 @@ type VerifyVCRequestParams = { verifiableCredential: W3CVerifiableCredential };
 export function isValidVerifyVCRequest(
   params: unknown,
 ): asserts params is VerifyVCRequestParams {
-  if (params === null || _.isEmpty(params)) {
+  if (
+    params === null ||
+    _.isEmpty(params) ||
+    !('verifiableCredential' in params)
+  ) {
     console.error(
       'Invalid verifyVC Params passed. "verifiableCredential" must be passed as a parameter',
     );
@@ -636,18 +620,16 @@ export function isValidVerifyVCRequest(
 
   if (
     'verifiableCredential' in parameter &&
-    parameter.verifiableCredential !== null &&
-    typeof parameter.verifiableCredential === 'object'
+    (parameter.verifiableCredential === null ||
+      typeof parameter.verifiableCredential !== 'object')
   ) {
-    return;
+    console.error(
+      'Invalid verifyVC Params passed. "verifiableCredential" must be passed an object',
+    );
+    throw new Error(
+      'Invalid verifyVC Params passed. "verifiableCredential" must be passed an object',
+    );
   }
-
-  console.error(
-    'Invalid verifyVC Params passed. "verifiableCredential" must be passed as a parameter and it must be an object',
-  );
-  throw new Error(
-    'Invalid verifyVC Params passed. "verifiableCredential" must be passed as a parameter and it must be an object',
-  );
 }
 
 /**
@@ -658,7 +640,7 @@ export function isValidVerifyVCRequest(
 export function isValidRemoveVCRequest(
   params: unknown,
 ): asserts params is IDataManagerDeleteArgs {
-  if (params === null || _.isEmpty(params)) {
+  if (params === null || _.isEmpty(params) || !('id' in params)) {
     console.error(
       'Invalid removeVC Params passed. "id" must be passed as a parameter',
     );
@@ -738,15 +720,7 @@ export function isValidRemoveVCRequest(
         );
       }
     }
-    return;
   }
-
-  console.error(
-    'Invalid removeVC Params passed. "id" must be passed as a parameter',
-  );
-  throw new Error(
-    'Invalid savremoveVCeVC Params passed. "id" must be passed as a parameter ',
-  );
 }
 
 /**
@@ -757,10 +731,6 @@ export function isValidRemoveVCRequest(
 export function isValidDeleteAllVCsRequest(
   params: unknown,
 ): asserts params is IDataManagerClearArgs {
-  if (params === null || _.isEmpty(params)) {
-    return;
-  }
-
   const parameter = params as IDataManagerClearArgs;
 
   // Check if filter is valid
@@ -1035,7 +1005,11 @@ type VerifyVPRequestParams = { verifiablePresentation: VerifiablePresentation };
 export function isValidVerifyVPRequest(
   params: unknown,
 ): asserts params is VerifyVPRequestParams {
-  if (params === null || _.isEmpty(params)) {
+  if (
+    params === null ||
+    _.isEmpty(params) ||
+    !('verifiablePresentation' in params)
+  ) {
     console.error(
       'Invalid verifyVP Params passed. "verifiablePresentation" must be passed as a parameter',
     );
@@ -1048,18 +1022,16 @@ export function isValidVerifyVPRequest(
 
   if (
     'verifiablePresentation' in parameter &&
-    parameter.verifiablePresentation !== null &&
-    typeof parameter.verifiablePresentation === 'object'
+    (parameter.verifiablePresentation === null ||
+      typeof parameter.verifiablePresentation !== 'object')
   ) {
-    return;
+    console.error(
+      'Invalid verifyVP Params passed. "verifiablePresentation" must be an object',
+    );
+    throw new Error(
+      'Invalid verifyVP Params passed. "verifiablePresentation" must be an object',
+    );
   }
-
-  console.error(
-    'Invalid verifyVP Params passed. "verifiablePresentation" must be passed as a parameter and it must be an object',
-  );
-  throw new Error(
-    'Invalid verifyVP Params passed. "verifiablePresentation" must be passed as a parameter and it must be an object',
-  );
 }
 
 /**
@@ -1070,7 +1042,7 @@ export function isValidVerifyVPRequest(
 export function isValidConfigueGoogleRequest(
   params: unknown,
 ): asserts params is GoogleToken {
-  if (params === null || _.isEmpty(params)) {
+  if (params === null || _.isEmpty(params) || !('accessToken' in params)) {
     console.error(
       'Invalid configureGoogleAccount Params passed. "accessToken" must be passed as a parameter',
     );
@@ -1083,16 +1055,14 @@ export function isValidConfigueGoogleRequest(
 
   if (
     'accessToken' in parameter &&
-    parameter.accessToken !== null &&
-    typeof parameter.accessToken === 'string'
+    (parameter.accessToken === null ||
+      typeof parameter.accessToken !== 'string')
   ) {
-    return;
+    console.error(
+      'Invalid configureGoogleAccount Params passed. "accessToken" must be a string',
+    );
+    throw new Error(
+      'Invalid configureGoogleAccount Params passed. "accessToken" must be a string',
+    );
   }
-
-  console.error(
-    'Invalid configureGoogleAccount Params passed. "accessToken" must be passed as a parameter and it must be a string',
-  );
-  throw new Error(
-    'Invalid configureGoogleAccount Params passed. "accessToken" must be passed as a parameter and it must be a string',
-  );
 }
