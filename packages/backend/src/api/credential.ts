@@ -1,49 +1,99 @@
+import { VerifiableCredential, VerifiablePresentation } from '@veramo/core';
+import axios from 'axios';
 import crypto from 'crypto';
-import { createBrotliDecompress } from 'zlib';
-import {
-  IIdentifier,
-  ProofFormat,
-  ProofType,
-  VerifiableCredential,
-  VerifiablePresentation,
-} from '@veramo/core';
-import express, { NextFunction } from 'express';
-import NodeCache from 'node-cache';
+import express from 'express';
 import jwt_decode from 'jwt-decode';
-import e from 'express';
-import { getAgent, setupAgent } from '../veramo/setup';
+import cloneDeep from 'lodash.clonedeep';
+import NodeCache from 'node-cache';
 import * as middlewares from '../middlewares';
+import { getAgent } from '../veramo/setup';
 
 const router = express.Router();
 
 const cache = new NodeCache();
 
-type CredentialResponse = string[];
-
 router.use(middlewares.init);
 router.post('/register/', async (req, res) => {
   console.log(`body${JSON.stringify(req.body)}`);
 
-  const agent = await getAgent();
-  const identifier = await agent.didManagerCreate({
-    kms: 'local',
-    provider: 'did:pkh',
-    options: { network: 'eip155', chainId: '1' },
-  });
-  const credential = await agent.createVerifiableCredential({
-    proofFormat: 'jwt',
-    credential: {
-      credentialSubject: {
-        id: req.body.identifier,
-        loginName: req.body.loginName,
-      },
-      type: ['SiteLoginCredential'],
-      issuer: identifier.did,
-    },
-  });
+  const intoriAgentHeaders = {
+    accept: 'application/json; charset=utf-8',
+    Authorization: `Bearer ${process.env.INTORI_AGENT_API_KEY}`,
+    'Content-Type': 'application/json',
+  };
 
-  console.log(JSON.stringify(credential));
-  res.json(credential);
+  let verifiableCredential;
+  if (process.env.INTORI_AGENT_USE) {
+    const issuanceDate = new Date();
+    // Set the expiration date to be 1 year from the date it's issued
+    const expirationDate = cloneDeep(issuanceDate);
+    expirationDate.setFullYear(
+      issuanceDate.getFullYear() + 1,
+      issuanceDate.getMonth(),
+      issuanceDate.getDate()
+    );
+
+    // Create Verifiable Credential
+    const data = {
+      credential: {
+        issuer: {
+          id: process.env.INTORI_AGENT_ISSUER_DID,
+        },
+        credentialSubject: {
+          loginName: req.body.loginName,
+          id: req.body.identifier,
+        },
+        type: ['SiteLoginCredential'],
+        '@context': ['https://www.w3.org/2018/credentials/v1'],
+        issuanceDate: issuanceDate.toISOString(),
+        expirationDate: expirationDate.toISOString(),
+      },
+      proofFormat: 'jwt',
+    };
+
+    const ret = await axios({
+      method: 'post',
+      url: `${process.env.INTORI_AGENT_URL}/agent/createVerifiableCredential`,
+      headers: intoriAgentHeaders,
+      data: data,
+    });
+
+    verifiableCredential = ret.data;
+    console.log('Credential: ', JSON.stringify(verifiableCredential));
+
+    // Save Verifiable Credential
+    const dataSave = {
+      verifiableCredential,
+    };
+    await axios({
+      method: 'post',
+      url: `${process.env.INTORI_AGENT_URL}/agent/dataStoreSaveVerifiableCredential`,
+      headers: intoriAgentHeaders,
+      data: dataSave,
+    });
+  } else {
+    const agent = await getAgent();
+    const identifier = await agent.didManagerCreate({
+      kms: 'local',
+      provider: 'did:pkh',
+      options: { network: 'eip155', chainId: '1' },
+    });
+    verifiableCredential = await agent.createVerifiableCredential({
+      proofFormat: 'jwt',
+      credential: {
+        credentialSubject: {
+          id: req.body.identifier,
+          loginName: req.body.loginName,
+        },
+        type: ['SiteLoginCredential'],
+        issuer: {
+          id: identifier.did,
+        },
+      },
+    });
+  }
+
+  res.json(verifiableCredential);
 });
 
 router.post('/challenge', async (req, res) => {
@@ -59,36 +109,55 @@ router.post('/challenge', async (req, res) => {
 
 router.post('/signIn', async (req, res) => {
   console.log(`presentation:${JSON.stringify(req.body.presentation)}`);
-  const agent = await getAgent();
+
+  const intoriAgentHeaders = {
+    accept: 'application/json; charset=utf-8',
+    Authorization: `Bearer ${process.env.INTORI_AGENT_API_KEY}`,
+    'Content-Type': 'application/json',
+  };
 
   const verifiablePresentation: VerifiablePresentation = req.body
     .presentation as VerifiablePresentation;
 
-  // check challenge
-  const a: any = jwt_decode(verifiablePresentation.proof.jwt);
-  const did = a.iss;
-  const cachedNonce = cache.get(did);
+  let verified = false;
+  if (process.env.INTORI_AGENT_USE) {
+    const dataPresentation = {
+      presentation: {
+        ...req.body.presentation,
+      },
+    };
 
-  if (
-    cachedNonce === undefined ||
-    cachedNonce !== verifiablePresentation.nonce
-  ) {
-    res.json({ verified: false, message: 'Invalid Nonce' });
-  }
+    const retPresentation = await axios({
+      method: 'post',
+      url: `${process.env.INTORI_AGENT_URL}/agent/verifyPresentation`,
+      headers: intoriAgentHeaders,
+      data: dataPresentation,
+    });
 
-  // We verify the presentation is signed by the user
-  const verified = await agent.verifyPresentation({
-    presentation: verifiablePresentation,
-  });
+    verified = retPresentation.data.verified;
+  } else {
+    const agent = await getAgent();
 
-  if (verified) {
-    if (verifiablePresentation.verifiableCredential?.length !== 1) {
-      res.json({
-        verified: false,
-        message: 'Invalid Presentation: we are expecting a single credential',
-      });
+    // check challenge
+    const a: any = jwt_decode(verifiablePresentation.proof.jwt);
+    const did = a.iss;
+    const cachedNonce = cache.get(did);
+
+    if (
+      cachedNonce === undefined ||
+      cachedNonce !== verifiablePresentation.nonce
+    ) {
+      res.json({ verified: false, message: 'Invalid Nonce' });
     }
 
+    // We verify the presentation is signed by the user
+    const result = await agent.verifyPresentation({
+      presentation: verifiablePresentation,
+    });
+    verified = result.verified;
+  }
+
+  if (verified) {
     const credential: VerifiableCredential =
       verifiablePresentation.verifiableCredential?.pop() as VerifiableCredential;
     if (!credential.type?.includes('SiteLoginCredential')) {
@@ -101,8 +170,23 @@ router.post('/signIn', async (req, res) => {
 
     let verificationResponse = null;
     try {
-      verificationResponse = await agent.verifyCredential({ credential });
-      console.log(verificationResponse.error?.message);
+      if (process.env.INTORI_AGENT_USE) {
+        const dataCredential = {
+          credential,
+        };
+        const retCredential = await axios({
+          method: 'post',
+          url: `${process.env.INTORI_AGENT_URL}/agent/verifyCredential`,
+          headers: intoriAgentHeaders,
+          data: dataCredential,
+        });
+        verificationResponse = retCredential.data;
+        console.log(verificationResponse?.error);
+      } else {
+        const agent = await getAgent();
+        verificationResponse = await agent.verifyCredential({ credential });
+        console.log(verificationResponse.error?.message);
+      }
     } catch (e) {
       res.sendStatus(500).json({ verified: false, message: e });
     }
@@ -110,7 +194,7 @@ router.post('/signIn', async (req, res) => {
     if (!verificationResponse?.verified) {
       res.json({
         verified: false,
-        message: `Invalid Credential: ${verificationResponse?.error?.message}`,
+        message: `Invalid Credential: ${verificationResponse?.error}`,
       });
     } else {
       res.json({ verified: true });

@@ -8,7 +8,7 @@ import {
 import { VerifiablePresentation, W3CVerifiableCredential } from '@veramo/core';
 import axios from 'axios';
 import { useContext, useEffect, useState } from 'react';
-import { Button, Modal } from 'react-bootstrap';
+import { Button, Form, Modal } from 'react-bootstrap';
 import { Card, InstallFlaskButton, SendHelloButton } from '../components/base';
 import {
   ConnectIdentitySnap,
@@ -25,7 +25,7 @@ import {
 import { MetaMaskContext, MetamaskActions } from '../contexts/MetamaskContext';
 import useModal from '../hooks/useModal';
 import { shouldDisplayReconnectButton } from '../utils';
-import { getNetwork, validHederaChainID } from '../utils/hedera';
+import { getNetwork } from '../utils/hedera';
 import {
   connectSnap,
   createVP,
@@ -40,7 +40,6 @@ import {
 function LoginPage() {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [metamaskAddress, setMetamaskAddress] = useState('');
-  const [hederaAccountConnected, setHederaAccountConnected] = useState(false);
   const [loginName, setLoginName] = useState('exampleUsername');
 
   // TODO: get did by calling getDid
@@ -160,9 +159,6 @@ function LoginPage() {
   useEffect(() => {
     setMetamaskAddress(metamaskAddress);
     setCurrentNetwork(getNetwork(currentChainId));
-    if (!validHederaChainID(currentChainId)) {
-      setHederaAccountConnected(false);
-    }
   }, [metamaskAddress, currentChainId]);
 
   const handleConnectClick = async () => {
@@ -239,10 +235,6 @@ function LoginPage() {
 
       if (ret.status === 200) {
         setChallenge(ret.data.challenge);
-        showModal({
-          title: 'Sign in',
-          content: `challenge ${ret.data.challenge}`,
-        });
       }
     } catch (e) {
       console.error(e);
@@ -264,16 +256,19 @@ function LoginPage() {
       </dl>
       <Modal show={showVcsModal} onHide={() => setShowVcsModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Choose the credential to Sign in with</Modal.Title>
+          <Modal.Title>Choose the credential to sign in with</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {vcList.map((cred: any) => (
-            <div key={cred.metadata.id}>
-              <span
-                onClick={() => handleVCClicked(cred.metadata.id)}
-              >{`Login : ${cred.data.credentialSubject.loginName} Issuance: ${cred.data.issuanceDate}`}</span>
-            </div>
-          ))}
+          <Form.Control
+            as="select"
+            onChange={(e) => handleVCClicked(e.target.value)}
+          >
+            {vcList.map((cred: any) => (
+              <option key={cred.metadata.id} value={cred.metadata.id}>
+                {`Login : ${cred.data.credentialSubject.loginName} Issuance: ${cred.data.issuanceDate}`}
+              </option>
+            ))}
+          </Form.Control>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={() => setShowVcsModal(false)}>
