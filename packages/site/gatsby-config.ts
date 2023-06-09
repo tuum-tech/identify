@@ -10,7 +10,7 @@ const config: GatsbyConfig = {
     {
       resolve: 'gatsby-plugin-manifest',
       options: {
-        name: 'Template Snap',
+        name: 'Identity Snap',
         icon: 'src/assets/logo.svg',
         theme_color: '#6F4CFF',
         background_color: '#FFFFFF',

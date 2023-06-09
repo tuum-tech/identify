@@ -8,7 +8,7 @@ import {
 import { VerifiablePresentation, W3CVerifiableCredential } from '@veramo/core';
 import axios from 'axios';
 import { useContext, useEffect, useState } from 'react';
-import { Button, Form, Modal } from 'react-bootstrap';
+import { Alert, Button, Form, Modal } from 'react-bootstrap';
 import { Card, InstallFlaskButton, SendHelloButton } from '../components/base';
 import {
   ConnectIdentitySnap,
@@ -23,7 +23,6 @@ import {
   Subtitle,
 } from '../config/styles';
 import { MetaMaskContext, MetamaskActions } from '../contexts/MetamaskContext';
-import useModal from '../hooks/useModal';
 import { shouldDisplayReconnectButton } from '../utils';
 import { getNetwork } from '../utils/hedera';
 import {
@@ -41,6 +40,7 @@ function LoginPage() {
   const [state, dispatch] = useContext(MetaMaskContext);
   const [metamaskAddress, setMetamaskAddress] = useState('');
   const [loginName, setLoginName] = useState('exampleUsername');
+  const [selectedCredential, setSelectedCredential] = useState('');
 
   // TODO: get did by calling getDid
   const [identifier, setIdentifier] = useState(''); // useState('did:pkh:eip155:296:0x7d871f006d97498ea338268a956af94ab2e65cdd');
@@ -55,7 +55,10 @@ function LoginPage() {
   const [vc, setVC] = useState('');
   const [vcList, setVcList] = useState([] as any);
   const [showVcsModal, setShowVcsModal] = useState(false);
-  const { showModal } = useModal();
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertVariant, setAlertVariant] = useState('danger');
+  const [alertHeading, setAlertHeading] = useState('');
+  const [alertBody, setAlertBody] = useState('');
 
   const handleSaveVC = async () => {
     try {
@@ -94,11 +97,17 @@ function LoginPage() {
       )) as IDataManagerQueryResult[];
 
       console.log(`Your VCs are: ${JSON.stringify(vcs, null, 4)}`);
+
       if (vcs.length > 0) {
         setVcList(vcs);
         setShowVcsModal(true);
       } else {
-        alert('no Vcs found');
+        setAlertVariant('danger');
+        setAlertHeading('Could not Sign in');
+        setAlertBody(
+          'No Verifiable Credentials(VCs) for SiteLogin could be found. Please register first and try signing in again.',
+        );
+        setShowAlert(true);
       }
     } catch (e) {
       console.error(e);
@@ -129,7 +138,21 @@ function LoginPage() {
             presentation,
           },
         });
-        alert(`Verified: ${JSON.stringify(ret.data)}`);
+
+        console.log('Presentation ret: ', JSON.stringify(ret.data));
+
+        if (ret.status !== 200 || !ret.data.verified) {
+          setAlertVariant('danger');
+          setAlertHeading('Could not Sign in');
+          setAlertBody(
+            'The Verifiable Presentation(VP) could not be verified. Please try again.',
+          );
+        } else {
+          setAlertVariant('success');
+          setAlertHeading('Sign in successful');
+          setAlertBody('');
+        }
+        setShowAlert(true);
       }
     })();
   }, [presentation]);
@@ -148,10 +171,21 @@ function LoginPage() {
           },
         });
 
-        setVC(JSON.stringify(ret.data));
+        console.log('Credential ret: ', JSON.stringify(ret.data));
+
         if (ret.status === 200) {
-          alert('Register user successful');
+          setVC(JSON.stringify(ret.data));
+          setAlertVariant('success');
+          setAlertHeading('Registration successful');
+          setAlertBody('');
+        } else {
+          setAlertVariant('danger');
+          setAlertHeading('Could not Register');
+          setAlertBody(
+            'Verifiable Credential(VC) for registration could not be issued. Please try again.',
+          );
         }
+        setShowAlert(true);
       }
     })();
   }, [identifier]);
@@ -254,6 +288,16 @@ function LoginPage() {
         <dt style={{ float: 'left' }}>Current Network:</dt>
         <dd style={{ paddingLeft: 10 }}>{currentNetwork}</dd>
       </dl>
+      {showAlert && (
+        <Alert
+          variant={alertVariant}
+          onClose={() => setShowAlert(false)}
+          dismissible
+        >
+          <Alert.Heading>{alertHeading}</Alert.Heading>
+          {alertBody && <p>{alertBody}</p>}
+        </Alert>
+      )}
       <Modal show={showVcsModal} onHide={() => setShowVcsModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Choose the credential to sign in with</Modal.Title>
@@ -261,8 +305,10 @@ function LoginPage() {
         <Modal.Body>
           <Form.Control
             as="select"
-            onChange={(e) => handleVCClicked(e.target.value)}
+            value={selectedCredential}
+            onChange={(e) => setSelectedCredential(e.target.value)}
           >
+            <option value="">Select a credential...</option>
             {vcList.map((cred: any) => (
               <option key={cred.metadata.id} value={cred.metadata.id}>
                 {`Login : ${cred.data.credentialSubject.loginName} Issuance: ${cred.data.issuanceDate}`}
@@ -271,7 +317,14 @@ function LoginPage() {
           </Form.Control>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" onClick={() => setShowVcsModal(false)}>
+          <Button
+            variant="primary"
+            onClick={() => handleVCClicked(selectedCredential)}
+            disabled={!selectedCredential}
+          >
+            Login
+          </Button>
+          <Button variant="secondary" onClick={() => setShowVcsModal(false)}>
             Cancel
           </Button>
         </Modal.Footer>

@@ -1,5 +1,5 @@
 {
-  "compileOnSave": false,
+  "compileOnSave": true,
   "compilerOptions": {
     /*
       Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects
