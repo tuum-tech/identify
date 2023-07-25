@@ -38,14 +38,30 @@ export async function snapDialog(
 }
 
 /**
- * Function to toggle popups.
+ * Function to generate snap dialog panel.
  *
+ * @param origin - The origin of where the call is being made from.
+ * @param prompt - Prompt text of the metamask dialog box(eg. 'Are you sure you want to send VCs to the dApp?').
+ */
+export async function generateCommonPanel(
+  origin: string,
+  prompt: any[],
+): Promise<Panel> {
+  const panelToShow = [text(`Origin: ${origin}`), divider(), ...prompt];
+  return panel(panelToShow);
+}
+
+/**
+ * Function to generate snap dialog panel for VC related functions.
+ *
+ * @param origin - The origin of where the call is being made from.
  * @param header - Header text of the metamask dialog box(eg. 'Retrieve Verifiable Credentials').
  * @param prompt - Prompt text of the metamask dialog box(eg. 'Are you sure you want to send VCs to the dApp?').
  * @param description - Description text of the metamask dialog box(eg. 'Some dApps are less secure than others and could save data from VCs against your will. Be careful where you send your private VCs! Number of VCs submitted is 2').
  * @param vcs - The Verifiable Credentials to show on the metamask dialog box.
  */
 export async function generateVCPanel(
+  origin: string,
   header: string,
   prompt: string,
   description: string,
@@ -53,6 +69,8 @@ export async function generateVCPanel(
 ): Promise<Panel> {
   const vcsToUse = cloneDeep(vcs);
   const panelToShow = [
+    text(`Origin: ${origin}`),
+    divider(),
     heading(header),
     text(prompt),
     divider(),
@@ -132,7 +150,7 @@ export async function requestHederaAccountId(
 ): Promise<string> {
   const dialogParamsForHederaAccountId: SnapDialogParams = {
     type: 'prompt',
-    content: panel([
+    content: await generateCommonPanel(origin, [
       heading('Connect to Hedera Account'),
       prevHederaAccountId
         ? text(

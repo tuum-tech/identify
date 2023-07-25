@@ -1,5 +1,5 @@
 import { PrivateKey } from '@hashgraph/sdk';
-import { divider, heading, panel, text } from '@metamask/snaps-ui';
+import { divider, heading, text } from '@metamask/snaps-ui';
 import { Wallet, ethers } from 'ethers';
 import _ from 'lodash';
 import { validHederaChainID } from '../hedera/config';
@@ -16,7 +16,7 @@ import {
 import { DEFAULTCOINTYPE, HEDERACOINTYPE } from '../types/constants';
 import { getHederaAccountIfExists } from '../utils/params';
 import { veramoImportMetaMaskAccount } from '../veramo/accountImport';
-import { snapDialog } from './dialog';
+import { generateCommonPanel, snapDialog } from './dialog';
 import { getCurrentNetwork } from './network';
 import { getCurrentCoinType, initAccountState } from './state';
 
@@ -114,7 +114,7 @@ async function connectEVMAccount(
   } else {
     const dialogParamsForPrivateKey: SnapDialogParams = {
       type: 'prompt',
-      content: panel([
+      content: await generateCommonPanel(origin, [
         heading('Connect to EVM Account'),
         text('Enter your ECDSA private key for the following Account'),
         divider(),
@@ -172,7 +172,7 @@ async function connectHederaAccount(
   if (evmAddress === null || _.isEmpty(evmAddress)) {
     const dialogParamsForPrivateKey: SnapDialogParams = {
       type: 'prompt',
-      content: panel([
+      content: await generateCommonPanel(origin, [
         heading('Connect to Hedera Account'),
         text('Enter your ECDSA private key for the following Account'),
         divider(),

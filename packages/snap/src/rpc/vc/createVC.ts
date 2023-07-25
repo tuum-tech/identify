@@ -1,4 +1,4 @@
-import { divider, heading, panel, text } from '@metamask/snaps-ui';
+import { divider, heading, text } from '@metamask/snaps-ui';
 import { ProofFormat, W3CVerifiableCredential } from '@veramo/core';
 import cloneDeep from 'lodash.clonedeep';
 import { v4 as uuidv4 } from 'uuid';
@@ -9,7 +9,7 @@ import {
   ISaveVC,
   SaveOptions,
 } from '../../plugins/veramo/verifiable-creds-manager';
-import { snapDialog } from '../../snap/dialog';
+import { generateCommonPanel, snapDialog } from '../../snap/dialog';
 import { getCurrentNetwork } from '../../snap/network';
 import { getAccountStateByCoinType } from '../../snap/state';
 import {
@@ -28,7 +28,7 @@ export async function createVC(
   identitySnapParams: IdentitySnapParams,
   vcRequestParams: CreateVCRequestParams,
 ): Promise<CreateVCResponseResult> {
-  const { snap, state, metamask, account } = identitySnapParams;
+  const { origin, snap, state, metamask, account } = identitySnapParams;
 
   // Get Veramo agent
   const agent = await getVeramoAgent(snap, state);
@@ -47,7 +47,7 @@ export async function createVC(
 
   const dialogParams: SnapDialogParams = {
     type: 'confirmation',
-    content: panel([
+    content: await generateCommonPanel(origin, [
       heading('Create Verifiable Credential'),
       text('Would you like to create and save the following VC in the snap?'),
       divider(),

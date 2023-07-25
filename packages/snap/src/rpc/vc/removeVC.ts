@@ -19,7 +19,7 @@ export async function removeVC(
   identitySnapParams: IdentitySnapParams,
   vcRequestParams: IDataManagerDeleteArgs,
 ): Promise<IDataManagerDeleteResult[] | null> {
-  const { snap, state, account } = identitySnapParams;
+  const { origin, snap, state, account } = identitySnapParams;
 
   const { id = '', options } = vcRequestParams || {};
   const { store = 'snap' } = options || {};
@@ -57,7 +57,13 @@ export async function removeVC(
   const description = `Note that this action cannot be reversed and you will need to recreate your VCs if you go through with it. Number of VCs to be removed is ${vcsToBeRemoved.length.toString()}`;
   const dialogParams: SnapDialogParams = {
     type: 'confirmation',
-    content: await generateVCPanel(header, prompt, description, vcsToBeRemoved),
+    content: await generateVCPanel(
+      origin,
+      header,
+      prompt,
+      description,
+      vcsToBeRemoved,
+    ),
   };
 
   if (await snapDialog(snap, dialogParams)) {

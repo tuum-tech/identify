@@ -69,6 +69,7 @@ export type IdentityAccountConfig = {
 };
 
 export type IdentitySnapParams = {
+  origin: string;
   snap: SnapsGlobalObject;
   state: IdentitySnapState;
   metamask: MetaMaskInpageProvider;
