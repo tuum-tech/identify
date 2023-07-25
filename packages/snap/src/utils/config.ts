@@ -1,6 +1,7 @@
 import cloneDeep from 'lodash.clonedeep';
 import {
   Account,
+  GoogleUserInfo,
   IdentityAccountConfig,
   IdentityAccountState,
   IdentitySnapState,
@@ -17,6 +18,7 @@ const emptyAccountState = {
     identity: {
       didMethod: 'did:pkh',
       vcStore: 'snap',
+      googleUserInfo: {} as GoogleUserInfo,
     },
   } as IdentityAccountConfig,
 } as IdentityAccountState;

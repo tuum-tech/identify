@@ -104,7 +104,8 @@ export async function createVC(
     const saved: IDataManagerSaveResult[] = await agent.saveVC({
       data: [{ vc: verifiableCredential, id: uuidv4() }] as ISaveVC[],
       options: optionsFiltered,
-      accessToken: accountState.accountConfig.identity.googleAccessToken,
+      accessToken:
+        accountState.accountConfig.identity.googleUserInfo.accessToken,
     });
 
     // Retrieve the created Verifiable Credential

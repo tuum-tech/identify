@@ -33,7 +33,9 @@ export async function syncGoogleVCs(
     state,
     account.evmAddress,
   );
-  await verifyToken(accountState.accountConfig.identity.googleAccessToken);
+  await verifyToken(
+    accountState.accountConfig.identity.googleUserInfo.accessToken,
+  );
 
   const options: QueryOptions = { store: 'snap', returnStore: true };
   // Get VCs from the snap state storage
@@ -46,7 +48,7 @@ export async function syncGoogleVCs(
   const googleVCs = (await agent.queryVC({
     filter: undefined,
     options,
-    accessToken: accountState.accountConfig.identity.googleAccessToken,
+    accessToken: accountState.accountConfig.identity.googleUserInfo.accessToken,
   })) as IDataManagerQueryResult[];
   /* googleVCs = googleVCs.filter(
     (vc) =>
@@ -151,7 +153,8 @@ async function handleSync(
     const result: IDataManagerSaveResult[] = await agent.saveVC({
       data,
       options,
-      accessToken: accountState.accountConfig.identity.googleAccessToken,
+      accessToken:
+        accountState.accountConfig.identity.googleUserInfo.accessToken,
     });
     if (!(result.length > 0 && result[0].id !== '')) {
       console.log('Could not sync the vc: ', JSON.stringify(data, null, 4));

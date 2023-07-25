@@ -87,7 +87,8 @@ export async function saveVC(
         },
       ) as ISaveVC[],
       options: optionsFiltered,
-      accessToken: accountState.accountConfig.identity.googleAccessToken,
+      accessToken:
+        accountState.accountConfig.identity.googleUserInfo.accessToken,
     });
   }
 

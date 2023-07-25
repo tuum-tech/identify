@@ -60,11 +60,16 @@ export type IdentityAccountState = {
   extraData?: unknown;
 };
 
+export type GoogleUserInfo = {
+  accessToken: string;
+  email: string;
+};
+
 export type IdentityAccountConfig = {
   identity: {
     didMethod: string;
     vcStore: string;
-    googleAccessToken: string;
+    googleUserInfo: GoogleUserInfo;
   };
 };
 

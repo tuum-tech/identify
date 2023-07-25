@@ -45,7 +45,8 @@ export async function removeVC(
         filter: vcId,
       },
       options: optionsFiltered,
-      accessToken: accountState.accountConfig.identity.googleAccessToken,
+      accessToken:
+        accountState.accountConfig.identity.googleUserInfo.accessToken,
     })) as IDataManagerQueryResult[];
     if (vcs.length > 0) {
       vcsToBeRemoved.push(vcs[0]);
@@ -73,7 +74,8 @@ export async function removeVC(
         return await agent.deleteVC({
           id: _id,
           options: optionsFiltered,
-          accessToken: accountState.accountConfig.identity.googleAccessToken,
+          accessToken:
+            accountState.accountConfig.identity.googleUserInfo.accessToken,
         });
       }),
     ).then((data: IDataManagerDeleteResult[][]) => {

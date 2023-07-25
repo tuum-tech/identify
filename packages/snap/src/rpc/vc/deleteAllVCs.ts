@@ -34,7 +34,7 @@ export async function deleteAllVCs(
   const vcsToBeRemoved = (await agent.queryVC({
     filter: undefined,
     options: optionsFiltered,
-    accessToken: accountState.accountConfig.identity.googleAccessToken,
+    accessToken: accountState.accountConfig.identity.googleUserInfo.accessToken,
   })) as IDataManagerQueryResult[];
 
   const header = 'Delete all Verifiable Credentials';
@@ -55,7 +55,8 @@ export async function deleteAllVCs(
     // Remove all the Verifiable Credentials from the store
     return await agent.clearVCs({
       options: optionsFiltered,
-      accessToken: accountState.accountConfig.identity.googleAccessToken,
+      accessToken:
+        accountState.accountConfig.identity.googleUserInfo.accessToken,
     });
   }
   throw new Error('User rejected');

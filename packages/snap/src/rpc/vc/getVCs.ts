@@ -35,7 +35,7 @@ export async function getVCs(
   const vcs = (await agent.queryVC({
     filter,
     options: optionsFiltered,
-    accessToken: accountState.accountConfig.identity.googleAccessToken,
+    accessToken: accountState.accountConfig.identity.googleUserInfo.accessToken,
   })) as IDataManagerQueryResult[];
   console.log('VCs: ', JSON.stringify(vcs, null, 4));
 
