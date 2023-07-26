@@ -1,5 +1,5 @@
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
-import { heading, panel, text } from '@metamask/snaps-ui';
+import { heading, text } from '@metamask/snaps-ui';
 import { Account, ExternalAccount, IdentitySnapParams } from './interfaces';
 import { getAccountInfo } from './rpc/account/getAccountInfo';
 import { getAvailableDIDMethods } from './rpc/did/getAvailableDIDMethods';
@@ -20,6 +20,7 @@ import { syncGoogleVCs } from './rpc/vc/syncGoogleVCs';
 import { verifyVC } from './rpc/vc/verifyVC';
 import { verifyVP } from './rpc/vc/verifyVP';
 import { getCurrentAccount } from './snap/account';
+import { generateCommonPanel } from './snap/dialog';
 import { getSnapStateUnchecked } from './snap/state';
 import { CreateNewHederaAccountRequestParams } from './types/params';
 import { init } from './utils/init';
@@ -89,6 +90,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   );
 
   const identitySnapParams: IdentitySnapParams = {
+    origin,
     snap,
     state,
     metamask: ethereum,
@@ -107,8 +109,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
             - 'prompt': for inputting some information.
           */
           type: 'alert',
-          content: panel([
-            heading(`Hello, ${origin}!`),
+          content: await generateCommonPanel(origin, [
+            heading('Hello from Identity Snap!'),
             text('This custom alert is just for display purposes.'),
           ]),
         },

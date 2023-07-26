@@ -1,5 +1,5 @@
-import { PrivateKey } from '@hashgraph/sdk';
-import { divider, heading, panel, text } from '@metamask/snaps-ui';
+import { AccountId, PrivateKey } from '@hashgraph/sdk';
+import { divider, heading, text } from '@metamask/snaps-ui';
 import { Wallet, ethers } from 'ethers';
 import _ from 'lodash';
 import { validHederaChainID } from '../hedera/config';
@@ -16,7 +16,7 @@ import {
 import { DEFAULTCOINTYPE, HEDERACOINTYPE } from '../types/constants';
 import { getHederaAccountIfExists } from '../utils/params';
 import { veramoImportMetaMaskAccount } from '../veramo/accountImport';
-import { snapDialog } from './dialog';
+import { generateCommonPanel, snapDialog } from './dialog';
 import { getCurrentNetwork } from './network';
 import { getCurrentCoinType, initAccountState } from './state';
 
@@ -39,20 +39,33 @@ export async function getCurrentAccount(
       const nonMetamaskAccount = params as ExternalAccount;
       if (nonMetamaskAccount.externalAccount) {
         if (nonMetamaskAccount.externalAccount.blockchainType === 'hedera') {
-          return await connectHederaAccount(
-            state,
-            (nonMetamaskAccount.externalAccount.data as HederaAccountParams)
-              .accountId,
-          );
+          const hederaAccountId = (
+            nonMetamaskAccount.externalAccount.data as HederaAccountParams
+          ).accountId;
+          if (!AccountId.fromString(hederaAccountId)) {
+            console.error(
+              `Invalid Hedera Account Id '${hederaAccountId}' is not a valid account Id`,
+            );
+            throw new Error(
+              `Invalid Hedera Account Id '${hederaAccountId}' is not a valid account Id`,
+            );
+          }
+          return await connectHederaAccount(state, hederaAccountId);
         } else if (
           nonMetamaskAccount.externalAccount.blockchainType === 'evm'
         ) {
-          return await connectEVMAccount(
-            state,
-            (
-              nonMetamaskAccount.externalAccount.data as EvmAccountParams
-            ).address.toLowerCase(),
-          );
+          const ethAddress = (
+            nonMetamaskAccount.externalAccount.data as EvmAccountParams
+          ).address.toLowerCase();
+          if (!ethers.isAddress(ethAddress)) {
+            console.error(
+              `Invalid EVM Account Address '${ethAddress}' is not a valid address`,
+            );
+            throw new Error(
+              `Invalid EVM Account Address '${ethAddress}' is not a valid address`,
+            );
+          }
+          return await connectEVMAccount(state, ethAddress);
         }
 
         console.error(
@@ -66,6 +79,15 @@ export async function getCurrentAccount(
 
     // Handle metamask account
     const { metamaskAddress } = params as MetamaskAccountParams;
+    if (!ethers.isAddress(metamaskAddress)) {
+      console.error(
+        `Invalid Account Address '${metamaskAddress}' is not a valid address`,
+      );
+      throw new Error(
+        `Invalid Account Address '${metamaskAddress}' is not a valid address`,
+      );
+    }
+
     // Initialize if not there
     const coinType = (await getCurrentCoinType()).toString();
     if (metamaskAddress && !(metamaskAddress in state.accountState[coinType])) {
@@ -114,7 +136,7 @@ async function connectEVMAccount(
   } else {
     const dialogParamsForPrivateKey: SnapDialogParams = {
       type: 'prompt',
-      content: panel([
+      content: await generateCommonPanel(origin, [
         heading('Connect to EVM Account'),
         text('Enter your ECDSA private key for the following Account'),
         divider(),
@@ -172,7 +194,7 @@ async function connectHederaAccount(
   if (evmAddress === null || _.isEmpty(evmAddress)) {
     const dialogParamsForPrivateKey: SnapDialogParams = {
       type: 'prompt',
-      content: panel([
+      content: await generateCommonPanel(origin, [
         heading('Connect to Hedera Account'),
         text('Enter your ECDSA private key for the following Account'),
         divider(),

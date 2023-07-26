@@ -26,7 +26,7 @@ export async function createVP(
   identitySnapParams: IdentitySnapParams,
   vpRequestParams: CreateVPRequestParams,
 ): Promise<VerifiablePresentation | null> {
-  const { snap, state, account } = identitySnapParams;
+  const { origin, snap, state, account } = identitySnapParams;
 
   const {
     vcIds = [],
@@ -94,6 +94,7 @@ export async function createVP(
   const dialogParams: SnapDialogParams = {
     type: 'confirmation',
     content: await generateVCPanel(
+      origin,
       header,
       prompt,
       description,

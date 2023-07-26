@@ -6,7 +6,7 @@ type UploadData = {
 export const GOOGLE_DRIVE_VCS_FILE_NAME = 'identity-snap-vcs.json';
 const BOUNDARY = '314159265358979323846';
 
-export const verifyToken = async (accessToken: string) => {
+export const verifyToken = async (accessToken: string): Promise<string> => {
   try {
     const res = await fetch(
       `https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${accessToken}`,
@@ -18,9 +18,9 @@ export const verifyToken = async (accessToken: string) => {
     if (res.status !== 200) {
       throw new Error(data.error_description);
     }
-    console.log('VerifyToken: ', { data: JSON.stringify(data) });
+    console.log('VerifyToken data: ', JSON.stringify(data, null, 4));
 
-    return true;
+    return data.email;
   } catch (error) {
     console.error(`Failed to verify token: ${error}`);
     throw new Error(`Failed to verify token: ${error}`);
@@ -39,7 +39,7 @@ const searchFile = async (accessToken: string, fileName: string) => {
       },
     );
     const data = await res.json();
-    console.log('searchFile: ', { data: JSON.stringify(data) });
+    console.log('searchFile data: ', JSON.stringify(data, null, 4));
 
     const count = data.files.length;
 

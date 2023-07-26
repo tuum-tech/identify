@@ -1,6 +1,6 @@
-import { divider, heading, panel, text } from '@metamask/snaps-ui';
+import { divider, heading, text } from '@metamask/snaps-ui';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
-import { snapDialog } from '../../snap/dialog';
+import { generateCommonPanel, snapDialog } from '../../snap/dialog';
 import { getAccountStateByCoinType, updateSnapState } from '../../snap/state';
 import { availableMethods, isValidMethod } from '../../types/constants';
 
@@ -33,7 +33,7 @@ export async function switchDIDMethod(
   if (method !== didMethod) {
     const dialogParams: SnapDialogParams = {
       type: 'confirmation',
-      content: panel([
+      content: await generateCommonPanel(origin, [
         heading('Switch to a different DID method to use'),
         text('Would you like to change did method to the following?'),
         divider(),

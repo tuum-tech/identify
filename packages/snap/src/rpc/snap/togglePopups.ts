@@ -1,6 +1,10 @@
-import { heading, panel, text } from '@metamask/snaps-ui';
+import { heading, text } from '@metamask/snaps-ui';
 import { IdentitySnapParams, SnapDialogParams } from '../../interfaces';
-import { snapDialog, updatePopups } from '../../snap/dialog';
+import {
+  generateCommonPanel,
+  snapDialog,
+  updatePopups,
+} from '../../snap/dialog';
 
 /**
  * Function to toggle popups.
@@ -10,13 +14,13 @@ import { snapDialog, updatePopups } from '../../snap/dialog';
 export async function togglePopups(
   identitySnapParams: IdentitySnapParams,
 ): Promise<boolean> {
-  const { snap, state } = identitySnapParams;
+  const { origin, snap, state } = identitySnapParams;
   const { disablePopups } = state.snapConfig.dApp;
 
   const toggleTextToShow = disablePopups ? 'enable' : 'disable';
   const dialogParams: SnapDialogParams = {
     type: 'confirmation',
-    content: panel([
+    content: await generateCommonPanel(origin, [
       heading('Toggle Popups'),
       text(`Would you like to ${toggleTextToShow} the popups?`),
     ]),

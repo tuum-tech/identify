@@ -21,7 +21,7 @@ export async function saveVC(
   identitySnapParams: IdentitySnapParams,
   vcSaveRequestParams: IDataManagerSaveArgs,
 ): Promise<IDataManagerSaveResult[]> {
-  const { snap, state, account } = identitySnapParams;
+  const { origin, snap, state, account } = identitySnapParams;
 
   const { data: verifiableCredentials, options } = vcSaveRequestParams || {};
   const { store = 'snap' } = options || {};
@@ -56,6 +56,7 @@ export async function saveVC(
   const dialogParams: SnapDialogParams = {
     type: 'confirmation',
     content: await generateVCPanel(
+      origin,
       header,
       prompt,
       description,
@@ -86,7 +87,8 @@ export async function saveVC(
         },
       ) as ISaveVC[],
       options: optionsFiltered,
-      accessToken: accountState.accountConfig.identity.googleAccessToken,
+      accessToken:
+        accountState.accountConfig.identity.googleUserInfo.accessToken,
     });
   }
 

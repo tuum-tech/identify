@@ -42,14 +42,15 @@ const ConfigureGoogleAccount: FC<Props> = ({
       const externalAccountParams =
         externalAccountRef.current?.handleGetAccountParams();
 
-      await configureGoogleAccount(
+      const configured = await configureGoogleAccount(
         metamaskAddress,
         tokenResponse.access_token,
         externalAccountParams,
       );
+      console.log('Google Drive Configured: ', configured);
       showModal({
-        title: 'Google Account Configuration',
-        content: 'Google Account configuration was successful!',
+        title: 'Verify VC',
+        content: `Google Drive Configured: ${configured}`,
       });
       setLoading(false);
     },

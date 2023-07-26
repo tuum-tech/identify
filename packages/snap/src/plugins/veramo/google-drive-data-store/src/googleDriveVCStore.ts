@@ -31,11 +31,14 @@ export class GoogleDriveVCStore extends AbstractDataStore {
 
   accessToken: string;
 
+  email: string;
+
   constructor(snap: SnapsGlobalObject, state: IdentitySnapState) {
     super();
     this.snap = snap;
     this.state = state;
     this.accessToken = '';
+    this.email = '';
   }
 
   async queryVC(args: IFilterArgs): Promise<IQueryResult[]> {
@@ -258,8 +261,9 @@ export class GoogleDriveVCStore extends AbstractDataStore {
 
   public async configure({ accessToken }: IConfigureArgs): Promise<boolean> {
     try {
-      await verifyToken(accessToken);
+      const email = await verifyToken(accessToken);
       this.accessToken = accessToken;
+      this.email = email;
 
       return true;
     } catch (error) {

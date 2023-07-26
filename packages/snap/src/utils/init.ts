@@ -1,7 +1,7 @@
 import { SnapsGlobalObject } from '@metamask/snaps-types';
-import { heading, panel, text } from '@metamask/snaps-ui';
+import { heading, text } from '@metamask/snaps-ui';
 import { IdentitySnapState, SnapDialogParams } from '../interfaces';
-import { snapDialog } from '../snap/dialog';
+import { generateCommonPanel, snapDialog } from '../snap/dialog';
 import { initSnapState } from '../snap/state';
 
 /**
@@ -14,7 +14,7 @@ export async function init(
 ): Promise<IdentitySnapState> {
   const dialogParams: SnapDialogParams = {
     type: 'alert',
-    content: panel([
+    content: await generateCommonPanel(origin, [
       heading('Risks about using Identity Snap'),
       text(
         'Applications do NOT have access to your private keys. You are in control of what VCs and VPs you sign and what you use your DIDs for.',

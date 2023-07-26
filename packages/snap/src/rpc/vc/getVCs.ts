@@ -18,7 +18,7 @@ export async function getVCs(
   identitySnapParams: IdentitySnapParams,
   vcRequestParams: IDataManagerQueryArgs,
 ): Promise<IDataManagerQueryResult[]> {
-  const { snap, state, account } = identitySnapParams;
+  const { origin, snap, state, account } = identitySnapParams;
 
   const { filter, options } = vcRequestParams || {};
   const { store = 'snap', returnStore = true } = options || {};
@@ -35,7 +35,7 @@ export async function getVCs(
   const vcs = (await agent.queryVC({
     filter,
     options: optionsFiltered,
-    accessToken: accountState.accountConfig.identity.googleAccessToken,
+    accessToken: accountState.accountConfig.identity.googleUserInfo.accessToken,
   })) as IDataManagerQueryResult[];
   console.log('VCs: ', JSON.stringify(vcs, null, 4));
 
@@ -44,7 +44,7 @@ export async function getVCs(
   const description = `Some dApps are less secure than others and could save data from VCs against your will. Be careful where you send your private VCs! Number of VCs submitted is ${vcs.length.toString()}`;
   const dialogParams: SnapDialogParams = {
     type: 'confirmation',
-    content: await generateVCPanel(header, prompt, description, vcs),
+    content: await generateVCPanel(origin, header, prompt, description, vcs),
   };
 
   if (
