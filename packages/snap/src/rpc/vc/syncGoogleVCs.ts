@@ -26,81 +26,90 @@ export async function syncGoogleVCs(
 ): Promise<boolean> {
   const { origin, state, account } = identitySnapParams;
 
-  // Get Veramo agent
-  const agent = await getVeramoAgent(snap, state);
+  try {
+    // Get Veramo agent
+    const agent = await getVeramoAgent(snap, state);
 
-  const accountState = await getAccountStateByCoinType(
-    state,
-    account.evmAddress,
-  );
-  await verifyToken(
-    accountState.accountConfig.identity.googleUserInfo.accessToken,
-  );
+    const accountState = await getAccountStateByCoinType(
+      state,
+      account.evmAddress,
+    );
+    const gUserEmail = await verifyToken(
+      accountState.accountConfig.identity.googleUserInfo.accessToken,
+    );
 
-  const options: QueryOptions = { store: 'snap', returnStore: true };
-  // Get VCs from the snap state storage
-  const snapVCs = (await agent.queryVC({
-    filter: undefined,
-    options,
-  })) as IDataManagerQueryResult[];
-  // Get VCs from google drive storage
-  options.store = 'googleDrive';
-  const googleVCs = (await agent.queryVC({
-    filter: undefined,
-    options,
-    accessToken: accountState.accountConfig.identity.googleUserInfo.accessToken,
-  })) as IDataManagerQueryResult[];
-  /* googleVCs = googleVCs.filter(
+    const options: QueryOptions = { store: 'snap', returnStore: true };
+    // Get VCs from the snap state storage
+    const snapVCs = (await agent.queryVC({
+      filter: undefined,
+      options,
+    })) as IDataManagerQueryResult[];
+    // Get VCs from google drive storage
+    options.store = 'googleDrive';
+    const googleVCs = (await agent.queryVC({
+      filter: undefined,
+      options,
+      accessToken:
+        accountState.accountConfig.identity.googleUserInfo.accessToken,
+    })) as IDataManagerQueryResult[];
+    /* googleVCs = googleVCs.filter(
     (vc) =>
       (vc.data as VerifiableCredential).credentialSubject.id?.split(':')[4] ===
       account.evmAddress, // Note that we're only doing this because this is a did:pkh VC. We need to handle other VCs differently
   ); */
 
-  const snapVCIds = snapVCs.map((vc) => vc.metadata.id);
-  const googleVCIds = googleVCs.map((vc) => vc.metadata.id);
+    const snapVCIds = snapVCs.map((vc) => vc.metadata.id);
+    const googleVCIds = googleVCs.map((vc) => vc.metadata.id);
 
-  const vcsNotInSnap = googleVCs.filter(
-    (vc) => !snapVCIds.includes(vc.metadata.id),
-  );
-  console.log('vcsNotInSnap: ', JSON.stringify(vcsNotInSnap, null, 4));
-
-  const vcsNotInGDrive = snapVCs.filter(
-    (vc) => !googleVCIds.includes(vc.metadata.id),
-  );
-  console.log('vcsNotInGDrive: ', JSON.stringify(vcsNotInGDrive, null, 4));
-
-  const header = 'Sync Verifiable Credentials';
-  let vcsNotInSnapSync = true;
-  if (vcsNotInSnap.length > 0) {
-    vcsNotInSnapSync = await handleSync(
-      state,
-      account,
-      agent,
-      origin,
-      `${header} - Import VCs from Google drive`,
-      'Would you like to sync VCs in Google drive with Metamask snap?',
-      'This action will import the VCs that are in Google drive to the Metamask snap',
-      vcsNotInSnap,
-      'snap',
+    const vcsNotInSnap = googleVCs.filter(
+      (vc) => !snapVCIds.includes(vc.metadata.id),
     );
-  }
-  let vcsNotInGDriveSync = true;
-  if (vcsNotInGDrive.length > 0) {
-    vcsNotInGDriveSync = await handleSync(
-      state,
-      account,
-      agent,
-      origin,
-      `${header} - Export VCs to Google drive`,
-      'Would you like to sync VCs in Metamask snap with Google drive?',
-      'This action will export the VCs that are in Metamask snap to Google drive',
-      vcsNotInGDrive,
-      'googleDrive',
-    );
-  }
+    console.log('vcsNotInSnap: ', JSON.stringify(vcsNotInSnap, null, 4));
 
-  if (vcsNotInSnapSync && vcsNotInGDriveSync) {
-    return true;
+    const vcsNotInGDrive = snapVCs.filter(
+      (vc) => !googleVCIds.includes(vc.metadata.id),
+    );
+    console.log('vcsNotInGDrive: ', JSON.stringify(vcsNotInGDrive, null, 4));
+
+    const header = 'Sync Verifiable Credentials';
+    let vcsNotInSnapSync = true;
+    if (vcsNotInSnap.length > 0) {
+      vcsNotInSnapSync = await handleSync(
+        state,
+        account,
+        agent,
+        origin,
+        `${header} - Import VCs from Google drive: ${gUserEmail}`,
+        'Would you like to sync VCs in Google drive with Metamask snap?',
+        'This action will import the VCs that are in Google drive to the Metamask snap',
+        vcsNotInSnap,
+        'snap',
+      );
+    }
+    let vcsNotInGDriveSync = true;
+    if (vcsNotInGDrive.length > 0) {
+      vcsNotInGDriveSync = await handleSync(
+        state,
+        account,
+        agent,
+        origin,
+        `${header} - Export VCs to Google drive: ${gUserEmail}`,
+        'Would you like to sync VCs in Metamask snap with Google drive?',
+        'This action will export the VCs that are in Metamask snap to Google drive',
+        vcsNotInGDrive,
+        'googleDrive',
+      );
+    }
+
+    if (vcsNotInSnapSync && vcsNotInGDriveSync) {
+      return true;
+    }
+  } catch (error) {
+    console.error(
+      'Could not sync Verifiable Credentials between the Metamask snap and Google Drive properly. Please try again',
+      JSON.stringify(error, null, 4),
+    );
+    throw error;
   }
 
   console.log(

@@ -4,10 +4,10 @@ import styled from 'styled-components';
 import { Footer, Header, Modal } from './components/base';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { ToggleThemeContext } from './Root';
 import { GlobalStyle } from './config/theme';
 import { ModalContextProvider } from './contexts/ModalContext';
 import { VcContextProvider } from './contexts/VcContext';
-import { ToggleThemeContext } from './Root';
 
 const Wrapper = styled.div`
   display: flex;
