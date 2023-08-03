@@ -1,6 +1,6 @@
 {
   "name": "@tuum-tech/identify-example-backend",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": " A basic starter for an express.js API with Typescript",
   "keywords": [],
   "repository": {
