@@ -16,9 +16,9 @@ const ConnectIdentitySnap: FC<Props> = ({ handleConnectClick }) => {
   return (
     <Card
       content={{
-        title: 'Connect to Identity Snap',
+        title: 'Connect to Identify Snap',
         description:
-          'Get started by connecting to and installing the Identity Snap.',
+          'Get started by connecting to and installing the Identify Snap.',
         button: (
           <ConnectButton
             onClick={handleConnectClick}

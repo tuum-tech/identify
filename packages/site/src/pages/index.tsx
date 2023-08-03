@@ -79,7 +79,7 @@ const Index = () => {
   return (
     <PageContainer>
       <Heading>
-        Welcome to <Span>Identity Snap</Span>
+        Welcome to <Span>Identify Snap</Span>
       </Heading>
       <Container>
         <Row>

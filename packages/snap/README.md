@@ -1,12 +1,12 @@
-# @tuum-tech/identity-snap
+# @tuum-tech/identify
 
-This repository contains code for Identity Snap that offers various features such as configuring hedera account, getting current did method, getting DID, resolving DID, getting Verifiable Credentials, creating Verifiable Credentials out of some arbitary JSON object, generating Verifiable Presentations from Verifiable Credentials and verifying VCs and verifying VPs.
+This repository contains code for Identify Snap that offers various features such as configuring hedera account, getting current did method, getting DID, resolving DID, getting Verifiable Credentials, creating Verifiable Credentials out of some arbitary JSON object, generating Verifiable Presentations from Verifiable Credentials and verifying VCs and verifying VPs.
 
 MetaMask Snaps is a system that allows anyone to safely expand the capabilities of MetaMask. A _snap_ is a program that we run in an isolated environment that can customize the wallet experience.
 
 ## Snaps is pre-release software
 
-To interact with Identity Snap, you will need to install [MetaMask Flask](https://metamask.io/flask/), a canary distribution for developers that provides access to upcoming features.
+To interact with Identify Snap, you will need to install [MetaMask Flask](https://metamask.io/flask/), a canary distribution for developers that provides access to upcoming features.
 
 ## Getting Started
 
@@ -16,9 +16,9 @@ To interact with Identity Snap, you will need to install [MetaMask Flask](https:
 yarn install && yarn start
 ```
 
-### Connect to official npm package @tuum-tech/identity-snap
+### Connect to official npm package @tuum-tech/identify
 
-If you want to integrate the Identity Snap on your website, you can install the package [from the npm registry](https://www.npmjs.com/package/@tuum-tech/identity-snap).
+If you want to integrate the Identify Snap on your website, you can install the package [from the npm registry](https://www.npmjs.com/package/@tuum-tech/identify).
 
 ## Contributing
 

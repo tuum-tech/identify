@@ -15,7 +15,7 @@ export async function init(
   const dialogParams: SnapDialogParams = {
     type: 'alert',
     content: await generateCommonPanel(origin, [
-      heading('Risks about using Identity Snap'),
+      heading('Risks about using Identify Snap'),
       text(
         'Applications do NOT have access to your private keys. You are in control of what VCs and VPs you sign and what you use your DIDs for.',
       ),

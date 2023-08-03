@@ -278,11 +278,11 @@ function LoginPage() {
   return (
     <PageContainer>
       <Heading>
-        Welcome to <Span>Identity Snap</Span>
+        Welcome to <Span>Identify Snap</Span>
       </Heading>
       <Subtitle>
         Check out how Signup and Login actions can be handled by utilizing VCs
-        through the use of Identity Snap
+        through the use of Identify Snap
       </Subtitle>
       <dl>
         <dt style={{ float: 'left' }}>Current Network:</dt>

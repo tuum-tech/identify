@@ -86,7 +86,7 @@ export async function veramoImportMetaMaskAccount(
   const coinType = (await getCurrentCoinType()).toString();
   if (address && !(address in state.accountState[coinType])) {
     console.log(
-      `The address ${address} has NOT yet been configured in the Identity Snap. Configuring now...`,
+      `The address ${address} has NOT yet been configured in the Identify Snap. Configuring now...`,
     );
     await initAccountState(snap, state, coinType, address);
   }

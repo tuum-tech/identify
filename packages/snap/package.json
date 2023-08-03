@@ -1,6 +1,6 @@
 {
-  "name": "@tuum-tech/identity-snap",
-  "version": "1.4.0",
+  "name": "@tuum-tech/identify",
+  "version": "1.4.1",
   "description": "A snap for managing Decentralized Identifiers(DIDs)",
   "keywords": [
     "MetaMask",
@@ -15,7 +15,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/tuum-tech/identity-snap.git"
+    "url": "https://github.com/tuum-tech/identify.git"
   },
   "license": "MIT",
   "author": {

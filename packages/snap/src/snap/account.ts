@@ -92,7 +92,7 @@ export async function getCurrentAccount(
     const coinType = (await getCurrentCoinType()).toString();
     if (metamaskAddress && !(metamaskAddress in state.accountState[coinType])) {
       console.log(
-        `The address ${metamaskAddress} has NOT yet been configured in the Identity Snap. Configuring now...`,
+        `The address ${metamaskAddress} has NOT yet been configured in the Identify Snap. Configuring now...`,
       );
       await initAccountState(snap, state, coinType, metamaskAddress);
     }

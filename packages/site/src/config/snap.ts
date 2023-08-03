@@ -4,4 +4,4 @@
  */
 // Comment or uncomment depending on what you want to test
 export const defaultSnapId = `local:http://localhost:8080`;
-// export const defaultSnapId = `npm:@tuum-tech/identity-snap`;
+// export const defaultSnapId = `npm:@tuum-tech/identify`;

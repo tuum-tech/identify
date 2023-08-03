@@ -110,7 +110,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           */
           type: 'alert',
           content: await generateCommonPanel(origin, [
-            heading('Hello from Identity Snap!'),
+            heading('Hello from Identify Snap!'),
             text('This custom alert is just for display purposes.'),
           ]),
         },

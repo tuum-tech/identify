@@ -30,21 +30,21 @@ export const getSnaps = async (): Promise<GetSnapsResponse> => {
  */
 export const connectSnap = async (snapId: string = defaultSnapId) => {
   try {
-    const identitySnap = await window.ethereum.request({
+    const identifySnap = await window.ethereum.request({
       method: 'wallet_requestSnaps',
       params: {
         [snapId]: {},
       },
     });
     console.log(
-      'Identity Snap Details: ',
-      JSON.stringify(identitySnap, null, 4),
+      'Identify Snap Details: ',
+      JSON.stringify(identifySnap, null, 4),
     );
     const account = await getCurrentMetamaskAccount();
     console.log('Metamask account: ', account);
     return account;
   } catch (error) {
-    console.log('Could not connect to Identity Snap: ', error);
+    console.log('Could not connect to Identify Snap: ', error);
   }
 };
 
