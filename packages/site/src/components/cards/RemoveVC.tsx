@@ -1,4 +1,4 @@
-import { IDataManagerDeleteResult } from '@tuum-tech/identity-snap/src/veramo/plugins/verifiable-creds-manager';
+import { IDataManagerDeleteResult } from '@tuum-tech/identify/src/veramo/plugins/verifiable-creds-manager';
 import { FC, useContext, useRef, useState } from 'react';
 import Select from 'react-select';
 import { storeOptions } from '../../config/constants';

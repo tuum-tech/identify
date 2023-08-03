@@ -6,7 +6,7 @@ import Row from 'react-bootstrap/Row';
 import {
   HederaAccountParams,
   PublicAccountInfo,
-} from '@tuum-tech/identity-snap/src/interfaces';
+} from '@tuum-tech/identify/src/interfaces';
 import { Card, InstallFlaskButton } from '../components/base';
 import {
   ConfigureGoogleAccount,

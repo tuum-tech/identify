@@ -1,4 +1,4 @@
-import { ProofInfo } from '@tuum-tech/identity-snap/src/types/params';
+import { ProofInfo } from '@tuum-tech/identify/src/types/params';
 import { VerifiablePresentation, W3CVerifiableCredential } from '@veramo/core';
 import { FC, useContext, useRef, useState } from 'react';
 import {

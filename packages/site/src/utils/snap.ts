@@ -3,11 +3,11 @@ import {
   Filter,
   IDataManagerClearArgs,
   IDataManagerDeleteArgs,
-} from '@tuum-tech/identity-snap/src/plugins/veramo/verifiable-creds-manager';
+} from '@tuum-tech/identify/src/plugins/veramo/verifiable-creds-manager';
 import {
   CreateNewHederaAccountRequestParams,
   CreateVPRequestParams,
-} from '@tuum-tech/identity-snap/src/types/params';
+} from '@tuum-tech/identify/src/types/params';
 
 import { VerifiableCredential, VerifiablePresentation } from '@veramo/core';
 import { defaultSnapId } from '../config/snap';

@@ -1,4 +1,4 @@
-import { CreateVCResponseResult } from '@tuum-tech/identity-snap/src/types/params';
+import { CreateVCResponseResult } from '@tuum-tech/identify/src/types/params';
 import { FC, useContext, useRef, useState } from 'react';
 import Select from 'react-select';
 import { storeOptions } from '../../config/constants';

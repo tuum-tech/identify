@@ -1,10 +1,10 @@
 /* eslint-disable no-alert */
-import { PublicAccountInfo } from '@tuum-tech/identity-snap/src/interfaces';
-import { IDataManagerQueryResult } from '@tuum-tech/identity-snap/src/plugins/veramo/verifiable-creds-manager';
+import { PublicAccountInfo } from '@tuum-tech/identify/src/interfaces';
+import { IDataManagerQueryResult } from '@tuum-tech/identify/src/plugins/veramo/verifiable-creds-manager';
 import {
   CreateVPRequestParams,
   ProofInfo,
-} from '@tuum-tech/identity-snap/src/types/params';
+} from '@tuum-tech/identify/src/types/params';
 import { VerifiablePresentation, W3CVerifiableCredential } from '@veramo/core';
 import axios from 'axios';
 import { useContext, useEffect, useState } from 'react';

@@ -1,4 +1,4 @@
-import { HederaMirrorInfo } from '@tuum-tech/identity-snap/src/hedera/service';
+import { HederaMirrorInfo } from '@tuum-tech/identify/src/hedera/service';
 import { FC, useContext, useRef, useState } from 'react';
 import {
   MetaMaskContext,
