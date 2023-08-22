@@ -2,7 +2,6 @@ import {
   AccountId,
   Client,
   Hbar,
-  PrivateKey,
   Status,
   StatusError,
   TransferTransaction,
@@ -13,7 +12,6 @@ import _ from 'lodash';
 import { SimpleHederaClientImpl } from './client';
 import { HederaMirrorInfo, HederaService, SimpleHederaClient } from './service';
 import { WalletHedera } from './wallet/abstract';
-import { PrivateKeySoftwareWallet } from './wallet/software-private-key';
 
 export class HederaServiceImpl implements HederaService {
   private network: string;
@@ -41,6 +39,7 @@ export class HederaServiceImpl implements HederaService {
     const publicKey = await options.walletHedera.getPublicKey(options.keyIndex);
 
     if (publicKey === null) {
+      console.error('Public key is null');
       return null;
     }
 
@@ -52,6 +51,7 @@ export class HederaServiceImpl implements HederaService {
     );
 
     if (!(await testClientOperatorMatch(client))) {
+      console.log('failed testClientOperatorMatch');
       return null;
     }
 
@@ -206,7 +206,7 @@ export async function testClientOperatorMatch(client: Client) {
       return false;
     }
 
-    console.log(
+    console.error(
       `Error while validating private key and account id: ${JSON.stringify(
         err,
         null,
@@ -241,30 +241,39 @@ export async function mirrorNodeQuery(url: RequestInfo | URL) {
 /**
  * To HederaAccountInfo.
  *
- * @param _privateKey - Private Key.
+ * @param _address - EVM address.
  * @param _accountId - Account Id.
  * @param _network - Network.
  */
 export async function isValidHederaAccountInfo(
-  _privateKey: string,
+  _address: string,
   _accountId: string,
   _network: string,
-): Promise<SimpleHederaClient | null> {
-  const accountId = AccountId.fromString(_accountId);
-  const privateKey = PrivateKey.fromStringECDSA(_privateKey);
-  const walletHedera: WalletHedera = new PrivateKeySoftwareWallet(privateKey);
-  const hederaService = new HederaServiceImpl(_network);
+): Promise<boolean> {
+  try {
+    const hederaService = new HederaServiceImpl(_network);
+    const result = (await hederaService.getAccountFromEvmAddres(
+      _address,
+    )) as HederaMirrorInfo;
 
-  const client = await hederaService.createClient({
-    walletHedera,
-    keyIndex: 0,
-    accountId,
-  });
+    if (result === null || _.isEmpty(result)) {
+      console.error(`Response from mirror node is empty`);
+      return false;
+    }
 
-  if (client === null || _.isEmpty(client)) {
-    console.error('Invalid private key or account Id of the operator');
-    return null;
+    if (result.account !== _accountId) {
+      console.error(
+        `The accountId for the given evm address does not match the accountId that was passed`,
+      );
+      return false;
+    }
+  } catch (error) {
+    console.log(
+      'Error while retrieving account info using evm address from the mirror node. Error: ',
+      error,
+    );
+    return false;
   }
 
-  return client;
+  return true;
 }

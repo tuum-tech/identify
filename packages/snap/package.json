@@ -1,6 +1,6 @@
 {
   "name": "@tuum-tech/identify",
-  "version": "1.4.2",
+  "version": "1.5.0",
   "description": "A snap for managing Decentralized Identifiers(DIDs)",
   "keywords": [
     "MetaMask",
@@ -48,11 +48,11 @@
   },
   "dependencies": {
     "@ethersproject/transactions": "^5.7.0",
-    "@hashgraph/sdk": "^2.24.0",
-    "@metamask/key-tree": "^7.0.0",
-    "@metamask/providers": "^10.2.1",
-    "@metamask/snaps-types": "^0.32.2",
-    "@metamask/snaps-ui": "^0.32.2",
+    "@hashgraph/sdk": "2.31.0",
+    "@metamask/key-tree": "^9.0.0",
+    "@metamask/providers": "10.2.1",
+    "@metamask/snaps-types": "^1.0.1",
+    "@metamask/snaps-ui": "^1.0.1",
     "@veramo/core": "5.1.2",
     "@veramo/credential-eip712": "5.1.2",
     "@veramo/credential-ld": "5.1.2",

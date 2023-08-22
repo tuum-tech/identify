@@ -1,4 +1,3 @@
-import { BIP44CoinTypeNode } from '@metamask/key-tree';
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { IIdentifier, MinimalImportableKey } from '@veramo/core';
@@ -17,10 +16,19 @@ import {
   initAccountState,
   updateSnapState,
 } from '../snap/state';
-import { getAddressKeyDeriver, snapGetKeysFromAddress } from '../utils/keyPair';
+import { generateWallet } from '../utils/keyPair';
 import { convertChainIdFromHex } from '../utils/network';
 import { getHederaAccountIfExists } from '../utils/params';
 import { getVeramoAgent } from './agent';
+
+const getCurrentMetamaskAccount = async (
+  metamask: MetaMaskInpageProvider,
+): Promise<string> => {
+  const accounts = (await metamask.request({
+    method: 'eth_requestAccounts',
+  })) as string[];
+  return accounts[0];
+};
 
 /**
  * Veramo Import metamask account.
@@ -44,31 +52,39 @@ export async function veramoImportMetaMaskAccount(
   let privateKey: string;
   let publicKey: string;
   let address: string = evmAddress.toLowerCase();
+  let addressToUseForDid = '';
   let hederaAccountId = '';
 
   if (accountViaPrivateKey) {
     privateKey = accountViaPrivateKey.privateKey;
     publicKey = accountViaPrivateKey.publicKey;
     address = accountViaPrivateKey.address.toLowerCase();
+    addressToUseForDid = address;
     if (validHederaChainID(chainId)) {
       hederaAccountId = accountViaPrivateKey.extraData as string;
     }
   } else {
-    const bip44CoinTypeNode = await getAddressKeyDeriver(snap);
-    const res = await snapGetKeysFromAddress(
-      bip44CoinTypeNode as BIP44CoinTypeNode,
-      state,
-      address,
-      snap,
-    );
+    // Verify if the user is connected to the correct wallet
+    const connectedAddress = await getCurrentMetamaskAccount(metamask);
+    if (address !== connectedAddress) {
+      console.log(
+        `Please connect to the account '${address}' via Metamask first`,
+      );
+      throw new Error(
+        `Please connect to the account '${address}' via Metamask first`,
+      );
+    }
+
+    const res = await generateWallet(address);
 
     if (!res) {
-      console.log('Failed to get private keys from Metamask account');
-      throw new Error('Failed to get private keys from Metamask account');
+      console.log('Failed to generate snap wallet for DID operations');
+      throw new Error('Failed to generate snap wallet for DID operations');
     }
     privateKey = res.privateKey.split('0x')[1];
     publicKey = res.publicKey;
-    address = res.address.toLowerCase();
+    addressToUseForDid = res.address.toLowerCase();
+
     if (validHederaChainID(chainId)) {
       hederaAccountId = await getHederaAccountIfExists(
         state,
@@ -92,13 +108,13 @@ export async function veramoImportMetaMaskAccount(
   }
 
   if (validHederaChainID(chainId)) {
-    const hederaClient = await isValidHederaAccountInfo(
-      privateKey,
-      hederaAccountId,
-      getHederaNetwork(chainId),
-    );
-
-    if (hederaClient === null) {
+    if (
+      !(await isValidHederaAccountInfo(
+        address,
+        hederaAccountId,
+        getHederaNetwork(chainId),
+      ))
+    ) {
       console.error(
         `Could not retrieve hedera account info using the accountId '${hederaAccountId}'`,
       );
@@ -116,7 +132,9 @@ export async function veramoImportMetaMaskAccount(
 
   let did = '';
   if (method === 'did:pkh') {
-    did = `did:pkh:eip155:${convertChainIdFromHex(chainId)}:${address}`;
+    did = `did:pkh:eip155:${convertChainIdFromHex(
+      chainId,
+    )}:${addressToUseForDid}`;
   }
 
   if (!did) {
@@ -126,6 +144,7 @@ export async function veramoImportMetaMaskAccount(
 
   // eslint-disable-next-line
   state.currentAccount.evmAddress = address;
+  state.currentAccount.addrToUseForDid = addressToUseForDid;
 
   // Get Veramo agent
   const agent = await getVeramoAgent(snap, state);
@@ -136,34 +155,42 @@ export async function veramoImportMetaMaskAccount(
 
   let identifier: IIdentifier;
   // Get identifier if it exists
+  console.log('did: ', did);
   try {
     identifier = await agent.didManagerGet({
       did,
     });
   } catch (error) {
-    identifier = await agent.didManagerImport({
-      did,
-      provider: method,
-      controllerKeyId,
-      keys: [
-        {
-          kid: controllerKeyId,
-          type: 'Secp256k1',
-          kms: 'snap',
-          privateKeyHex: privateKey,
-          publicKeyHex: publicKey,
-        } as MinimalImportableKey,
-      ],
-    });
+    try {
+      identifier = await agent.didManagerImport({
+        did,
+        provider: method,
+        controllerKeyId,
+        keys: [
+          {
+            kid: controllerKeyId,
+            type: 'Secp256k1',
+            kms: 'snap',
+            privateKeyHex: privateKey,
+            publicKeyHex: publicKey,
+          } as MinimalImportableKey,
+        ],
+      });
+    } catch (e) {
+      console.log(`Error while creating identifier: ${(e as Error).message}`);
+      throw new Error(
+        `Error while creating identifier: ${(e as Error).message}`,
+      );
+    }
   }
   await updateSnapState(snap, state);
-  console.log('Imported successfully');
+  console.log('Identifier imported successfully: ', identifier);
 
   return {
     evmAddress: address,
+    addrToUseForDid: addressToUseForDid,
     method,
     identifier,
     privateKey,
-    publicKey,
   } as Account;
 }

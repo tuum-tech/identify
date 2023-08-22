@@ -85,9 +85,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   );
   account.extraData = extraData;
 
-  console.log(
-    `Currently connected account: ${JSON.stringify(account, null, 4)}`,
-  );
+  console.log(`Current account: ${JSON.stringify(account, null, 4)}`);
 
   const identitySnapParams: IdentitySnapParams = {
     origin,

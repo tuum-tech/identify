@@ -1,9 +1,11 @@
-import { PublicKey } from '@hashgraph/sdk';
+import { AccountId, PrivateKey, PublicKey } from '@hashgraph/sdk';
 import { BigNumber } from 'bignumber.js';
 import _ from 'lodash';
 import { HederaServiceImpl, isValidHederaAccountInfo } from '../../hedera';
 import { getHederaNetwork, validHederaChainID } from '../../hedera/config';
 import { HederaMirrorInfo, SimpleHederaClient } from '../../hedera/service';
+import { WalletHedera } from '../../hedera/wallet/abstract';
+import { PrivateKeySoftwareWallet } from '../../hedera/wallet/software-private-key';
 import { HederaAccountParams, IdentitySnapParams } from '../../interfaces';
 import { getCurrentNetwork } from '../../snap/network';
 import { CreateNewHederaAccountRequestParams } from '../../types/params';
@@ -48,13 +50,31 @@ export async function createNewHederaAccount(
   }
 
   const network = getHederaNetwork(chainId);
-  const hederaClient = (await isValidHederaAccountInfo(
-    account.privateKey,
-    _accountId,
-    network,
-  )) as SimpleHederaClient;
+  if (
+    !(await isValidHederaAccountInfo(account.evmAddress, _accountId, network))
+  ) {
+    console.error(
+      `Could not retrieve hedera account info using the accountId '${_accountId} and evm address '${account.evmAddress}'`,
+    );
+    throw new Error(
+      `Could not retrieve hedera account info using the accountId '${_accountId} and evm address '${account.evmAddress}'`,
+    );
+  }
 
   const hederaService = new HederaServiceImpl(network);
+  const accountId = AccountId.fromString(_accountId);
+  const privateKey = PrivateKey.fromStringECDSA(account.privateKey);
+  const walletHedera: WalletHedera = new PrivateKeySoftwareWallet(privateKey);
+  const hederaClient = (await hederaService.createClient({
+    walletHedera,
+    keyIndex: 0,
+    accountId,
+  })) as SimpleHederaClient;
+  if (hederaClient === null || _.isEmpty(hederaClient)) {
+    console.error('Invalid private key or account Id of the operator');
+    throw new Error('Invalid private key or account Id of the operator');
+  }
+
   let newAccount = false;
   let result;
   if (newAccountPublickey) {

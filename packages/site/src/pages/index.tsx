@@ -106,7 +106,6 @@ const Index = () => {
                     <dd>Did Method: {accountInfo?.method}</dd>
                     <dd>Did: {accountInfo?.did}</dd>
                     <dd>EVM Address: {accountInfo?.evmAddress}</dd>
-                    <dd>Public Key: {accountInfo?.publicKey}</dd>
                   </>
                 )
               : accountInfo && (
@@ -114,7 +113,6 @@ const Index = () => {
                     <dd>Did Method: {accountInfo?.method}</dd>
                     <dd>Did: {accountInfo?.did}</dd>
                     <dd>EVM Address: {accountInfo?.evmAddress}</dd>
-                    <dd>Public Key: {accountInfo?.publicKey}</dd>
                   </>
                 )}
           </Col>

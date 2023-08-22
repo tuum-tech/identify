@@ -1,4 +1,3 @@
-import { SigningKey } from 'ethers';
 import { validHederaChainID } from '../../hedera/config';
 import {
   HederaAccountParams,
@@ -19,12 +18,9 @@ export async function getAccountInfo(
 ): Promise<PublicAccountInfo> {
   const { state, account } = identitySnapParams;
 
-  const publicKey = SigningKey.computePublicKey(account.publicKey, true);
-
   const publicAccountInfo: PublicAccountInfo = {
     evmAddress: account.evmAddress,
     did: account.identifier.did,
-    publicKey,
     method: account.method,
   };
   const chainId = await getCurrentNetwork(ethereum);

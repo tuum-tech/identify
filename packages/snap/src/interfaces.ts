@@ -6,17 +6,16 @@ import { ManagedPrivateKey } from '@veramo/key-manager';
 
 export type Account = {
   evmAddress: string;
+  addrToUseForDid: string;
   method: string;
   identifier: IIdentifier;
   privateKey: string;
-  publicKey: string;
   extraData?: unknown;
 };
 
 export type PublicAccountInfo = {
   evmAddress: string;
   did: string;
-  publicKey: string;
   method: string;
   extraData?: unknown;
 };
