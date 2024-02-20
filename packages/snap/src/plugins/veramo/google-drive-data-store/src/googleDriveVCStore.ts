@@ -74,7 +74,8 @@ export class GoogleDriveVCStore extends AbstractDataStore {
         .filter((item: any) => {
           return (
             item.metadata.id === (filter.filter as string) &&
-            item.data.credentialSubject.id?.split(':')[4] === account
+            item.data.credentialSubject.id?.split(':')[4] ===
+              this.state.currentAccount.addrToUseForDid
           );
         });
     }
@@ -95,7 +96,8 @@ export class GoogleDriveVCStore extends AbstractDataStore {
         .filter((item: any) => {
           return (
             item.data.type?.includes(filter.filter as string) &&
-            item.data.credentialSubject.id?.split(':')[4] === account
+            item.data.credentialSubject.id?.split(':')[4] ===
+              this.state.currentAccount.addrToUseForDid
           );
         });
     }
@@ -113,7 +115,10 @@ export class GoogleDriveVCStore extends AbstractDataStore {
           };
         })
         .filter((item: any) => {
-          return item.data.credentialSubject.id?.split(':')[4] === account;
+          return (
+            item.data.credentialSubject.id?.split(':')[4] ===
+            this.state.currentAccount.addrToUseForDid
+          );
         });
     }
 
@@ -130,7 +135,10 @@ export class GoogleDriveVCStore extends AbstractDataStore {
           };
         })
         .filter((item: any) => {
-          return item.data.credentialSubject.id?.split(':')[4] === account;
+          return (
+            item.data.credentialSubject.id?.split(':')[4] ===
+            this.state.currentAccount.addrToUseForDid
+          );
         });
       const filteredObjects = jsonpath.query(objects, filter.filter as string);
       return filteredObjects as IQueryResult[];
@@ -163,7 +171,7 @@ export class GoogleDriveVCStore extends AbstractDataStore {
     for (const vc of vcs) {
       if (
         (vc.vc as VerifiableCredential).credentialSubject.id?.split(':')[4] ===
-        account
+        this.state.currentAccount.addrToUseForDid
       ) {
         const newId = vc.id || uuidv4();
         newVCs = { ...newVCs, [newId]: vc.vc };

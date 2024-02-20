@@ -58,6 +58,8 @@ const ConfigureGoogleAccount: FC<Props> = ({
       console.error('Login Failed', e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
     },
+    scope:
+      'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.metadata.readonly',
   });
 
   return (

@@ -18,7 +18,6 @@ export const verifyToken = async (accessToken: string): Promise<string> => {
     if (res.status !== 200) {
       throw new Error(data.error_description);
     }
-    console.log('VerifyToken data: ', JSON.stringify(data, null, 4));
 
     return data.email;
   } catch (error) {
@@ -39,7 +38,6 @@ const searchFile = async (accessToken: string, fileName: string) => {
       },
     );
     const data = await res.json();
-    console.log('searchFile data: ', JSON.stringify(data, null, 4));
 
     const count = data.files.length;
 
@@ -109,7 +107,6 @@ export const uploadToGoogleDrive = async (
       );
     }
     const val = await res.json();
-    console.log({ val });
 
     return val;
   } catch (error) {

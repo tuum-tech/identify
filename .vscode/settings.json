@@ -47,7 +47,7 @@
   "bracket-pair-colorizer-2.depreciation-notice": false,
   "editor.guides.bracketPairs": true,
   "editor.codeActionsOnSave": {
-    "source.organizeImports": true
+    "source.organizeImports": "explicit"
   },
   "editor.fontWeight": "normal",
   "editor.indentSize": "tabSize"
