@@ -18,7 +18,7 @@ const common: Configuration = {
     publicPath: './dist',
   },
   resolve: {
-    extensions: ['.ts', '.js'],
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
     fallback: {
       stream: false,
       assert: require.resolve('assert'),
@@ -90,7 +90,7 @@ const common: Configuration = {
 // Configuration for the Snap bundle
 const snapConfig: Configuration = merge(common, {
   entry: {
-    snap: './src/index.ts',
+    snap: './src/index.tsx',
   },
   output: {
     // Required so that webpack doesn't mangle our `exports` variable

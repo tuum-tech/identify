@@ -7,6 +7,7 @@ module.exports = (api) => {
   const presets = [
     ['@babel/preset-env', { targets: { node: 'current' } }],
     '@babel/preset-typescript',
+    ['@babel/preset-react', { runtime: 'automatic' }],
   ];
   // Plugins needed for class validator tests
   const plugins = [

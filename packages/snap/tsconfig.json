@@ -5,7 +5,9 @@
     "outDir": "./dist",
     "baseUrl": ".",
     "typeRoots": ["./node_modules/@types", "../../node_modules/@types"],
-    "sourceMap": true
+    "sourceMap": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "@metamask/snaps-sdk"
   },
   "files": ["./global.d.ts", "./json-typings.d.ts"],
   "include": ["src/**/*", "tests/**/*", "global.d.ts"]

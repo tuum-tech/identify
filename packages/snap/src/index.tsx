@@ -1,45 +1,37 @@
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
-import { heading, text } from '@metamask/snaps-ui';
+import {
+  OnHomePageHandler,
+  OnInstallHandler,
+  OnUserInputHandler,
+  UserInputEventType,
+} from '@metamask/snaps-sdk';
 import { Account, ExternalAccount, IdentitySnapParams } from './interfaces';
 import { getAccountInfo } from './rpc/account/getAccountInfo';
 import { getAvailableDIDMethods } from './rpc/did/getAvailableDIDMethods';
 import { getCurrentDIDMethod } from './rpc/did/getCurrentDIDMethod';
-import { resolveDID } from './rpc/did/resolveDID';
-import { switchDIDMethod } from './rpc/did/switchDIDMethod';
-import { configureGoogleAccount } from './rpc/gdrive/configureGoogleAccount';
-import { createNewHederaAccount } from './rpc/hedera/createNewHederaAccount';
 import { togglePopups } from './rpc/snap/togglePopups';
-import { createVC } from './rpc/vc/createVC';
-import { createVP } from './rpc/vc/createVP';
-import { deleteAllVCs } from './rpc/vc/deleteAllVCs';
 import { getSupportedProofFormats } from './rpc/vc/getSupportedProofFormats';
-import { getVCs } from './rpc/vc/getVCs';
-import { removeVC } from './rpc/vc/removeVC';
-import { saveVC } from './rpc/vc/saveVC';
 import { syncGoogleVCs } from './rpc/vc/syncGoogleVCs';
-import { verifyVC } from './rpc/vc/verifyVC';
-import { verifyVP } from './rpc/vc/verifyVP';
 import { getCurrentAccount } from './snap/account';
-import { generateCommonPanel } from './snap/dialog';
 import { getSnapStateUnchecked } from './snap/state';
-import { CreateNewHederaAccountRequestParams } from './types/params';
 import { init } from './utils/init';
 import {
   isExternalAccountFlagSet,
-  isValidConfigueGoogleRequest,
-  isValidCreateNewHederaAccountParams,
-  isValidCreateVCRequest,
-  isValidCreateVPRequest,
-  isValidDeleteAllVCsRequest,
-  isValidGetVCsRequest,
   isValidMetamaskAccountParams,
-  isValidRemoveVCRequest,
-  isValidResolveDIDRequest,
-  isValidSaveVCRequest,
-  isValidSwitchMethodRequest,
-  isValidVerifyVCRequest,
-  isValidVerifyVPRequest,
 } from './utils/params';
+import { IdentifySnapFacade } from './snap-classes/IdentifySnapFacade';
+
+export const onInstall: OnInstallHandler = async () => {
+
+};
+
+export const onUserInput: OnUserInputHandler = async ({
+                                                        id,
+                                                        event,
+                                                        context,
+                                                      }) => {
+
+};
 
 /**
  * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
@@ -97,22 +89,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
   switch (request.method) {
     case 'hello': {
-      return snap.request({
-        method: 'snap_dialog',
-        params: {
-          /* 
-            Type can be one of the following:
-            - 'alert': for displaying information.
-            - 'confirmation': for accepting or rejecting some action.
-            - 'prompt': for inputting some information.
-          */
-          type: 'alert',
-          content: await generateCommonPanel(origin, [
-            heading('Hello from Identify Snap!'),
-            text('This custom alert is just for display purposes.'),
-          ]),
-        },
-      });
+      return await IdentifySnapFacade.sendHello();
     }
 
     case 'togglePopups': {
@@ -124,62 +101,43 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     }
 
     case 'createNewHederaAccount': {
-      isValidCreateNewHederaAccountParams(request.params);
-      return await createNewHederaAccount(
-        identitySnapParams,
-        request.params as CreateNewHederaAccountRequestParams,
-      );
+      return await IdentifySnapFacade.createNewHederaAccount(request, identitySnapParams);
     }
 
     case 'resolveDID': {
-      isValidResolveDIDRequest(request.params);
-      return await resolveDID(identitySnapParams, request.params.did);
+      return await IdentifySnapFacade.resolveDID(request, identitySnapParams);
     }
 
     case 'getVCs': {
-      isValidGetVCsRequest(request.params);
-      return await getVCs(identitySnapParams, request.params);
+     return await IdentifySnapFacade.getVCs(request, identitySnapParams);
     }
 
     case 'saveVC': {
-      isValidSaveVCRequest(request.params);
-      return await saveVC(identitySnapParams, request.params);
+      return await IdentifySnapFacade.saveVC(request, identitySnapParams);
     }
 
     case 'createVC': {
-      isValidCreateVCRequest(request.params);
-      return await createVC(identitySnapParams, request.params);
+      return await IdentifySnapFacade.createVC(request, identitySnapParams);
     }
 
     case 'verifyVC': {
-      isValidVerifyVCRequest(request.params);
-      return await verifyVC(
-        identitySnapParams,
-        request.params.verifiableCredential,
-      );
+      return await IdentifySnapFacade.verifyVC(request, identitySnapParams);
     }
 
     case 'removeVC': {
-      isValidRemoveVCRequest(request.params);
-      return await removeVC(identitySnapParams, request.params);
+      return await IdentifySnapFacade.removeVC(request, identitySnapParams);
     }
 
     case 'deleteAllVCs': {
-      isValidDeleteAllVCsRequest(request.params);
-      return await deleteAllVCs(identitySnapParams, request.params);
+      return await IdentifySnapFacade.deleteAllVCs(request, identitySnapParams);
     }
 
     case 'createVP': {
-      isValidCreateVPRequest(request.params);
-      return await createVP(identitySnapParams, request.params);
+      return await IdentifySnapFacade.createVP(request, identitySnapParams);
     }
 
     case 'verifyVP': {
-      isValidVerifyVPRequest(request.params);
-      return await verifyVP(
-        identitySnapParams,
-        request.params.verifiablePresentation,
-      );
+      return await IdentifySnapFacade.verifyVP(request, identitySnapParams);
     }
 
     case 'getAvailableMethods': {
@@ -191,11 +149,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     }
 
     case 'switchDIDMethod': {
-      isValidSwitchMethodRequest(request.params);
-      return await switchDIDMethod(
-        identitySnapParams,
-        request.params.didMethod,
-      );
+      return IdentifySnapFacade.switchDIDMethod(request, identitySnapParams);
     }
 
     case 'getSupportedProofFormats': {
@@ -203,8 +157,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     }
 
     case 'configureGoogleAccount': {
-      isValidConfigueGoogleRequest(request.params);
-      return await configureGoogleAccount(identitySnapParams, request.params);
+      return await IdentifySnapFacade.configureGoogleAccount(request, identitySnapParams);
     }
 
     case 'syncGoogleVCs': {
